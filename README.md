@@ -53,21 +53,19 @@ It's very simple to add pf4j in your application:
 
 In above code, I created a DefaultPluginManager (it's the default implementation for
 PluginManager interface) that load and start all active(resolved) plugins.
-The plugins are stored in a folder. You can specify the plugins folder in constructor of DefaultPluginManager
-or using the constructor without parameters (in this case plugins folder is returned by System.getProperty("pf4j.pluginsDir", "plugins")).
+The plugins are stored in a folder. You can specify the plugins folder in constructor of DefaultPluginManager. If the plugins folder is not specified 
+than the location is returned by System.getProperty("pf4j.pluginsDir", "plugins").
 
 The structure of plugins folder is:
-- plugin1.zip (or plugin1 folder)
-- plugin2.zip (or plugin2 folder)
-...
-- pluginN.zip (or pluginN folder)
+* plugin1.zip (or plugin1 folder)
+* plugin2.zip (or plugin2 folder)
 
 In plugins folder you can put a plugin as folder or archive file (zip).
 A plugin folder has this structure:
-- `classes` folder
-- `lib` folder (optional - if the plugin used third party libraries)
+* `classes` folder
+* `lib` folder (optional - if the plugin used third party libraries)
 
-The plugin manager discovers plugins metadata using a PluginDescriptorFinder. DefaultPluginDescriptorFinder lookup plugin descriptor in MANIFEST.MF file.
+The plugin manager discovers plugins metadata using a PluginDescriptorFinder. DefaultPluginDescriptorFinder lookup plugins descriptors in MANIFEST.MF file.
 In this case the classes/META-INF/MANIFEST.MF looks like:
 
     Manifest-Version: 1.0
