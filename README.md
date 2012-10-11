@@ -8,7 +8,8 @@ Components
 -------------------
 - **Plugin** is the base class for all plugins types. Each plugin is loaded into a separate class loader to avoid conflicts.
 - **PluginManager** is used for all aspects of plugins management (loading, starting, stopping).
-- **ExtensionPoint** is a point in the application where custom code can be invoked. It's a java interface marker.
+- **ExtensionPoint** is a point in the application where custom code can be invoked. It's a java interface marker.   
+Any java interface or abstract class can be marked as extension point (implements _ExtensionPoint_ interface).
 - **Extension** is an implementation of extension point. It's a java annotation on a class.
 
 Artifacts
