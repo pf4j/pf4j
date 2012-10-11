@@ -8,8 +8,8 @@ Components
 -------------------
 - **Plugin** is the base class for all plugins types. Each plugin is loaded into a separate class loader to avoid conflicts.
 - **PluginManager** is used for all aspects of plugins management (loading, starting, stopping).
-- **ExtensionPoint** is a point in the application where custom code can be invoked.
-- **Extension** is an implementation of extension point.
+- **ExtensionPoint** is a point in the application where custom code can be invoked. It's a java interface marker.
+- **Extension** is an implementation of extension point. It's a java annotation on a class.
 
 Artifacts
 -------------------
@@ -51,10 +51,10 @@ It's very simple to add pf4j in your application:
         ...
     }
 
-In above code, I created a DefaultPluginManager (it's the default implementation for
-PluginManager interface) that load and start all active(resolved) plugins.
+In above code, I created a **DefaultPluginManager** (it's the default implementation for
+**PluginManager** interface) that load and start all active(resolved) plugins.
 The plugins are stored in a folder. You can specify the plugins folder in constructor of DefaultPluginManager. If the plugins folder is not specified 
-than the location is returned by System.getProperty("pf4j.pluginsDir", "plugins").
+than the location is returned by `System.getProperty("pf4j.pluginsDir", "plugins")`.
 
 The structure of plugins folder is:
 * plugin1.zip (or plugin1 folder)
@@ -65,8 +65,9 @@ A plugin folder has this structure:
 * `classes` folder
 * `lib` folder (optional - if the plugin used third party libraries)
 
-The plugin manager discovers plugins metadata using a PluginDescriptorFinder. DefaultPluginDescriptorFinder lookup plugins descriptors in MANIFEST.MF file.
-In this case the classes/META-INF/MANIFEST.MF looks like:
+The plugin manager discovers plugins metadata using a **PluginDescriptorFinder**.   
+**DefaultPluginDescriptorFinder** lookup plugins descriptors in MANIFEST.MF file.
+In this case the `classes/META-INF/MANIFEST.MF` looks like:
 
     Manifest-Version: 1.0
     Archiver-Version: Plexus Archiver
@@ -82,7 +83,7 @@ In this case the classes/META-INF/MANIFEST.MF looks like:
 In above manifest I described a plugin with id `welcome-plugin`, with class `org.pf4j.demo.welcome.WelcomePlugin`, with version `0.0.1` and with dependencies 
 to plugins `x, y, z`.
 
-You can define an extension point in your application using ExtensionPoint interface marker.
+You can define an extension point in your application using **ExtensionPoint** interface marker.
 
     public interface Greeting extends ExtensionPoint {
 
@@ -90,7 +91,8 @@ You can define an extension point in your application using ExtensionPoint inter
 
     }
 
-Another important internal component is ExtensionFinder that describes how plugin manager discovers extensions for extensions points. DefaultExtensionFinder look up extensions using Extension annotation.
+Another important internal component is **ExtensionFinder** that describes how plugin manager discovers extensions for extensions points.   
+**DefaultExtensionFinder** look up extensions using **Extension** annotation.
 
     public class WelcomePlugin extends Plugin {
 
@@ -109,7 +111,7 @@ Another important internal component is ExtensionFinder that describes how plugi
 
     }
 
-In above code I supply an extension for the Greeting extension point.
+In above code I supply an extension for the `Greeting` extension point.
 
 You can retrieves all extensions for an extension point with:
 
@@ -124,10 +126,10 @@ For more information please see the demo sources.
 Demo
 -------------------
 
-I have a tiny demo application. In demo/api folder I declared an extension point (Greeting).
-In this demo I have implemented two plugins: plugin1, plugin2 (each plugin with an extension).
+I have a tiny demo application. The demo application is in demo folder.
+In demo/api folder I declared an extension point (_Greeting_).  
+In demo/plugin* I implemented two plugins: plugin1, plugin2 (each plugin add an extension for _Greeting_).  
 
-The demo application is in demo folder.
 To run the demo application use:  
  
     ./run-demo.sh
