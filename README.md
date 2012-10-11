@@ -126,10 +126,8 @@ For more information please see the demo sources.
 Demo
 -------------------
 
-I have a tiny demo application. In this demo I have implemented two widgets types:
-a chart widget (using open flash chart) and a text widget (display a Lorem Ipsum).
-You can drag and drop widgets, perform some actions on each widget, add or remove new
-widgets, change widget settings, collapse widgets.
+I have a tiny demo application. In demo/api folder I declared an extension point (Greeting).
+In this demo I have implemented two plugins: plugin1, plugin2 (each plugin with an extension).
 
 The demo application is in demo folder.
 To run the demo application use:  
