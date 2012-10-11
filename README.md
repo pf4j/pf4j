@@ -74,7 +74,7 @@ In this case the classes/META-INF/MANIFEST.MF looks like:
     Built-By: decebal
     Build-Jdk: 1.6.0_17
     Plugin-Class: org.pf4j.demo.welcome.WelcomePlugin
-    Plugin-Dependencies: x, y z
+    Plugin-Dependencies: x, y, z
     Plugin-Id: welcome-plugin
     Plugin-Provider: Decebal Suiu
     Plugin-Version: 0.0.1
