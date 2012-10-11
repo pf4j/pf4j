@@ -53,7 +53,9 @@ It's very simple to add pf4j in your application:
     }
 
 In above code, I created a **DefaultPluginManager** (it's the default implementation for
-**PluginManager** interface) that load and start all active(resolved) plugins.
+**PluginManager** interface) that load and start all active(resolved) plugins.  
+The available plugins are loaded using a **PluginClassLoader**.   
+The **PluginClassLoader** contains only classes found in _classes_ and _lib_ folders of plugin and runtime classes and libraries of plugins that are required plugin. 
 The plugins are stored in a folder. You can specify the plugins folder in constructor of DefaultPluginManager. If the plugins folder is not specified 
 than the location is returned by `System.getProperty("pf4j.pluginsDir", "plugins")`.
 
