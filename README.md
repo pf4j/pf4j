@@ -30,7 +30,7 @@ In your pom.xml you must define the dependencies to PF4J artifacts with:
 
 ```xml
 <dependency>
-    <groupId>org.pf4j</groupId>
+    <groupId>ro.fortsoft.pf4j</groupId>
     <artifactId>pf4j</artifactId>
     <version>${pf4j.version}</version>
 </dependency>    
@@ -77,13 +77,13 @@ In this case the `classes/META-INF/MANIFEST.MF` looks like:
     Created-By: Apache Maven
     Built-By: decebal
     Build-Jdk: 1.6.0_17
-    Plugin-Class: org.pf4j.demo.welcome.WelcomePlugin
+    Plugin-Class: ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
     Plugin-Dependencies: x, y, z
     Plugin-Id: welcome-plugin
     Plugin-Provider: Decebal Suiu
     Plugin-Version: 0.0.1
 
-In above manifest I described a plugin with id `welcome-plugin`, with class `org.pf4j.demo.welcome.WelcomePlugin`, with version `0.0.1` and with dependencies 
+In above manifest I described a plugin with id `welcome-plugin`, with class `ro.fortsoft.pf4j.demo.welcome.WelcomePlugin`, with version `0.0.1` and with dependencies 
 to plugins `x, y, z`.
 
 You can define an extension point in your application using **ExtensionPoint** interface marker.
