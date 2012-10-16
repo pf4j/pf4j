@@ -19,6 +19,6 @@ cp demo/plugin2/target/pf4j-demo-plugin2-*.zip demo-dist/plugins/
 
 # run demo
 cd demo-dist
-java -jar pf4j-demo-app-*.jar
+java -jar pf4j-demo-app-*-SNAPSHOT.jar
 cd -
 
