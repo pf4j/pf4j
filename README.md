@@ -1,16 +1,16 @@
 Plugin Framework for Java (PF4J)
 =====================
 
-A plugin is a way for a third party to extend the functionality of an application. A plugin implements extensions points
-declared by application or another plugins. Also a plugin can defines extension points.
+A plugin is a way for a third party to extend the functionality of an application. A plugin implements extension points
+declared by application or other plugins. Also a plugin can define extension points.
 
 Components
 -------------------
 - **Plugin** is the base class for all plugins types. Each plugin is loaded into a separate class loader to avoid conflicts.
 - **PluginManager** is used for all aspects of plugins management (loading, starting, stopping).
 - **ExtensionPoint** is a point in the application where custom code can be invoked. It's a java interface marker.   
-Any java interface or abstract class can be marked as extension point (implements _ExtensionPoint_ interface).
-- **Extension** is an implementation of extension point. It's a java annotation on a class.
+Any java interface or abstract class can be marked as an extension point (implements _ExtensionPoint_ interface).
+- **Extension** is an implementation of an extension point. It's a java annotation on a class.
 
 Artifacts
 -------------------
@@ -53,10 +53,10 @@ It's very simple to add pf4j in your application:
     }
 
 In above code, I created a **DefaultPluginManager** (it's the default implementation for
-**PluginManager** interface) that load and start all active(resolved) plugins.  
+**PluginManager** interface) that loads and starts all active(resolved) plugins.  
 The available plugins are loaded using a **PluginClassLoader**.   
-The **PluginClassLoader** contains only classes found in _classes_ and _lib_ folders of plugin and runtime classes and libraries of plugins that are required plugin. 
-The plugins are stored in a folder. You can specify the plugins folder in constructor of DefaultPluginManager. If the plugins folder is not specified 
+The **PluginClassLoader** contains only classes found in _classes_ and _lib_ folders of plugin and runtime classes and libraries of the required plugins. 
+The plugins are stored in a folder. You can specify the plugins folder in the constructor of DefaultPluginManager. If the plugins folder is not specified 
 than the location is returned by `System.getProperty("pf4j.pluginsDir", "plugins")`.
 
 The structure of plugins folder is:
@@ -68,9 +68,9 @@ A plugin folder has this structure:
 * `classes` folder
 * `lib` folder (optional - if the plugin used third party libraries)
 
-The plugin manager discovers plugins metadata using a **PluginDescriptorFinder**.   
-**DefaultPluginDescriptorFinder** lookup plugins descriptors in MANIFEST.MF file.
-In this case the `classes/META-INF/MANIFEST.MF` looks like:
+The plugin manager searches plugins metadata using a **PluginDescriptorFinder**.   
+**DefaultPluginDescriptorFinder** lookups plugins descriptors in MANIFEST.MF file.
+In this case the `classes/META-INF/MANIFEST.MF` file looks like:
 
     Manifest-Version: 1.0
     Archiver-Version: Plexus Archiver
@@ -95,7 +95,7 @@ You can define an extension point in your application using **ExtensionPoint** i
     }
 
 Another important internal component is **ExtensionFinder** that describes how plugin manager discovers extensions for extensions points.   
-**DefaultExtensionFinder** look up extensions using **Extension** annotation.
+**DefaultExtensionFinder** looks up extensions using **Extension** annotation.
 
     public class WelcomePlugin extends Plugin {
 
@@ -116,7 +116,7 @@ Another important internal component is **ExtensionFinder** that describes how p
 
 In above code I supply an extension for the `Greeting` extension point.
 
-You can retrieves all extensions for an extension point with:
+You can retrieve all extensions for an extension point with:
 
     List<ExtensionWrapper<Greeting>> greetings = pluginManager.getExtensions(Greeting.class);
     for (ExtensionWrapper<Greeting> greeting : greetings) {
@@ -131,7 +131,7 @@ Demo
 
 I have a tiny demo application. The demo application is in demo folder.
 In demo/api folder I declared an extension point (_Greeting_).  
-In demo/plugin* I implemented two plugins: plugin1, plugin2 (each plugin add an extension for _Greeting_).  
+In demo/plugin* I implemented two plugins: plugin1, plugin2 (each plugin adds an extension for _Greeting_).  
 
 To run the demo application use:  
  
