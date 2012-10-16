@@ -23,6 +23,7 @@
 
     <properties>
         <main.class>ro.fortsoft.pf4j.demo.Boot</main.class>
+        <slf4j.version>1.6.4</slf4j.version>
     </properties>
     
     <build>
@@ -79,10 +80,30 @@
             <artifactId>pf4j</artifactId>
             <version>${project.version}</version>
         </dependency>    
+
         <dependency>
             <groupId>ro.fortsoft.pf4j.demo</groupId>
             <artifactId>pf4j-demo-api</artifactId>
             <version>${project.version}</version>
+        </dependency>        
+
+        <!-- Logs -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>        
     </dependencies>
     
