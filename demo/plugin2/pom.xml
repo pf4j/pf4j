@@ -20,27 +20,37 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    
+    <properties>
+        <plugin.id>hello-plugin</plugin.id>
+        <plugin.class>ro.fortsoft.pf4j.demo.hello.HelloPlugin</plugin.class>
+        <plugin.version>0.0.1</plugin.version>
+        <plugin.provider>Decebal Suiu</plugin.provider>
+        <plugin.dependencies></plugin.dependencies>
+    </properties>   
 
     <build>
         <plugins>
+            <!-- DOESN'T WORK WITH MAVEN 3 (I defined the plugin metadata in properties section)
             <plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<phase>initialize</phase>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<configuration>
-							<files>
-								<file>plugin.properties</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>plugin.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
+            -->
         
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -66,28 +76,19 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.3</version>
                 <configuration>
-                    <appendAssemblyId>false</appendAssemblyId>
                     <descriptors>
                         <descriptor>
                             src/main/assembly/assembly.xml
                         </descriptor>
                     </descriptors>
-                    <archive>
-                        <manifestEntries>
-                            <Plugin-Id>${plugin.id}</Plugin-Id>
-                            <Plugin-Class>${plugin.class}</Plugin-Class>
-                            <Plugin-Version>${plugin.version}</Plugin-Version>
-                            <Plugin-Provider>${plugin.provider}</Plugin-Provider>
-                            <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>
-                        </manifestEntries>
-                    </archive>                    
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
                         <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>attached</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -96,6 +97,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
