@@ -28,13 +28,13 @@ class PluginClassLoader extends URLClassLoader {
 	private static final String PLUGIN_PACKAGE_PREFIX = "ro.fortsoft.pf4j.";
 
 	private PluginManager pluginManager;
-	private PluginWrapper pluginWrapper;
-
-	public PluginClassLoader(PluginManager pluginManager, PluginWrapper pluginWrapper, ClassLoader parent) {
+	private PluginDescriptor pluginDescriptor;
+	
+	public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
 		super(new URL[0], parent);
 		
 		this.pluginManager = pluginManager;
-		this.pluginWrapper = pluginWrapper;
+		this.pluginDescriptor = pluginDescriptor;
 	}
 
 	@Override
@@ -74,9 +74,9 @@ class PluginClassLoader extends URLClassLoader {
         }
 
         // look in dependencies
-        List<String> dependencies = pluginWrapper.getDescriptor().getDependencies();
-        for (String dependency : dependencies) {
-        	PluginClassLoader classLoader = pluginManager.getPluginClassLoader(dependency);
+        List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
+        for (PluginDependency dependency : dependencies) {
+        	PluginClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
         	try {
         		return classLoader.loadClass(className);
         	} catch (ClassNotFoundException e) {

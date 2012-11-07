@@ -33,12 +33,11 @@ class PluginDescriptor {
     private String pluginClass;
     private PluginVersion version;
     private String provider;
-    private String pluginPath;
-    private List<String> dependencies;
+    private List<PluginDependency> dependencies;
     private PluginClassLoader pluginClassLoader;
 
     public PluginDescriptor() {
-        dependencies = new ArrayList<String>();
+        dependencies = new ArrayList<PluginDependency>();
     }
 
     /**
@@ -70,17 +69,10 @@ class PluginDescriptor {
     }
 
     /**
-     * Returns the path of this plugin relative to plugins directory.
-     */
-    public String getPluginPath() {
-        return pluginPath;
-    }
-
-    /**
      * Returns all dependencies declared by this plugin.
      * Returns an empty array if this plugin does not declare any require.
      */
-    public List<String> getDependencies() {
+    public List<PluginDependency> getDependencies() {
         return dependencies;
     }
 
@@ -100,7 +92,6 @@ class PluginDescriptor {
             .append("pluginClass", pluginClass)
             .append("version", version)
             .append("provider", provider)
-            .append("pluginPath", pluginPath)
             .append("dependencies", dependencies)
             .toString();
     }
@@ -120,14 +111,14 @@ class PluginDescriptor {
     void setProvider(String provider) {
         this.provider = provider;
     }
-
-    void setPluginPath(String pluginPath) {
-        this.pluginPath = pluginPath;
-    }
     
     void setDependencies(String dependencies) {
     	if (dependencies != null) {
-    		this.dependencies = Arrays.asList(StringUtils.split(dependencies, ','));
+    		this.dependencies = new ArrayList<PluginDependency>();
+    		List<String> tokens = Arrays.asList(StringUtils.split(dependencies, ','));
+    		for (String dependency : tokens) {
+    			this.dependencies.add(new PluginDependency(dependency));
+    		}
     	} else {
     		this.dependencies = Collections.emptyList();
     	}

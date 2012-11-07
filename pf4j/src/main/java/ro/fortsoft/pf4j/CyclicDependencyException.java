@@ -12,38 +12,17 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.util.List;
-
 /**
- * Provides the functionality for plugin management such as load,
- * start and stop the plugins.
- *
+ * CyclicDependencyException will be thrown if a cyclic dependency is detected.
+ * 
  * @author Decebal Suiu
  */
-public interface PluginManager {
+class CyclicDependencyException extends PluginException {
 
-    /**
-     * Retrieves all plugins.
-     */
-    public List<PluginWrapper> getPlugins();
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Load plugins.
-     */
-    public void loadPlugins();
+	public CyclicDependencyException(String message) {
+		super(message);
+	}
 
-    /**
-     * Start all active plugins.
-     */
-    public void startPlugins();
-
-    /**
-     * Stop all active plugins.
-     */
-    public void stopPlugins();
-
-	public PluginClassLoader getPluginClassLoader(String pluginId);
-
-	public <T> List<T> getExtensions(Class<T> type);
-	
 }

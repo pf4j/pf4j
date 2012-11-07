@@ -15,8 +15,6 @@ package ro.fortsoft.pf4j;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +27,6 @@ import ro.fortsoft.pf4j.util.DirectoryFilter;
 import ro.fortsoft.pf4j.util.UberClassLoader;
 import ro.fortsoft.pf4j.util.Unzip;
 import ro.fortsoft.pf4j.util.ZipFilter;
-
 
 /**
  * Default implementation of the PluginManager interface.
@@ -52,7 +49,7 @@ public class DefaultPluginManager implements PluginManager {
     /**
      * A map of plugins this manager is responsible for (the key is the 'pluginId').
      */
-    private Map<String, Plugin> plugins;
+    private Map<String, PluginWrapper> plugins;
 
     /**
      * A map of plugin class loaders (he key is the 'pluginId').
@@ -67,17 +64,17 @@ public class DefaultPluginManager implements PluginManager {
     /**
      * A list with unresolved plugins (unresolved dependency).
      */
-    private List<Plugin> unresolvedPlugins;
+    private List<PluginWrapper> unresolvedPlugins;
 
     /**
      * A list with resolved plugins (resolved dependency).
      */
-    private List<Plugin> resolvedPlugins;
+    private List<PluginWrapper> resolvedPlugins;
 
     /**
      * A list with disabled plugins.
      */
-    private List<Plugin> disabledPlugins;
+    private List<PluginWrapper> disabledPlugins;
     
     private UberClassLoader uberClassLoader;
 
@@ -96,12 +93,12 @@ public class DefaultPluginManager implements PluginManager {
      */
     public DefaultPluginManager(File pluginsDirectory) {
         this.pluginsDirectory = pluginsDirectory;
-        plugins = new HashMap<String, Plugin>();
+        plugins = new HashMap<String, PluginWrapper>();
         pluginClassLoaders = new HashMap<String, PluginClassLoader>();
         pathToIdMap = new HashMap<String, String>();
-        unresolvedPlugins = new ArrayList<Plugin>();
-        resolvedPlugins = new ArrayList<Plugin>();
-        disabledPlugins = new ArrayList<Plugin>();
+        unresolvedPlugins = new ArrayList<PluginWrapper>();
+        resolvedPlugins = new ArrayList<PluginWrapper>();
+        disabledPlugins = new ArrayList<PluginWrapper>();
         pluginDescriptorFinder = new DefaultPluginDescriptorFinder();
         uberClassLoader = new UberClassLoader();
         extensionFinder = new DefaultExtensionFinder(uberClassLoader);
@@ -110,23 +107,23 @@ public class DefaultPluginManager implements PluginManager {
     /**
      * Retrieves all active plugins.
      */
-    public List<Plugin> getPlugins() {
-        return new ArrayList<Plugin>(plugins.values());
+    public List<PluginWrapper> getPlugins() {
+        return new ArrayList<PluginWrapper>(plugins.values());
     }
 
-	public List<Plugin> getResolvedPlugins() {
+	public List<PluginWrapper> getResolvedPlugins() {
 		return resolvedPlugins;
 	}
 
-	public Plugin getPlugin(String pluginId) {
+	public PluginWrapper getPlugin(String pluginId) {
 		return plugins.get(pluginId);
 	}
 
-    public List<Plugin> getUnresolvedPlugins() {
+    public List<PluginWrapper> getUnresolvedPlugins() {
 		return unresolvedPlugins;
 	}
 
-	public List<Plugin> getDisabledPlugins() {
+	public List<PluginWrapper> getDisabledPlugins() {
 		return disabledPlugins;
 	}
 
@@ -134,13 +131,13 @@ public class DefaultPluginManager implements PluginManager {
      * Start all active plugins.
      */
     public void startPlugins() {
-    	List<Plugin> resolvedPlugins = getResolvedPlugins();
-        for (Plugin plugin : resolvedPlugins) {
+    	List<PluginWrapper> resolvedPlugins = getResolvedPlugins();
+        for (PluginWrapper pluginWrapper : resolvedPlugins) {
             try {
-				plugin.start();
+            	LOG.info("Start plugin '" + pluginWrapper.getDescriptor().getPluginId() + "'");
+				pluginWrapper.getPlugin().start();
 			} catch (PluginException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error(e.getMessage(), e);
 			}
         }
     }
@@ -149,13 +146,13 @@ public class DefaultPluginManager implements PluginManager {
      * Stop all active plugins.
      */
     public void stopPlugins() {
-    	List<Plugin> resolvedPlugins = getResolvedPlugins();
-        for (Plugin plugin : resolvedPlugins) {
+    	List<PluginWrapper> resolvedPlugins = getResolvedPlugins();
+        for (PluginWrapper pluginWrapper : resolvedPlugins) {
             try {
-				plugin.stop();
+            	LOG.info("Stop plugin '" + pluginWrapper.getDescriptor().getPluginId() + "'");
+            	pluginWrapper.getPlugin().stop();
 			} catch (PluginException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error(e.getMessage(), e);
 			}
         }
     }
@@ -178,7 +175,6 @@ public class DefaultPluginManager implements PluginManager {
 				expandPluginArchive(zipFile);
 			} catch (IOException e) {
 				LOG.error(e.getMessage(), e);
-				e.printStackTrace();
 			}
         }
 
@@ -188,9 +184,8 @@ public class DefaultPluginManager implements PluginManager {
         for (String directory : directories) {
             try {
                 loadPlugin(directory);
-            } catch (Exception e) {
+            } catch (PluginException e) {
 				LOG.error(e.getMessage(), e);
-                e.printStackTrace();
             }
         }
 
@@ -201,7 +196,11 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         // resolve 'unresolvedPlugins'
-        resolvePlugins();
+        try {
+			resolvePlugins();
+		} catch (PluginException e) {
+			LOG.error(e.getMessage(), e);
+		}
     }
 
     /**
@@ -211,11 +210,17 @@ public class DefaultPluginManager implements PluginManager {
     	return pluginClassLoaders.get(pluginId);
     }
 
-	public <T> List<ExtensionWrapper<T>> getExtensions(Class<T> type) {
-		return extensionFinder.find(type);
+	public <T> List<T> getExtensions(Class<T> type) {
+		List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
+		List<T> extensions = new ArrayList<T>(extensionsWrapper.size());
+		for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
+			extensions.add(extensionWrapper.getInstance());
+		}
+		
+		return extensions;
 	}
 	
-	private void loadPlugin(String fileName) throws Exception {
+	private void loadPlugin(String fileName) throws PluginException {
         // test for plugin directory
         File pluginDirectory = new File(pluginsDirectory, fileName);
         if (!pluginDirectory.isDirectory()) {
@@ -244,25 +249,20 @@ public class DefaultPluginManager implements PluginManager {
 
         // load plugin
         LOG.debug("Loading plugin '" + pluginPath + "'");
-        PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor);
-        PluginLoader pluginLoader = new PluginLoader(this, pluginWrapper, pluginDirectory);
+        PluginLoader pluginLoader = new PluginLoader(this, pluginDescriptor, pluginDirectory);
         pluginLoader.load();
         LOG.debug("Loaded plugin '" + pluginPath + "'");
         
-        // set some variables in plugin wrapper
-        pluginWrapper.setPluginPath(pluginPath);
-        pluginWrapper.setPluginClassLoader(pluginLoader.getPluginClassLoader());
-
-        // create the plugin instance
-        LOG.debug("Creating instance for plugin '" + pluginPath + "'");
-        Plugin plugin = getPluginInstance(pluginWrapper, pluginLoader);
-        LOG.debug("Created instance '" + plugin + "' for plugin '" + pluginPath + "'");
+        // create the plugin wrapper
+        LOG.debug("Creating wrapper for plugin '" + pluginPath + "'");
+        PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor, pluginPath, pluginLoader.getPluginClassLoader());
+        LOG.debug("Created wrapper '" + pluginWrapper + "' for plugin '" + pluginPath + "'");
 
         String pluginId = pluginDescriptor.getPluginId();
 
         // add plugin to the list with plugins
-        plugins.put(pluginId, plugin);
-        unresolvedPlugins.add(plugin);
+        plugins.put(pluginId, pluginWrapper);
+        unresolvedPlugins.add(pluginWrapper);
 
         // add plugin class loader to the list with class loaders
         PluginClassLoader pluginClassLoader = pluginLoader.getPluginClassLoader();
@@ -289,39 +289,17 @@ public class DefaultPluginManager implements PluginManager {
         }
     }
 
-    private Plugin getPluginInstance(PluginWrapper pluginWrapper, PluginLoader pluginLoader)
-    		throws Exception {
-    	String pluginClassName = pluginWrapper.getDescriptor().getPluginClass();
-
-        ClassLoader pluginClassLoader = pluginLoader.getPluginClassLoader();
-        Class<?> pluginClass = pluginClassLoader.loadClass(pluginClassName);
-
-        // once we have the class, we can do some checks on it to ensure
-        // that it is a valid implementation of a plugin.
-        int modifiers = pluginClass.getModifiers();
-        if (Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)
-                || (!Plugin.class.isAssignableFrom(pluginClass))) {
-            throw new PluginException("The plugin class '" + pluginClassName
-                    + "' is not compatible.");
-        }
-
-        // create the plugin instance
-        Constructor<?> constructor = pluginClass.getConstructor(new Class[] { PluginWrapper.class });
-        Plugin plugin = (Plugin) constructor.newInstance(new Object[] { pluginWrapper });
-
-        return plugin;
-    }
-
-	private void resolvePlugins() {
-        resolveDependencies();
+	private void resolvePlugins() throws PluginException {
+		resolveDependencies();
 	}
 
-	private void resolveDependencies() {
+	private void resolveDependencies() throws PluginException {
 		DependencyResolver dependencyResolver = new DependencyResolver(unresolvedPlugins);
-        resolvedPlugins = dependencyResolver.getSortedDependencies();
-        for (Plugin plugin : resolvedPlugins) {
-        	unresolvedPlugins.remove(plugin);
-        	uberClassLoader.addLoader(plugin.getWrapper().getPluginClassLoader());
+		resolvedPlugins = dependencyResolver.getSortedPlugins();
+        for (PluginWrapper pluginWrapper : resolvedPlugins) {
+        	unresolvedPlugins.remove(pluginWrapper);
+        	uberClassLoader.addLoader(pluginWrapper.getPluginClassLoader());
+        	LOG.info("Plugin '" + pluginWrapper.getDescriptor().getPluginId() + "' resolved");
         }
 	}
 

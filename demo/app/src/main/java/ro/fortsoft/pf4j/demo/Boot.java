@@ -17,7 +17,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import ro.fortsoft.pf4j.DefaultPluginManager;
-import ro.fortsoft.pf4j.ExtensionWrapper;
 import ro.fortsoft.pf4j.PluginManager;
 import ro.fortsoft.pf4j.demo.api.Greeting;
 
@@ -37,9 +36,9 @@ public class Boot {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
         
-        List<ExtensionWrapper<Greeting>> greetings = pluginManager.getExtensions(Greeting.class);
-        for (ExtensionWrapper<Greeting> greeting : greetings) {
-        	System.out.println(">>> " + greeting.getInstance().getGreeting());
+        List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);
+        for (Greeting greeting : greetings) {
+        	System.out.println(">>> " + greeting.getGreeting());
         }
         
         pluginManager.stopPlugins();

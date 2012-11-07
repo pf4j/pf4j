@@ -12,6 +12,12 @@
  */
 package ro.fortsoft.pf4j;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 /**
  * A wrapper over plugin instance.
  *
@@ -22,9 +28,20 @@ public class PluginWrapper {
 	PluginDescriptor descriptor;
 	String pluginPath;
 	PluginClassLoader pluginClassLoader;
+	Plugin plugin;
 	
-	public PluginWrapper(PluginDescriptor descriptor) {
+	public PluginWrapper(PluginDescriptor descriptor, String pluginPath, PluginClassLoader pluginClassLoader) {
 		this.descriptor = descriptor;
+		this.pluginPath = pluginPath;
+		this.pluginClassLoader = pluginClassLoader;
+		
+		// TODO
+		try {
+			plugin = createPluginInstance();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
     /**
@@ -50,12 +67,36 @@ public class PluginWrapper {
     	return pluginClassLoader;
     }
 
-	void setPluginPath(String pluginPath) {
-		this.pluginPath = pluginPath;
+    public Plugin getPlugin() {
+		return plugin;
 	}
 
-	void setPluginClassLoader(PluginClassLoader pluginClassLoader) {
-		this.pluginClassLoader = pluginClassLoader;
-	}
+	private Plugin createPluginInstance() throws Exception {
+    	String pluginClassName = descriptor.getPluginClass();
+        Class<?> pluginClass = pluginClassLoader.loadClass(pluginClassName);
+
+        // once we have the class, we can do some checks on it to ensure
+        // that it is a valid implementation of a plugin.
+        int modifiers = pluginClass.getModifiers();
+        if (Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)
+                || (!Plugin.class.isAssignableFrom(pluginClass))) {
+            throw new PluginException("The plugin class '" + pluginClassName + "' is not compatible.");
+        }
+
+        // create the plugin instance
+        Constructor<?> constructor = pluginClass.getConstructor(new Class[] { PluginWrapper.class });
+        Plugin plugin = (Plugin) constructor.newInstance(new Object[] { this });
+
+        return plugin;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+            .append("descriptor", descriptor)
+            .append("pluginPath", pluginPath)
+            .append("plugin", plugin)
+            .toString();
+    }
 
 }

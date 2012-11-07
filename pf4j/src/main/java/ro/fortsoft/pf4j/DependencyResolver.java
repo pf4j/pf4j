@@ -28,24 +28,24 @@ class DependencyResolver {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DependencyResolver.class);
 	
-    private List<Plugin> plugins;
+    private List<PluginWrapper> plugins;
 
-	public DependencyResolver(List<Plugin> plugins) {
+	public DependencyResolver(List<PluginWrapper> plugins) {
 		this.plugins = plugins;
 	}
 
 	/**
 	 * Get the list of plugins in dependency sorted order.
 	 */
-	public List<Plugin> getSortedDependencies() {
+	public List<PluginWrapper> getSortedPlugins() throws PluginException {
 		DirectedGraph<String> graph = new DirectedGraph<String>();
-		for (Plugin plugin : plugins) {
-			PluginDescriptor descriptor = plugin.getWrapper().getDescriptor();
+		for (PluginWrapper pluginWrapper : plugins) {
+			PluginDescriptor descriptor = pluginWrapper.getDescriptor();
 			String pluginId = descriptor.getPluginId();
-			List<String> dependencies = descriptor.getDependencies();
+			List<PluginDependency> dependencies = descriptor.getDependencies();
 			if (!dependencies.isEmpty()) {
-				for (String dependency : dependencies) {
-					graph.addEdge(pluginId, dependency);
+				for (PluginDependency dependency : dependencies) {
+					graph.addEdge(pluginId, dependency.getPluginId());
 				}
 			} else {
 				graph.addVertex(pluginId);
@@ -56,12 +56,11 @@ class DependencyResolver {
 		List<String> pluginsId = graph.reverseTopologicalSort();
 
 		if (pluginsId == null) {
-			LOG.error("Cyclic dependences !!!");
-			return null;
+			throw new CyclicDependencyException("Cyclic dependences !!!" + graph.toString());
 		}
 
 		LOG.debug("Plugins order: " + pluginsId);
-		List<Plugin> sortedPlugins = new ArrayList<Plugin>();
+		List<PluginWrapper> sortedPlugins = new ArrayList<PluginWrapper>();
 		for (String pluginId : pluginsId) {
 			sortedPlugins.add(getPlugin(pluginId));
 		}
@@ -69,14 +68,14 @@ class DependencyResolver {
 		return sortedPlugins;
 	}
 
-	private Plugin getPlugin(String pluginId) {
-		for (Plugin plugin : plugins) {
-			if (pluginId.equals(plugin.getWrapper().getDescriptor().getPluginId())) {
-				return plugin;
+	private PluginWrapper getPlugin(String pluginId) throws PluginNotFoundException {
+		for (PluginWrapper pluginWrapper : plugins) {
+			if (pluginId.equals(pluginWrapper.getDescriptor().getPluginId())) {
+				return pluginWrapper;
 			}
 		}
 
-		return null;
+		throw new PluginNotFoundException(pluginId);
 	}
 
 }

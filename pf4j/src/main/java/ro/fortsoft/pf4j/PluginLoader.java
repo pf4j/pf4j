@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.util.DirectoryFilter;
 import ro.fortsoft.pf4j.util.JarFilter;
 
-
 /**
  * Load all informations needed by a plugin.
  * This means add all jar files from 'lib' directory, 'classes'
@@ -53,12 +52,12 @@ class PluginLoader {
 
     private PluginClassLoader pluginClassLoader;
 
-    public PluginLoader(PluginManager pluginManager, PluginWrapper pluginWrapper, File pluginRepository) {
+    public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository) {
         this.pluginRepository = pluginRepository;
         classesDirectory = new File(pluginRepository, "classes");
         libDirectory = new File(pluginRepository, "lib");
         ClassLoader parent = getClass().getClassLoader(); 
-        pluginClassLoader = new PluginClassLoader(pluginManager, pluginWrapper, parent);        
+        pluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, parent);        
         LOG.debug("Created class loader " + pluginClassLoader);
     }
 

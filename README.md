@@ -20,12 +20,6 @@ Artifacts
 Using Maven
 -------------------
 
-First you must install the pf4j artifacts in your local maven repository with:
-
-    mvn clean install
-
-I will upload these artifacts in maven central repository as soon as possible.
-
 In your pom.xml you must define the dependencies to PF4J artifacts with:
 
 ```xml
@@ -43,8 +37,8 @@ How to use
 It's very simple to add pf4j in your application:
 
     public static void main(String[] args) {
-    	...
-    	
+        ...
+        
         PluginManager pluginManager = new DefaultPluginManager();
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
@@ -118,11 +112,15 @@ In above code I supply an extension for the `Greeting` extension point.
 
 You can retrieve all extensions for an extension point with:
 
-    List<ExtensionWrapper<Greeting>> greetings = pluginManager.getExtensions(Greeting.class);
-    for (ExtensionWrapper<Greeting> greeting : greetings) {
-    	System.out.println(">>> " + greeting.getInstance().getGreeting());
+    List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);
+    for (Greeting greeting : greetings) {
+        System.out.println(">>> " + greeting.getGreeting());
     }
 
+The output is:
+
+    >>> Welcome
+    >>> Hello
 
 For more information please see the demo sources.
 
