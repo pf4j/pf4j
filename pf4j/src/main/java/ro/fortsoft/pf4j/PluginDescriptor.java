@@ -13,7 +13,6 @@
 package ro.fortsoft.pf4j;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -107,10 +106,21 @@ public class PluginDescriptor {
     
     void setDependencies(String dependencies) {
     	if (dependencies != null) {
-    		this.dependencies = new ArrayList<PluginDependency>();
-    		List<String> tokens = Arrays.asList(dependencies.split(","));
-    		for (String dependency : tokens) {
-    			this.dependencies.add(new PluginDependency(dependency));
+    		dependencies = dependencies.trim();
+    		if (dependencies.isEmpty()) {
+    			this.dependencies = Collections.emptyList();
+    		} else {
+	    		this.dependencies = new ArrayList<PluginDependency>();
+	    		String[] tokens = dependencies.split(",");    		
+	    		for (String dependency : tokens) {
+	    			dependency = dependency.trim();
+	    			if (!dependency.isEmpty()) {
+	    				this.dependencies.add(new PluginDependency(dependency));
+	    			}
+	    		}
+	    		if (this.dependencies.isEmpty()) {
+	    			this.dependencies = Collections.emptyList();
+	    		}
     		}
     	} else {
     		this.dependencies = Collections.emptyList();

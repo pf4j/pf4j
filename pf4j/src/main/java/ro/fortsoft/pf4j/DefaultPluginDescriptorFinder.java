@@ -86,6 +86,6 @@ public class DefaultPluginDescriptorFinder implements PluginDescriptorFinder {
 	}
     
 	private boolean isEmpty(String value) {
-		return (value != null) && !value.isEmpty();
+		return (value == null) || value.isEmpty();
 	}
 }
