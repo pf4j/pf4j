@@ -15,11 +15,6 @@ package ro.fortsoft.pf4j;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-
 /**
  * A wrapper over plugin instance.
  *
@@ -41,7 +36,6 @@ public class PluginWrapper {
 		try {
 			plugin = createPluginInstance();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -92,31 +86,42 @@ public class PluginWrapper {
         return plugin;
     }
 
-    @Override
+
+	@Override
 	public int hashCode() {
-    	return new HashCodeBuilder().append(descriptor.getPluginId())
-    		.toHashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + descriptor.getPluginId().hashCode();
+		
+		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof PluginWrapper)) {
+		if (this == obj) {
+			return true;
+		}
+		
+		if (obj == null) {
 			return false;
 		}
 		
-		PluginWrapper wrapper = (PluginWrapper) obj;
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
 		
-		return new EqualsBuilder().append(descriptor.getPluginId(), wrapper.getDescriptor().getPluginId())
-			.isEquals();
+		PluginWrapper other = (PluginWrapper) obj;
+		if (!descriptor.getPluginId().equals(other.descriptor.getPluginId())) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	@Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-            .append("descriptor", descriptor)
-            .append("pluginPath", pluginPath)
-            .append("plugin", plugin)
-            .toString();
-    }
+	public String toString() {
+		return "PluginWrapper [descriptor=" + descriptor + ", pluginPath="
+				+ pluginPath + "]";
+	}
 
 }

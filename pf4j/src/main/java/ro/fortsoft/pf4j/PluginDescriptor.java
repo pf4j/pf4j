@@ -17,10 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-
 /**
  * A plugin descriptor contains information about a plug-in obtained
  * from the manifest (META-INF) file.
@@ -86,17 +82,14 @@ public class PluginDescriptor {
     }
 
     @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-            .append("pluginId", pluginId)
-            .append("pluginClass", pluginClass)
-            .append("version", version)
-            .append("provider", provider)
-            .append("dependencies", dependencies)
-            .toString();
-    }
+	public String toString() {
+		return "PluginDescriptor [pluginId=" + pluginId + ", pluginClass="
+				+ pluginClass + ", version=" + version + ", provider="
+				+ provider + ", dependencies=" + dependencies
+				+ ", pluginClassLoader=" + pluginClassLoader + "]";
+	}
 
-    void setPluginId(String pluginId) {
+	void setPluginId(String pluginId) {
         this.pluginId = pluginId;
     }
 
@@ -115,7 +108,7 @@ public class PluginDescriptor {
     void setDependencies(String dependencies) {
     	if (dependencies != null) {
     		this.dependencies = new ArrayList<PluginDependency>();
-    		List<String> tokens = Arrays.asList(StringUtils.split(dependencies, ','));
+    		List<String> tokens = Arrays.asList(dependencies.split(","));
     		for (String dependency : tokens) {
     			this.dependencies.add(new PluginDependency(dependency));
     		}

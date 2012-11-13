@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * Read the plugin descriptor from the manifest file.
  *
@@ -62,19 +60,19 @@ public class DefaultPluginDescriptorFinder implements PluginDescriptorFinder {
         // TODO validate !!!
         Attributes attrs = manifest.getMainAttributes();
         String id = attrs.getValue("Plugin-Id");
-        if (StringUtils.isEmpty(id)) {
+        if (isEmpty(id)) {
         	throw new PluginException("Plugin-Id cannot be empty");
         }
         pluginDescriptor.setPluginId(id);
         
         String clazz = attrs.getValue("Plugin-Class");
-        if (StringUtils.isEmpty(clazz)) {
+        if (isEmpty(clazz)) {
         	throw new PluginException("Plugin-Class cannot be empty");
         }
         pluginDescriptor.setPluginClass(clazz);
         
         String version = attrs.getValue("Plugin-Version");
-        if (StringUtils.isEmpty(version)) {
+        if (isEmpty(version)) {
         	throw new PluginException("Plugin-Version cannot be empty");
         }
         pluginDescriptor.setPluginVersion(PluginVersion.createVersion(version));
@@ -87,4 +85,7 @@ public class DefaultPluginDescriptorFinder implements PluginDescriptorFinder {
 		return pluginDescriptor;
 	}
     
+	private boolean isEmpty(String value) {
+		return (value != null) && !value.isEmpty();
+	}
 }
