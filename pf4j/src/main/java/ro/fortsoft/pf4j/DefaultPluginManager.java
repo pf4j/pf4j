@@ -76,6 +76,11 @@ public class DefaultPluginManager implements PluginManager {
      */
     private List<PluginWrapper> disabledPlugins;
     
+    /**
+     * A list with started plugins.
+     */
+    private List<PluginWrapper> startedPlugins;
+    
     private UberClassLoader uberClassLoader;
 
     /**
@@ -93,15 +98,19 @@ public class DefaultPluginManager implements PluginManager {
      */
     public DefaultPluginManager(File pluginsDirectory) {
         this.pluginsDirectory = pluginsDirectory;
+        
         plugins = new HashMap<String, PluginWrapper>();
         pluginClassLoaders = new HashMap<String, PluginClassLoader>();
         pathToIdMap = new HashMap<String, String>();
         unresolvedPlugins = new ArrayList<PluginWrapper>();
         resolvedPlugins = new ArrayList<PluginWrapper>();
         disabledPlugins = new ArrayList<PluginWrapper>();
+        startedPlugins = new ArrayList<PluginWrapper>();
         pluginDescriptorFinder = new DefaultPluginDescriptorFinder();
         uberClassLoader = new UberClassLoader();
         extensionFinder = new DefaultExtensionFinder(uberClassLoader);
+        
+        System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
     }
 
     /**
@@ -127,6 +136,10 @@ public class DefaultPluginManager implements PluginManager {
 		return disabledPlugins;
 	}
 
+	public List<PluginWrapper> getStartedPlugins() {
+		return startedPlugins;
+	}
+	
     /**
      * Start all active plugins.
      */
@@ -136,6 +149,7 @@ public class DefaultPluginManager implements PluginManager {
             try {
             	LOG.info("Start plugin '" + pluginWrapper.getDescriptor().getPluginId() + "'");
 				pluginWrapper.getPlugin().start();
+				startedPlugins.add(pluginWrapper);
 			} catch (PluginException e) {
 				LOG.error(e.getMessage(), e);
 			}

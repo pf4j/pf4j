@@ -21,7 +21,7 @@ import java.util.List;
  * 
  * @author Decebal Suiu
  */
-class PluginClassLoader extends URLClassLoader {
+public class PluginClassLoader extends URLClassLoader {
 
 	private static final String JAVA_PACKAGE_PREFIX = "java.";
 	private static final String JAVAX_PACKAGE_PREFIX = "javax.";

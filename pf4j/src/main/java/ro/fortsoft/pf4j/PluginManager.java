@@ -28,6 +28,21 @@ public interface PluginManager {
     public List<PluginWrapper> getPlugins();
 
     /**
+     * Retrieves all resolved plugins (with resolved dependency).
+     */
+	public List<PluginWrapper> getResolvedPlugins();
+
+	/**
+	 * Retrieves all unresolved plugins (with unresolved dependency).
+	 */
+	public List<PluginWrapper> getUnresolvedPlugins();
+	
+    /**
+     * Retrieves all started plugins.
+     */
+    public List<PluginWrapper> getStartedPlugins();
+
+    /**
      * Load plugins.
      */
     public void loadPlugins();

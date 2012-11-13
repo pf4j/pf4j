@@ -27,7 +27,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
  *
  * @author Decebal Suiu
  */
-class PluginDescriptor {
+public class PluginDescriptor {
 
 	private String pluginId;
     private String pluginClass;

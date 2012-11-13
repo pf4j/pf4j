@@ -31,7 +31,7 @@ public abstract class Plugin {
     /**
      * Wrapper of the plugin.
      */
-    PluginWrapper wrapper;
+    protected PluginWrapper wrapper;
 
     /**
      * Constructor to be used by plugin manager for plugin instantiation.

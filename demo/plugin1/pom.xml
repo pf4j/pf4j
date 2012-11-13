@@ -21,7 +21,6 @@
         </license>
     </licenses>
 
-
     <properties>
         <plugin.id>welcome-plugin</plugin.id>
         <plugin.class>ro.fortsoft.pf4j.demo.welcome.WelcomePlugin</plugin.class>
