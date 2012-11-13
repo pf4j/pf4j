@@ -113,9 +113,6 @@ public class DefaultPluginManager implements PluginManager {
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
     }
 
-    /**
-     * Retrieves all active plugins.
-     */
     public List<PluginWrapper> getPlugins() {
         return new ArrayList<PluginWrapper>(plugins.values());
     }
@@ -144,7 +141,6 @@ public class DefaultPluginManager implements PluginManager {
      * Start all active plugins.
      */
     public void startPlugins() {
-    	List<PluginWrapper> resolvedPlugins = getResolvedPlugins();
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
             try {
             	LOG.info("Start plugin '" + pluginWrapper.getDescriptor().getPluginId() + "'");
@@ -160,8 +156,7 @@ public class DefaultPluginManager implements PluginManager {
      * Stop all active plugins.
      */
     public void stopPlugins() {
-    	List<PluginWrapper> resolvedPlugins = getResolvedPlugins();
-        for (PluginWrapper pluginWrapper : resolvedPlugins) {
+        for (PluginWrapper pluginWrapper : startedPlugins) {
             try {
             	LOG.info("Stop plugin '" + pluginWrapper.getDescriptor().getPluginId() + "'");
             	pluginWrapper.getPlugin().stop();
