@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.fortsoft.pf4j.util.DirectedGraph;
 
-
 /**
  * @author Decebal Suiu
  */

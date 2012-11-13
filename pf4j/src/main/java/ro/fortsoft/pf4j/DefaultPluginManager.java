@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,6 +157,8 @@ public class DefaultPluginManager implements PluginManager {
      * Stop all active plugins.
      */
     public void stopPlugins() {
+    	// stop started plugins in reverse order
+    	Collections.reverse(startedPlugins);
         for (PluginWrapper pluginWrapper : startedPlugins) {
             try {
             	LOG.info("Stop plugin '" + pluginWrapper.getDescriptor().getPluginId() + "'");
