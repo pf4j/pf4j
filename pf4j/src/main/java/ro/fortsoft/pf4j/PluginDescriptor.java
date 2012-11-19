@@ -29,7 +29,6 @@ public class PluginDescriptor {
     private PluginVersion version;
     private String provider;
     private List<PluginDependency> dependencies;
-    private PluginClassLoader pluginClassLoader;
 
     public PluginDescriptor() {
         dependencies = new ArrayList<PluginDependency>();
@@ -71,21 +70,12 @@ public class PluginDescriptor {
         return dependencies;
     }
 
-    /**
-     * Returns the plugin class loader used to load classes and resources
-	 * for this plug-in. The class loader can be used to directly access
-	 * plug-in resources and classes.
-	 */
-    public PluginClassLoader getPluginClassLoader() {
-    	return pluginClassLoader;
-    }
-
     @Override
 	public String toString() {
 		return "PluginDescriptor [pluginId=" + pluginId + ", pluginClass="
 				+ pluginClass + ", version=" + version + ", provider="
 				+ provider + ", dependencies=" + dependencies
-				+ ", pluginClassLoader=" + pluginClassLoader + "]";
+				+ "]";
 	}
 
 	void setPluginId(String pluginId) {
@@ -126,9 +116,5 @@ public class PluginDescriptor {
     		this.dependencies = Collections.emptyList();
     	}
     }
-
-	void setPluginClassLoader(PluginClassLoader pluginClassLoader) {
-		this.pluginClassLoader = pluginClassLoader;
-	}
 
 }

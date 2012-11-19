@@ -26,6 +26,7 @@ public class PluginWrapper {
 	String pluginPath;
 	PluginClassLoader pluginClassLoader;
 	Plugin plugin;
+	PluginState pluginState;
 	
 	public PluginWrapper(PluginDescriptor descriptor, String pluginPath, PluginClassLoader pluginClassLoader) {
 		this.descriptor = descriptor;
@@ -38,6 +39,8 @@ public class PluginWrapper {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		pluginState = PluginState.CREATED;
 	}
 	
     /**
@@ -67,25 +70,9 @@ public class PluginWrapper {
 		return plugin;
 	}
 
-	private Plugin createPluginInstance() throws Exception {
-    	String pluginClassName = descriptor.getPluginClass();
-        Class<?> pluginClass = pluginClassLoader.loadClass(pluginClassName);
-
-        // once we have the class, we can do some checks on it to ensure
-        // that it is a valid implementation of a plugin.
-        int modifiers = pluginClass.getModifiers();
-        if (Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)
-                || (!Plugin.class.isAssignableFrom(pluginClass))) {
-            throw new PluginException("The plugin class '" + pluginClassName + "' is not compatible.");
-        }
-
-        // create the plugin instance
-        Constructor<?> constructor = pluginClass.getConstructor(new Class[] { PluginWrapper.class });
-        Plugin plugin = (Plugin) constructor.newInstance(new Object[] { this });
-
-        return plugin;
-    }
-
+	public PluginState getPluginState() {
+		return pluginState;
+	}
 
 	@Override
 	public int hashCode() {
@@ -123,5 +110,28 @@ public class PluginWrapper {
 		return "PluginWrapper [descriptor=" + descriptor + ", pluginPath="
 				+ pluginPath + "]";
 	}
+
+	void setPluginState(PluginState pluginState) {
+		this.pluginState = pluginState;
+	}
+
+	private Plugin createPluginInstance() throws Exception {
+    	String pluginClassName = descriptor.getPluginClass();
+        Class<?> pluginClass = pluginClassLoader.loadClass(pluginClassName);
+
+        // once we have the class, we can do some checks on it to ensure
+        // that it is a valid implementation of a plugin.
+        int modifiers = pluginClass.getModifiers();
+        if (Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)
+                || (!Plugin.class.isAssignableFrom(pluginClass))) {
+            throw new PluginException("The plugin class '" + pluginClassName + "' is not compatible.");
+        }
+
+        // create the plugin instance
+        Constructor<?> constructor = pluginClass.getConstructor(new Class[] { PluginWrapper.class });
+        Plugin plugin = (Plugin) constructor.newInstance(new Object[] { this });
+
+        return plugin;
+    }
 
 }

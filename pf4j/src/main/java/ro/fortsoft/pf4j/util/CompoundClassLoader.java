@@ -26,7 +26,7 @@ import java.util.Set;
  * 
  * @author Decebal Suiu
  */
-public class UberClassLoader extends ClassLoader {
+public class CompoundClassLoader extends ClassLoader {
 
 	private Set<ClassLoader> loaders = new HashSet<ClassLoader>();
 

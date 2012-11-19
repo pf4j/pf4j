@@ -6,6 +6,7 @@ declared by application or other plugins. Also a plugin can define extension poi
 
 Components
 -------------------
+
 - **Plugin** is the base class for all plugins types. Each plugin is loaded into a separate class loader to avoid conflicts.
 - **PluginManager** is used for all aspects of plugins management (loading, starting, stopping).
 - **ExtensionPoint** is a point in the application where custom code can be invoked. It's a java interface marker.   
@@ -14,6 +15,7 @@ Any java interface or abstract class can be marked as an extension point (implem
 
 Artifacts
 -------------------
+
 - PF4J `pf4j` (jar)
 - PF4J Demo `pf4j-demo` (executable jar)
 
@@ -34,6 +36,7 @@ where ${pf4j.version} is the last pf4j version.
 
 How to use
 -------------------
+
 It's very simple to add pf4j in your application:
 
     public static void main(String[] args) {
