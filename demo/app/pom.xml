@@ -3,7 +3,7 @@
     
     <parent>
         <groupId>ro.fortsoft.pf4j.demo</groupId>
-        <artifactId>pom</artifactId>
+        <artifactId>pf4j-demo-parent</artifactId>
         <version>0.4-SNAPSHOT</version>
     </parent>
 

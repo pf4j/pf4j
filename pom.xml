@@ -9,7 +9,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.fortsoft.pf4j</groupId>
-    <artifactId>pom</artifactId>
+    <artifactId>pf4j-parent</artifactId>
     <version>0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>PF4J</name>

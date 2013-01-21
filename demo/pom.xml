@@ -3,13 +3,13 @@
     
     <parent>
         <groupId>ro.fortsoft.pf4j</groupId>
-        <artifactId>pom</artifactId>
+        <artifactId>pf4j-parent</artifactId>
         <version>0.4-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.fortsoft.pf4j.demo</groupId>
-    <artifactId>pom</artifactId>
+    <artifactId>pf4j-demo-parent</artifactId>
     <version>0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>PF4J Demo</name>
