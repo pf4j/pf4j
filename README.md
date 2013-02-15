@@ -34,6 +34,8 @@ In your pom.xml you must define the dependencies to PF4J artifacts with:
 
 where ${pf4j.version} is the last pf4j version.
 
+You may want to check for the latest released version using [Maven Search](http://search.maven.org/#search%7Cga%7C1%7Cpf4j)
+
 How to use
 -------------------
 
@@ -51,7 +53,7 @@ It's very simple to add pf4j in your application:
 
 In above code, I created a **DefaultPluginManager** (it's the default implementation for
 **PluginManager** interface) that loads and starts all active(resolved) plugins.  
-The available plugins are loaded using a **PluginClassLoader**.   
+Each available plugin is loaded using a **PluginClassLoader**.   
 The **PluginClassLoader** contains only classes found in _classes_ and _lib_ folders of plugin and runtime classes and libraries of the required plugins. 
 The plugins are stored in a folder. You can specify the plugins folder in the constructor of DefaultPluginManager. If the plugins folder is not specified 
 than the location is returned by `System.getProperty("pf4j.pluginsDir", "plugins")`.
