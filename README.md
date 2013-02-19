@@ -89,6 +89,8 @@ In this case the `classes/META-INF/MANIFEST.MF` file looks like:
 In above manifest I described a plugin with id `welcome-plugin`, with class `ro.fortsoft.pf4j.demo.welcome.WelcomePlugin`, with version `0.0.1` and with dependencies 
 to plugins `x, y, z`.
 
+Also you can use any PluginDescriptorFinder (for example **PropertiesPluginDescriptorFinder**) in DefaultPluginManager (using setPluginDescriptorFinder() method).
+
 You can define an extension point in your application using **ExtensionPoint** interface marker.
 
     public interface Greeting extends ExtensionPoint {
