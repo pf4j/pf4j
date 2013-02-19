@@ -92,9 +92,9 @@ to plugins `x, y, z`.
 Also you can use any PluginDescriptorFinder (for example **PropertiesPluginDescriptorFinder**) in DefaultPluginManager (using setPluginDescriptorFinder() method).
 
     plugin.class=ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
-    plugin-dependencies=x, y, z
-    plugin-id=welcome-plugin
-    plugin-Provider=Decebal Suiu
+    plugin.dependencies=x, y, z
+    plugin.id=welcome-plugin
+    plugin.provider=Decebal Suiu
     plugin.version=0.0.1
 
 You can define an extension point in your application using **ExtensionPoint** interface marker.
