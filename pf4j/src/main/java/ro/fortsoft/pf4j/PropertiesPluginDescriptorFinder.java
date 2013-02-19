@@ -16,36 +16,45 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
+import java.io.InputStream;
+import java.util.Properties;
 
 import ro.fortsoft.pf4j.util.StringUtils;
 
 /**
- * Read the plugin descriptor from the manifest file.
- *
+ * Find a plugin descriptor in a properties file (in plugin repository).
+ * 
  * @author Decebal Suiu
  */
-public class DefaultPluginDescriptorFinder implements PluginDescriptorFinder {
+public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder {
 
+	private String propertiesFileName;
+
+	public PropertiesPluginDescriptorFinder() {
+		this("plugin.properties");
+	}
+
+	public PropertiesPluginDescriptorFinder(String propertiesFileName) {
+		this.propertiesFileName = propertiesFileName;
+	}
+	
 	@Override
 	public PluginDescriptor find(File pluginRepository) throws PluginException {
-    	// TODO it's ok with classes/ ?
-        File manifestFile = new File(pluginRepository, "classes/META-INF/MANIFEST.MF");
-        if (!manifestFile.exists()) {
-            throw new PluginException("Cannot find '" + manifestFile + "' file");
+        File propertiesFile = new File(pluginRepository, propertiesFileName);
+        if (!propertiesFile.exists()) {
+            throw new PluginException("Cannot find '" + propertiesFile + "' file");
         }
 
-    	FileInputStream input = null;
+    	InputStream input = null;
 		try {
-			input = new FileInputStream(manifestFile);
+			input = new FileInputStream(propertiesFile);
 		} catch (FileNotFoundException e) {
 			// not happening 
 		}
 		
-    	Manifest manifest = null;
+    	Properties properties = new Properties();
         try {
-            manifest = new Manifest(input);
+        	properties.load(input);
         } catch (IOException e) {
             throw new PluginException(e.getMessage(), e);
         } finally {
@@ -59,31 +68,30 @@ public class DefaultPluginDescriptorFinder implements PluginDescriptorFinder {
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
         
         // TODO validate !!!
-        Attributes attrs = manifest.getMainAttributes();
-        String id = attrs.getValue("Plugin-Id");
+        String id = properties.getProperty("plugin.id");
         if (StringUtils.isEmpty(id)) {
-        	throw new PluginException("Plugin-Id cannot be empty");
+        	throw new PluginException("plugin.id cannot be empty");
         }
         pluginDescriptor.setPluginId(id);
         
-        String clazz = attrs.getValue("Plugin-Class");
+        String clazz = properties.getProperty("plugin.class");
         if (StringUtils.isEmpty(clazz)) {
-        	throw new PluginException("Plugin-Class cannot be empty");
+        	throw new PluginException("plugin.class cannot be empty");
         }
         pluginDescriptor.setPluginClass(clazz);
         
-        String version = attrs.getValue("Plugin-Version");
+        String version = properties.getProperty("plugin.version");
         if (StringUtils.isEmpty(version)) {
-        	throw new PluginException("Plugin-Version cannot be empty");
+        	throw new PluginException("plugin.version cannot be empty");
         }
         pluginDescriptor.setPluginVersion(PluginVersion.createVersion(version));
         
-        String provider = attrs.getValue("Plugin-Provider");
+        String provider = properties.getProperty("plugin.provider");
         pluginDescriptor.setProvider(provider);        
-        String dependencies = attrs.getValue("Plugin-Dependencies");
+        String dependencies = properties.getProperty("plugin.dependencies");
         pluginDescriptor.setDependencies(dependencies);
 
 		return pluginDescriptor;
 	}
-    	
+
 }

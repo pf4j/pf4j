@@ -117,7 +117,15 @@ public class DefaultPluginManager implements PluginManager {
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
     }
 
-    @Override
+    public PluginDescriptorFinder getPluginDescriptorFinder() {
+		return pluginDescriptorFinder;
+	}
+
+	public void setPluginDescriptorFinder(PluginDescriptorFinder pluginDescriptorFinder) {
+		this.pluginDescriptorFinder = pluginDescriptorFinder;
+	}
+
+	@Override
     public List<PluginWrapper> getPlugins() {
         return new ArrayList<PluginWrapper>(plugins.values());
     }
