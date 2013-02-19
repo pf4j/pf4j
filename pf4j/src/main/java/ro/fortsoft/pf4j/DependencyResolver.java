@@ -25,7 +25,7 @@ import ro.fortsoft.pf4j.util.DirectedGraph;
  */
 class DependencyResolver {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DependencyResolver.class);
+	private static final Logger log = LoggerFactory.getLogger(DependencyResolver.class);
 	
     private List<PluginWrapper> plugins;
 
@@ -51,14 +51,14 @@ class DependencyResolver {
 			}
 		}
 
-		LOG.debug("Graph: " + graph);
+		log.debug("Graph: " + graph);
 		List<String> pluginsId = graph.reverseTopologicalSort();
 
 		if (pluginsId == null) {
 			throw new CyclicDependencyException("Cyclic dependences !!!" + graph.toString());
 		}
 
-		LOG.debug("Plugins order: " + pluginsId);
+		log.debug("Plugins order: " + pluginsId);
 		List<PluginWrapper> sortedPlugins = new ArrayList<PluginWrapper>();
 		for (String pluginId : pluginsId) {
 			sortedPlugins.add(getPlugin(pluginId));
