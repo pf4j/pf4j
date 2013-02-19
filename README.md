@@ -1,12 +1,19 @@
 Plugin Framework for Java (PF4J)
 =====================
-
 A plugin is a way for a third party to extend the functionality of an application. A plugin implements extension points
 declared by application or other plugins. Also a plugin can define extension points.
 
+Features/Benefits
+-------------------
+With PF4J you can easily transform a monolithic java application in a modular application. 
+PF4J is an open source (Apache license) tiny Java library (around 35KB), with minimal dependencies and very extensible (see PluginDescriptorFinder and ExtensionFinder).
+
+No XML, only Java.
+
+You can mark any interface or abstract class as an extension point (with marker interface ExtensionPoint) and you specified that an class is an extension with @Extension annotation.
+
 Components
 -------------------
-
 - **Plugin** is the base class for all plugins types. Each plugin is loaded into a separate class loader to avoid conflicts.
 - **PluginManager** is used for all aspects of plugins management (loading, starting, stopping).
 - **ExtensionPoint** is a point in the application where custom code can be invoked. It's a java interface marker.   
@@ -15,13 +22,11 @@ Any java interface or abstract class can be marked as an extension point (implem
 
 Artifacts
 -------------------
-
 - PF4J `pf4j` (jar)
 - PF4J Demo `pf4j-demo` (executable jar)
 
 Using Maven
 -------------------
-
 In your pom.xml you must define the dependencies to PF4J artifacts with:
 
 ```xml
@@ -34,9 +39,10 @@ In your pom.xml you must define the dependencies to PF4J artifacts with:
 
 where ${pf4j.version} is the last pf4j version.
 
+You may want to check for the latest released version using [Maven Search](http://search.maven.org/#search%7Cga%7C1%7Cpf4j)
+
 How to use
 -------------------
-
 It's very simple to add pf4j in your application:
 
     public static void main(String[] args) {
@@ -51,7 +57,7 @@ It's very simple to add pf4j in your application:
 
 In above code, I created a **DefaultPluginManager** (it's the default implementation for
 **PluginManager** interface) that loads and starts all active(resolved) plugins.  
-The available plugins are loaded using a **PluginClassLoader**.   
+Each available plugin is loaded using a **PluginClassLoader**.   
 The **PluginClassLoader** contains only classes found in _classes_ and _lib_ folders of plugin and runtime classes and libraries of the required plugins. 
 The plugins are stored in a folder. You can specify the plugins folder in the constructor of DefaultPluginManager. If the plugins folder is not specified 
 than the location is returned by `System.getProperty("pf4j.pluginsDir", "plugins")`.
@@ -129,7 +135,6 @@ For more information please see the demo sources.
 
 Demo
 -------------------
-
 I have a tiny demo application. The demo application is in demo folder.
 In demo/api folder I declared an extension point (_Greeting_).  
 In demo/plugin* I implemented two plugins: plugin1, plugin2 (each plugin adds an extension for _Greeting_).  
@@ -140,7 +145,6 @@ To run the demo application use:
 
 License
 --------------
-  
 Copyright 2012 Decebal Suiu
  
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
