@@ -85,7 +85,7 @@ public class DefaultPluginManager implements PluginManager {
     /**
      * A compound class loader of resolved plugins. 
      */
-    private CompoundClassLoader compoundClassLoader;
+    protected CompoundClassLoader compoundClassLoader;
     
     /**
      * Th plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
@@ -110,20 +110,21 @@ public class DefaultPluginManager implements PluginManager {
         resolvedPlugins = new ArrayList<PluginWrapper>();
         disabledPlugins = new ArrayList<PluginWrapper>();
         startedPlugins = new ArrayList<PluginWrapper>();
-        pluginDescriptorFinder = new DefaultPluginDescriptorFinder();
         compoundClassLoader = new CompoundClassLoader();
-        extensionFinder = new DefaultExtensionFinder(compoundClassLoader);
+        
+        pluginDescriptorFinder = createPluginDescriptorFinder();
+        extensionFinder = createExtensionFinder();
         
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
     }
 
-    public PluginDescriptorFinder getPluginDescriptorFinder() {
-		return pluginDescriptorFinder;
-	}
+    protected PluginDescriptorFinder createPluginDescriptorFinder() {
+    	return new DefaultPluginDescriptorFinder();
+    }
 
-	public void setPluginDescriptorFinder(PluginDescriptorFinder pluginDescriptorFinder) {
-		this.pluginDescriptorFinder = pluginDescriptorFinder;
-	}
+    protected ExtensionFinder createExtensionFinder() {
+    	return new DefaultExtensionFinder(compoundClassLoader);
+    }
 
 	@Override
     public List<PluginWrapper> getPlugins() {
@@ -349,5 +350,5 @@ public class DefaultPluginManager implements PluginManager {
         	log.info("Plugin '" + pluginWrapper.getDescriptor().getPluginId() + "' resolved");
         }
 	}
-
+	
 }
