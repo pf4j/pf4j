@@ -89,14 +89,6 @@ In this case the `classes/META-INF/MANIFEST.MF` file looks like:
 In above manifest I described a plugin with id `welcome-plugin`, with class `ro.fortsoft.pf4j.demo.welcome.WelcomePlugin`, with version `0.0.1` and with dependencies 
 to plugins `x, y, z`.
 
-Also you can use any PluginDescriptorFinder (for example **PropertiesPluginDescriptorFinder**) in DefaultPluginManager (using setPluginDescriptorFinder() method).
-
-    plugin.class=ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
-    plugin.dependencies=x, y, z
-    plugin.id=welcome-plugin
-    plugin.provider=Decebal Suiu
-    plugin.version=0.0.1
-
 You can define an extension point in your application using **ExtensionPoint** interface marker.
 
     public interface Greeting extends ExtensionPoint {
@@ -138,6 +130,23 @@ The output is:
 
     >>> Welcome
     >>> Hello
+
+You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder) in DefaultPluginManager just override createXXX methods (factory method pattern).
+
+Example:
+
+    protected PluginDescriptorFinder createPluginDescriptorFinder() {
+        return new PropertiesPluginDescriptorFinder();
+    }
+    
+and in plugin respository you must have a plugin.properties file with the below content:
+
+    plugin.class=ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
+    plugin.dependencies=x, y, z
+    plugin.id=welcome-plugin
+    plugin.provider=Decebal Suiu
+    plugin.version=0.0.1
+    
 
 For more information please see the demo sources.
 
