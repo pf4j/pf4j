@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.fortsoft.pf4j.util.CompoundClassLoader;
 import ro.fortsoft.pf4j.util.DirectoryFilter;
+import ro.fortsoft.pf4j.util.FileUtils;
 import ro.fortsoft.pf4j.util.Unzip;
 import ro.fortsoft.pf4j.util.ZipFilter;
 
@@ -71,16 +72,14 @@ public class DefaultPluginManager implements PluginManager {
      * A list with resolved plugins (resolved dependency).
      */
     private List<PluginWrapper> resolvedPlugins;
-
-    /**
-     * A list with disabled plugins.
-     */
-    private List<PluginWrapper> disabledPlugins;
     
     /**
      * A list with started plugins.
      */
     private List<PluginWrapper> startedPlugins;
+    
+    private List<String> enabledPlugins;
+    private List<String> disabledPlugins;
     
     /**
      * A compound class loader of resolved plugins. 
@@ -108,22 +107,26 @@ public class DefaultPluginManager implements PluginManager {
         pathToIdMap = new HashMap<String, String>();
         unresolvedPlugins = new ArrayList<PluginWrapper>();
         resolvedPlugins = new ArrayList<PluginWrapper>();
-        disabledPlugins = new ArrayList<PluginWrapper>();
         startedPlugins = new ArrayList<PluginWrapper>();
+        disabledPlugins = new ArrayList<String>();
         compoundClassLoader = new CompoundClassLoader();
         
         pluginDescriptorFinder = createPluginDescriptorFinder();
         extensionFinder = createExtensionFinder();
-        
+
+        try {
+        	// create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
+        	enabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true);
+        	log.info("Enabled plugins: " + enabledPlugins);
+        	
+        	// create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
+        	disabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true);
+        	log.info("Disabled plugins: " + disabledPlugins);
+        } catch (IOException e) {
+        	log.error(e.getMessage(), e);
+        }
+
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
-    }
-
-    protected PluginDescriptorFinder createPluginDescriptorFinder() {
-    	return new DefaultPluginDescriptorFinder();
-    }
-
-    protected ExtensionFinder createExtensionFinder() {
-    	return new DefaultExtensionFinder(compoundClassLoader);
     }
 
 	@Override
@@ -143,10 +146,6 @@ public class DefaultPluginManager implements PluginManager {
 	@Override
     public List<PluginWrapper> getUnresolvedPlugins() {
 		return unresolvedPlugins;
-	}
-
-	public List<PluginWrapper> getDisabledPlugins() {
-		return disabledPlugins;
 	}
 
 	@Override
@@ -211,21 +210,21 @@ public class DefaultPluginManager implements PluginManager {
 			}
         }
 
-        // load any plugin from plugins directory
+        // check for no plugins
         FilenameFilter directoryFilter = new DirectoryFilter();
         String[] directories = pluginsDirectory.list(directoryFilter);
+        if (directories.length == 0) {
+        	log.info("No plugins");
+        	return;
+        }
+
+        // load any plugin from plugins directory
         for (String directory : directories) {
             try {
                 loadPlugin(directory);
             } catch (PluginException e) {
 				log.error(e.getMessage(), e);
             }
-        }
-
-        // check for no plugins
-        if (directories.length == 0) {
-        	log.info("No plugins");
-        	return;
         }
 
         // resolve 'unresolvedPlugins'
@@ -279,11 +278,6 @@ public class DefaultPluginManager implements PluginManager {
         // try to load the plugin
         String pluginPath = "/".concat(fileName);
 
-        // test for disabled plugin
-        if (disabledPlugins.contains(pluginPath)) {
-            return;
-        }
-
         // test for plugin duplication
         if (plugins.get(pathToIdMap.get(pluginPath)) != null) {
             return;
@@ -295,6 +289,12 @@ public class DefaultPluginManager implements PluginManager {
         log.debug("Descriptor " + pluginDescriptor);
         String pluginClassName = pluginDescriptor.getPluginClass();
         log.debug("Class '" + pluginClassName + "'" + " for plugin '" + pluginPath + "'");
+
+        // test for disabled plugin
+        if (isPluginDisabled(pluginDescriptor.getPluginId())) {
+        	log.info("Plugin '" + pluginPath + "' is disabled");
+            return;
+        }
 
         // load plugin
         log.debug("Loading plugin '" + pluginPath + "'");
@@ -318,6 +318,28 @@ public class DefaultPluginManager implements PluginManager {
         pluginClassLoaders.put(pluginId, pluginClassLoader);
     }
 
+	/**
+	 * Add the possibility to override the PluginDescriptorFinder. 
+	 */
+    protected PluginDescriptorFinder createPluginDescriptorFinder() {
+    	return new DefaultPluginDescriptorFinder();
+    }
+
+    /**
+     * Add the possibility to override the ExtensionFinder. 
+     */
+    protected ExtensionFinder createExtensionFinder() {
+    	return new DefaultExtensionFinder(compoundClassLoader);
+    }
+
+    protected boolean isPluginDisabled(String pluginId) {
+    	if (enabledPlugins.isEmpty()) {
+    		return disabledPlugins.contains(pluginId);
+    	}
+    	
+    	return !enabledPlugins.contains(pluginId);
+    }
+    
     private void expandPluginArchive(String fileName) throws IOException {
         File pluginArchiveFile = new File(pluginsDirectory, fileName);
         long pluginArchiveDate = pluginArchiveFile.lastModified();
