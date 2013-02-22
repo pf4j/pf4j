@@ -6,7 +6,7 @@ declared by application or other plugins. Also a plugin can define extension poi
 Features/Benefits
 -------------------
 With PF4J you can easily transform a monolithic java application in a modular application. 
-PF4J is an open source (Apache license) tiny Java library (around 35KB), with minimal dependencies and very extensible (see PluginDescriptorFinder and ExtensionFinder).
+PF4J is an open source (Apache license) lightweight (around 35KB) plugin framework for java, with minimal dependencies and very extensible (see PluginDescriptorFinder and ExtensionFinder).
 
 No XML, only Java.
 
