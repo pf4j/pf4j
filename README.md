@@ -162,8 +162,8 @@ I want to go only with one extension ( **1:1** relation between extension point 
 1) uninstall Plugin1 or Plugin2 (remove folder pluginX.zip and pluginX from plugins folder)  
 2) disable Plugin1 or Plugin2  
 
-For option two you must create a simple file enabled.txt or disabled.txt in your plugins folder.   
-The content for enabled.txt is similar with:
+For option two you must create a simple file **enabled.txt** or **disabled.txt** in your plugins folder.   
+The content for **enabled.txt** is similar with:
 
     ########################################
     # - load only these plugins
@@ -172,7 +172,7 @@ The content for enabled.txt is similar with:
     ########################################
     welcome-plugin
 
-The content for disabled.txt is similar with:
+The content for **disabled.txt** is similar with:
 
     ########################################
     # - load all plugins except these
