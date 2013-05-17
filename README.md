@@ -192,7 +192,8 @@ In demo/plugin* I implemented two plugins: plugin1, plugin2 (each plugin adds an
 
 To run the demo application use:  
  
-    ./run-demo.sh
+    ./run-demo.sh (for Linux/Unix)
+    ./run-demo.bat (for Windows)
 
 License
 --------------
