@@ -5,9 +5,10 @@
  @version 1.0
 -->
 <assembly>
-	<id>plugin</id>
+	<id>app</id>
 	<formats>
 		<format>dir</format>
+		<format>zip</format>
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<dependencySets>
@@ -26,6 +27,10 @@
             <includes>
                 <include>*.jar</include>
             </includes>
+            <excludes>
+                <exclude>*-javadoc.jar</exclude>
+				<exclude>*-sources.jar</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
 </assembly>
