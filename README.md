@@ -195,6 +195,11 @@ To run the demo application use:
     ./run-demo.sh (for Linux/Unix)
     ./run-demo.bat (for Windows)
 
+Mailing list
+--------------
+
+Much of the conversation between developers and users is managed through [mailing list] (http://groups.google.com/group/pf4j).
+
 License
 --------------
 Copyright 2012 Decebal Suiu
