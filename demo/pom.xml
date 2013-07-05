@@ -12,15 +12,7 @@
     <artifactId>pf4j-demo-parent</artifactId>
     <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>PF4J Demo</name>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+    <name>Demo Parent</name>
 
     <build>
         <resources>

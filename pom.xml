@@ -12,7 +12,7 @@
     <artifactId>pf4j-parent</artifactId>
     <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>PF4J</name>
+    <name>PF4J Parent</name>
     <description>Plugin Framework for Java</description>
 
     <licenses>
