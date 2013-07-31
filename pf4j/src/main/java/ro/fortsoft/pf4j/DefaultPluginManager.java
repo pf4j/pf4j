@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.fortsoft.pf4j.util.CompoundClassLoader;
 import ro.fortsoft.pf4j.util.DirectoryFilter;
+import ro.fortsoft.pf4j.util.FileUtils;
 import ro.fortsoft.pf4j.util.Unzip;
 import ro.fortsoft.pf4j.util.ZipFilter;
 
@@ -36,7 +37,7 @@ import ro.fortsoft.pf4j.util.ZipFilter;
  */
 public class DefaultPluginManager implements PluginManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DefaultPluginManager.class);
+	private static final Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
 
     /**
      * The plugins repository.
@@ -71,21 +72,19 @@ public class DefaultPluginManager implements PluginManager {
      * A list with resolved plugins (resolved dependency).
      */
     private List<PluginWrapper> resolvedPlugins;
-
-    /**
-     * A list with disabled plugins.
-     */
-    private List<PluginWrapper> disabledPlugins;
     
     /**
      * A list with started plugins.
      */
     private List<PluginWrapper> startedPlugins;
     
+    private List<String> enabledPlugins;
+    private List<String> disabledPlugins;
+    
     /**
      * A compound class loader of resolved plugins. 
      */
-    private CompoundClassLoader compoundClassLoader;
+    protected CompoundClassLoader compoundClassLoader;
     
     /**
      * Th plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
@@ -108,16 +107,29 @@ public class DefaultPluginManager implements PluginManager {
         pathToIdMap = new HashMap<String, String>();
         unresolvedPlugins = new ArrayList<PluginWrapper>();
         resolvedPlugins = new ArrayList<PluginWrapper>();
-        disabledPlugins = new ArrayList<PluginWrapper>();
         startedPlugins = new ArrayList<PluginWrapper>();
-        pluginDescriptorFinder = new DefaultPluginDescriptorFinder();
+        disabledPlugins = new ArrayList<String>();
         compoundClassLoader = new CompoundClassLoader();
-        extensionFinder = new DefaultExtensionFinder(compoundClassLoader);
         
+        pluginDescriptorFinder = createPluginDescriptorFinder();
+        extensionFinder = createExtensionFinder();
+
+        try {
+        	// create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
+        	enabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true);
+        	log.info("Enabled plugins: " + enabledPlugins);
+        	
+        	// create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
+        	disabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true);
+        	log.info("Disabled plugins: " + disabledPlugins);
+        } catch (IOException e) {
+        	log.error(e.getMessage(), e);
+        }
+
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
     }
 
-    @Override
+	@Override
     public List<PluginWrapper> getPlugins() {
         return new ArrayList<PluginWrapper>(plugins.values());
     }
@@ -136,10 +148,6 @@ public class DefaultPluginManager implements PluginManager {
 		return unresolvedPlugins;
 	}
 
-	public List<PluginWrapper> getDisabledPlugins() {
-		return disabledPlugins;
-	}
-
 	@Override
 	public List<PluginWrapper> getStartedPlugins() {
 		return startedPlugins;
@@ -152,12 +160,12 @@ public class DefaultPluginManager implements PluginManager {
     public void startPlugins() {
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
             try {
-            	LOG.info("Start plugin '" + pluginWrapper.getDescriptor().getPluginId() + "'");
+            	log.info("Start plugin '" + pluginWrapper.getDescriptor().getPluginId() + "'");
 				pluginWrapper.getPlugin().start();
 				pluginWrapper.setPluginState(PluginState.STARTED);
 				startedPlugins.add(pluginWrapper);
 			} catch (PluginException e) {
-				LOG.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
         }
     }
@@ -171,11 +179,11 @@ public class DefaultPluginManager implements PluginManager {
     	Collections.reverse(startedPlugins);
         for (PluginWrapper pluginWrapper : startedPlugins) {
             try {
-            	LOG.info("Stop plugin '" + pluginWrapper.getDescriptor().getPluginId() + "'");
+            	log.info("Stop plugin '" + pluginWrapper.getDescriptor().getPluginId() + "'");
             	pluginWrapper.getPlugin().stop();
             	pluginWrapper.setPluginState(PluginState.STOPPED);
 			} catch (PluginException e) {
-				LOG.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
         }
     }
@@ -187,7 +195,7 @@ public class DefaultPluginManager implements PluginManager {
     public void loadPlugins() {
     	// check for plugins directory
         if (!pluginsDirectory.exists() || !pluginsDirectory.isDirectory()) {
-            LOG.error("No '" + pluginsDirectory + "' directory");
+            log.error("No '" + pluginsDirectory + "' directory");
             return;
         }
 
@@ -198,32 +206,32 @@ public class DefaultPluginManager implements PluginManager {
         	try {
 				expandPluginArchive(zipFile);
 			} catch (IOException e) {
-				LOG.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
         }
 
-        // load any plugin from plugins directory
+        // check for no plugins
         FilenameFilter directoryFilter = new DirectoryFilter();
         String[] directories = pluginsDirectory.list(directoryFilter);
+        if (directories.length == 0) {
+        	log.info("No plugins");
+        	return;
+        }
+
+        // load any plugin from plugins directory
         for (String directory : directories) {
             try {
                 loadPlugin(directory);
             } catch (PluginException e) {
-				LOG.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
             }
-        }
-
-        // check for no plugins
-        if (directories.length == 0) {
-        	LOG.info("No plugins");
-        	return;
         }
 
         // resolve 'unresolvedPlugins'
         try {
 			resolvePlugins();
 		} catch (PluginException e) {
-			LOG.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
     }
 
@@ -270,33 +278,34 @@ public class DefaultPluginManager implements PluginManager {
         // try to load the plugin
         String pluginPath = "/".concat(fileName);
 
-        // test for disabled plugin
-        if (disabledPlugins.contains(pluginPath)) {
-            return;
-        }
-
         // test for plugin duplication
         if (plugins.get(pathToIdMap.get(pluginPath)) != null) {
             return;
         }
 
         // retrieves the plugin descriptor
-        LOG.debug("Find plugin descriptor '" + pluginPath + "'");
+        log.debug("Find plugin descriptor '" + pluginPath + "'");
         PluginDescriptor pluginDescriptor = pluginDescriptorFinder.find(pluginDirectory);
-        LOG.debug("Descriptor " + pluginDescriptor);
+        log.debug("Descriptor " + pluginDescriptor);
         String pluginClassName = pluginDescriptor.getPluginClass();
-        LOG.debug("Class '" + pluginClassName + "'" + " for plugin '" + pluginPath + "'");
+        log.debug("Class '" + pluginClassName + "'" + " for plugin '" + pluginPath + "'");
+
+        // test for disabled plugin
+        if (isPluginDisabled(pluginDescriptor.getPluginId())) {
+        	log.info("Plugin '" + pluginPath + "' is disabled");
+            return;
+        }
 
         // load plugin
-        LOG.debug("Loading plugin '" + pluginPath + "'");
+        log.debug("Loading plugin '" + pluginPath + "'");
         PluginLoader pluginLoader = new PluginLoader(this, pluginDescriptor, pluginDirectory);
         pluginLoader.load();
-        LOG.debug("Loaded plugin '" + pluginPath + "'");
+        log.debug("Loaded plugin '" + pluginPath + "'");
         
         // create the plugin wrapper
-        LOG.debug("Creating wrapper for plugin '" + pluginPath + "'");
+        log.debug("Creating wrapper for plugin '" + pluginPath + "'");
         PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor, pluginPath, pluginLoader.getPluginClassLoader());
-        LOG.debug("Created wrapper '" + pluginWrapper + "' for plugin '" + pluginPath + "'");
+        log.debug("Created wrapper '" + pluginWrapper + "' for plugin '" + pluginPath + "'");
 
         String pluginId = pluginDescriptor.getPluginId();
 
@@ -309,6 +318,28 @@ public class DefaultPluginManager implements PluginManager {
         pluginClassLoaders.put(pluginId, pluginClassLoader);
     }
 
+	/**
+	 * Add the possibility to override the PluginDescriptorFinder. 
+	 */
+    protected PluginDescriptorFinder createPluginDescriptorFinder() {
+    	return new DefaultPluginDescriptorFinder();
+    }
+
+    /**
+     * Add the possibility to override the ExtensionFinder. 
+     */
+    protected ExtensionFinder createExtensionFinder() {
+    	return new DefaultExtensionFinder(compoundClassLoader);
+    }
+
+    protected boolean isPluginDisabled(String pluginId) {
+    	if (enabledPlugins.isEmpty()) {
+    		return disabledPlugins.contains(pluginId);
+    	}
+    	
+    	return !enabledPlugins.contains(pluginId);
+    }
+    
     private void expandPluginArchive(String fileName) throws IOException {
         File pluginArchiveFile = new File(pluginsDirectory, fileName);
         long pluginArchiveDate = pluginArchiveFile.lastModified();
@@ -316,7 +347,7 @@ public class DefaultPluginManager implements PluginManager {
         File pluginDirectory = new File(pluginsDirectory, pluginName);
         // check if exists directory or the '.zip' file is "newer" than directory
         if (!pluginDirectory.exists() || (pluginArchiveDate > pluginDirectory.lastModified())) {
-        	LOG.debug("Expand plugin archive '" + pluginArchiveFile + "' in '" + pluginDirectory + "'");
+        	log.debug("Expand plugin archive '" + pluginArchiveFile + "' in '" + pluginDirectory + "'");
             // create directorie for plugin
             pluginDirectory.mkdirs();
 
@@ -338,8 +369,8 @@ public class DefaultPluginManager implements PluginManager {
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
         	unresolvedPlugins.remove(pluginWrapper);
         	compoundClassLoader.addLoader(pluginWrapper.getPluginClassLoader());
-        	LOG.info("Plugin '" + pluginWrapper.getDescriptor().getPluginId() + "' resolved");
+        	log.info("Plugin '" + pluginWrapper.getDescriptor().getPluginId() + "' resolved");
         }
 	}
-
+	
 }

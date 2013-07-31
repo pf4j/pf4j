@@ -30,7 +30,7 @@ import net.java.sezpoz.IndexItem;
  */
 public class DefaultExtensionFinder implements ExtensionFinder {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DefaultExtensionFinder.class);
+	private static final Logger log = LoggerFactory.getLogger(DefaultExtensionFinder.class);
 	
 	private volatile List<IndexItem<Extension, Object>> indices;
 	private ClassLoader classLoader;
@@ -41,7 +41,7 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 	
 	@Override
 	public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
-		LOG.debug("Find extensions for " + type);
+		log.debug("Find extensions for " + type);
         List<ExtensionWrapper<T>> result = new ArrayList<ExtensionWrapper<T>>();
 		getIndices();
 //		System.out.println("indices =  "+ indices);
@@ -49,16 +49,16 @@ public class DefaultExtensionFinder implements ExtensionFinder {
             try {
             	AnnotatedElement element = item.element();
             	Class<?> extensionType = (Class<?>) element;
-            	LOG.debug("Checking extension type " + extensionType);
+            	log.debug("Checking extension type " + extensionType);
             	if (type.isAssignableFrom(extensionType)) {
                     Object instance = item.instance();
                     if (instance != null) {
-                		LOG.debug("Added extension " + extensionType);
+                		log.debug("Added extension " + extensionType);
 						result.add(new ExtensionWrapper<T>(type.cast(instance), item.annotation().ordinal()));
                     }
                 }
             } catch (InstantiationException e) {
-            	LOG.error(e.getMessage(), e);
+            	log.error(e.getMessage(), e);
 			}
 		}
 		

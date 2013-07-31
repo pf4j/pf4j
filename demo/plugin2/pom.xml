@@ -3,24 +3,16 @@
     
     <parent>
         <groupId>ro.fortsoft.pf4j.demo</groupId>
-        <artifactId>pom</artifactId>
-        <version>0.4-SNAPSHOT</version>
+        <artifactId>pf4j-demo-parent</artifactId>
+        <version>0.5-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>pf4j-demo-plugin2</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Demo Plugin #2</name>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    
     <properties>
         <plugin.id>hello-plugin</plugin.id>
         <plugin.class>ro.fortsoft.pf4j.demo.hello.HelloPlugin</plugin.class>

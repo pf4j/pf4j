@@ -33,7 +33,7 @@ import ro.fortsoft.pf4j.util.JarFilter;
  */
 class PluginLoader {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
+	private static final Logger log = LoggerFactory.getLogger(PluginLoader.class);
 
     /*
      * The plugin repository.
@@ -58,7 +58,7 @@ class PluginLoader {
         libDirectory = new File(pluginRepository, "lib");
         ClassLoader parent = getClass().getClassLoader(); 
         pluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, parent);        
-        LOG.debug("Created class loader " + pluginClassLoader);
+        log.debug("Created class loader " + pluginClassLoader);
     }
 
     public File getPluginRepository() {
@@ -100,14 +100,14 @@ class PluginLoader {
         classesDirectory = classesDirectory.getAbsoluteFile();
 
         if (classesDirectory.exists() && classesDirectory.isDirectory()) {
-            LOG.debug("Found '" + classesDirectory.getPath() + "' directory");
+            log.debug("Found '" + classesDirectory.getPath() + "' directory");
 
             try {
                 pluginClassLoader.addURL(classesDirectory.toURI().toURL());
-                LOG.debug("Added '" + classesDirectory + "' to the class loader path");
+                log.debug("Added '" + classesDirectory + "' to the class loader path");
             } catch (MalformedURLException e) {
                 e.printStackTrace();
-                LOG.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
                 return false;
             }
         }
@@ -128,10 +128,10 @@ class PluginLoader {
             File jarFile = new File(libDirectory, jar);
             try {
                 pluginClassLoader.addURL(jarFile.toURI().toURL());
-                LOG.debug("Added '" + jarFile + "' to the class loader path");
+                log.debug("Added '" + jarFile + "' to the class loader path");
             } catch (MalformedURLException e) {
                 e.printStackTrace();
-                LOG.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
                 return false;
             }
         }

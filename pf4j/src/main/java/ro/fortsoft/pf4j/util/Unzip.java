@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Unzip {
 
-	private static final Logger LOG = LoggerFactory.getLogger(Unzip.class);
+	private static final Logger log = LoggerFactory.getLogger(Unzip.class);
 
     /**
      * Holds the destination directory.
@@ -61,7 +61,7 @@ public class Unzip {
     }
 
     public void extract() throws IOException {
-        LOG.debug("Extract content of " + source + " to " + destination);
+        log.debug("Extract content of " + source + " to " + destination);
 
         // delete destination file if exists
         removeDirectory(destination);
@@ -91,7 +91,7 @@ public class Unzip {
 		            fos.close();
                 }
     	    } catch (FileNotFoundException e) {
-    	    	LOG.error("File '" + zipEntry.getName() + "' not found");
+    	    	log.error("File '" + zipEntry.getName() + "' not found");
     	    }
 	    }
 

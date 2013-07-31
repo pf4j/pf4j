@@ -23,8 +23,8 @@ import java.util.List;
  */
 public class PluginClassLoader extends URLClassLoader {
 
-	private static final String JAVA_PACKAGE_PREFIX = "java.";
-	private static final String JAVAX_PACKAGE_PREFIX = "javax.";
+//	private static final String JAVA_PACKAGE_PREFIX = "java.";
+//	private static final String JAVAX_PACKAGE_PREFIX = "javax.";
 	private static final String PLUGIN_PACKAGE_PREFIX = "ro.fortsoft.pf4j.";
 
 	private PluginManager pluginManager;
@@ -46,10 +46,13 @@ public class PluginClassLoader extends URLClassLoader {
     public Class<?> loadClass(String className) throws ClassNotFoundException {
 //		System.out.println(">>>" + className);
 
+		/*
+		 // javax.mail is not in JDK ?!
 		// first check whether it's a system class, delegate to the system loader
 		if (className.startsWith(JAVA_PACKAGE_PREFIX) || className.startsWith(JAVAX_PACKAGE_PREFIX)) {
 			return findSystemClass(className);
 		}
+		*/
 
         // second check whether it's already been loaded
         Class<?> loadedClass = findLoadedClass(className);

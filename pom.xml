@@ -9,10 +9,10 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.fortsoft.pf4j</groupId>
-    <artifactId>pom</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <artifactId>pf4j-parent</artifactId>
+    <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>PF4J</name>
+    <name>PF4J Parent</name>
     <description>Plugin Framework for Java</description>
 
     <licenses>

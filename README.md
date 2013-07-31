@@ -1,12 +1,23 @@
 Plugin Framework for Java (PF4J)
 =====================
-
 A plugin is a way for a third party to extend the functionality of an application. A plugin implements extension points
-declared by application or other plugins. Also a plugin can define extension points.
+declared by application or other plugins. Also a plugin can define extension points.  
+
+Current build status:  [![Build Status](https://buildhive.cloudbees.com/job/decebals/job/pf4j/badge/icon)](https://buildhive.cloudbees.com/job/decebals/job/pf4j/)
+
+Features/Benefits
+-------------------
+With PF4J you can easily transform a monolithic java application in a modular application. 
+PF4J is an open source (Apache license) lightweight (around 35KB) plugin framework for java, with minimal dependencies and very extensible (see PluginDescriptorFinder and ExtensionFinder).
+
+No XML, only Java.
+
+You can mark any interface or abstract class as an extension point (with marker interface ExtensionPoint) and you specified that an class is an extension with @Extension annotation.
+
+Also, PF4J can be used in web applications. For my web applications when I want modularity I use [Wicket Plugin](https://github.com/decebals/wicket-plugin).
 
 Components
 -------------------
-
 - **Plugin** is the base class for all plugins types. Each plugin is loaded into a separate class loader to avoid conflicts.
 - **PluginManager** is used for all aspects of plugins management (loading, starting, stopping).
 - **ExtensionPoint** is a point in the application where custom code can be invoked. It's a java interface marker.   
@@ -15,13 +26,11 @@ Any java interface or abstract class can be marked as an extension point (implem
 
 Artifacts
 -------------------
-
 - PF4J `pf4j` (jar)
 - PF4J Demo `pf4j-demo` (executable jar)
 
 Using Maven
 -------------------
-
 In your pom.xml you must define the dependencies to PF4J artifacts with:
 
 ```xml
@@ -34,9 +43,10 @@ In your pom.xml you must define the dependencies to PF4J artifacts with:
 
 where ${pf4j.version} is the last pf4j version.
 
+You may want to check for the latest released version using [Maven Search](http://search.maven.org/#search%7Cga%7C1%7Cpf4j)
+
 How to use
 -------------------
-
 It's very simple to add pf4j in your application:
 
     public static void main(String[] args) {
@@ -51,7 +61,7 @@ It's very simple to add pf4j in your application:
 
 In above code, I created a **DefaultPluginManager** (it's the default implementation for
 **PluginManager** interface) that loads and starts all active(resolved) plugins.  
-The available plugins are loaded using a **PluginClassLoader**.   
+Each available plugin is loaded using a **PluginClassLoader**.   
 The **PluginClassLoader** contains only classes found in _classes_ and _lib_ folders of plugin and runtime classes and libraries of the required plugins. 
 The plugins are stored in a folder. You can specify the plugins folder in the constructor of DefaultPluginManager. If the plugins folder is not specified 
 than the location is returned by `System.getProperty("pf4j.pluginsDir", "plugins")`.
@@ -125,22 +135,77 @@ The output is:
     >>> Welcome
     >>> Hello
 
+You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder) in DefaultPluginManager just override createXXX methods (factory method pattern).
+
+Example:
+
+    protected PluginDescriptorFinder createPluginDescriptorFinder() {
+        return new PropertiesPluginDescriptorFinder();
+    }
+    
+and in plugin respository you must have a plugin.properties file with the below content:
+
+    plugin.class=ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
+    plugin.dependencies=x, y, z
+    plugin.id=welcome-plugin
+    plugin.provider=Decebal Suiu
+    plugin.version=0.0.1
+    
+
 For more information please see the demo sources.
+
+Enable/Disable plugins
+-------------------
+In theory, it's a relation **1:N** between an extension point and the extensions for this extension point.   
+This works well, except for when you develop multiple plugins for this extension point as different options for your clients to decide on which one to use.  
+In this situation you wish a possibility to disable all but one extension.   
+For example I have an extension point for sending mail (EmailSender interface) with two extensions: one based on Sendgrid and another
+based on Amazon Simple Email Service.   
+The first extension is located in Plugin1 and the second extension is located in Plugin2.   
+I want to go only with one extension ( **1:1** relation between extension point and extensions) and to achieve this I have two options:  
+1) uninstall Plugin1 or Plugin2 (remove folder pluginX.zip and pluginX from plugins folder)  
+2) disable Plugin1 or Plugin2  
+
+For option two you must create a simple file **enabled.txt** or **disabled.txt** in your plugins folder.   
+The content for **enabled.txt** is similar with:
+
+    ########################################
+    # - load only these plugins
+    # - add one plugin id on each line
+    # - put this file in plugins folder
+    ########################################
+    welcome-plugin
+
+The content for **disabled.txt** is similar with:
+
+    ########################################
+    # - load all plugins except these
+    # - add one plugin id on each line
+    # - put this file in plugins folder
+    ########################################
+    welcome-plugin
+
+All comment lines (line that start with # character) are ignored.   
+If a file with enabled.txt exists than disabled.txt is ignored. See enabled.txt and disabled.txt from the demo folder. 
 
 Demo
 -------------------
-
 I have a tiny demo application. The demo application is in demo folder.
 In demo/api folder I declared an extension point (_Greeting_).  
 In demo/plugin* I implemented two plugins: plugin1, plugin2 (each plugin adds an extension for _Greeting_).  
 
 To run the demo application use:  
  
-    ./run-demo.sh
+    ./run-demo.sh (for Linux/Unix)
+    ./run-demo.bat (for Windows)
+
+Mailing list
+--------------
+
+Much of the conversation between developers and users is managed through [mailing list] (http://groups.google.com/group/pf4j).
 
 License
 --------------
-  
 Copyright 2012 Decebal Suiu
  
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
