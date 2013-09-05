@@ -34,6 +34,7 @@ public class ExtensionFilter implements FilenameFilter {
         return file.getName().toUpperCase().endsWith(extension.toUpperCase());
     }
 
+    @Override
     public boolean accept(File dir, String name) {
         return accept(new File(dir, name));
     }

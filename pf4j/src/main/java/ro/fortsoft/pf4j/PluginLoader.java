@@ -58,7 +58,7 @@ class PluginLoader {
         libDirectory = new File(pluginRepository, "lib");
         ClassLoader parent = getClass().getClassLoader(); 
         pluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, parent);        
-        log.debug("Created class loader " + pluginClassLoader);
+        log.debug("Created class loader {}", pluginClassLoader);
     }
 
     public File getPluginRepository() {
@@ -100,11 +100,11 @@ class PluginLoader {
         classesDirectory = classesDirectory.getAbsoluteFile();
 
         if (classesDirectory.exists() && classesDirectory.isDirectory()) {
-            log.debug("Found '" + classesDirectory.getPath() + "' directory");
+            log.debug("Found '{}' directory", classesDirectory.getPath());
 
             try {
                 pluginClassLoader.addURL(classesDirectory.toURI().toURL());
-                log.debug("Added '" + classesDirectory + "' to the class loader path");
+                log.debug("Added '{}' to the class loader path", classesDirectory);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 log.error(e.getMessage(), e);
@@ -128,7 +128,7 @@ class PluginLoader {
             File jarFile = new File(libDirectory, jar);
             try {
                 pluginClassLoader.addURL(jarFile.toURI().toURL());
-                log.debug("Added '" + jarFile + "' to the class loader path");
+                log.debug("Added '{}' to the class loader path", jarFile);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 log.error(e.getMessage(), e);

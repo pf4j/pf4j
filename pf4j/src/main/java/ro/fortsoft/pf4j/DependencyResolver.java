@@ -51,14 +51,14 @@ class DependencyResolver {
 			}
 		}
 
-		log.debug("Graph: " + graph);
+		log.debug("Graph: {}", graph);
 		List<String> pluginsId = graph.reverseTopologicalSort();
 
 		if (pluginsId == null) {
 			throw new CyclicDependencyException("Cyclic dependences !!!" + graph.toString());
 		}
 
-		log.debug("Plugins order: " + pluginsId);
+		log.debug("Plugins order: {}", pluginsId);
 		List<PluginWrapper> sortedPlugins = new ArrayList<PluginWrapper>();
 		for (String pluginId : pluginsId) {
 			sortedPlugins.add(getPlugin(pluginId));

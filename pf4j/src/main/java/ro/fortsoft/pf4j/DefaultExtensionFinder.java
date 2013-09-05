@@ -41,7 +41,7 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 	
 	@Override
 	public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
-		log.debug("Find extensions for " + type);
+		log.debug("Find extensions for {}", type);
         List<ExtensionWrapper<T>> result = new ArrayList<ExtensionWrapper<T>>();
 		getIndices();
 //		System.out.println("indices =  "+ indices);
@@ -49,11 +49,11 @@ public class DefaultExtensionFinder implements ExtensionFinder {
             try {
             	AnnotatedElement element = item.element();
             	Class<?> extensionType = (Class<?>) element;
-            	log.debug("Checking extension type " + extensionType);
+            	log.debug("Checking extension type {}", extensionType);
             	if (type.isAssignableFrom(extensionType)) {
                     Object instance = item.instance();
                     if (instance != null) {
-                		log.debug("Added extension " + extensionType);
+                		log.debug("Added extension {}", extensionType);
 						result.add(new ExtensionWrapper<T>(type.cast(instance), item.annotation().ordinal()));
                     }
                 }
