@@ -2,17 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     
     <parent>
-        <groupId>ro.fortsoft.pf4j</groupId>
-        <artifactId>pf4j-parent</artifactId>
+        <groupId>ro.fortsoft.pf4j.demo</groupId>
+        <artifactId>pf4j-demo-parent</artifactId>
         <version>0.5-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.fortsoft.pf4j.demo</groupId>
-    <artifactId>pf4j-demo-parent</artifactId>
+    <artifactId>pf4j-demo-plugins</artifactId>
     <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Demo Parent</name>
+    <name>Demo Plugins Parent</name>
 
     <build>
         <resources>
@@ -30,9 +30,8 @@
     </build>
 
     <modules>
-        <module>app</module>
-        <module>api</module>
-        <module>plugins</module>
+        <module>plugin1</module>
+        <module>plugin2</module>
     </modules>
 
 </project>
