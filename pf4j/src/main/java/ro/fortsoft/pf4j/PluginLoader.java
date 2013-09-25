@@ -15,6 +15,7 @@ package ro.fortsoft.pf4j;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.Vector;
 
 import org.slf4j.Logger;
@@ -40,22 +41,12 @@ class PluginLoader {
      */
     private File pluginRepository;
 
-    /*
-     * The directory with '.class' files.
-     */
-    private File classesDirectory;
-
-    /*
-     * The directory with '.jar' files.
-     */
-    private File libDirectory;
-
+    private PluginClasspath pluginClasspath;
     private PluginClassLoader pluginClassLoader;
 
-    public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository) {
+    public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository, PluginClasspath pluginClasspath) {
         this.pluginRepository = pluginRepository;
-        classesDirectory = new File(pluginRepository, "classes");
-        libDirectory = new File(pluginRepository, "lib");
+        this.pluginClasspath = pluginClasspath; 
         ClassLoader parent = getClass().getClassLoader(); 
         pluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, parent);        
         log.debug("Created class loader {}", pluginClassLoader);
@@ -77,6 +68,60 @@ class PluginLoader {
        return loadClasses() && loadJars();
     }
 
+    private boolean loadClasses() {
+    	List<String> classesDirectories = pluginClasspath.getClassesDirectories();
+    	
+    	// add each classes directory to plugin class loader
+    	for (String classesDirectory : classesDirectories) {
+	        // make 'classesDirectory' absolute
+	        File file = new File(pluginRepository, classesDirectory).getAbsoluteFile();
+	
+	        if (file.exists() && file.isDirectory()) {
+	            log.debug("Found '{}' directory", file.getPath());
+	
+	            try {
+	                pluginClassLoader.addURL(file.toURI().toURL());
+	                log.debug("Added '{}' to the class loader path", file);
+	            } catch (MalformedURLException e) {
+	                e.printStackTrace();
+	                log.error(e.getMessage(), e);
+	                return false;
+	            }
+	        }
+    	}
+
+        return true;
+    }
+
+    /**
+     * Add all *.jar files from lib directories to class loader.
+     */
+    private boolean loadJars() {
+    	List<String> libDirectories = pluginClasspath.getLibDirectories();
+    	
+    	// add each jars directory to plugin class loader
+    	for (String libDirectory : libDirectories) {
+	        // make 'libDirectory' absolute
+	        File file = new File(pluginRepository, libDirectory).getAbsoluteFile();
+	
+	        // collect all jars from current lib directory in jars variable
+	        Vector<File> jars = new Vector<File>();
+	        getJars(jars, file);
+	        for (File jar : jars) {
+	            try {
+	                pluginClassLoader.addURL(jar.toURI().toURL());
+	                log.debug("Added '{}' to the class loader path", jar);
+	            } catch (MalformedURLException e) {
+	                e.printStackTrace();
+	                log.error(e.getMessage(), e);
+	                return false;
+	            }
+	        }
+    	}
+
+        return true;
+    }
+
     private void getJars(Vector<File> bucket, File file) {
         FileFilter jarFilter = new JarFileFilter();
         FileFilter directoryFilter = new DirectoryFileFilter();
@@ -93,49 +138,6 @@ class PluginLoader {
                 getJars(bucket, directory);
             }
         }
-    }
-
-    private boolean loadClasses() {
-        // make 'classesDirectory' absolute
-        classesDirectory = classesDirectory.getAbsoluteFile();
-
-        if (classesDirectory.exists() && classesDirectory.isDirectory()) {
-            log.debug("Found '{}' directory", classesDirectory.getPath());
-
-            try {
-                pluginClassLoader.addURL(classesDirectory.toURI().toURL());
-                log.debug("Added '{}' to the class loader path", classesDirectory);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                log.error(e.getMessage(), e);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Add all *.jar files from '/lib' directory.
-     */
-    private boolean loadJars() {
-        // make 'jarDirectory' absolute
-        libDirectory = libDirectory.getAbsoluteFile();
-
-        Vector<File> jars = new Vector<File>();
-        getJars(jars, libDirectory);
-        for (File jar : jars) {
-            try {
-                pluginClassLoader.addURL(jar.toURI().toURL());
-                log.debug("Added '{}' to the class loader path", jar);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                log.error(e.getMessage(), e);
-                return false;
-            }
-        }
-
-        return true;
     }
 
 }

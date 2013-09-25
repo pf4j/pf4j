@@ -47,9 +47,11 @@ public class DefaultPluginManager implements PluginManager {
      */
     private File pluginsDirectory;
 
-    private ExtensionFinder extensionFinder;
+    private final ExtensionFinder extensionFinder;
     
-    private PluginDescriptorFinder pluginDescriptorFinder;
+    private final PluginDescriptorFinder pluginDescriptorFinder;
+    
+    private final PluginClasspath pluginClasspath;
     
     /**
      * A map of plugins this manager is responsible for (the key is the 'pluginId').
@@ -114,6 +116,7 @@ public class DefaultPluginManager implements PluginManager {
         disabledPlugins = new ArrayList<String>();
         compoundClassLoader = new CompoundClassLoader();
         
+        pluginClasspath = createPluginClasspath();
         pluginDescriptorFinder = createPluginDescriptorFinder();
         extensionFinder = createExtensionFinder();
 
@@ -278,7 +281,7 @@ public class DefaultPluginManager implements PluginManager {
 	 * Add the possibility to override the PluginDescriptorFinder. 
 	 */
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
-    	return new DefaultPluginDescriptorFinder();
+    	return new DefaultPluginDescriptorFinder(pluginClasspath);
     }
 
     /**
@@ -288,6 +291,13 @@ public class DefaultPluginManager implements PluginManager {
     	return new DefaultExtensionFinder(compoundClassLoader);
     }
 
+    /**
+     * Add the possibility to override the PluginClassPath. 
+     */
+    protected PluginClasspath createPluginClasspath() {
+    	return new PluginClasspath();
+    }
+    
     protected boolean isPluginDisabled(String pluginId) {
     	if (enabledPlugins.isEmpty()) {
     		return disabledPlugins.contains(pluginId);
@@ -325,7 +335,7 @@ public class DefaultPluginManager implements PluginManager {
 
         // load plugin
         log.debug("Loading plugin '{}'", pluginPath);
-        PluginLoader pluginLoader = new PluginLoader(this, pluginDescriptor, pluginDirectory);
+        PluginLoader pluginLoader = new PluginLoader(this, pluginDescriptor, pluginDirectory, pluginClasspath);
         pluginLoader.load();
         log.debug("Loaded plugin '{}'", pluginPath);
         
