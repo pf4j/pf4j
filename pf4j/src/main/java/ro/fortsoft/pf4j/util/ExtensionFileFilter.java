@@ -12,21 +12,26 @@
  */
 package ro.fortsoft.pf4j.util;
 
+import java.io.File;
+import java.io.FileFilter;
+
 /**
- * File filter that accepts all files ending with .ZIP.
- * This filter is case insensitive.
- *
+ * Filter accepts any file ending in extension. The case of the filename is ignored.
+ * 
  * @author Decebal Suiu
  */
-public class ZipFilter extends ExtensionFilter {
+public class ExtensionFileFilter implements FileFilter {
 
-    /**
-     * The extension that this filter will search for.
-     */
-    private static final String ZIP_EXTENSION = ".ZIP";
+    private String extension;
 
-    public ZipFilter() {
-        super(ZIP_EXTENSION);
+    public ExtensionFileFilter(String extension) {
+        this.extension = extension;
+    }
+
+    @Override
+    public boolean accept(File file) {
+        // perform a case insensitive check.
+        return file.getName().toUpperCase().endsWith(extension.toUpperCase());
     }
 
 }

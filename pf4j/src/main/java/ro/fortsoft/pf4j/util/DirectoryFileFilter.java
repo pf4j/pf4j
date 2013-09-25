@@ -14,22 +14,17 @@ package ro.fortsoft.pf4j.util;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 
 /**
+ * Filter accepts files that are directories.
+ * 
  * @author Decebal Suiu
  */
-public class DirectoryFilter implements FileFilter, FilenameFilter {
+public class DirectoryFileFilter implements FileFilter {
 
-    /**
-     * Accepts any file ending in .jar. The case of the filename is ignored.
-     */
+	@Override
     public boolean accept(File file) {
         return file.isDirectory();
-    }
-
-    public boolean accept(File dir, String name) {
-        return accept(new File(dir, name));
     }
 
 }

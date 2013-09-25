@@ -13,7 +13,7 @@
 package ro.fortsoft.pf4j;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,11 +24,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.fortsoft.pf4j.util.AndFileFilter;
 import ro.fortsoft.pf4j.util.CompoundClassLoader;
-import ro.fortsoft.pf4j.util.DirectoryFilter;
+import ro.fortsoft.pf4j.util.DirectoryFileFilter;
 import ro.fortsoft.pf4j.util.FileUtils;
+import ro.fortsoft.pf4j.util.HiddenFilter;
+import ro.fortsoft.pf4j.util.NotFileFilter;
 import ro.fortsoft.pf4j.util.Unzip;
-import ro.fortsoft.pf4j.util.ZipFilter;
+import ro.fortsoft.pf4j.util.ZipFileFilter;
 
 /**
  * Default implementation of the PluginManager interface.
@@ -200,9 +203,9 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         // expand all plugin archives
-        FilenameFilter zipFilter = new ZipFilter();
-        String[] zipFiles = pluginsDirectory.list(zipFilter);
-        for (String zipFile : zipFiles) {
+        FileFilter zipFilter = new ZipFileFilter();
+        File[] zipFiles = pluginsDirectory.listFiles(zipFilter);
+        for (File zipFile : zipFiles) {
         	try {
 				expandPluginArchive(zipFile);
 			} catch (IOException e) {
@@ -211,15 +214,18 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         // check for no plugins
-        FilenameFilter directoryFilter = new DirectoryFilter();
-        String[] directories = pluginsDirectory.list(directoryFilter);
+        List<FileFilter> filterList = new ArrayList<FileFilter>();
+        filterList.add(new DirectoryFileFilter());
+        filterList.add(new NotFileFilter(createHiddenPluginFilter()));
+        FileFilter pluginsFilter = new AndFileFilter(filterList);
+        File[] directories = pluginsDirectory.listFiles(pluginsFilter);
         if (directories.length == 0) {
         	log.info("No plugins");
         	return;
         }
 
         // load any plugin from plugins directory
-        for (String directory : directories) {
+        for (File directory : directories) {
             try {
                 loadPlugin(directory);
             } catch (PluginException e) {
@@ -268,15 +274,36 @@ public class DefaultPluginManager implements PluginManager {
         return null;
     }
 
-	private void loadPlugin(String fileName) throws PluginException {
-        // test for plugin directory
-        File pluginDirectory = new File(pluginsDirectory, fileName);
-        if (!pluginDirectory.isDirectory()) {
-            return;
-        }
-        
+	/**
+	 * Add the possibility to override the PluginDescriptorFinder. 
+	 */
+    protected PluginDescriptorFinder createPluginDescriptorFinder() {
+    	return new DefaultPluginDescriptorFinder();
+    }
+
+    /**
+     * Add the possibility to override the ExtensionFinder. 
+     */
+    protected ExtensionFinder createExtensionFinder() {
+    	return new DefaultExtensionFinder(compoundClassLoader);
+    }
+
+    protected boolean isPluginDisabled(String pluginId) {
+    	if (enabledPlugins.isEmpty()) {
+    		return disabledPlugins.contains(pluginId);
+    	}
+    	
+    	return !enabledPlugins.contains(pluginId);
+    }
+    
+    protected FileFilter createHiddenPluginFilter() {
+    	return new HiddenFilter();
+    }
+    
+	private void loadPlugin(File pluginDirectory) throws PluginException {
         // try to load the plugin
-        String pluginPath = "/".concat(fileName);
+		String pluginName = pluginDirectory.getName();
+        String pluginPath = "/".concat(pluginName);
 
         // test for plugin duplication
         if (plugins.get(pathToIdMap.get(pluginPath)) != null) {
@@ -318,37 +345,15 @@ public class DefaultPluginManager implements PluginManager {
         pluginClassLoaders.put(pluginId, pluginClassLoader);
     }
 
-	/**
-	 * Add the possibility to override the PluginDescriptorFinder. 
-	 */
-    protected PluginDescriptorFinder createPluginDescriptorFinder() {
-    	return new DefaultPluginDescriptorFinder();
-    }
-
-    /**
-     * Add the possibility to override the ExtensionFinder. 
-     */
-    protected ExtensionFinder createExtensionFinder() {
-    	return new DefaultExtensionFinder(compoundClassLoader);
-    }
-
-    protected boolean isPluginDisabled(String pluginId) {
-    	if (enabledPlugins.isEmpty()) {
-    		return disabledPlugins.contains(pluginId);
-    	}
-    	
-    	return !enabledPlugins.contains(pluginId);
-    }
-    
-    private void expandPluginArchive(String fileName) throws IOException {
-        File pluginArchiveFile = new File(pluginsDirectory, fileName);
+    private void expandPluginArchive(File pluginArchiveFile) throws IOException {
+    	String fileName = pluginArchiveFile.getName();
         long pluginArchiveDate = pluginArchiveFile.lastModified();
         String pluginName = fileName.substring(0, fileName.length() - 4);
         File pluginDirectory = new File(pluginsDirectory, pluginName);
         // check if exists directory or the '.zip' file is "newer" than directory
         if (!pluginDirectory.exists() || (pluginArchiveDate > pluginDirectory.lastModified())) {
         	log.debug("Expand plugin archive '{}' in '{}'", pluginArchiveFile, pluginDirectory);
-            // create directorie for plugin
+            // create directory for plugin
             pluginDirectory.mkdirs();
 
             // expand '.zip' file

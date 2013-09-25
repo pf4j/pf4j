@@ -13,15 +13,15 @@
 package ro.fortsoft.pf4j;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.FileFilter;
 import java.net.MalformedURLException;
 import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.fortsoft.pf4j.util.DirectoryFilter;
-import ro.fortsoft.pf4j.util.JarFilter;
+import ro.fortsoft.pf4j.util.DirectoryFileFilter;
+import ro.fortsoft.pf4j.util.JarFileFilter;
 
 /**
  * Load all informations needed by a plugin.
@@ -77,20 +77,20 @@ class PluginLoader {
        return loadClasses() && loadJars();
     }
 
-    private void getJars(Vector<String> v, File file) {
-        FilenameFilter jarFilter = new JarFilter();
-        FilenameFilter directoryFilter = new DirectoryFilter();
+    private void getJars(Vector<File> bucket, File file) {
+        FileFilter jarFilter = new JarFileFilter();
+        FileFilter directoryFilter = new DirectoryFileFilter();
 
         if (file.exists() && file.isDirectory() && file.isAbsolute()) {
-            String[] jars = file.list(jarFilter);
+            File[] jars = file.listFiles(jarFilter);
             for (int i = 0; (jars != null) && (i < jars.length); ++i) {
-                v.addElement(jars[i]);
+                bucket.addElement(jars[i]);
             }
 
-            String[] directoryList = file.list(directoryFilter);
-            for (int i = 0; (directoryList != null) && (i < directoryList.length); ++i) {
-                File directory = new File(file, directoryList[i]);
-                getJars(v, directory);
+            File[] directories = file.listFiles(directoryFilter);
+            for (int i = 0; (directories != null) && (i < directories.length); ++i) {
+                File directory = directories[i];
+                getJars(bucket, directory);
             }
         }
     }
@@ -122,13 +122,12 @@ class PluginLoader {
         // make 'jarDirectory' absolute
         libDirectory = libDirectory.getAbsoluteFile();
 
-        Vector<String> jars = new Vector<String>();
+        Vector<File> jars = new Vector<File>();
         getJars(jars, libDirectory);
-        for (String jar : jars) {
-            File jarFile = new File(libDirectory, jar);
+        for (File jar : jars) {
             try {
-                pluginClassLoader.addURL(jarFile.toURI().toURL());
-                log.debug("Added '{}' to the class loader path", jarFile);
+                pluginClassLoader.addURL(jar.toURI().toURL());
+                log.debug("Added '{}' to the class loader path", jar);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 log.error(e.getMessage(), e);

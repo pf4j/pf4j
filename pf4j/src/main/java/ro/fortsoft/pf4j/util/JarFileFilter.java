@@ -18,14 +18,14 @@ package ro.fortsoft.pf4j.util;
  *
  * @author Decebal Suiu
  */
-public class JarFilter extends ExtensionFilter {
+public class JarFileFilter extends ExtensionFileFilter {
 
     /**
      * The extension that this filter will search for.
      */
     private static final String JAR_EXTENSION = ".JAR";
 
-    public JarFilter() {
+    public JarFileFilter() {
         super(JAR_EXTENSION);
     }
 
