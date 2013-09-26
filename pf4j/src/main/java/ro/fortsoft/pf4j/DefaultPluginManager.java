@@ -199,9 +199,10 @@ public class DefaultPluginManager implements PluginManager {
      */
     @Override
     public void loadPlugins() {
+    	log.debug("Lookup plugins in '{}'", pluginsDirectory.getAbsolutePath());
     	// check for plugins directory
         if (!pluginsDirectory.exists() || !pluginsDirectory.isDirectory()) {
-            log.error("No '{}' directory", pluginsDirectory);
+            log.error("No '{}' directory", pluginsDirectory.getAbsolutePath());
             return;
         }
 
