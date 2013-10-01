@@ -12,24 +12,21 @@
  */
 package ro.fortsoft.pf4j.util;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-
 /**
+ * File filter that accepts all files ending with .JAR.
+ * This filter is case insensitive.
+ *
  * @author Decebal Suiu
  */
-public class DirectoryFilter implements FileFilter, FilenameFilter {
+public class JarFileFilter extends ExtensionFileFilter {
 
     /**
-     * Accepts any file ending in .jar. The case of the filename is ignored.
+     * The extension that this filter will search for.
      */
-    public boolean accept(File file) {
-        return file.isDirectory();
-    }
+    private static final String JAR_EXTENSION = ".JAR";
 
-    public boolean accept(File dir, String name) {
-        return accept(new File(dir, name));
+    public JarFileFilter() {
+        super(JAR_EXTENSION);
     }
 
 }

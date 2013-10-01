@@ -16,8 +16,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,44 +25,40 @@ import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.util.StringUtils;
 
 /**
- * Find a plugin descriptor in a properties file (in plugin repository).
- * 
+ * Read the plugin descriptor from the manifest file.
+ *
  * @author Decebal Suiu
  */
-public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder {
+public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
-	private static final Logger log = LoggerFactory.getLogger(PropertiesPluginDescriptorFinder.class);
+	private static final Logger log = LoggerFactory.getLogger(ManifestPluginDescriptorFinder.class);
 	
-	private static final String DEFAULT_PROPERTIES_FILE_NAME = "plugin.properties";
+	private PluginClasspath pluginClasspath;
 	
-	private String propertiesFileName;
-
-	public PropertiesPluginDescriptorFinder() {
-		this(DEFAULT_PROPERTIES_FILE_NAME);
+	public ManifestPluginDescriptorFinder(PluginClasspath pluginClasspath) {
+		this.pluginClasspath = pluginClasspath;
 	}
 
-	public PropertiesPluginDescriptorFinder(String propertiesFileName) {
-		this.propertiesFileName = propertiesFileName;
-	}
-	
 	@Override
 	public PluginDescriptor find(File pluginRepository) throws PluginException {
-        File propertiesFile = new File(pluginRepository, propertiesFileName);
-        log.debug("Lookup plugin descriptor in '{}'", propertiesFile);
-        if (!propertiesFile.exists()) {
-            throw new PluginException("Cannot find '" + propertiesFile + "' file");
+    	// TODO it's ok with first classes directory? Another idea is to specify in PluginClasspath the folder.
+		String classes = pluginClasspath.getClassesDirectories().get(0);
+        File manifestFile = new File(pluginRepository, classes + "/META-INF/MANIFEST.MF");
+        log.debug("Lookup plugin descriptor in '{}'", manifestFile);
+        if (!manifestFile.exists()) {
+            throw new PluginException("Cannot find '" + manifestFile + "' file");
         }
 
-    	InputStream input = null;
+    	FileInputStream input = null;
 		try {
-			input = new FileInputStream(propertiesFile);
+			input = new FileInputStream(manifestFile);
 		} catch (FileNotFoundException e) {
 			// not happening 
 		}
 		
-    	Properties properties = new Properties();
+    	Manifest manifest = null;
         try {
-        	properties.load(input);
+            manifest = new Manifest(input);
         } catch (IOException e) {
             throw new PluginException(e.getMessage(), e);
         } finally {
@@ -76,30 +72,31 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
         
         // TODO validate !!!
-        String id = properties.getProperty("plugin.id");
+        Attributes attrs = manifest.getMainAttributes();
+        String id = attrs.getValue("Plugin-Id");
         if (StringUtils.isEmpty(id)) {
-        	throw new PluginException("plugin.id cannot be empty");
+        	throw new PluginException("Plugin-Id cannot be empty");
         }
         pluginDescriptor.setPluginId(id);
         
-        String clazz = properties.getProperty("plugin.class");
+        String clazz = attrs.getValue("Plugin-Class");
         if (StringUtils.isEmpty(clazz)) {
-        	throw new PluginException("plugin.class cannot be empty");
+        	throw new PluginException("Plugin-Class cannot be empty");
         }
         pluginDescriptor.setPluginClass(clazz);
         
-        String version = properties.getProperty("plugin.version");
+        String version = attrs.getValue("Plugin-Version");
         if (StringUtils.isEmpty(version)) {
-        	throw new PluginException("plugin.version cannot be empty");
+        	throw new PluginException("Plugin-Version cannot be empty");
         }
         pluginDescriptor.setPluginVersion(PluginVersion.createVersion(version));
         
-        String provider = properties.getProperty("plugin.provider");
+        String provider = attrs.getValue("Plugin-Provider");
         pluginDescriptor.setProvider(provider);        
-        String dependencies = properties.getProperty("plugin.dependencies");
+        String dependencies = attrs.getValue("Plugin-Dependencies");
         pluginDescriptor.setDependencies(dependencies);
 
 		return pluginDescriptor;
 	}
-
+    	
 }

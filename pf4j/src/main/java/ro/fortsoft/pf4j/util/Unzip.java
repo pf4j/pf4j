@@ -61,7 +61,7 @@ public class Unzip {
     }
 
     public void extract() throws IOException {
-        log.debug("Extract content of " + source + " to " + destination);
+        log.debug("Extract content of '{}' to '{}'", source, destination);
 
         // delete destination file if exists
         removeDirectory(destination);
@@ -91,7 +91,7 @@ public class Unzip {
 		            fos.close();
                 }
     	    } catch (FileNotFoundException e) {
-    	    	log.error("File '" + zipEntry.getName() + "' not found");
+    	    	log.error("File '{}' not found", zipEntry.getName());
     	    }
 	    }
 

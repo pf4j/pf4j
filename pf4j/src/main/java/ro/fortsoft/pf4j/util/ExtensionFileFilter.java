@@ -13,29 +13,25 @@
 package ro.fortsoft.pf4j.util;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.FileFilter;
 
 /**
+ * Filter accepts any file ending in extension. The case of the filename is ignored.
+ * 
  * @author Decebal Suiu
  */
-public class ExtensionFilter implements FilenameFilter {
+public class ExtensionFileFilter implements FileFilter {
 
     private String extension;
 
-    public ExtensionFilter(String extension) {
+    public ExtensionFileFilter(String extension) {
         this.extension = extension;
     }
 
-    /**
-     * Accepts any file ending in extension. The case of the filename is ignored.
-     */
+    @Override
     public boolean accept(File file) {
         // perform a case insensitive check.
         return file.getName().toUpperCase().endsWith(extension.toUpperCase());
-    }
-
-    public boolean accept(File dir, String name) {
-        return accept(new File(dir, name));
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Decebal Suiu
+ * Copyright 2013 Decebal Suiu
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
@@ -12,21 +12,25 @@
  */
 package ro.fortsoft.pf4j.util;
 
+import java.io.File;
+import java.io.FileFilter;
+
 /**
- * File filter that accepts all files ending with .JAR.
- * This filter is case insensitive.
+ * This filter produces a logical NOT of the filters specified.
  *
  * @author Decebal Suiu
  */
-public class JarFilter extends ExtensionFilter {
+public class NotFileFilter implements FileFilter {
 
-    /**
-     * The extension that this filter will search for.
-     */
-    private static final String JAR_EXTENSION = ".JAR";
+    private FileFilter filter;
 
-    public JarFilter() {
-        super(JAR_EXTENSION);
+    public NotFileFilter(FileFilter filter) {
+        this.filter = filter;
+    }
+
+    @Override
+    public boolean accept(File file) {
+        return !filter.accept(file);
     }
 
 }

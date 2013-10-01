@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Decebal Suiu
+ * Copyright 2012 Decebal Suiu
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
@@ -10,18 +10,23 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package ro.fortsoft.pf4j;
+package ro.fortsoft.pf4j.util;
 
 /**
- * The default implementation for PluginDescriptorFinder. 
- * Now, this class it's a "link" to {@link ro.fortsoft.pf4j.ManifestPluginDescriptorFinder}.
- * 
+ * File filter that accepts all files ending with .ZIP.
+ * This filter is case insensitive.
+ *
  * @author Decebal Suiu
  */
-public class DefaultPluginDescriptorFinder extends ManifestPluginDescriptorFinder {
+public class ZipFileFilter extends ExtensionFileFilter {
 
-	public DefaultPluginDescriptorFinder(PluginClasspath pluginClasspath) {
-		super(pluginClasspath);
-	}
-    	
+    /**
+     * The extension that this filter will search for.
+     */
+    private static final String ZIP_EXTENSION = ".ZIP";
+
+    public ZipFileFilter() {
+        super(ZIP_EXTENSION);
+    }
+
 }
