@@ -61,8 +61,8 @@ It's very simple to add pf4j in your application:
 
 In above code, I created a **DefaultPluginManager** (it's the default implementation for
 **PluginManager** interface) that loads and starts all active(resolved) plugins.  
-Each available plugin is loaded using a **PluginClassLoader**.   
-The **PluginClassLoader** contains only classes found in _classes_ and _lib_ folders of plugin and runtime classes and libraries of the required plugins. 
+Each available plugin is loaded using a different java class loader, **PluginClassLoader**.   
+The **PluginClassLoader** contains only classes found in **PluginClasspath** (default _classes_ and _lib_ folders) of plugin and runtime classes and libraries of the required/dependent plugins. 
 The plugins are stored in a folder. You can specify the plugins folder in the constructor of DefaultPluginManager. If the plugins folder is not specified 
 than the location is returned by `System.getProperty("pf4j.pluginsDir", "plugins")`.
 
@@ -71,12 +71,12 @@ The structure of plugins folder is:
 * plugin2.zip (or plugin2 folder)
 
 In plugins folder you can put a plugin as folder or archive file (zip).
-A plugin folder has this structure:
+A plugin folder has this structure by default:
 * `classes` folder
 * `lib` folder (optional - if the plugin used third party libraries)
 
 The plugin manager searches plugins metadata using a **PluginDescriptorFinder**.   
-**DefaultPluginDescriptorFinder** lookups plugins descriptors in MANIFEST.MF file.
+**DefaultPluginDescriptorFinder** is a "link" to **ManifestPluginDescriptorFinder** that lookups plugins descriptors in MANIFEST.MF file.
 In this case the `classes/META-INF/MANIFEST.MF` file looks like:
 
     Manifest-Version: 1.0
@@ -102,7 +102,7 @@ You can define an extension point in your application using **ExtensionPoint** i
     }
 
 Another important internal component is **ExtensionFinder** that describes how plugin manager discovers extensions for extensions points.   
-**DefaultExtensionFinder** looks up extensions using **Extension** annotation.
+**DefaultExtensionFinder** is a "link" to **SezpozExtensionFinder** that looks up extensions using **Extension** annotation.
 
     public class WelcomePlugin extends Plugin {
 
@@ -135,7 +135,7 @@ The output is:
     >>> Welcome
     >>> Hello
 
-You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder) in DefaultPluginManager just override createXXX methods (factory method pattern).
+You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder, PluginClasspath, ...) in DefaultPluginManager just override createXXX methods (factory method pattern).
 
 Example:
 
@@ -153,6 +153,26 @@ and in plugin respository you must have a plugin.properties file with the below 
     
 
 For more information please see the demo sources.
+
+Development runtime mode
+--------------------------
+PF4J can run in two modes: **DEVELOPMENT** and **DEPLOYMENT**.  
+The DEPLOYMENT(default) mode is the standard workflow for plugins creation: create a new maven module for each plugin, codding the plugin (declares new extension points and/or 
+add new extensions), pack the plugin in a zip file, deploy the zip file to plugins folder. These operations are time consuming and from this reason I introduced the DEVELOPMENT runtime mode.  
+The main advantage of DEVELOPMENT runtime mode for a plugin developer is that he/she is not enforced to pack and deploy the plugins. In DEVELOPMENT mode you can developing plugins in a simple and fast mode.   
+
+Lets describe how DEVELOPMENT runtime mode works.
+
+First, you can change the runtime mode using the "pf4j.mode" system property or overriding `DefaultPluginManager.getRuntimeMode()`.  
+For example I run the pf4j demo in eclipse in DEVELOPMENT mode adding only `"-Dpf4j.mode=development"` to the pf4j demo launcher.  
+You can retrieve the current runtime mode using `PluginManager.getRuntimeMode()` or in your Plugin implementation with `getWrapper().getRuntimeMode()`(see [WelcomePlugin](https://github.com/decebals/pf4j/blob/master/demo/plugins/plugin1/src/main/java/ro/fortsoft/pf4j/demo/welcome/WelcomePlugin.java)).   
+The DefaultPluginManager determines automatically the correct runtime mode and for DEVELOPMENT mode overrides some components(pluginsDirectory is __"../plugins"__, __PropertiesPluginDescriptorFinder__ as PluginDescriptorFinder, __DevelopmentPluginClasspath__ as PluginClassPath).  
+Another advantage of DEVELOPMENT runtime mode is that you can execute some code lines only in this mode (for example more debug messages). 
+
+If you use maven as build manger, after each dependency modification in you plugin (maven module) you must run Maven>Update Project...   
+
+
+For more details see the demo application. 
 
 Enable/Disable plugins
 -------------------
@@ -191,8 +211,8 @@ If a file with enabled.txt exists than disabled.txt is ignored. See enabled.txt 
 Demo
 -------------------
 I have a tiny demo application. The demo application is in demo folder.
-In demo/api folder I declared an extension point (_Greeting_).  
-In demo/plugin* I implemented two plugins: plugin1, plugin2 (each plugin adds an extension for _Greeting_).  
+In demo/api folder I declared an extension point ( _Greeting_).  
+In demo/plugins I implemented two plugins: plugin1, plugin2 (each plugin adds an extension for _Greeting_).  
 
 To run the demo application use:  
  

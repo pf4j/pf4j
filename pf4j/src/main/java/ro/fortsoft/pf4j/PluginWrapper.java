@@ -27,6 +27,7 @@ public class PluginWrapper {
 	PluginClassLoader pluginClassLoader;
 	Plugin plugin;
 	PluginState pluginState;
+	RuntimeMode runtimeMode;
 	
 	public PluginWrapper(PluginDescriptor descriptor, String pluginPath, PluginClassLoader pluginClassLoader) {
 		this.descriptor = descriptor;
@@ -74,6 +75,10 @@ public class PluginWrapper {
 		return pluginState;
 	}
 
+	public RuntimeMode getRuntimeMode() {
+		return runtimeMode;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -113,6 +118,10 @@ public class PluginWrapper {
 
 	void setPluginState(PluginState pluginState) {
 		this.pluginState = pluginState;
+	}
+	
+	void setRuntimeMode(RuntimeMode runtimeMode) {
+		this.runtimeMode = runtimeMode;
 	}
 
 	private Plugin createPluginInstance() throws Exception {

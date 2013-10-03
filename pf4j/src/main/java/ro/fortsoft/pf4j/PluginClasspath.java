@@ -28,16 +28,14 @@ public class PluginClasspath {
 	private static final String DEFAULT_CLASSES_DIRECTORY = "classes";
 	private static final String DEFAULT_LIB_DIRECTORY = "lib";
 	
-	private List<String> classesDirectories;
-	private List<String> libDirectories;
+	protected List<String> classesDirectories;
+	protected List<String> libDirectories;
 	
 	public PluginClasspath() {
 		classesDirectories = new ArrayList<String>();
 		libDirectories = new ArrayList<String>();
 		
-		// add defaults
-		classesDirectories.add(DEFAULT_CLASSES_DIRECTORY);
-		libDirectories.add(DEFAULT_LIB_DIRECTORY);
+		addResources();
 	}
 
 	public List<String> getClassesDirectories() {
@@ -54,6 +52,11 @@ public class PluginClasspath {
 
 	public void setLibDirectories(List<String> libDirectories) {
 		this.libDirectories = libDirectories;
+	}
+	
+	protected void addResources() {
+		classesDirectories.add(DEFAULT_CLASSES_DIRECTORY);
+		libDirectories.add(DEFAULT_LIB_DIRECTORY);		
 	}
 	
 }
