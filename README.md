@@ -165,7 +165,7 @@ Lets describe how DEVELOPMENT runtime mode works.
 
 First, you can change the runtime mode using the "pf4j.mode" system property or overriding `DefaultPluginManager.getRuntimeMode()`.  
 For example I run the pf4j demo in eclipse in DEVELOPMENT mode adding only `"-Dpf4j.mode=development"` to the pf4j demo launcher.  
-You can retrieve the current runtime mode using `PluginManager.getRuntimeMode()` or in your Plugin implementation with `getWrapper().getRuntimeMode()`(see [WelcomeMessage](https://github.com/decebals/pf4j/blob/master/demo/plugins/plugin1/src/main/java/ro/fortsoft/pf4j/demo/welcome/WelcomePlugin.java)).   
+You can retrieve the current runtime mode using `PluginManager.getRuntimeMode()` or in your Plugin implementation with `getWrapper().getRuntimeMode()`(see [WelcomePlugin](https://github.com/decebals/pf4j/blob/master/demo/plugins/plugin1/src/main/java/ro/fortsoft/pf4j/demo/welcome/WelcomePlugin.java)).   
 The DefaultPluginManager determines automatically the correct runtime mode and for DEVELOPMENT mode overrides some components(pluginsDirectory is __"../plugins"__, __PropertiesPluginDescriptorFinder__ as PluginDescriptorFinder, __DevelopmentPluginClasspath__ as PluginClassPath).  
 Another advantage of DEVELOPMENT runtime mode is that you can execute some code lines only in this mode (for example more debug messages). 
 
