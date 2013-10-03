@@ -61,4 +61,9 @@ public interface PluginManager {
 
 	public <T> List<T> getExtensions(Class<T> type);
 	
+	/**
+	 * The runtime mode. Must currently be either DEVELOPMENT or DEPLOYMENT.
+	 */
+	public RuntimeMode getRuntimeMode();
+	
 }

@@ -110,22 +110,6 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
-        
-    <dependencies>
-        <dependency>
-            <groupId>ro.fortsoft.pf4j</groupId>
-            <artifactId>pf4j</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>    
-
-        <dependency>
-            <groupId>ro.fortsoft.pf4j.demo</groupId>
-            <artifactId>pf4j-demo-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+    </build>        
 
 </project>

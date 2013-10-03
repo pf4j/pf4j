@@ -28,10 +28,12 @@ public class HelloPlugin extends Plugin {
         super(wrapper);
     }
 
+    @Override
     public void start() {
         System.out.println("HelloPlugin.start()");
     }
 
+    @Override
     public void stop() {
         System.out.println("HelloPlugin.stop()");
     }
@@ -39,6 +41,7 @@ public class HelloPlugin extends Plugin {
     @Extension
     public static class HelloGreeting implements Greeting {
 
+    	@Override
         public String getGreeting() {
             return "Hello";
         }

@@ -12,9 +12,12 @@
  */
 package ro.fortsoft.pf4j.demo.welcome;
 
+import org.apache.commons.lang.StringUtils;
+
 import ro.fortsoft.pf4j.Extension;
 import ro.fortsoft.pf4j.Plugin;
 import ro.fortsoft.pf4j.PluginWrapper;
+import ro.fortsoft.pf4j.RuntimeMode;
 import ro.fortsoft.pf4j.demo.api.Greeting;
 
 /**
@@ -26,10 +29,16 @@ public class WelcomePlugin extends Plugin {
         super(wrapper);
     }
 
+    @Override
     public void start() {
         System.out.println("WelcomePlugin.start()");
+        // for testing the development mode
+        if (RuntimeMode.DEVELOPMENT.equals(wrapper.getRuntimeMode())) {
+        	System.out.println(StringUtils.upperCase("WelcomePlugin"));
+        }
     }
 
+    @Override
     public void stop() {
         System.out.println("WelcomePlugin.stop()");
     }
@@ -37,6 +46,7 @@ public class WelcomePlugin extends Plugin {
     @Extension
     public static class WelcomeGreeting implements Greeting {
 
+    	@Override
         public String getGreeting() {
             return "Welcome";
         }

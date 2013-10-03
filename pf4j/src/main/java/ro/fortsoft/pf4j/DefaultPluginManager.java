@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,17 +42,20 @@ import ro.fortsoft.pf4j.util.ZipFileFilter;
 public class DefaultPluginManager implements PluginManager {
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
+	
+	public static final String DEFAULT_PLUGINS_DIRECTORY = "plugins";
+	public static final String DEVELOPMENT_PLUGINS_DIRECTORY = "../plugins";
 
     /**
      * The plugins repository.
      */
     private File pluginsDirectory;
 
-    private final ExtensionFinder extensionFinder;
+    private ExtensionFinder extensionFinder;
     
-    private final PluginDescriptorFinder pluginDescriptorFinder;
+    private PluginDescriptorFinder pluginDescriptorFinder;
     
-    private final PluginClasspath pluginClasspath;
+    private PluginClasspath pluginClasspath;
     
     /**
      * A map of plugins this manager is responsible for (the key is the 'pluginId').
@@ -92,10 +96,18 @@ public class DefaultPluginManager implements PluginManager {
     protected CompoundClassLoader compoundClassLoader;
     
     /**
-     * Th plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
+     * Cache value for the runtime mode. No need to re-read it because it wont change at
+	 * runtime.
+     */
+    private RuntimeMode runtimeMode;
+    
+    /**
+     * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
      */
     public DefaultPluginManager() {
-    	this(new File(System.getProperty("pf4j.pluginsDir", "plugins")));
+    	this.pluginsDirectory = createPluginsDirectory();
+    	
+    	initialize();
     }
     
     /**
@@ -107,32 +119,7 @@ public class DefaultPluginManager implements PluginManager {
     public DefaultPluginManager(File pluginsDirectory) {
         this.pluginsDirectory = pluginsDirectory;
         
-        plugins = new HashMap<String, PluginWrapper>();
-        pluginClassLoaders = new HashMap<String, PluginClassLoader>();
-        pathToIdMap = new HashMap<String, String>();
-        unresolvedPlugins = new ArrayList<PluginWrapper>();
-        resolvedPlugins = new ArrayList<PluginWrapper>();
-        startedPlugins = new ArrayList<PluginWrapper>();
-        disabledPlugins = new ArrayList<String>();
-        compoundClassLoader = new CompoundClassLoader();
-        
-        pluginClasspath = createPluginClasspath();
-        pluginDescriptorFinder = createPluginDescriptorFinder();
-        extensionFinder = createExtensionFinder();
-
-        try {
-        	// create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
-        	enabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true);
-        	log.info("Enabled plugins: {}", enabledPlugins);
-        	
-        	// create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
-        	disabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true);
-        	log.info("Disabled plugins: {}", disabledPlugins);
-        } catch (IOException e) {
-        	log.error(e.getMessage(), e);
-        }
-
-        System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
+        initialize();
     }
 
 	@Override
@@ -223,6 +210,7 @@ public class DefaultPluginManager implements PluginManager {
         filterList.add(new NotFileFilter(createHiddenPluginFilter()));
         FileFilter pluginsFilter = new AndFileFilter(filterList);
         File[] directories = pluginsDirectory.listFiles(pluginsFilter);
+        log.debug("Possible plugins: {}", Arrays.asList(directories));
         if (directories.length == 0) {
         	log.info("No plugins");
         	return;
@@ -264,6 +252,20 @@ public class DefaultPluginManager implements PluginManager {
 		return extensions;
 	}
 	
+    @Override
+	public RuntimeMode getRuntimeMode() {
+    	if (runtimeMode == null) {
+        	// retrieves the runtime mode from system  
+        	String modeAsString = System.getProperty("pf4j.mode", RuntimeMode.DEPLOYMENT.toString());
+        	runtimeMode = RuntimeMode.byName(modeAsString);
+
+        	log.info("PF4J runtime mode: '" + runtimeMode + "'");
+
+    	}
+    	
+		return runtimeMode;
+	}
+	
     /**
      * Retrieves the {@link PluginWrapper} that loaded the given class 'clazz'.
      */
@@ -280,8 +282,15 @@ public class DefaultPluginManager implements PluginManager {
 
 	/**
 	 * Add the possibility to override the PluginDescriptorFinder. 
+	 * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a 
+	 * PropertiesPluginDescriptorFinder is returned else this method returns 
+	 * DefaultPluginDescriptorFinder.
 	 */
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
+    	if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
+    		return new PropertiesPluginDescriptorFinder();
+    	}
+    	
     	return new DefaultPluginDescriptorFinder(pluginClasspath);
     }
 
@@ -294,8 +303,15 @@ public class DefaultPluginManager implements PluginManager {
 
     /**
      * Add the possibility to override the PluginClassPath. 
+     * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a 
+	 * DevelopmentPluginClasspath is returned else this method returns 
+	 * PluginClasspath.
      */
     protected PluginClasspath createPluginClasspath() {
+    	if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
+    		return new DevelopmentPluginClasspath();
+    	}
+    	
     	return new PluginClasspath();
     }
     
@@ -311,6 +327,57 @@ public class DefaultPluginManager implements PluginManager {
     	return new HiddenFilter();
     }
     
+    /**
+     * Add the possibility to override the plugins directory.
+     * If a "pf4j.pluginsDir" system property is defined than this method returns
+     * that directory.
+     * If getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a 
+	 * DEVELOPMENT_PLUGINS_DIRECTORY ("../plugins") is returned else this method returns 
+	 * DEFAULT_PLUGINS_DIRECTORY ("plugins").
+     * @return
+     */
+    protected File createPluginsDirectory() {
+    	String pluginsDir = System.getProperty("pf4j.pluginsDir");
+    	if (pluginsDir == null) {
+    		if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
+    			pluginsDir = DEVELOPMENT_PLUGINS_DIRECTORY;
+    		} else {
+    			pluginsDir = DEFAULT_PLUGINS_DIRECTORY;
+    		}
+    	}
+    	
+    	return new File(pluginsDir);
+    }
+    
+	private void initialize() {
+		plugins = new HashMap<String, PluginWrapper>();
+        pluginClassLoaders = new HashMap<String, PluginClassLoader>();
+        pathToIdMap = new HashMap<String, String>();
+        unresolvedPlugins = new ArrayList<PluginWrapper>();
+        resolvedPlugins = new ArrayList<PluginWrapper>();
+        startedPlugins = new ArrayList<PluginWrapper>();
+        disabledPlugins = new ArrayList<String>();
+        compoundClassLoader = new CompoundClassLoader();
+        
+        pluginClasspath = createPluginClasspath();
+        pluginDescriptorFinder = createPluginDescriptorFinder();
+        extensionFinder = createExtensionFinder();
+
+        try {
+        	// create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
+        	enabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true);
+        	log.info("Enabled plugins: {}", enabledPlugins);
+        	
+        	// create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
+        	disabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true);
+        	log.info("Disabled plugins: {}", disabledPlugins);
+        } catch (IOException e) {
+        	log.error(e.getMessage(), e);
+        }
+
+        System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
+	}
+
 	private void loadPlugin(File pluginDirectory) throws PluginException {
         // try to load the plugin
 		String pluginName = pluginDirectory.getName();
@@ -343,6 +410,7 @@ public class DefaultPluginManager implements PluginManager {
         // create the plugin wrapper
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
         PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor, pluginPath, pluginLoader.getPluginClassLoader());
+        pluginWrapper.setRuntimeMode(getRuntimeMode());
         log.debug("Created wrapper '{}' for plugin '{}'", pluginWrapper, pluginPath);
 
         String pluginId = pluginDescriptor.getPluginId();
