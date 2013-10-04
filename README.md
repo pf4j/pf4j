@@ -101,7 +101,7 @@ You can define an extension point in your application using **ExtensionPoint** i
 
     }
 
-Another important internal component is **ExtensionFinder** that describes how plugin manager discovers extensions for extensions points.   
+Another important internal component is **ExtensionFinder** that describes how the plugin manager discovers extensions for the extensions points.   
 **DefaultExtensionFinder** is a "link" to **SezpozExtensionFinder** that looks up extensions using **Extension** annotation.
 
     public class WelcomePlugin extends Plugin {
@@ -135,7 +135,7 @@ The output is:
     >>> Welcome
     >>> Hello
 
-You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder, PluginClasspath, ...) in DefaultPluginManager just override createXXX methods (factory method pattern).
+You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder, PluginClasspath, ...) in DefaultPluginManager just override `create...` methods (factory method pattern).
 
 Example:
 
@@ -154,7 +154,7 @@ and in plugin respository you must have a plugin.properties file with the below 
 
 For more information please see the demo sources.
 
-Development runtime mode
+Development mode
 --------------------------
 PF4J can run in two modes: **DEVELOPMENT** and **DEPLOYMENT**.  
 The DEPLOYMENT(default) mode is the standard workflow for plugins creation: create a new maven module for each plugin, codding the plugin (declares new extension points and/or 
