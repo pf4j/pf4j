@@ -38,7 +38,7 @@ public class HelloPlugin extends Plugin {
         System.out.println("HelloPlugin.stop()");
     }
 
-    @Extension
+    @Extension(ordinal=1)
     public static class HelloGreeting implements Greeting {
 
     	@Override

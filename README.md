@@ -8,7 +8,7 @@ Current build status:  [![Build Status](https://buildhive.cloudbees.com/job/dece
 Features/Benefits
 -------------------
 With PF4J you can easily transform a monolithic java application in a modular application. 
-PF4J is an open source (Apache license) lightweight (around 35KB) plugin framework for java, with minimal dependencies and very extensible (see PluginDescriptorFinder and ExtensionFinder).
+PF4J is an open source (Apache license) lightweight (around 50KB) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see PluginDescriptorFinder and ExtensionFinder).
 
 No XML, only Java.
 
@@ -102,7 +102,7 @@ You can define an extension point in your application using **ExtensionPoint** i
     }
 
 Another important internal component is **ExtensionFinder** that describes how the plugin manager discovers extensions for the extensions points.   
-**DefaultExtensionFinder** is a "link" to **SezpozExtensionFinder** that looks up extensions using **Extension** annotation.
+**DefaultExtensionFinder** looks up extensions using **Extension** annotation.
 
     public class WelcomePlugin extends Plugin {
 
@@ -169,7 +169,7 @@ You can retrieve the current runtime mode using `PluginManager.getRuntimeMode()`
 The DefaultPluginManager determines automatically the correct runtime mode and for DEVELOPMENT mode overrides some components(pluginsDirectory is __"../plugins"__, __PropertiesPluginDescriptorFinder__ as PluginDescriptorFinder, __DevelopmentPluginClasspath__ as PluginClassPath).  
 Another advantage of DEVELOPMENT runtime mode is that you can execute some code lines only in this mode (for example more debug messages). 
 
-If you use maven as build manger, after each dependency modification in you plugin (maven module) you must run Maven>Update Project...   
+If you use maven as build manger, after each dependency modification in your plugin (maven module) you must run Maven>Update Project...   
 
 
 For more details see the demo application. 

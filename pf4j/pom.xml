@@ -13,14 +13,20 @@
     <packaging>jar</packaging>
     <name>PF4J</name>
     <description>Plugin Framework for Java</description>
-        
-    <dependencies>
-        <dependency>
-            <groupId>net.java.sezpoz</groupId>
-            <artifactId>sezpoz</artifactId>
-            <version>1.9</version>
-        </dependency>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<compilerArgument>-proc:none</compilerArgument>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+    <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
