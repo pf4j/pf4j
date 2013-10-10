@@ -102,7 +102,7 @@ You can define an extension point in your application using **ExtensionPoint** i
     }
 
 Another important internal component is **ExtensionFinder** that describes how the plugin manager discovers extensions for the extensions points.   
-**DefaultExtensionFinder** looks up extensions using **Extension** annotation.
+**DefaultExtensionFinder** looks up extensions using **Extension** annotation. You can control extension instance creation overriding `createExtensionFactory` method.
 
     public class WelcomePlugin extends Plugin {
 
