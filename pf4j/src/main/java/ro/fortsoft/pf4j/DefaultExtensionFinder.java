@@ -38,10 +38,12 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 	private static final Logger log = LoggerFactory.getLogger(DefaultExtensionFinder.class);
 	
 	private ClassLoader classLoader;
+	private ExtensionFactory extensionFactory;
 	private volatile Set<String> entries;
 	
 	public DefaultExtensionFinder(ClassLoader classLoader) {
 		this.classLoader = classLoader;
+		this.extensionFactory = createExtensionFactory();
 	}
 	
 	@Override
@@ -57,21 +59,17 @@ public class DefaultExtensionFinder implements ExtensionFinder {
         		Class<?> extensionType = classLoader.loadClass(entry);
         		log.debug("Checking extension type {}", extensionType.getName());
             	if (type.isAssignableFrom(extensionType)) {
-                    Object instance = extensionType.newInstance();
+                    Object instance = extensionFactory.create(extensionType);
                     if (instance != null) {
                 		Extension extension = extensionType.getAnnotation(Extension.class);
-                		log.debug("Added extension {} with ordinal {}", extensionType, extension.ordinal());
+                		log.debug("Added extension {} with ordinal {}", extensionType.getName(), extension.ordinal());
                 		result.add(new ExtensionWrapper<T>(type.cast(instance), extension.ordinal()));
                     }
             	} else {
-            		log.warn("{} is not an extension for extension point {}", extensionType, type.getName());
+            		log.warn("{} is not an extension for extension point {}", extensionType.getName(), type.getName());
             	}
         	} catch (ClassNotFoundException e) {
-        		log.error(e.getMessage(), e);
-        	} catch (InstantiationException e) {
-        		log.error(e.getMessage(), e);
-			} catch (IllegalAccessException e) {
-				log.error(e.getMessage(), e);
+        		log.error(e.getMessage(), e);        	
 			}
         }
         
@@ -85,6 +83,31 @@ public class DefaultExtensionFinder implements ExtensionFinder {
         Collections.sort(result);
 		
 		return result;
+	}
+	
+	/**
+     * Add the possibility to override the ExtensionFactory.
+     * The default implementation uses Class.newInstance() method.
+     */
+	protected ExtensionFactory createExtensionFactory() {
+		return new ExtensionFactory() {
+			
+			@Override
+			public Object create(Class<?> extensionType) {
+				log.debug("Create instance for extension {}", extensionType.getName());
+				
+				try {
+					return extensionType.newInstance();
+				} catch (InstantiationException e) {
+					log.error(e.getMessage(), e);
+				} catch (IllegalAccessException e) {
+					log.error(e.getMessage(), e);
+				}
+				
+				return null;
+			}
+			
+		};
 	}
 	
 	private Set<String> readIndexFiles() {
@@ -110,4 +133,13 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 		return entries;
 	}	
 	
+	/**
+	 * Creates an extension instance.
+	 */
+	public static interface ExtensionFactory {
+
+		public Object create(Class<?> extensionType);
+		
+	}
+
 }
