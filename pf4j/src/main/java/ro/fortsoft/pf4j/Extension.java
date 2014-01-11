@@ -19,12 +19,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import net.java.sezpoz.Indexable;
-
 /**
  * @author Decebal Suiu
  */
-@Indexable
 @Retention(RUNTIME)
 @Target(TYPE)
 @Documented

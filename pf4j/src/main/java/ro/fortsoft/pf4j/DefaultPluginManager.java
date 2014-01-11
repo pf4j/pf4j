@@ -210,7 +210,7 @@ public class DefaultPluginManager implements PluginManager {
         filterList.add(new NotFileFilter(createHiddenPluginFilter()));
         FileFilter pluginsFilter = new AndFileFilter(filterList);
         File[] directories = pluginsDirectory.listFiles(pluginsFilter);
-        log.debug("Possible plugins: {}", Arrays.asList(directories));
+        log.debug("Found possible {} plugins: {}", directories.length, Arrays.asList(directories));
         if (directories.length == 0) {
         	log.info("No plugins");
         	return;

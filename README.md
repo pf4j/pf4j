@@ -8,7 +8,7 @@ Current build status:  [![Build Status](https://buildhive.cloudbees.com/job/dece
 Features/Benefits
 -------------------
 With PF4J you can easily transform a monolithic java application in a modular application. 
-PF4J is an open source (Apache license) lightweight (around 35KB) plugin framework for java, with minimal dependencies and very extensible (see PluginDescriptorFinder and ExtensionFinder).
+PF4J is an open source (Apache license) lightweight (around 50KB) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see PluginDescriptorFinder and ExtensionFinder).
 
 No XML, only Java.
 
@@ -101,8 +101,8 @@ You can define an extension point in your application using **ExtensionPoint** i
 
     }
 
-Another important internal component is **ExtensionFinder** that describes how plugin manager discovers extensions for extensions points.   
-**DefaultExtensionFinder** is a "link" to **SezpozExtensionFinder** that looks up extensions using **Extension** annotation.
+Another important internal component is **ExtensionFinder** that describes how the plugin manager discovers extensions for the extensions points.   
+**DefaultExtensionFinder** looks up extensions using **Extension** annotation. You can control extension instance creation overriding `createExtensionFactory` method from DefaultExtensionFinder.
 
     public class WelcomePlugin extends Plugin {
 
@@ -135,7 +135,7 @@ The output is:
     >>> Welcome
     >>> Hello
 
-You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder, PluginClasspath, ...) in DefaultPluginManager just override createXXX methods (factory method pattern).
+You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder, PluginClasspath, ...) in DefaultPluginManager just override `create...` methods (factory method pattern).
 
 Example:
 
@@ -154,7 +154,7 @@ and in plugin respository you must have a plugin.properties file with the below 
 
 For more information please see the demo sources.
 
-Development runtime mode
+Development mode
 --------------------------
 PF4J can run in two modes: **DEVELOPMENT** and **DEPLOYMENT**.  
 The DEPLOYMENT(default) mode is the standard workflow for plugins creation: create a new maven module for each plugin, codding the plugin (declares new extension points and/or 
@@ -169,7 +169,7 @@ You can retrieve the current runtime mode using `PluginManager.getRuntimeMode()`
 The DefaultPluginManager determines automatically the correct runtime mode and for DEVELOPMENT mode overrides some components(pluginsDirectory is __"../plugins"__, __PropertiesPluginDescriptorFinder__ as PluginDescriptorFinder, __DevelopmentPluginClasspath__ as PluginClassPath).  
 Another advantage of DEVELOPMENT runtime mode is that you can execute some code lines only in this mode (for example more debug messages). 
 
-If you use maven as build manger, after each dependency modification in you plugin (maven module) you must run Maven>Update Project...   
+If you use maven as build manger, after each dependency modification in your plugin (maven module) you must run Maven>Update Project...   
 
 
 For more details see the demo application. 
