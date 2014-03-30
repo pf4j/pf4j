@@ -102,7 +102,10 @@ You can define an extension point in your application using **ExtensionPoint** i
     }
 
 Another important internal component is **ExtensionFinder** that describes how the plugin manager discovers extensions for the extensions points.   
-**DefaultExtensionFinder** looks up extensions using **Extension** annotation. You can control extension instance creation overriding `createExtensionFactory` method from DefaultExtensionFinder.
+**DefaultExtensionFinder** looks up extensions using **Extension** annotation.   
+DefaultExtensionFinder looks up extensions in all extensions index files `META-INF/extensions.idx`. PF4J uses Java Annotation Processing to process at compile time all classes annotated with @Extension and to produce the extensions index file.
+
+You can control extension instance creation overriding `createExtensionFactory` method from DefaultExtensionFinder.
 
     public class WelcomePlugin extends Plugin {
 
