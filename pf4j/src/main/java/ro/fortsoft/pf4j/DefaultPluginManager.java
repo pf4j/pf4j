@@ -259,7 +259,7 @@ public class DefaultPluginManager implements PluginManager {
         	String modeAsString = System.getProperty("pf4j.mode", RuntimeMode.DEPLOYMENT.toString());
         	runtimeMode = RuntimeMode.byName(modeAsString);
 
-        	log.info("PF4J runtime mode: '" + runtimeMode + "'");
+        	log.info("PF4J runtime mode is '{}'", runtimeMode);
 
     	}
     	
