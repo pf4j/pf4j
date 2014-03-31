@@ -17,7 +17,7 @@ package ro.fortsoft.pf4j;
  *
  * @author Decebal Suiu
  */
-class PluginException extends Exception {
+public class PluginException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
