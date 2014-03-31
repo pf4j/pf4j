@@ -48,7 +48,14 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 	
 	@Override
 	public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
-		log.debug("Find extensions for extension point {}", type.getName());
+        log.debug("Checking extension point '{}'", type.getName());
+        if (!isExtensionPoint(type)) {
+            log.warn("'{}' is not an extension point", type.getName());
+
+            return Collections.emptyList(); // or return null ?!
+        }
+
+		log.debug("Finding extensions for extension point '{}'", type.getName());
         List<ExtensionWrapper<T>> result = new ArrayList<ExtensionWrapper<T>>();
         if (entries == null) {
         	entries = readIndexFiles();
@@ -57,16 +64,16 @@ public class DefaultExtensionFinder implements ExtensionFinder {
         for (String entry : entries) {
         	try {
         		Class<?> extensionType = classLoader.loadClass(entry);
-        		log.debug("Checking extension type {}", extensionType.getName());
+        		log.debug("Checking extension type '{}'", extensionType.getName());
             	if (type.isAssignableFrom(extensionType)) {
                     Object instance = extensionFactory.create(extensionType);
                     if (instance != null) {
                 		Extension extension = extensionType.getAnnotation(Extension.class);
-                		log.debug("Added extension {} with ordinal {}", extensionType.getName(), extension.ordinal());
+                		log.debug("Added extension '{}' with ordinal {}", extensionType.getName(), extension.ordinal());
                 		result.add(new ExtensionWrapper<T>(type.cast(instance), extension.ordinal()));
                     }
             	} else {
-            		log.warn("{} is not an extension for extension point {}", extensionType.getName(), type.getName());
+            		log.warn("'{}' is not an extension for extension point '{}'", extensionType.getName(), type.getName());
             	}
         	} catch (ClassNotFoundException e) {
         		log.error(e.getMessage(), e);        	
@@ -74,9 +81,9 @@ public class DefaultExtensionFinder implements ExtensionFinder {
         }
         
         if (entries.isEmpty()) {
-        	log.debug("No extensions found for extension point {}", type.getName());
+        	log.debug("No extensions found for extension point '{}'", type.getName());
         } else {
-        	log.debug("Found {} extensions for extension point {}", entries.size(), type.getName());
+        	log.debug("Found {} extensions for extension point '{}'", entries.size(), type.getName());
         }
 
         // sort by "ordinal" property
@@ -94,7 +101,7 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 			
 			@Override
 			public Object create(Class<?> extensionType) {
-				log.debug("Create instance for extension {}", extensionType.getName());
+				log.debug("Create instance for extension '{}'", extensionType.getName());
 				
 				try {
 					return extensionType.newInstance();
@@ -131,7 +138,11 @@ public class DefaultExtensionFinder implements ExtensionFinder {
         }
 
 		return entries;
-	}	
+	}
+
+    private boolean isExtensionPoint(Class type) {
+        return ExtensionPoint.class.isAssignableFrom(type);
+    }
 	
 	/**
 	 * Creates an extension instance.
