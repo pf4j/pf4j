@@ -12,19 +12,20 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import ro.fortsoft.pf4j.util.StringUtils;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents the version of a Plugin and allows versions to be compared.
- * Version identifiers have five components.
+ * Version following semantic defined by <a href="http://semver.org/">Semantic Versioning</a> document.
+ * Version identifiers have four components.
  *
  *  1. Major version. A non-negative integer.
  *  2. Minor version. A non-negative integer.
- *  3. Release version. A non-negative integer.
- *  4. Build version. A non-negative integer.
- *  5. Qualifier. A text string.
+ *  3. Patch version. A non-negative integer.
+ *  4. Qualifier. A text string.
  *
  * This class is immutable.
  *
@@ -32,75 +33,51 @@ import java.util.StringTokenizer;
  */
 public class PluginVersion implements Comparable<PluginVersion> {
 
+    private static final String FORMAT = "(\\d+)\\.(\\d+)(?:\\.)?(\\d*)(\\.|-|\\+)?([0-9A-Za-z-.]*)?";
+    private static final Pattern PATTERN = Pattern.compile(FORMAT);
+
 	private int major;
 	private int minor;
-	private int release;
-	private int build;
+	private int patch;
+    private String separator;
 	private String qualifier;
 
-    private PluginVersion() {
-    }
-
-	public PluginVersion(int major, int minor, int release) {
+	public PluginVersion(int major, int minor, int patch) {
 		this.major = major;
 		this.minor = minor;
-		this.release = release;
+		this.patch = patch;
 	}
 
-	public PluginVersion(int major, int minor, int release, int build) {
+	public PluginVersion(int major, int minor, int patch, String separator, String qualifier) {
 		this.major = major;
 		this.minor = minor;
-		this.release = release;
-		this.build = build;
-	}
-
-	public PluginVersion(int major, int minor, int release, int build, String qualifier) {
-		this.major = major;
-		this.minor = minor;
-		this.release = release;
-		this.build = build;
+		this.patch = patch;
+        this.separator = separator;
 		this.qualifier = qualifier;
 	}
 
 	public static PluginVersion createVersion(String version) {
-        if (version == null) {
-            return new PluginVersion();
+        Matcher matcher = PATTERN.matcher(version);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("'" + version + "' does not match format '" + FORMAT + "'");
         }
 
-		PluginVersion v = new PluginVersion();
 
-		StringTokenizer st = new StringTokenizer(version, ".");
-		List<String> tmp = new ArrayList<String>();
-		for (int i = 0; st.hasMoreTokens() && i < 4; i++) {
-			tmp.add(st.nextToken());
-		}
 
-		int n = tmp.size();
-		switch (n) {
-			case 0 :
-				break;
-			case 1 :
-				v.major = Integer.parseInt(tmp.get(0));
-				break;
-			case 2 :
-				v.major = Integer.parseInt(tmp.get(0));
-				v.minor = Integer.parseInt(tmp.get(1));
-				break;
-			case 3 :
-				v.major = Integer.parseInt(tmp.get(0));
-				v.minor = Integer.parseInt(tmp.get(1));
-				v.release = Integer.parseInt(tmp.get(2));
-				break;
-			case 4 :
-				v.major = Integer.parseInt(tmp.get(0));
-				v.minor = Integer.parseInt(tmp.get(1));
-				v.release = Integer.parseInt(tmp.get(2));
-				v.build = Integer.parseInt(tmp.get(3));
-				break;
-		}
+        int major = Integer.valueOf(matcher.group(1));
+        int minor = Integer.valueOf(matcher.group(2));
+        int patch;
+        String patchMatch = matcher.group(3);
+        if (StringUtils.isNotEmpty(patchMatch)) {
+            patch = Integer.valueOf(patchMatch);
+        } else {
+            patch = 0;
+        }
+        String separator = matcher.group(4);
+        String qualifier = matcher.group(5);
 
-		return v;
-	}
+        return new PluginVersion(major, minor, patch, separator, "".equals(qualifier) ? null : qualifier);
+    }
 
 	public int getMajor() {
 		return this.major;
@@ -110,13 +87,9 @@ public class PluginVersion implements Comparable<PluginVersion> {
 		return this.minor;
 	}
 
-	public int getRelease() {
-		return this.release;
+	public int getPatch() {
+		return this.patch;
 	}
-
-    public int getBuild() {
-        return this.build;
-    }
 
     public String getQualifier() {
 		return qualifier;
@@ -128,9 +101,10 @@ public class PluginVersion implements Comparable<PluginVersion> {
         sb.append('.');
         sb.append(minor);
         sb.append('.');
-        sb.append(release);
-        sb.append('.');
-        sb.append(build);
+        sb.append(patch);
+        if (separator != null) {
+            sb.append(separator);
+        }
         if (qualifier != null) {
         	sb.append(qualifier);
         }
@@ -138,6 +112,7 @@ public class PluginVersion implements Comparable<PluginVersion> {
         return sb.toString();
     }
 
+    @Override
     public int compareTo(PluginVersion version) {
         if (version.major > major) {
             return 1;
@@ -151,36 +126,19 @@ public class PluginVersion implements Comparable<PluginVersion> {
             return -1;
         }
 
-        if (version.release > release) {
+        if (version.patch > patch) {
             return 1;
-        } else if (version.release < release) {
-            return -1;
-        }
-
-        if (version.build > build) {
-            return 1;
-        } else if (version.build < build) {
+        } else if (version.patch < patch) {
             return -1;
         }
 
         return 0;
     }
 
-    /*
-    private String extractQualifier(String token) {
-    	StringTokenizer st = new StringTokenizer(token, "-");
-    	if (st.countTokens() == 2) {
-    		return st.
-    	}
-    }
-    */
-
     // for test only
     public static void main(String[] args) {
-        PluginVersion v = PluginVersion.createVersion("4.0.0.123");
+        PluginVersion v = PluginVersion.createVersion("1.2.3-SNAPSHOT");
         System.out.println(v.toString());
-//        v = PluginVersion.createVersion("4.0.0.123-alpha");
-//        System.out.println(v.toString());
         PluginVersion v1 = PluginVersion.createVersion("4.1.0");
         System.out.println(v1.toString());
         PluginVersion v2  = PluginVersion.createVersion("4.0.32");
