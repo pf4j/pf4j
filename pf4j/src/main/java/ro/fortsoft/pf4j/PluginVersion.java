@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Decebal Suiu
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -80,26 +80,61 @@ public class PluginVersion implements Comparable<PluginVersion> {
 			case 0 :
 				break;
 			case 1 :
-				v.major = Integer.parseInt(tmp.get(0));
+				v.major = extractInt(tmp.get(0));
+				v.qualifier = extractQualifier(tmp.get(0));
 				break;
 			case 2 :
-				v.major = Integer.parseInt(tmp.get(0));
-				v.minor = Integer.parseInt(tmp.get(1));
+				v.major = extractInt(tmp.get(0));
+				v.minor = extractInt(tmp.get(1));
+				v.qualifier = extractQualifier(tmp.get(1));
 				break;
 			case 3 :
-				v.major = Integer.parseInt(tmp.get(0));
-				v.minor = Integer.parseInt(tmp.get(1));
-				v.release = Integer.parseInt(tmp.get(2));
+				v.major = extractInt(tmp.get(0));
+				v.minor = extractInt(tmp.get(1));
+				v.release = extractInt(tmp.get(2));
+				v.qualifier = extractQualifier(tmp.get(2));
 				break;
 			case 4 :
-				v.major = Integer.parseInt(tmp.get(0));
-				v.minor = Integer.parseInt(tmp.get(1));
-				v.release = Integer.parseInt(tmp.get(2));
-				v.build = Integer.parseInt(tmp.get(3));
+				v.major = extractInt(tmp.get(0));
+				v.minor = extractInt(tmp.get(1));
+				v.release = extractInt(tmp.get(2));
+				v.build = extractInt(tmp.get(3));
+				v.qualifier = extractQualifier(tmp.get(3));
 				break;
 		}
 
 		return v;
+	}
+
+	private static int extractInt(String value) {
+		try {
+			return Integer.parseInt(value);
+		} catch (NumberFormatException n) {
+			int boundary;
+			for (boundary = 0; boundary < value.length(); boundary++) {
+				char ch = value.charAt(boundary);
+				if (!Character.isDigit(ch)) {
+					break;
+				}
+			}
+			return Integer.parseInt(value.substring(0, boundary));
+		}
+	}
+
+	private static String extractQualifier(String value) {
+		try {
+			Integer.parseInt(value);
+			return null;
+		} catch (NumberFormatException n) {
+			int boundary;
+			for (boundary = 0; boundary < value.length(); boundary++) {
+				char ch = value.charAt(boundary);
+				if (!Character.isDigit(ch)) {
+					break;
+				}
+			}
+			return value.substring(boundary);
+		}
 	}
 
 	public int getMajor() {
@@ -122,8 +157,9 @@ public class PluginVersion implements Comparable<PluginVersion> {
 		return qualifier;
 	}
 
+	@Override
 	public String toString() {
-        StringBuffer sb = new StringBuffer(50);
+        StringBuilder sb = new StringBuilder(50);
         sb.append(major);
         sb.append('.');
         sb.append(minor);
@@ -138,7 +174,8 @@ public class PluginVersion implements Comparable<PluginVersion> {
         return sb.toString();
     }
 
-    public int compareTo(PluginVersion version) {
+    @Override
+	public int compareTo(PluginVersion version) {
         if (version.major > major) {
             return 1;
         } else if (version.major < major) {

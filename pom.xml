@@ -29,7 +29,16 @@
         <url>git@github.com/decebals/pf4j.git</url>
       <tag>HEAD</tag>
   </scm>
-        
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>   
