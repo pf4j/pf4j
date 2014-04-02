@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Decebal Suiu
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -42,7 +42,7 @@ import ro.fortsoft.pf4j.util.ZipFileFilter;
 public class DefaultPluginManager implements PluginManager {
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
-	
+
 	public static final String DEFAULT_PLUGINS_DIRECTORY = "plugins";
 	public static final String DEVELOPMENT_PLUGINS_DIRECTORY = "../plugins";
 
@@ -52,11 +52,11 @@ public class DefaultPluginManager implements PluginManager {
     private File pluginsDirectory;
 
     private ExtensionFinder extensionFinder;
-    
+
     private PluginDescriptorFinder pluginDescriptorFinder;
-    
+
     private PluginClasspath pluginClasspath;
-    
+
     /**
      * A map of plugins this manager is responsible for (the key is the 'pluginId').
      */
@@ -81,35 +81,35 @@ public class DefaultPluginManager implements PluginManager {
      * A list with resolved plugins (resolved dependency).
      */
     private List<PluginWrapper> resolvedPlugins;
-    
+
     /**
      * A list with started plugins.
      */
     private List<PluginWrapper> startedPlugins;
-    
+
     private List<String> enabledPlugins;
     private List<String> disabledPlugins;
-    
+
     /**
-     * A compound class loader of resolved plugins. 
+     * A compound class loader of resolved plugins.
      */
     protected CompoundClassLoader compoundClassLoader;
-    
+
     /**
      * Cache value for the runtime mode. No need to re-read it because it wont change at
 	 * runtime.
      */
     private RuntimeMode runtimeMode;
-    
+
     /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
      */
     public DefaultPluginManager() {
     	this.pluginsDirectory = createPluginsDirectory();
-    	
+
     	initialize();
     }
-    
+
     /**
      * Constructs DefaultPluginManager which the given plugins directory.
      *
@@ -118,7 +118,7 @@ public class DefaultPluginManager implements PluginManager {
      */
     public DefaultPluginManager(File pluginsDirectory) {
         this.pluginsDirectory = pluginsDirectory;
-        
+
         initialize();
     }
 
@@ -145,7 +145,7 @@ public class DefaultPluginManager implements PluginManager {
 	public List<PluginWrapper> getStartedPlugins() {
 		return startedPlugins;
 	}
-	
+
     /**
      * Start all active plugins.
      */
@@ -153,7 +153,8 @@ public class DefaultPluginManager implements PluginManager {
     public void startPlugins() {
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
             try {
-            	log.info("Start plugin '{}'", pluginWrapper.getDescriptor().getPluginId());
+            	PluginDescriptor descriptor = pluginWrapper.getDescriptor();
+            	log.info("Start plugin '{}:{}'", descriptor.getPluginId(), descriptor.getVersion());
 				pluginWrapper.getPlugin().start();
 				pluginWrapper.setPluginState(PluginState.STARTED);
 				startedPlugins.add(pluginWrapper);
@@ -248,24 +249,24 @@ public class DefaultPluginManager implements PluginManager {
 		for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
 			extensions.add(extensionWrapper.getInstance());
 		}
-		
+
 		return extensions;
 	}
-	
+
     @Override
 	public RuntimeMode getRuntimeMode() {
     	if (runtimeMode == null) {
-        	// retrieves the runtime mode from system  
+        	// retrieves the runtime mode from system
         	String modeAsString = System.getProperty("pf4j.mode", RuntimeMode.DEPLOYMENT.toString());
         	runtimeMode = RuntimeMode.byName(modeAsString);
 
         	log.info("PF4J runtime mode is '{}'", runtimeMode);
 
     	}
-    	
+
 		return runtimeMode;
 	}
-	
+
     /**
      * Retrieves the {@link PluginWrapper} that loaded the given class 'clazz'.
      */
@@ -276,63 +277,63 @@ public class DefaultPluginManager implements PluginManager {
             	return plugin;
             }
         }
-        
+
         return null;
     }
 
 	/**
-	 * Add the possibility to override the PluginDescriptorFinder. 
-	 * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a 
-	 * PropertiesPluginDescriptorFinder is returned else this method returns 
+	 * Add the possibility to override the PluginDescriptorFinder.
+	 * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
+	 * PropertiesPluginDescriptorFinder is returned else this method returns
 	 * DefaultPluginDescriptorFinder.
 	 */
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
     	if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
     		return new PropertiesPluginDescriptorFinder();
     	}
-    	
+
     	return new DefaultPluginDescriptorFinder(pluginClasspath);
     }
 
     /**
-     * Add the possibility to override the ExtensionFinder. 
+     * Add the possibility to override the ExtensionFinder.
      */
     protected ExtensionFinder createExtensionFinder() {
     	return new DefaultExtensionFinder(compoundClassLoader);
     }
 
     /**
-     * Add the possibility to override the PluginClassPath. 
-     * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a 
-	 * DevelopmentPluginClasspath is returned else this method returns 
+     * Add the possibility to override the PluginClassPath.
+     * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
+	 * DevelopmentPluginClasspath is returned else this method returns
 	 * PluginClasspath.
      */
     protected PluginClasspath createPluginClasspath() {
     	if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
     		return new DevelopmentPluginClasspath();
     	}
-    	
+
     	return new PluginClasspath();
     }
-    
+
     protected boolean isPluginDisabled(String pluginId) {
     	if (enabledPlugins.isEmpty()) {
     		return disabledPlugins.contains(pluginId);
     	}
-    	
+
     	return !enabledPlugins.contains(pluginId);
     }
-    
+
     protected FileFilter createHiddenPluginFilter() {
     	return new HiddenFilter();
     }
-    
+
     /**
      * Add the possibility to override the plugins directory.
      * If a "pf4j.pluginsDir" system property is defined than this method returns
      * that directory.
-     * If getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a 
-	 * DEVELOPMENT_PLUGINS_DIRECTORY ("../plugins") is returned else this method returns 
+     * If getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
+	 * DEVELOPMENT_PLUGINS_DIRECTORY ("../plugins") is returned else this method returns
 	 * DEFAULT_PLUGINS_DIRECTORY ("plugins").
      * @return
      */
@@ -345,10 +346,10 @@ public class DefaultPluginManager implements PluginManager {
     			pluginsDir = DEFAULT_PLUGINS_DIRECTORY;
     		}
     	}
-    	
+
     	return new File(pluginsDir);
     }
-    
+
 	private void initialize() {
 		plugins = new HashMap<String, PluginWrapper>();
         pluginClassLoaders = new HashMap<String, PluginClassLoader>();
@@ -358,7 +359,7 @@ public class DefaultPluginManager implements PluginManager {
         startedPlugins = new ArrayList<PluginWrapper>();
         disabledPlugins = new ArrayList<String>();
         compoundClassLoader = new CompoundClassLoader();
-        
+
         pluginClasspath = createPluginClasspath();
         pluginDescriptorFinder = createPluginDescriptorFinder();
         extensionFinder = createExtensionFinder();
@@ -367,7 +368,7 @@ public class DefaultPluginManager implements PluginManager {
         	// create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
         	enabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true);
         	log.info("Enabled plugins: {}", enabledPlugins);
-        	
+
         	// create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
         	disabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true);
         	log.info("Disabled plugins: {}", disabledPlugins);
@@ -406,7 +407,7 @@ public class DefaultPluginManager implements PluginManager {
         PluginLoader pluginLoader = new PluginLoader(this, pluginDescriptor, pluginDirectory, pluginClasspath);
         pluginLoader.load();
         log.debug("Loaded plugin '{}'", pluginPath);
-        
+
         // create the plugin wrapper
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
         PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor, pluginPath, pluginLoader.getPluginClassLoader());
@@ -453,8 +454,8 @@ public class DefaultPluginManager implements PluginManager {
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
         	unresolvedPlugins.remove(pluginWrapper);
         	compoundClassLoader.addLoader(pluginWrapper.getPluginClassLoader());
-        	log.info("Plugin '{}' resolved", pluginWrapper.getDescriptor().getPluginId());
+        	log.debug("Plugin '{}' resolved", pluginWrapper.getDescriptor().getPluginId());
         }
 	}
-	
+
 }
