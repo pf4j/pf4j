@@ -22,25 +22,25 @@ public class VersionTest extends org.junit.Assert {
 		assertEquals("4.0.0.123", v.toString());
 
 		PluginVersion v1 = PluginVersion.createVersion("4.1.0");
-		assertEquals("4.1.0.0", v1.toString());
+		assertEquals("4.1.0", v1.toString());
 		assertEquals(1, v.compareTo(v1));
 
 		PluginVersion v2 = PluginVersion.createVersion("4.0.32");
-		assertEquals("4.0.32.0", v2.toString());
+		assertEquals("4.0.32", v2.toString());
 		assertEquals(-1, v1.compareTo(v2));
 	}
 
 	@Test
 	public void testMavenVersionParsing() {
 		PluginVersion v1 = PluginVersion.createVersion("4-SNAPSHOT");
-		assertEquals("4.0.0.0-SNAPSHOT", v1.toString());
+		assertEquals("4-SNAPSHOT", v1.toString());
 
 		PluginVersion v2 = PluginVersion.createVersion("4.1.0.0-SNAPSHOT");
 		assertEquals("4.1.0.0-SNAPSHOT", v2.toString());
 		assertEquals(1, v1.compareTo(v2));
 
 		PluginVersion v3 = PluginVersion.createVersion("4.1-SNAPSHOT");
-		assertEquals("4.1.0.0-SNAPSHOT", v3.toString());
+		assertEquals("4.1-SNAPSHOT", v3.toString());
 		assertEquals(0, v2.compareTo(v3));
 		assertEquals(1, v1.compareTo(v3));
 

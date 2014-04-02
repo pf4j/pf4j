@@ -32,10 +32,10 @@ import java.util.StringTokenizer;
  */
 public class PluginVersion implements Comparable<PluginVersion> {
 
-	private int major;
-	private int minor;
-	private int release;
-	private int build;
+	private Integer major;
+	private Integer minor;
+	private Integer release;
+	private Integer build;
 	private String qualifier;
 
     private PluginVersion() {
@@ -138,19 +138,19 @@ public class PluginVersion implements Comparable<PluginVersion> {
 	}
 
 	public int getMajor() {
-		return this.major;
+		return major == null ? 0 : this.major;
 	}
 
 	public int getMinor() {
-		return this.minor;
+		return minor == null ? 0 : this.minor;
 	}
 
 	public int getRelease() {
-		return this.release;
+		return release == null ? 0 : this.release;
 	}
 
     public int getBuild() {
-        return this.build;
+    	return build == null ? 0 : this.build;
     }
 
     public String getQualifier() {
@@ -161,12 +161,18 @@ public class PluginVersion implements Comparable<PluginVersion> {
 	public String toString() {
         StringBuilder sb = new StringBuilder(50);
         sb.append(major);
-        sb.append('.');
-        sb.append(minor);
-        sb.append('.');
-        sb.append(release);
-        sb.append('.');
-        sb.append(build);
+        if (minor != null) {
+        	sb.append('.');
+        	sb.append(minor);
+        }
+        if (release != null) {
+        	sb.append('.');
+        	sb.append(release);
+        }
+        if (build != null) {
+        	sb.append('.');
+        	sb.append(build);
+        }
         if (qualifier != null) {
         	sb.append(qualifier);
         }
@@ -176,27 +182,27 @@ public class PluginVersion implements Comparable<PluginVersion> {
 
     @Override
 	public int compareTo(PluginVersion version) {
-        if (version.major > major) {
+        if (version.getMajor() > getMajor()) {
             return 1;
-        } else if (version.major < major) {
+        } else if (version.getMajor() < getMajor()) {
             return -1;
         }
 
-        if (version.minor > minor) {
+        if (version.getMinor() > getMinor()) {
             return 1;
-        } else if (version.minor < minor) {
+        } else if (version.getMinor() < getMinor()) {
             return -1;
         }
 
-        if (version.release > release) {
+        if (version.getRelease() > getRelease()) {
             return 1;
-        } else if (version.release < release) {
+        } else if (version.getRelease() < getRelease()) {
             return -1;
         }
 
-        if (version.build > build) {
+        if (version.getBuild() > getBuild()) {
             return 1;
-        } else if (version.build < build) {
+        } else if (version.getBuild() < getBuild()) {
             return -1;
         }
 
