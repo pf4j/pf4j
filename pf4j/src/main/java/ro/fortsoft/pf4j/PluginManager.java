@@ -71,6 +71,14 @@ public interface PluginManager {
      */
     public PluginState stopPlugin(String pluginId);
 
+    /**
+     * Unload a plugin.
+     *
+     * @param pluginId
+     * @return true if the plugin was unloaded
+     */
+    public boolean unloadPlugin(String pluginId);
+
 	public PluginClassLoader getPluginClassLoader(String pluginId);
 
 	public <T> List<T> getExtensions(Class<T> type);

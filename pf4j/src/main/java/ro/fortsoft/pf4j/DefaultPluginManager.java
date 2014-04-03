@@ -294,6 +294,45 @@ public class DefaultPluginManager implements PluginManager {
 		}
     }
 
+    @Override
+    public boolean unloadPlugin(String pluginId) {
+    	try {
+    		PluginState state = stopPlugin(pluginId);
+    		if (!PluginState.STOPPED.equals(state)) {
+    			return false;
+    		}
+
+    		PluginWrapper pluginWrapper = plugins.get(pluginId);
+    		PluginDescriptor descriptor = pluginWrapper.getDescriptor();
+    		List<PluginDependency> dependencies = descriptor.getDependencies();
+    		for (PluginDependency dependency : dependencies) {
+    			if (!unloadPlugin(dependency.getPluginId())) {
+    				return false;
+    			}
+    		}
+
+    		// remove the plugin
+    		plugins.remove(pluginId);
+    		resolvedPlugins.remove(pluginWrapper);
+    		pathToIdMap.remove(pluginWrapper.getPluginPath());
+
+    		// remove the classloader
+    		if (pluginClassLoaders.containsKey(pluginId)) {
+    			PluginClassLoader classLoader = pluginClassLoaders.remove(pluginId);
+    			compoundClassLoader.removeLoader(classLoader);
+    			try {
+    				classLoader.close();
+    			} catch (IOException e) {
+    				log.error(e.getMessage(), e);
+    			}
+    		}
+    		return true;
+    	} catch (IllegalArgumentException e) {
+    		// ignore not found exceptions because this method is recursive
+    	}
+    	return false;
+    }
+
     /**
      * Get plugin class loader for this path.
      */
