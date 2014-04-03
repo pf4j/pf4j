@@ -79,6 +79,14 @@ public interface PluginManager {
      */
     public boolean unloadPlugin(String pluginId);
 
+    /**
+     * Deletes a plugin.
+     *
+     * @param pluginId
+     * @return true if the plugin was deleted
+     */
+    public boolean deletePlugin(String pluginId);
+
 	public PluginClassLoader getPluginClassLoader(String pluginId);
 
 	public <T> List<T> getExtensions(Class<T> type);
