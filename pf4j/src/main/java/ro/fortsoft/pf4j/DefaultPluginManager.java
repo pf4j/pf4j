@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -257,12 +256,14 @@ public class DefaultPluginManager implements PluginManager {
         // expand all plugin archives
         FileFilter zipFilter = new ZipFileFilter();
         File[] zipFiles = pluginsDirectory.listFiles(zipFilter);
-        for (File zipFile : zipFiles) {
-        	try {
-				expandPluginArchive(zipFile);
-			} catch (IOException e) {
-				log.error(e.getMessage(), e);
-			}
+        if (zipFiles != null) {
+        	for (File zipFile : zipFiles) {
+        		try {
+        			expandPluginArchive(zipFile);
+        		} catch (IOException e) {
+        			log.error(e.getMessage(), e);
+        		}
+        	}
         }
 
         // check for no plugins
@@ -271,20 +272,23 @@ public class DefaultPluginManager implements PluginManager {
         filterList.add(new NotFileFilter(createHiddenPluginFilter()));
         FileFilter pluginsFilter = new AndFileFilter(filterList);
         File[] directories = pluginsDirectory.listFiles(pluginsFilter);
-        log.debug("Found possible {} plugins: {}", directories.length, Arrays.asList(directories));
+        if (directories == null) {
+        	directories = new File[0];
+        }
+        log.debug("Found possible {} plugins: {}", directories.length, directories);
         if (directories.length == 0) {
         	log.info("No plugins");
         	return;
         }
 
         // load any plugin from plugins directory
-        for (File directory : directories) {
-            try {
-                loadPlugin(directory);
-            } catch (PluginException e) {
-				log.error(e.getMessage(), e);
-            }
-        }
+       	for (File directory : directories) {
+       		try {
+       			loadPlugin(directory);
+       		} catch (PluginException e) {
+       			log.error(e.getMessage(), e);
+       		}
+       	}
 
         // resolve 'unresolvedPlugins'
         try {
@@ -332,6 +336,51 @@ public class DefaultPluginManager implements PluginManager {
     	}
     	return false;
     }
+
+    @Override
+	public boolean deletePlugin(String pluginId) {
+    	if (!plugins.containsKey(pluginId)) {
+    		throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
+    	}
+		PluginWrapper pw = getPlugin(pluginId);
+		PluginState state = stopPlugin(pluginId);
+
+		if (PluginState.STOPPED != state) {
+			log.error("Failed to stop plugin {} on delete", pluginId);
+			return false;
+		}
+
+		if (!unloadPlugin(pluginId)) {
+			log.error("Failed to unload plugin {} on delete", pluginId);
+			return false;
+		}
+
+		File pluginFolder = new File(pluginsDirectory, pw.getPluginPath());
+		File pluginZip = null;
+
+		FileFilter zipFilter = new ZipFileFilter();
+        File[] zipFiles = pluginsDirectory.listFiles(zipFilter);
+        if (zipFiles != null) {
+        	// strip prepended / from the plugin path
+        	String dirName = pw.getPluginPath().substring(1);
+        	// find the zip file that matches the plugin path
+        	for (File zipFile : zipFiles) {
+        		String name = zipFile.getName().substring(0, zipFile.getName().lastIndexOf('.'));
+        		if (name.equals(dirName)) {
+        			pluginZip = zipFile;
+        			break;
+        		}
+        	}
+        }
+
+		if (pluginFolder.exists()) {
+			FileUtils.delete(pluginFolder);
+		}
+		if (pluginZip != null && pluginZip.exists()) {
+			FileUtils.delete(pluginZip);
+		}
+		return true;
+	}
 
     /**
      * Get plugin class loader for this path.
