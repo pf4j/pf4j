@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -273,18 +272,17 @@ public class DefaultPluginManager implements PluginManager {
         filterList.add(new NotFileFilter(createHiddenPluginFilter()));
         FileFilter pluginsFilter = new AndFileFilter(filterList);
         File[] directories = pluginsDirectory.listFiles(pluginsFilter);
-        List<File> dirArray = new ArrayList<File>();
-        if (directories != null) {
-        	dirArray.addAll(Arrays.asList(directories));
+        if (directories == null) {
+        	directories = new File[0];
         }
-        log.debug("Found possible {} plugins: {}", dirArray.size(), dirArray);
-        if (dirArray.size() == 0) {
+        log.debug("Found possible {} plugins: {}", directories.length, directories);
+        if (directories.length == 0) {
         	log.info("No plugins");
         	return;
         }
 
         // load any plugin from plugins directory
-       	for (File directory : dirArray) {
+       	for (File directory : directories) {
        		try {
        			loadPlugin(directory);
        		} catch (PluginException e) {
@@ -348,12 +346,12 @@ public class DefaultPluginManager implements PluginManager {
 		PluginState state = stopPlugin(pluginId);
 
 		if (PluginState.STOPPED != state) {
-			log.error(String.format("Failed to stop plugin %s on delete", pluginId));
+			log.error("Failed to stop plugin {} on delete", pluginId);
 			return false;
 		}
 
 		if (!unloadPlugin(pluginId)) {
-			log.error(String.format("Failed to unload plugin %s on delete", pluginId));
+			log.error("Failed to unload plugin {} on delete", pluginId);
 			return false;
 		}
 
