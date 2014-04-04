@@ -146,6 +146,36 @@ public class DefaultPluginManager implements PluginManager {
 		return startedPlugins;
 	}
 
+	@Override
+	public String loadPlugin(File pluginArchiveFile) {
+		if (pluginArchiveFile == null || !pluginArchiveFile.exists()) {
+			throw new IllegalArgumentException(String.format("Specified plugin %s does not exist!", pluginArchiveFile));
+		}
+
+		File pluginDirectory = null;
+		try {
+			pluginDirectory = expandPluginArchive(pluginArchiveFile);
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+		if (pluginDirectory == null || !pluginDirectory.exists()) {
+			throw new IllegalArgumentException(String.format("Failed to expand %s", pluginArchiveFile));
+		}
+
+		try {
+			PluginWrapper pluginWrapper = loadPluginDirectory(pluginDirectory);
+			// TODO uninstalled plugin dependencies?
+        	unresolvedPlugins.remove(pluginWrapper);
+        	resolvedPlugins.add(pluginWrapper);
+        	compoundClassLoader.addLoader(pluginWrapper.getPluginClassLoader());
+        	extensionFinder.reset();
+			return pluginWrapper.getDescriptor().getPluginId();
+		} catch (PluginException e) {
+			log.error(e.getMessage(), e);
+		}
+		return null;
+	}
+
     /**
      * Start all active plugins.
      */
@@ -284,10 +314,10 @@ public class DefaultPluginManager implements PluginManager {
         // load any plugin from plugins directory
        	for (File directory : directories) {
        		try {
-       			loadPlugin(directory);
-       		} catch (PluginException e) {
-       			log.error(e.getMessage(), e);
-       		}
+       			loadPluginDirectory(directory);
+    		} catch (PluginException e) {
+    			log.error(e.getMessage(), e);
+    		}
        	}
 
         // resolve 'unresolvedPlugins'
@@ -319,6 +349,7 @@ public class DefaultPluginManager implements PluginManager {
     		plugins.remove(pluginId);
     		resolvedPlugins.remove(pluginWrapper);
     		pathToIdMap.remove(pluginWrapper.getPluginPath());
+    		extensionFinder.reset();
 
     		// remove the classloader
     		if (pluginClassLoaders.containsKey(pluginId)) {
@@ -425,7 +456,7 @@ public class DefaultPluginManager implements PluginManager {
             	return plugin;
             }
         }
-
+        log.warn("Failed to find the plugin for {}", clazz);
         return null;
     }
 
@@ -527,14 +558,14 @@ public class DefaultPluginManager implements PluginManager {
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
 	}
 
-	private void loadPlugin(File pluginDirectory) throws PluginException {
+	private PluginWrapper loadPluginDirectory(File pluginDirectory) throws PluginException {
         // try to load the plugin
 		String pluginName = pluginDirectory.getName();
         String pluginPath = "/".concat(pluginName);
 
         // test for plugin duplication
         if (plugins.get(pathToIdMap.get(pluginPath)) != null) {
-            return;
+            return null;
         }
 
         // retrieves the plugin descriptor
@@ -547,7 +578,7 @@ public class DefaultPluginManager implements PluginManager {
         // test for disabled plugin
         if (isPluginDisabled(pluginDescriptor.getPluginId())) {
         	log.info("Plugin '{}' is disabled", pluginPath);
-            return;
+            return null;
         }
 
         // load plugin
@@ -571,9 +602,11 @@ public class DefaultPluginManager implements PluginManager {
         // add plugin class loader to the list with class loaders
         PluginClassLoader pluginClassLoader = pluginLoader.getPluginClassLoader();
         pluginClassLoaders.put(pluginId, pluginClassLoader);
+
+        return pluginWrapper;
     }
 
-    private void expandPluginArchive(File pluginArchiveFile) throws IOException {
+    private File expandPluginArchive(File pluginArchiveFile) throws IOException {
     	String fileName = pluginArchiveFile.getName();
         long pluginArchiveDate = pluginArchiveFile.lastModified();
         String pluginName = fileName.substring(0, fileName.length() - 4);
@@ -581,6 +614,12 @@ public class DefaultPluginManager implements PluginManager {
         // check if exists directory or the '.zip' file is "newer" than directory
         if (!pluginDirectory.exists() || (pluginArchiveDate > pluginDirectory.lastModified())) {
         	log.debug("Expand plugin archive '{}' in '{}'", pluginArchiveFile, pluginDirectory);
+
+        	// do not overwrite an old version, remove it
+        	if (pluginDirectory.exists()) {
+        		FileUtils.delete(pluginDirectory);
+        	}
+
             // create directory for plugin
             pluginDirectory.mkdirs();
 
@@ -590,6 +629,7 @@ public class DefaultPluginManager implements PluginManager {
             unzip.setDestination(pluginDirectory);
             unzip.extract();
         }
+        return pluginDirectory;
     }
 
 	private void resolvePlugins() throws PluginException {

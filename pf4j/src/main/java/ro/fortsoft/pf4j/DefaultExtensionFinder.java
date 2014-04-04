@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Decebal Suiu
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -29,23 +29,28 @@ import org.slf4j.LoggerFactory;
 /**
  * The default implementation for ExtensionFinder.
  * All extensions declared in a plugin are indexed in a file "META-INF/extensions.idx".
- * This class lookup extensions in all extensions index files "META-INF/extensions.idx". 
- * 
+ * This class lookup extensions in all extensions index files "META-INF/extensions.idx".
+ *
  * @author Decebal Suiu
  */
 public class DefaultExtensionFinder implements ExtensionFinder {
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultExtensionFinder.class);
-	
+
 	private ClassLoader classLoader;
 	private ExtensionFactory extensionFactory;
 	private volatile Set<String> entries;
-	
+
 	public DefaultExtensionFinder(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 		this.extensionFactory = createExtensionFactory();
 	}
-	
+
+	@Override
+	public void reset() {
+		entries = null;
+	}
+
 	@Override
 	public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
         log.debug("Checking extension point '{}'", type.getName());
@@ -60,7 +65,7 @@ public class DefaultExtensionFinder implements ExtensionFinder {
         if (entries == null) {
         	entries = readIndexFiles();
         }
-                
+
         for (String entry : entries) {
         	try {
         		Class<?> extensionType = classLoader.loadClass(entry);
@@ -76,10 +81,10 @@ public class DefaultExtensionFinder implements ExtensionFinder {
             		log.warn("'{}' is not an extension for extension point '{}'", extensionType.getName(), type.getName());
             	}
         	} catch (ClassNotFoundException e) {
-        		log.error(e.getMessage(), e);        	
+        		log.error(e.getMessage(), e);
 			}
         }
-        
+
         if (entries.isEmpty()) {
         	log.debug("No extensions found for extension point '{}'", type.getName());
         } else {
@@ -88,21 +93,21 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 
         // sort by "ordinal" property
         Collections.sort(result);
-		
+
 		return result;
 	}
-	
+
 	/**
      * Add the possibility to override the ExtensionFactory.
      * The default implementation uses Class.newInstance() method.
      */
 	protected ExtensionFactory createExtensionFactory() {
 		return new ExtensionFactory() {
-			
+
 			@Override
 			public Object create(Class<?> extensionType) {
 				log.debug("Create instance for extension '{}'", extensionType.getName());
-				
+
 				try {
 					return extensionType.newInstance();
 				} catch (InstantiationException e) {
@@ -110,17 +115,17 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 				} catch (IllegalAccessException e) {
 					log.error(e.getMessage(), e);
 				}
-				
+
 				return null;
 			}
-			
+
 		};
 	}
-	
+
 	private Set<String> readIndexFiles() {
 		log.debug("Reading extensions index files");
 		Set<String> entries = new HashSet<String>();
-		
+
 		try {
 			Enumeration<URL> indexFiles = classLoader.getResources(ExtensionsIndexer.EXTENSIONS_RESOURCE);
 			while (indexFiles.hasMoreElements()) {
@@ -129,7 +134,7 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
-		}			
+		}
 
         if (entries.isEmpty()) {
         	log.debug("No extensions found");
@@ -143,14 +148,14 @@ public class DefaultExtensionFinder implements ExtensionFinder {
     private boolean isExtensionPoint(Class type) {
         return ExtensionPoint.class.isAssignableFrom(type);
     }
-	
+
 	/**
 	 * Creates an extension instance.
 	 */
 	public static interface ExtensionFactory {
 
 		public Object create(Class<?> extensionType);
-		
+
 	}
 
 }
