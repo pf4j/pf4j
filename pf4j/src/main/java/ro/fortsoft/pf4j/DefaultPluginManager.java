@@ -319,6 +319,7 @@ public class DefaultPluginManager implements PluginManager {
     		plugins.remove(pluginId);
     		resolvedPlugins.remove(pluginWrapper);
     		pathToIdMap.remove(pluginWrapper.getPluginPath());
+    		extensionFinder.reset();
 
     		// remove the classloader
     		if (pluginClassLoaders.containsKey(pluginId)) {
