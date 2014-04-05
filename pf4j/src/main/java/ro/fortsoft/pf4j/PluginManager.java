@@ -12,6 +12,7 @@
  */
 package ro.fortsoft.pf4j;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -46,6 +47,14 @@ public interface PluginManager {
      * Load plugins.
      */
     public void loadPlugins();
+
+    /**
+     * Load a plugin.
+     *
+     * @param pluginArchiveFile
+     * @return the pluginId of the installed plugin or null
+     */
+	public String loadPlugin(File pluginArchiveFile);
 
     /**
      * Start all active plugins.
