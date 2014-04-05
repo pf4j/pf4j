@@ -89,6 +89,22 @@ public interface PluginManager {
     public boolean unloadPlugin(String pluginId);
 
     /**
+     * Disables a plugin from being loaded.
+     *
+     * @param pluginId
+     * @return true if plugin is disabled
+     */
+    public boolean disablePlugin(String pluginId);
+
+    /**
+     * Enables a plugin that has previously been disabled.
+     *
+     * @param pluginId
+     * @return true if plugin is enabled
+     */
+    public boolean enablePlugin(String pluginId);
+
+    /**
      * Deletes a plugin.
      *
      * @param pluginId

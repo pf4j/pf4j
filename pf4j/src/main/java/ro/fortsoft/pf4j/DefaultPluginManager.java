@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,8 +89,8 @@ public class DefaultPluginManager implements PluginManager {
      */
     private List<PluginWrapper> startedPlugins;
 
-    private List<String> enabledPlugins;
-    private List<String> disabledPlugins;
+    private Set<String> enabledPlugins;
+    private Set<String> disabledPlugins;
 
     /**
      * A compound class loader of resolved plugins.
@@ -164,6 +166,10 @@ public class DefaultPluginManager implements PluginManager {
 
 		try {
 			PluginWrapper pluginWrapper = loadPluginDirectory(pluginDirectory);
+			if (pluginWrapper == null) {
+				// duplicate or disabled
+				return null;
+			}
 			// TODO uninstalled plugin dependencies?
         	unresolvedPlugins.remove(pluginWrapper);
         	resolvedPlugins.add(pluginWrapper);
@@ -369,6 +375,40 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     @Override
+	public boolean disablePlugin(String pluginId) {
+    	if (plugins.containsKey(pluginId)) {
+    		log.debug("Unloading plugin {}", pluginId);
+    		unloadPlugin(pluginId);
+    	}
+
+    	if (disabledPlugins.add(pluginId)) {
+    		try {
+    			FileUtils.writeLines(disabledPlugins, new File(pluginsDirectory, "disabled.txt"));
+    			return true;
+    		} catch (IOException e) {
+    			log.error("Failed to disable plugin {}", pluginId, e);
+    		}
+    	}
+    	return false;
+    }
+
+    @Override
+	public boolean enablePlugin(String pluginId) {
+    	if (!disabledPlugins.remove(pluginId)) {
+    		log.debug("Plugin {} was not disabled", pluginId);
+    		return true;
+    	}
+
+       	try {
+       		FileUtils.writeLines(disabledPlugins, new File(pluginsDirectory, "disabled.txt"));
+       		return true;
+       	} catch (IOException e) {
+       		log.error("Failed to enable plugin {}", pluginId, e);
+       	}
+       	return false;
+    }
+
+    @Override
 	public boolean deletePlugin(String pluginId) {
     	if (!plugins.containsKey(pluginId)) {
     		throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
@@ -536,7 +576,7 @@ public class DefaultPluginManager implements PluginManager {
         unresolvedPlugins = new ArrayList<PluginWrapper>();
         resolvedPlugins = new ArrayList<PluginWrapper>();
         startedPlugins = new ArrayList<PluginWrapper>();
-        disabledPlugins = new ArrayList<String>();
+        disabledPlugins = new TreeSet<String>();
         compoundClassLoader = new CompoundClassLoader();
 
         pluginClasspath = createPluginClasspath();
@@ -545,11 +585,11 @@ public class DefaultPluginManager implements PluginManager {
 
         try {
         	// create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
-        	enabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true);
+        	enabledPlugins = new TreeSet<String>(FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true));
         	log.info("Enabled plugins: {}", enabledPlugins);
 
         	// create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
-        	disabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true);
+        	disabledPlugins = new TreeSet<String>(FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true));
         	log.info("Disabled plugins: {}", disabledPlugins);
         } catch (IOException e) {
         	log.error(e.getMessage(), e);
