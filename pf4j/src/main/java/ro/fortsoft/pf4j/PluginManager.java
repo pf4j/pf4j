@@ -29,14 +29,19 @@ public interface PluginManager {
     public List<PluginWrapper> getPlugins();
 
     /**
+     * Retrieves all plugins with this state.
+     */
+    public List<PluginWrapper> getPlugins(PluginState pluginState);
+
+    /**
      * Retrieves all resolved plugins (with resolved dependency).
      */
-	public List<PluginWrapper> getResolvedPlugins();
+  	public List<PluginWrapper> getResolvedPlugins();
 
 	/**
 	 * Retrieves all unresolved plugins (with unresolved dependency).
 	 */
-	public List<PluginWrapper> getUnresolvedPlugins();
+  	public List<PluginWrapper> getUnresolvedPlugins();
 
     /**
      * Retrieves all started plugins.
@@ -87,6 +92,24 @@ public interface PluginManager {
      * @return true if the plugin was unloaded
      */
     public boolean unloadPlugin(String pluginId);
+
+    public boolean isPluginDisabled(String pluginId);
+
+    /**
+     * Disables a plugin from being loaded.
+     *
+     * @param pluginId
+     * @return true if plugin is disabled
+     */
+    public boolean disablePlugin(String pluginId);
+
+    /**
+     * Enables a plugin that has previously been disabled.
+     *
+     * @param pluginId
+     * @return true if plugin is enabled
+     */
+    public boolean enablePlugin(String pluginId);
 
     /**
      * Deletes a plugin.
