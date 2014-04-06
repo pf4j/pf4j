@@ -50,6 +50,14 @@ public interface PluginManager {
     public List<PluginWrapper> getStartedPlugins();
 
     /**
+     * Retrieves the plugin with this id.
+     *
+     * @param pluginId
+     * @return the plugin
+     */
+    public PluginWrapper getPlugin(String pluginId);
+
+    /**
      * Load plugins.
      */
     public void loadPlugins();
@@ -93,8 +101,6 @@ public interface PluginManager {
      * @return true if the plugin was unloaded
      */
     public boolean unloadPlugin(String pluginId);
-
-    public boolean isPluginDisabled(String pluginId);
 
     /**
      * Disables a plugin from being loaded.

@@ -96,7 +96,7 @@ public class PluginClassLoader extends URLClassLoader {
 
     @Override
     public URL getResource(String name) {
-        if (pluginManager.isPluginDisabled(pluginDescriptor.getPluginId())) {
+        if (PluginState.DISABLED == getPlugin().getPluginState()) {
             return null;
         }
 
@@ -105,10 +105,15 @@ public class PluginClassLoader extends URLClassLoader {
 
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
-        if (pluginManager.isPluginDisabled(pluginDescriptor.getPluginId())) {
+        if (PluginState.DISABLED == getPlugin().getPluginState()) {
             return Collections.emptyEnumeration();
         }
 
         return super.getResources(name);
     }
+
+    private PluginWrapper getPlugin() {
+        return pluginManager.getPlugin(pluginDescriptor.getPluginId());
+    }
+
 }

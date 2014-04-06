@@ -126,10 +126,6 @@ public class DefaultPluginManager implements PluginManager {
 		return resolvedPlugins;
 	}
 
-	public PluginWrapper getPlugin(String pluginId) {
-		return plugins.get(pluginId);
-	}
-
 	@Override
     public List<PluginWrapper> getUnresolvedPlugins() {
 		return unresolvedPlugins;
@@ -139,6 +135,11 @@ public class DefaultPluginManager implements PluginManager {
 	public List<PluginWrapper> getStartedPlugins() {
 		return startedPlugins;
 	}
+
+    @Override
+    public PluginWrapper getPlugin(String pluginId) {
+        return plugins.get(pluginId);
+    }
 
 	@Override
 	public String loadPlugin(File pluginArchiveFile) {
@@ -588,8 +589,7 @@ public class DefaultPluginManager implements PluginManager {
     	return new PluginClasspath();
     }
 
-    @Override
-    public boolean isPluginDisabled(String pluginId) {
+    protected boolean isPluginDisabled(String pluginId) {
     	if (enabledPlugins.isEmpty()) {
     		return disabledPlugins.contains(pluginId);
     	}
