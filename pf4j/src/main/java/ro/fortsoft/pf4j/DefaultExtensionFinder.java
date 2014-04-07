@@ -26,6 +26,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.fortsoft.pf4j.util.CompoundClassLoader;
+
 /**
  * The default implementation for ExtensionFinder.
  * All extensions declared in a plugin are indexed in a file "META-INF/extensions.idx".
@@ -37,11 +39,11 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultExtensionFinder.class);
 
-	private ClassLoader classLoader;
+	private CompoundClassLoader classLoader;
 	private ExtensionFactory extensionFactory;
 	private volatile Set<String> entries;
 
-	public DefaultExtensionFinder(ClassLoader classLoader) {
+	public DefaultExtensionFinder(CompoundClassLoader classLoader) {
 		this.classLoader = classLoader;
 		this.extensionFactory = createExtensionFactory();
 	}
@@ -68,17 +70,18 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 
         for (String entry : entries) {
         	try {
-        		Class<?> extensionType = classLoader.loadClass(entry);
-        		log.debug("Checking extension type '{}'", extensionType.getName());
-            	if (type.isAssignableFrom(extensionType)) {
-                    Object instance = extensionFactory.create(extensionType);
+        		FoundExtension foundExtension = classLoader.findExtension(entry);
+        		Class<?> extensionClass = foundExtension.getExtensionClass();
+        		log.debug("Checking extension type '{}'", extensionClass.getName());
+            	if (type.isAssignableFrom(extensionClass)) {
+                    Object instance = extensionFactory.create(extensionClass);
                     if (instance != null) {
-                		Extension extension = extensionType.getAnnotation(Extension.class);
-                		log.debug("Added extension '{}' with ordinal {}", extensionType.getName(), extension.ordinal());
-                		result.add(new ExtensionWrapper<T>(type.cast(instance), extension.ordinal()));
+                		Extension extension = extensionClass.getAnnotation(Extension.class);
+                		log.debug("Added extension '{}' with ordinal {}", extensionClass.getName(), extension.ordinal());
+                		result.add(new ExtensionWrapper<T>(foundExtension.getPluginId(), type.cast(instance), extension.ordinal()));
                     }
             	} else {
-            		log.warn("'{}' is not an extension for extension point '{}'", extensionType.getName(), type.getName());
+            		log.warn("'{}' is not an extension for extension point '{}'", extensionClass.getName(), type.getName());
             	}
         	} catch (ClassNotFoundException e) {
         		log.error(e.getMessage(), e);
@@ -145,7 +148,7 @@ public class DefaultExtensionFinder implements ExtensionFinder {
 		return entries;
 	}
 
-    private boolean isExtensionPoint(Class type) {
+    private boolean isExtensionPoint(Class<?> type) {
         return ExtensionPoint.class.isAssignableFrom(type);
     }
 

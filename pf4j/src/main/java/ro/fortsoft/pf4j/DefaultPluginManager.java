@@ -176,12 +176,13 @@ public class DefaultPluginManager implements PluginManager {
 
 		try {
 			PluginWrapper pluginWrapper = loadPluginDirectory(pluginDirectory);
+			String pluginId = pluginWrapper.getDescriptor().getPluginId();
 			// TODO uninstalled plugin dependencies?
         	unresolvedPlugins.remove(pluginWrapper);
         	resolvedPlugins.add(pluginWrapper);
-        	compoundClassLoader.addLoader(pluginWrapper.getPluginClassLoader());
+        	compoundClassLoader.addLoader(pluginId, pluginWrapper.getPluginClassLoader());
         	extensionFinder.reset();
-			return pluginWrapper.getDescriptor().getPluginId();
+			return pluginId;
 		} catch (PluginException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -393,7 +394,7 @@ public class DefaultPluginManager implements PluginManager {
     		// remove the classloader
     		if (pluginClassLoaders.containsKey(pluginId)) {
     			PluginClassLoader classLoader = pluginClassLoaders.remove(pluginId);
-    			compoundClassLoader.removeLoader(classLoader);
+    			compoundClassLoader.removeLoader(pluginId, classLoader);
     			try {
     				classLoader.close();
     			} catch (IOException e) {
@@ -528,9 +529,13 @@ public class DefaultPluginManager implements PluginManager {
     @Override
 	public <T> List<T> getExtensions(Class<T> type) {
 		List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
-		List<T> extensions = new ArrayList<T>(extensionsWrapper.size());
+		List<T> extensions = new ArrayList<T>();
 		for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-			extensions.add(extensionWrapper.getInstance());
+			PluginWrapper pluginWrapper = plugins.get(extensionWrapper.getPluginId());
+			if (PluginState.STARTED == pluginWrapper.getPluginState()) {
+				// only started plugins may contribute extensions
+				extensions.add(extensionWrapper.getInstance());
+			}
 		}
 
 		return extensions;
@@ -746,8 +751,9 @@ public class DefaultPluginManager implements PluginManager {
 		DependencyResolver dependencyResolver = new DependencyResolver(unresolvedPlugins);
 		resolvedPlugins = dependencyResolver.getSortedPlugins();
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
+        	String pluginId = pluginWrapper.getDescriptor().getPluginId();
         	unresolvedPlugins.remove(pluginWrapper);
-        	compoundClassLoader.addLoader(pluginWrapper.getPluginClassLoader());
+        	compoundClassLoader.addLoader(pluginId, pluginWrapper.getPluginClassLoader());
         	log.info("Plugin '{}' resolved", pluginWrapper.getDescriptor().getPluginId());
         }
 	}
