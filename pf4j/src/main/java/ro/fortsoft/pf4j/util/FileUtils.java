@@ -12,11 +12,9 @@
  */
 package ro.fortsoft.pf4j.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,6 +48,21 @@ public class FileUtils {
 		return lines;
 	}
 
+    public static void writeLines(Collection<String> lines, File file) throws IOException {
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(file));
+            for (String line : lines) {
+                writer.write(line);
+                writer.write('\n');
+            }
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+        }
+    }
+
 	/**
 	 * Delete a file or recursively delete a folder.
 	 *
@@ -71,6 +84,7 @@ public class FileUtils {
 			}
 		}
 		success |= fileOrFolder.delete();
+
 		return success;
 	}
 }

@@ -3,4 +3,4 @@
 # - add one plugin id on each line
 # - put this file in plugins folder
 ########################################
-welcome-plugin
+#welcome-plugin

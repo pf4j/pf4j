@@ -14,6 +14,7 @@ package ro.fortsoft.pf4j;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides the functionality for plugin management such as load,
@@ -29,19 +30,32 @@ public interface PluginManager {
     public List<PluginWrapper> getPlugins();
 
     /**
+     * Retrieves all plugins with this state.
+     */
+    public List<PluginWrapper> getPlugins(PluginState pluginState);
+
+    /**
      * Retrieves all resolved plugins (with resolved dependency).
      */
-	public List<PluginWrapper> getResolvedPlugins();
+  	public List<PluginWrapper> getResolvedPlugins();
 
 	/**
 	 * Retrieves all unresolved plugins (with unresolved dependency).
 	 */
-	public List<PluginWrapper> getUnresolvedPlugins();
+  	public List<PluginWrapper> getUnresolvedPlugins();
 
     /**
      * Retrieves all started plugins.
      */
     public List<PluginWrapper> getStartedPlugins();
+
+    /**
+     * Retrieves the plugin with this id.
+     *
+     * @param pluginId
+     * @return the plugin
+     */
+    public PluginWrapper getPlugin(String pluginId);
 
     /**
      * Load plugins.
@@ -89,6 +103,22 @@ public interface PluginManager {
     public boolean unloadPlugin(String pluginId);
 
     /**
+     * Disables a plugin from being loaded.
+     *
+     * @param pluginId
+     * @return true if plugin is disabled
+     */
+    public boolean disablePlugin(String pluginId);
+
+    /**
+     * Enables a plugin that has previously been disabled.
+     *
+     * @param pluginId
+     * @return true if plugin is enabled
+     */
+    public boolean enablePlugin(String pluginId);
+
+    /**
      * Deletes a plugin.
      *
      * @param pluginId
@@ -100,7 +130,9 @@ public interface PluginManager {
 
 	public <T> List<T> getExtensions(Class<T> type);
 
-	/**
+    public Set<String> getExtensionClassNames(String pluginId);
+
+    /**
 	 * The runtime mode. Must currently be either DEVELOPMENT or DEPLOYMENT.
 	 */
 	public RuntimeMode getRuntimeMode();

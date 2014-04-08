@@ -1,24 +1,27 @@
 /*
  * Copyright 2012 Decebal Suiu
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 package ro.fortsoft.pf4j;
 
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
  * One instance of this class should be created by plugin manager for every available plug-in.
- * 
+ *
  * @author Decebal Suiu
  */
 public class PluginClassLoader extends URLClassLoader {
@@ -29,10 +32,10 @@ public class PluginClassLoader extends URLClassLoader {
 
 	private PluginManager pluginManager;
 	private PluginDescriptor pluginDescriptor;
-	
+
 	public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
 		super(new URL[0], parent);
-		
+
 		this.pluginManager = pluginManager;
 		this.pluginDescriptor = pluginDescriptor;
 	}
@@ -89,6 +92,28 @@ public class PluginClassLoader extends URLClassLoader {
 
         // use the standard URLClassLoader (which follows normal parent delegation)
         return super.loadClass(className);
+    }
+
+    @Override
+    public URL getResource(String name) {
+        if (PluginState.DISABLED == getPlugin().getPluginState()) {
+            return null;
+        }
+
+        return super.getResource(name);
+    }
+
+    @Override
+    public Enumeration<URL> getResources(String name) throws IOException {
+        if (PluginState.DISABLED == getPlugin().getPluginState()) {
+            return Collections.emptyEnumeration();
+        }
+
+        return super.getResources(name);
+    }
+
+    private PluginWrapper getPlugin() {
+        return pluginManager.getPlugin(pluginDescriptor.getPluginId());
     }
 
 }

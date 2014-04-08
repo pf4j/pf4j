@@ -13,14 +13,23 @@
 package ro.fortsoft.pf4j;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Decebal Suiu
  */
 public interface ExtensionFinder {
 
-	public <T> List<ExtensionWrapper<T>> find(Class<T> type);
+    /**
+     * Retrieves a list with all extensions found for an extension point.
+     */
+    public <T> List<ExtensionWrapper<T>> find(Class<T> type);
 
-	public void reset();
+    /**
+     * Retrieves a list with all extension class names found for a plugin.
+     */
+    public Set<String> findClassNames(String pluginId);
+
+    public void reset();
 
 }
