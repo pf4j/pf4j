@@ -14,6 +14,7 @@ package ro.fortsoft.pf4j;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides the functionality for plugin management such as load,
@@ -123,7 +124,9 @@ public interface PluginManager {
 
 	public <T> List<T> getExtensions(Class<T> type);
 
-	/**
+    public Set<String> getExtensionClassNames(String pluginId);
+
+    /**
 	 * The runtime mode. Must currently be either DEVELOPMENT or DEPLOYMENT.
 	 */
 	public RuntimeMode getRuntimeMode();

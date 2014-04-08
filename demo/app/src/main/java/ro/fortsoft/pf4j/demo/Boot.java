@@ -13,11 +13,13 @@
 package ro.fortsoft.pf4j.demo;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
 import ro.fortsoft.pf4j.DefaultPluginManager;
 import ro.fortsoft.pf4j.PluginManager;
+import ro.fortsoft.pf4j.PluginWrapper;
 import ro.fortsoft.pf4j.demo.api.Greeting;
 
 /**
@@ -28,26 +30,37 @@ import ro.fortsoft.pf4j.demo.api.Greeting;
 public class Boot {
 
     public static void main(String[] args) {
-    	// print logo
-    	printLogo();
+        // print logo
+        printLogo();
 
-    	// create the plugin manager
+        // create the plugin manager
         final PluginManager pluginManager = new DefaultPluginManager();
 
         // load the plugins
         pluginManager.loadPlugins();
 
         // enable a disabled plugin
-        pluginManager.enablePlugin("welcome-plugin");
+//        pluginManager.enablePlugin("welcome-plugin");
 
         // start (active/resolved) the plugins
         pluginManager.startPlugins();
 
         // retrieves the extensions for Greeting extension point
         List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);
-        System.out.println(String.format("### Found %d extensions for the extension point '%s'", greetings.size(), Greeting.class.getName()));
+        System.out.println(String.format("Found %d extensions for extension point '%s'", greetings.size(), Greeting.class.getName()));
         for (Greeting greeting : greetings) {
-        	System.out.println(">>> " + greeting.getGreeting());
+            System.out.println(">>> " + greeting.getGreeting());
+        }
+
+        // print extensions for each started plugin
+        List<PluginWrapper> startedPlugins = pluginManager.getStartedPlugins();
+        for (PluginWrapper plugin : startedPlugins) {
+            String pluginId = plugin.getDescriptor().getPluginId();
+            System.out.println(String.format("Extensions added by plugin '%s':", pluginId));
+            Set<String> extensionClassNames = pluginManager.getExtensionClassNames(pluginId);
+            for (String extension : extensionClassNames) {
+                System.out.println("   " + extension);
+            }
         }
 
         // stop the plugins
