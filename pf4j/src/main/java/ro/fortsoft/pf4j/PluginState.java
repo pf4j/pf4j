@@ -19,7 +19,7 @@ public class PluginState {
 
 	public static final PluginState CREATED = new PluginState("CREATED");
 //	public static final PluginState INITIALIZED = new PluginState("INITIALIZED");
-//    public static final PluginState DISABLED = new PluginState("DISABLED");
+    public static final PluginState DISABLED = new PluginState("DISABLED");
 	public static final PluginState STARTED = new PluginState("STARTED");
 	public static final PluginState STOPPED = new PluginState("STOPPED");
 //	public static final PluginState DESTROYED = new PluginState("DESTROYED");

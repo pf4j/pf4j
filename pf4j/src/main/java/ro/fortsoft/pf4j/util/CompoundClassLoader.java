@@ -17,9 +17,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.TreeMap;
+
+import ro.fortsoft.pf4j.FoundExtension;
 
 /**
  * A class loader that has multiple loaders and uses them for loading classes and resources.
@@ -28,19 +30,33 @@ import java.util.Set;
  */
 public class CompoundClassLoader extends ClassLoader {
 
-	private Set<ClassLoader> loaders = new HashSet<ClassLoader>();
+	private Map<String, ClassLoader> loaders = new TreeMap<String, ClassLoader>();
 
-	public void addLoader(ClassLoader loader) {
-		loaders.add(loader);
+	public void addLoader(String pluginId, ClassLoader loader) {
+		loaders.put(pluginId, loader);
 	}
 
-	public void removeLoader(ClassLoader loader) {
-		loaders.remove(loader);
+	public void removeLoader(String pluginId, ClassLoader loader) {
+		loaders.remove(pluginId);
+	}
+
+	public FoundExtension findExtension(String name) throws ClassNotFoundException {
+		for (Map.Entry<String, ClassLoader> entry : loaders.entrySet()) {
+			try {
+				ClassLoader loader = entry.getValue();
+				Class<?> clazz = loader.loadClass(name);
+				return new FoundExtension(entry.getKey(), clazz);
+			} catch (ClassNotFoundException e) {
+				// try next
+			}
+		}
+
+		throw new ClassNotFoundException(name);
 	}
 
 	@Override
 	public Class<?> findClass(String name) throws ClassNotFoundException {
-		for (ClassLoader loader : loaders) {
+		for (ClassLoader loader : loaders.values()) {
 			try {
 				return loader.loadClass(name);
 			} catch (ClassNotFoundException e) {
@@ -53,7 +69,7 @@ public class CompoundClassLoader extends ClassLoader {
 
 	@Override
 	public URL findResource(String name) {
-		for (ClassLoader loader : loaders) {
+		for (ClassLoader loader : loaders.values()) {
 			URL url = loader.getResource(name);
 			if (url != null) {
 				return url;
@@ -66,7 +82,7 @@ public class CompoundClassLoader extends ClassLoader {
 	@Override
 	protected Enumeration<URL> findResources(String name) throws IOException {
 		List<URL> resources = new ArrayList<URL>();
-		for (ClassLoader loader : loaders) {
+		for (ClassLoader loader : loaders.values()) {
 			resources.addAll(Collections.list(loader.getResources(name)));
 		}
 

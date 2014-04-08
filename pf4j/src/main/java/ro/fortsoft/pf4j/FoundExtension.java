@@ -15,33 +15,21 @@ package ro.fortsoft.pf4j;
 /**
  * @author Decebal Suiu
  */
-public class ExtensionWrapper<T> implements Comparable<ExtensionWrapper<T>> {
+public class FoundExtension {
 
 	private final String pluginId;
-	private final T instance;
-	private final int ordinal;
+	private final Class<?> extensionClass;
 
-	public ExtensionWrapper(String pluginId, T instance, int ordinal) {
+	public FoundExtension(String pluginId, Class<?> clazz) {
 		this.pluginId = pluginId;
-		this.instance = instance;
-		this.ordinal = ordinal;
+		this.extensionClass = clazz;
 	}
 
 	public String getPluginId() {
 		return pluginId;
 	}
 
-	public T getInstance() {
-		return instance;
+	public Class<?> getExtensionClass() {
+		return extensionClass;
 	}
-
-	public int getOrdinal() {
-		return ordinal;
-	}
-
-	@Override
-	public int compareTo(ExtensionWrapper<T> o) {
-		return (ordinal - o.getOrdinal());
-	}
-
 }
