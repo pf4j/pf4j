@@ -119,8 +119,7 @@ public class PluginWrapper {
 
 	@Override
 	public String toString() {
-		return "PluginWrapper [descriptor=" + descriptor + ", pluginPath="
-				+ pluginPath + "]";
+		return "PluginWrapper [descriptor=" + descriptor + ", pluginPath=" + pluginPath + "]";
 	}
 
 	void setPluginState(PluginState pluginState) {

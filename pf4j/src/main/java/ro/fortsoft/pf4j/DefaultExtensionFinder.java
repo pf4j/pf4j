@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Decebal Suiu
  */
-public class DefaultExtensionFinder implements ExtensionFinder {
+public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListener {
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultExtensionFinder.class);
 
@@ -95,8 +95,8 @@ public class DefaultExtensionFinder implements ExtensionFinder {
         return entries.get(pluginId);
     }
 
-    @Override
-    public void reset() {
+    public void pluginStateChanged(PluginStateEvent event) {
+        // TODO optimize (do only for some transitions)
         // clear cache
         entries = null;
     }

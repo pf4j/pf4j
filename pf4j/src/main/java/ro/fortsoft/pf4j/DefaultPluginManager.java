@@ -78,6 +78,11 @@ public class DefaultPluginManager implements PluginManager {
     private List<String> disabledPlugins;
 
     /**
+     * The registered {@link PluginStateListener}s.
+     */
+    private List<PluginStateListener> pluginStateListeners;
+
+    /**
      * Cache value for the runtime mode. No need to re-read it because it wont change at
 	 * runtime.
      */
@@ -143,7 +148,7 @@ public class DefaultPluginManager implements PluginManager {
 
 	@Override
 	public String loadPlugin(File pluginArchiveFile) {
-		if (pluginArchiveFile == null || !pluginArchiveFile.exists()) {
+		if ((pluginArchiveFile == null) || !pluginArchiveFile.exists()) {
 			throw new IllegalArgumentException(String.format("Specified plugin %s does not exist!", pluginArchiveFile));
 		}
 
@@ -153,7 +158,7 @@ public class DefaultPluginManager implements PluginManager {
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}
-		if (pluginDirectory == null || !pluginDirectory.exists()) {
+		if ((pluginDirectory == null) || !pluginDirectory.exists()) {
 			throw new IllegalArgumentException(String.format("Failed to expand %s", pluginArchiveFile));
 		}
 
@@ -162,7 +167,9 @@ public class DefaultPluginManager implements PluginManager {
 			// TODO uninstalled plugin dependencies?
         	unresolvedPlugins.remove(pluginWrapper);
         	resolvedPlugins.add(pluginWrapper);
-        	extensionFinder.reset();
+
+            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, null));
+
 			return pluginWrapper.getDescriptor().getPluginId();
 		} catch (PluginException e) {
 			log.error(e.getMessage(), e);
@@ -185,6 +192,8 @@ public class DefaultPluginManager implements PluginManager {
                     pluginWrapper.getPlugin().start();
                     pluginWrapper.setPluginState(PluginState.STARTED);
                     startedPlugins.add(pluginWrapper);
+
+                    firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
                 } catch (PluginException e) {
                     log.error(e.getMessage(), e);
                 }
@@ -201,17 +210,18 @@ public class DefaultPluginManager implements PluginManager {
     		throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
     	}
 
-    	PluginWrapper pluginWrapper = plugins.get(pluginId);
+    	PluginWrapper pluginWrapper = getPlugin(pluginId);
     	PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
-    	if (PluginState.STARTED == pluginWrapper.getPluginState()) {
+        PluginState pluginState = pluginWrapper.getPluginState();
+    	if (PluginState.STARTED == pluginState) {
     		log.debug("Already started plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
     		return PluginState.STARTED;
     	}
 
-        if (PluginState.DISABLED == pluginWrapper.getPluginState()) {
+        if (PluginState.DISABLED == pluginState) {
             // automatically enable plugin on manual plugin start
             if (!enablePlugin(pluginId)) {
-                return pluginWrapper.getPluginState();
+                return pluginState;
             }
         }
 
@@ -224,7 +234,9 @@ public class DefaultPluginManager implements PluginManager {
     		pluginWrapper.getPlugin().start();
     		pluginWrapper.setPluginState(PluginState.STARTED);
     		startedPlugins.add(pluginWrapper);
-    	} catch (PluginException e) {
+
+            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
+        } catch (PluginException e) {
     		log.error(e.getMessage(), e);
     	}
 
@@ -241,13 +253,16 @@ public class DefaultPluginManager implements PluginManager {
     	Iterator<PluginWrapper> itr = startedPlugins.iterator();
         while (itr.hasNext()) {
         	PluginWrapper pluginWrapper = itr.next();
-            if (PluginState.STARTED == pluginWrapper.getPluginState()) {
+            PluginState pluginState = pluginWrapper.getPluginState();
+            if (PluginState.STARTED == pluginState) {
                 try {
                     PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
                     log.info("Stop plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
                     pluginWrapper.getPlugin().stop();
                     pluginWrapper.setPluginState(PluginState.STOPPED);
                     itr.remove();
+
+                    firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
                 } catch (PluginException e) {
                     log.error(e.getMessage(), e);
                 }
@@ -264,17 +279,18 @@ public class DefaultPluginManager implements PluginManager {
     		throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
     	}
 
-    	PluginWrapper pluginWrapper = plugins.get(pluginId);
+    	PluginWrapper pluginWrapper = getPlugin(pluginId);
     	PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
-    	if (PluginState.STOPPED == pluginWrapper.getPluginState()) {
+        PluginState pluginState = pluginWrapper.getPluginState();
+    	if (PluginState.STOPPED == pluginState) {
     		log.debug("Already stopped plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
     		return PluginState.STOPPED;
     	}
 
         // test for disabled plugin
-        if (PluginState.DISABLED == pluginWrapper.getPluginState()) {
+        if (PluginState.DISABLED == pluginState) {
             // do nothing
-            return pluginWrapper.getPluginState();
+            return pluginState;
         }
 
     	for (PluginDependency dependency : pluginDescriptor.getDependencies()) {
@@ -286,6 +302,8 @@ public class DefaultPluginManager implements PluginManager {
     		pluginWrapper.getPlugin().stop();
     		pluginWrapper.setPluginState(PluginState.STOPPED);
     		startedPlugins.remove(pluginWrapper);
+
+            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
     	} catch (PluginException e) {
     		log.error(e.getMessage(), e);
     	}
@@ -353,12 +371,12 @@ public class DefaultPluginManager implements PluginManager {
     @Override
     public boolean unloadPlugin(String pluginId) {
     	try {
-    		PluginState state = stopPlugin(pluginId);
-    		if (PluginState.STOPPED != state) {
+    		PluginState pluginState = stopPlugin(pluginId);
+    		if (PluginState.STOPPED != pluginState) {
     			return false;
     		}
 
-    		PluginWrapper pluginWrapper = plugins.get(pluginId);
+    		PluginWrapper pluginWrapper = getPlugin(pluginId);
     		PluginDescriptor descriptor = pluginWrapper.getDescriptor();
     		List<PluginDependency> dependencies = descriptor.getDependencies();
     		for (PluginDependency dependency : dependencies) {
@@ -371,7 +389,8 @@ public class DefaultPluginManager implements PluginManager {
     		plugins.remove(pluginId);
     		resolvedPlugins.remove(pluginWrapper);
     		pathToIdMap.remove(pluginWrapper.getPluginPath());
-    		extensionFinder.reset();
+
+            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
 
     		// remove the classloader
     		if (pluginClassLoaders.containsKey(pluginId)) {
@@ -398,17 +417,18 @@ public class DefaultPluginManager implements PluginManager {
         }
 
 
-        PluginWrapper pluginWrapper = plugins.get(pluginId);
+        PluginWrapper pluginWrapper = getPlugin(pluginId);
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
-
-        if (PluginState.DISABLED == getPlugin(pluginId).getPluginState()) {
+        PluginState pluginState = pluginWrapper.getPluginState();
+        if (PluginState.DISABLED == pluginState) {
         	log.debug("Already disabled plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
            	return true;
         }
 
         if (PluginState.STOPPED == stopPlugin(pluginId)) {
-            getPlugin(pluginId).setPluginState(PluginState.DISABLED);
-            extensionFinder.reset();
+            pluginWrapper.setPluginState(PluginState.DISABLED);
+
+            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, PluginState.STOPPED));
 
             if (disabledPlugins.add(pluginId)) {
                 try {
@@ -432,10 +452,10 @@ public class DefaultPluginManager implements PluginManager {
             throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
         }
 
-        PluginWrapper pluginWrapper = plugins.get(pluginId);
+        PluginWrapper pluginWrapper = getPlugin(pluginId);
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
-
-        if (PluginState.DISABLED != getPlugin(pluginId).getPluginState()) {
+        PluginState pluginState = pluginWrapper.getPluginState();
+        if (PluginState.DISABLED != pluginState) {
             log.debug("Plugin plugin '{}:{}' is not disabled", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
             return true;
         }
@@ -449,8 +469,9 @@ public class DefaultPluginManager implements PluginManager {
             return false;
         }
 
-        getPlugin(pluginId).setPluginState(PluginState.CREATED);
-        extensionFinder.reset();
+        pluginWrapper.setPluginState(PluginState.CREATED);
+
+        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
 
         log.info("Enabled plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
 
@@ -462,10 +483,10 @@ public class DefaultPluginManager implements PluginManager {
     	if (!plugins.containsKey(pluginId)) {
     		throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
     	}
-		PluginWrapper pw = getPlugin(pluginId);
-		PluginState state = stopPlugin(pluginId);
 
-		if (PluginState.STOPPED != state) {
+		PluginWrapper pluginWrapper = getPlugin(pluginId);
+		PluginState pluginState = stopPlugin(pluginId);
+		if (PluginState.STOPPED != pluginState) {
 			log.error("Failed to stop plugin {} on delete", pluginId);
 			return false;
 		}
@@ -475,14 +496,14 @@ public class DefaultPluginManager implements PluginManager {
 			return false;
 		}
 
-		File pluginFolder = new File(pluginsDirectory, pw.getPluginPath());
+		File pluginFolder = new File(pluginsDirectory, pluginWrapper.getPluginPath());
 		File pluginZip = null;
 
 		FileFilter zipFilter = new ZipFileFilter();
         File[] zipFiles = pluginsDirectory.listFiles(zipFilter);
         if (zipFiles != null) {
         	// strip prepended / from the plugin path
-        	String dirName = pw.getPluginPath().substring(1);
+        	String dirName = pluginWrapper.getPluginPath().substring(1);
         	// find the zip file that matches the plugin path
         	for (File zipFile : zipFiles) {
         		String name = zipFile.getName().substring(0, zipFile.getName().lastIndexOf('.'));
@@ -499,6 +520,7 @@ public class DefaultPluginManager implements PluginManager {
 		if (pluginZip != null && pluginZip.exists()) {
 			FileUtils.delete(pluginZip);
 		}
+
 		return true;
 	}
 
@@ -551,10 +573,21 @@ public class DefaultPluginManager implements PluginManager {
             }
         }
         log.warn("Failed to find the plugin for {}", clazz);
+
         return null;
     }
 
-	/**
+    @Override
+    public synchronized void addPluginStateListener(PluginStateListener listener) {
+        pluginStateListeners.add(listener);
+    }
+
+    @Override
+    public synchronized void removePluginStateListener(PluginStateListener listener) {
+        pluginStateListeners.remove(listener);
+    }
+
+    /**
 	 * Add the possibility to override the PluginDescriptorFinder.
 	 * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
 	 * PropertiesPluginDescriptorFinder is returned else this method returns
@@ -572,7 +605,10 @@ public class DefaultPluginManager implements PluginManager {
      * Add the possibility to override the ExtensionFinder.
      */
     protected ExtensionFinder createExtensionFinder() {
-    	return new DefaultExtensionFinder(this);
+    	DefaultExtensionFinder extensionFinder = new DefaultExtensionFinder(this);
+        addPluginStateListener(extensionFinder);
+
+        return extensionFinder;
     }
 
     /**
@@ -631,6 +667,8 @@ public class DefaultPluginManager implements PluginManager {
         resolvedPlugins = new ArrayList<PluginWrapper>();
         startedPlugins = new ArrayList<PluginWrapper>();
         disabledPlugins = new ArrayList<String>();
+
+        pluginStateListeners = new ArrayList<PluginStateListener>();
 
         pluginClasspath = createPluginClasspath();
         pluginDescriptorFinder = createPluginDescriptorFinder();
@@ -738,5 +776,12 @@ public class DefaultPluginManager implements PluginManager {
         	log.info("Plugin '{}' resolved", pluginWrapper.getDescriptor().getPluginId());
         }
 	}
+
+    private synchronized void firePluginStateEvent(PluginStateEvent event) {
+        for (PluginStateListener listener : pluginStateListeners) {
+            log.debug("Fire '{}' to '{}'", event, listener);
+            listener.pluginStateChanged(event);
+        }
+    }
 
 }

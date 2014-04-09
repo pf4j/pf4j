@@ -137,4 +137,8 @@ public interface PluginManager {
 	 */
 	public RuntimeMode getRuntimeMode();
 
+    public void addPluginStateListener(PluginStateListener listener);
+
+    public void removePluginStateListener(PluginStateListener listener);
+
 }

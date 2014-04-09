@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Decebal Suiu
+ * Copyright 2014 Decebal Suiu
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
@@ -12,22 +12,18 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.util.List;
-import java.util.Set;
+import java.util.EventListener;
 
 /**
+ * PluginStateListener defines the interface for an object that listens to plugin state changes.
+ *
  * @author Decebal Suiu
  */
-public interface ExtensionFinder {
+public interface PluginStateListener extends EventListener {
 
     /**
-     * Retrieves a list with all extensions found for an extension point.
+     * Invoked when a plugin's state (for example DISABLED, STARTED) is changed.
      */
-    public <T> List<ExtensionWrapper<T>> find(Class<T> type);
-
-    /**
-     * Retrieves a list with all extension class names found for a plugin.
-     */
-    public Set<String> findClassNames(String pluginId);
+    public void pluginStateChanged(PluginStateEvent event);
 
 }
