@@ -12,14 +12,15 @@
  */
 package ro.fortsoft.pf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ro.fortsoft.pf4j.util.*;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ro.fortsoft.pf4j.util.*;
 
 /**
  * Default implementation of the PluginManager interface.
@@ -372,7 +373,7 @@ public class DefaultPluginManager implements PluginManager {
     public boolean unloadPlugin(String pluginId) {
     	try {
     		PluginState pluginState = stopPlugin(pluginId);
-    		if (PluginState.STOPPED != pluginState) {
+    		if (PluginState.STARTED == pluginState) {
     			return false;
     		}
 
@@ -486,7 +487,7 @@ public class DefaultPluginManager implements PluginManager {
 
 		PluginWrapper pluginWrapper = getPlugin(pluginId);
 		PluginState pluginState = stopPlugin(pluginId);
-		if (PluginState.STOPPED != pluginState) {
+		if (PluginState.STARTED == pluginState) {
 			log.error("Failed to stop plugin {} on delete", pluginId);
 			return false;
 		}
