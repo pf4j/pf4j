@@ -12,11 +12,8 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -93,27 +90,4 @@ public class PluginClassLoader extends URLClassLoader {
         // use the standard URLClassLoader (which follows normal parent delegation)
         return super.loadClass(className);
     }
-
-    @Override
-    public URL getResource(String name) {
-        if (PluginState.DISABLED == getPlugin().getPluginState()) {
-            return null;
-        }
-
-        return super.getResource(name);
-    }
-
-    @Override
-    public Enumeration<URL> getResources(String name) throws IOException {
-        if (PluginState.DISABLED == getPlugin().getPluginState()) {
-            return Collections.emptyEnumeration();
-        }
-
-        return super.getResources(name);
-    }
-
-    private PluginWrapper getPlugin() {
-        return pluginManager.getPlugin(pluginDescriptor.getPluginId());
-    }
-
 }

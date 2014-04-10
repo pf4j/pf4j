@@ -56,6 +56,12 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
         List<ExtensionWrapper<T>> result = new ArrayList<ExtensionWrapper<T>>();
         for (Map.Entry<String, Set<String>> entry : entries.entrySet()) {
             String pluginId = entry.getKey();
+
+            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
+            if (PluginState.STARTED != pluginWrapper.getPluginState()) {
+            	continue;
+            }
+
             Set<String> extensionClassNames = entry.getValue();
 
             for (String className : extensionClassNames) {
@@ -92,10 +98,12 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 
     @Override
     public Set<String> findClassNames(String pluginId) {
+    	readIndexFiles();
         return entries.get(pluginId);
     }
 
-    public void pluginStateChanged(PluginStateEvent event) {
+    @Override
+	public void pluginStateChanged(PluginStateEvent event) {
         // TODO optimize (do only for some transitions)
         // clear cache
         entries = null;
@@ -134,8 +142,8 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 
         entries = new HashMap<String, Set<String>>();
 
-        List<PluginWrapper> startedPlugins = pluginManager.getStartedPlugins();
-        for (PluginWrapper plugin : startedPlugins) {
+        List<PluginWrapper> plugins = pluginManager.getPlugins();
+        for (PluginWrapper plugin : plugins) {
             String pluginId = plugin.getDescriptor().getPluginId();
             log.debug("Reading extensions index file for plugin '{}'", pluginId);
             Set<String> entriesPerPlugin = new HashSet<String>();
@@ -164,7 +172,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
         return entries;
     }
 
-    private boolean isExtensionPoint(Class type) {
+    private boolean isExtensionPoint(Class<?> type) {
         return ExtensionPoint.class.isAssignableFrom(type);
     }
 
