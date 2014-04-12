@@ -141,4 +141,20 @@ public interface PluginManager {
 
     public void removePluginStateListener(PluginStateListener listener);
 
+    /**
+     * Set the system version.  This is used to compare against the plugin
+     * requires attribute.  The default system version is 0.0.0 which
+     * disables all version checking.
+     *
+     * @default 0.0.0
+     * @param version
+     */
+    public void setSystemVersion(PluginVersion version);
+
+    /**
+     * Returns the system version.
+     *
+     * * @return the system version
+     */
+    public PluginVersion getSystemVersion();
 }

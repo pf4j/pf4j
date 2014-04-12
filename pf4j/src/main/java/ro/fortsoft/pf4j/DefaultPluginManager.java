@@ -90,6 +90,11 @@ public class DefaultPluginManager implements PluginManager {
     private RuntimeMode runtimeMode;
 
     /**
+     * The system version used for comparisons to the plugin requires attribute.
+     */
+    private PluginVersion systemVersion = PluginVersion.DEFAULT;
+
+    /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
      */
     public DefaultPluginManager() {
@@ -108,6 +113,16 @@ public class DefaultPluginManager implements PluginManager {
         this.pluginsDirectory = pluginsDirectory;
 
         initialize();
+    }
+
+    @Override
+    public void setSystemVersion(PluginVersion version) {
+    	systemVersion = version;
+    }
+
+    @Override
+    public PluginVersion getSystemVersion() {
+    	return systemVersion;
     }
 
 	@Override
@@ -461,6 +476,16 @@ public class DefaultPluginManager implements PluginManager {
             return true;
         }
 
+        PluginVersion requires = pluginWrapper.getDescriptor().getRequires();
+       	PluginVersion system = getSystemVersion();
+       	if (!system.isDefault() && !system.atLeast(requires)) {
+       		log.warn(String.format("Failed to enable plugin `{}:{}` because it requires a minimum system version of %s",
+       				pluginWrapper.getPluginId(),
+       				pluginWrapper.getDescriptor().getVersion(),
+       				requires));
+            return false;
+        }
+
         try {
             if (disabledPlugins.remove(pluginId)) {
                 FileUtils.writeLines(disabledPlugins, new File(pluginsDirectory, "disabled.txt"));
@@ -722,6 +747,18 @@ public class DefaultPluginManager implements PluginManager {
         if (isPluginDisabled(pluginDescriptor.getPluginId())) {
             log.info("Plugin '{}' is disabled", pluginPath);
             pluginWrapper.setPluginState(PluginState.DISABLED);
+        }
+
+        // optionally enforce minimum system version requirements
+        PluginVersion requires = pluginWrapper.getDescriptor().getRequires();
+       	PluginVersion system = getSystemVersion();
+       	if (!system.isDefault() && !system.atLeast(requires)) {
+       		log.warn(String.format("Disabling plugin '%s:%s' because it requires a minimum system version of %s",
+       				pluginWrapper.getPluginId(),
+       				pluginWrapper.getDescriptor().getVersion(),
+       				requires));
+            pluginWrapper.setPluginState(PluginState.DISABLED);
+            disabledPlugins.add(pluginWrapper.getPluginId());
         }
 
         log.debug("Created wrapper '{}' for plugin '{}'", pluginWrapper, pluginPath);
