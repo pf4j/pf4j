@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Decebal Suiu
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -25,6 +25,7 @@ import java.util.List;
 public class PluginDescriptor {
 
 	private String pluginId;
+	private String pluginDescription;
     private String pluginClass;
     private PluginVersion version;
     private String provider;
@@ -39,6 +40,13 @@ public class PluginDescriptor {
      */
     public String getPluginId() {
         return pluginId;
+    }
+
+    /**
+     * Returns the description of this plugin.
+     */
+    public String getPluginDescription() {
+        return pluginDescription;
     }
 
     /**
@@ -82,6 +90,10 @@ public class PluginDescriptor {
         this.pluginId = pluginId;
     }
 
+	void setPluginDescription(String pluginDescription) {
+        this.pluginDescription = pluginDescription;
+    }
+
     void setPluginClass(String pluginClassName) {
         this.pluginClass = pluginClassName;
     }
@@ -93,7 +105,7 @@ public class PluginDescriptor {
     void setProvider(String provider) {
         this.provider = provider;
     }
-    
+
     void setDependencies(String dependencies) {
     	if (dependencies != null) {
     		dependencies = dependencies.trim();
@@ -101,7 +113,7 @@ public class PluginDescriptor {
     			this.dependencies = Collections.emptyList();
     		} else {
 	    		this.dependencies = new ArrayList<PluginDependency>();
-	    		String[] tokens = dependencies.split(",");    		
+	    		String[] tokens = dependencies.split(",");
 	    		for (String dependency : tokens) {
 	    			dependency = dependency.trim();
 	    			if (!dependency.isEmpty()) {
