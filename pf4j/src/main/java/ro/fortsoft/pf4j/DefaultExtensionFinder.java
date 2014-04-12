@@ -71,6 +71,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
                     if (type.isAssignableFrom(extensionType)) {
                         Object instance = extensionFactory.create(extensionType);
                         if (instance != null) {
+                            pluginWrapper.getPlugin().setupExtension(instance);
                             Extension extension = extensionType.getAnnotation(Extension.class);
                             log.debug("Added extension '{}' with ordinal {}", extensionType.getName(), extension.ordinal());
                             result.add(new ExtensionWrapper<T>(type.cast(instance), extension.ordinal()));
