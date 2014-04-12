@@ -1,11 +1,11 @@
 /*
  * Copyright 2012 Decebal Suiu
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -32,9 +32,9 @@ import ro.fortsoft.pf4j.util.StringUtils;
 public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
 	private static final Logger log = LoggerFactory.getLogger(ManifestPluginDescriptorFinder.class);
-	
+
 	private PluginClasspath pluginClasspath;
-	
+
 	public ManifestPluginDescriptorFinder(PluginClasspath pluginClasspath) {
 		this.pluginClasspath = pluginClasspath;
 	}
@@ -53,9 +53,9 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 		try {
 			input = new FileInputStream(manifestFile);
 		} catch (FileNotFoundException e) {
-			// not happening 
+			// not happening
 		}
-		
+
     	Manifest manifest = null;
         try {
             manifest = new Manifest(input);
@@ -67,10 +67,10 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 			} catch (IOException e) {
 				throw new PluginException(e.getMessage(), e);
 			}
-        } 
-        
+        }
+
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
-        
+
         // TODO validate !!!
         Attributes attrs = manifest.getMainAttributes();
         String id = attrs.getValue("Plugin-Id");
@@ -78,25 +78,32 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         	throw new PluginException("Plugin-Id cannot be empty");
         }
         pluginDescriptor.setPluginId(id);
-        
+
+        String description = attrs.getValue("Plugin-Description");
+        if (StringUtils.isEmpty(description)) {
+        	pluginDescriptor.setPluginDescription("");
+        } else {
+            pluginDescriptor.setPluginDescription(description);
+        }
+
         String clazz = attrs.getValue("Plugin-Class");
         if (StringUtils.isEmpty(clazz)) {
         	throw new PluginException("Plugin-Class cannot be empty");
         }
         pluginDescriptor.setPluginClass(clazz);
-        
+
         String version = attrs.getValue("Plugin-Version");
         if (StringUtils.isEmpty(version)) {
         	throw new PluginException("Plugin-Version cannot be empty");
         }
         pluginDescriptor.setPluginVersion(PluginVersion.createVersion(version));
-        
+
         String provider = attrs.getValue("Plugin-Provider");
-        pluginDescriptor.setProvider(provider);        
+        pluginDescriptor.setProvider(provider);
         String dependencies = attrs.getValue("Plugin-Dependencies");
         pluginDescriptor.setDependencies(dependencies);
 
 		return pluginDescriptor;
 	}
-    	
+
 }
