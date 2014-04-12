@@ -76,7 +76,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
                             result.add(new ExtensionWrapper<T>(type.cast(instance), extension.ordinal()));
                         }
                     } else {
-                        log.warn("'{}' is not an extension for extension point '{}'", extensionType.getName(), type.getName());
+                        log.debug("'{}' is not an extension for extension point '{}'", extensionType.getName(), type.getName());
                     }
                 } catch (ClassNotFoundException e) {
                     log.error(e.getMessage(), e);
