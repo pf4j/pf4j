@@ -28,10 +28,12 @@ public class PluginDescriptor {
 	private String pluginDescription;
     private String pluginClass;
     private PluginVersion version;
+    private PluginVersion requires;
     private String provider;
     private List<PluginDependency> dependencies;
 
     public PluginDescriptor() {
+    	requires = PluginVersion.ZERO;
         dependencies = new ArrayList<PluginDependency>();
     }
 
@@ -61,6 +63,13 @@ public class PluginDescriptor {
      */
     public PluginVersion getVersion() {
         return version;
+    }
+
+    /**
+     * Returns the requires of this plugin.
+     */
+    public PluginVersion getRequires() {
+        return requires;
     }
 
     /**
@@ -104,6 +113,10 @@ public class PluginDescriptor {
 
     void setProvider(String provider) {
         this.provider = provider;
+    }
+
+    void setRequires(PluginVersion requires) {
+        this.requires = requires;
     }
 
     void setDependencies(String dependencies) {

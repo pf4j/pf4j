@@ -90,6 +90,11 @@ public class DefaultPluginManager implements PluginManager {
     private RuntimeMode runtimeMode;
 
     /**
+     * The system version used for comparisons to the plugin requires attribute.
+     */
+    private PluginVersion systemVersion = PluginVersion.ZERO;
+
+    /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
      */
     public DefaultPluginManager() {
@@ -108,6 +113,16 @@ public class DefaultPluginManager implements PluginManager {
         this.pluginsDirectory = pluginsDirectory;
 
         initialize();
+    }
+
+    @Override
+    public void setSystemVersion(PluginVersion version) {
+    	systemVersion = version;
+    }
+
+    @Override
+    public PluginVersion getSystemVersion() {
+    	return systemVersion;
     }
 
 	@Override
@@ -454,10 +469,17 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
+       	if (!isPluginValid(pluginWrapper)) {
+        	log.warn("Plugin '{}:{}' can not be enabled",
+        			pluginWrapper.getPluginId(),
+        			pluginWrapper.getDescriptor().getVersion());
+            return false;
+        }
+
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
         if (PluginState.DISABLED != pluginState) {
-            log.debug("Plugin plugin '{}:{}' is not disabled", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            log.debug("Plugin '{}:{}' is not disabled", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
             return true;
         }
 
@@ -634,6 +656,20 @@ public class DefaultPluginManager implements PluginManager {
     	return !enabledPlugins.contains(pluginId);
     }
 
+    protected boolean isPluginValid(PluginWrapper pluginWrapper) {
+    	PluginVersion requires = pluginWrapper.getDescriptor().getRequires();
+    	PluginVersion system = getSystemVersion();
+    	if (system.isZero() || system.atLeast(requires)) {
+    		return true;
+    	}
+
+    	log.warn(String.format("Plugin '%s:%s' requires a minimum system version of %s",
+    			pluginWrapper.getPluginId(),
+    			pluginWrapper.getDescriptor().getVersion(),
+    			requires));
+    	return false;
+    }
+
     protected FileFilter createHiddenPluginFilter() {
     	return new HiddenFilter();
     }
@@ -722,6 +758,12 @@ public class DefaultPluginManager implements PluginManager {
         if (isPluginDisabled(pluginDescriptor.getPluginId())) {
             log.info("Plugin '{}' is disabled", pluginPath);
             pluginWrapper.setPluginState(PluginState.DISABLED);
+        }
+
+        // validate the plugin
+        if (!isPluginValid(pluginWrapper)) {
+        	log.info("Plugin '{}' is disabled", pluginPath);
+        	pluginWrapper.setPluginState(PluginState.DISABLED);
         }
 
         log.debug("Created wrapper '{}' for plugin '{}'", pluginWrapper, pluginPath);
