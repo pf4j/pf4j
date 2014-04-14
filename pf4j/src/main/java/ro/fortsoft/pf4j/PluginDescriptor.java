@@ -33,7 +33,7 @@ public class PluginDescriptor {
     private List<PluginDependency> dependencies;
 
     public PluginDescriptor() {
-    	requires = PluginVersion.DEFAULT;
+    	requires = PluginVersion.ZERO;
         dependencies = new ArrayList<PluginDependency>();
     }
 

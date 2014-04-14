@@ -33,7 +33,7 @@ import ro.fortsoft.pf4j.util.StringUtils;
  */
 public class PluginVersion implements Comparable<PluginVersion> {
 
-	public static final PluginVersion DEFAULT = new PluginVersion(0, 0, 0);
+	public static final PluginVersion ZERO = new PluginVersion(0, 0, 0);
 
     private static final String FORMAT = "(\\d+)\\.(\\d+)(?:\\.)?(\\d*)(\\.|-|\\+)?([0-9A-Za-z-.]*)?";
     private static final Pattern PATTERN = Pattern.compile(FORMAT);
@@ -138,12 +138,16 @@ public class PluginVersion implements Comparable<PluginVersion> {
         return 0;
     }
 
-    public boolean isDefault() {
-    	return compareTo(DEFAULT) == 0;
+    public boolean isZero() {
+    	return compareTo(ZERO) == 0;
     }
 
     public boolean atLeast(PluginVersion v) {
     	return compareTo(v) <= 0;
+    }
+
+    public boolean exceeds(PluginVersion v) {
+    	return compareTo(v) > 0;
     }
 
     // for test only
