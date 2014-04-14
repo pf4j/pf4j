@@ -432,7 +432,6 @@ public class DefaultPluginManager implements PluginManager {
             throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
         }
 
-
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
@@ -470,8 +469,7 @@ public class DefaultPluginManager implements PluginManager {
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
        	if (!isPluginValid(pluginWrapper)) {
-        	log.warn("Plugin '{}:{}' can not be enabled",
-        			pluginWrapper.getPluginId(),
+        	log.warn("Plugin '{}:{}' can not be enabled", pluginWrapper.getPluginId(),
         			pluginWrapper.getDescriptor().getVersion());
             return false;
         }
@@ -663,10 +661,11 @@ public class DefaultPluginManager implements PluginManager {
     		return true;
     	}
 
-    	log.warn(String.format("Plugin '%s:%s' requires a minimum system version of %s",
+    	log.warn("Plugin '{}:{}' requires a minimum system version of {}",
     			pluginWrapper.getPluginId(),
     			pluginWrapper.getDescriptor().getVersion(),
-    			requires));
+    			requires);
+
     	return false;
     }
 

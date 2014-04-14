@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    
+
     <parent>
         <groupId>ro.fortsoft.pf4j.demo</groupId>
         <artifactId>pf4j-demo-parent</artifactId>
@@ -15,11 +15,11 @@
 
     <properties>
         <main.class>ro.fortsoft.pf4j.demo.Boot</main.class>
-        <slf4j.version>1.6.4</slf4j.version>
+        <slf4j.version>1.7.5</slf4j.version>
     </properties>
-    
+
     <build>
-        <plugins>              
+        <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.3</version>
@@ -41,7 +41,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -56,7 +56,7 @@
                     </archive>
                 </configuration>
             </plugin>
-                        
+
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <configuration>
@@ -71,13 +71,13 @@
             <groupId>ro.fortsoft.pf4j</groupId>
             <artifactId>pf4j</artifactId>
             <version>${project.version}</version>
-        </dependency>    
+        </dependency>
 
         <dependency>
             <groupId>ro.fortsoft.pf4j.demo</groupId>
             <artifactId>pf4j-demo-api</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
 
         <!-- Logs -->
         <dependency>
@@ -88,21 +88,15 @@
 
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
+            <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>        
-        
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.4</version>
         </dependency>
     </dependencies>
-    
+
 </project>
