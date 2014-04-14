@@ -27,13 +27,13 @@ public class PluginDescriptor {
 	private String pluginId;
 	private String pluginDescription;
     private String pluginClass;
-    private PluginVersion version;
-    private PluginVersion requires;
+    private Version version;
+    private Version requires;
     private String provider;
     private List<PluginDependency> dependencies;
 
     public PluginDescriptor() {
-    	requires = PluginVersion.ZERO;
+    	requires = Version.ZERO;
         dependencies = new ArrayList<PluginDependency>();
     }
 
@@ -61,14 +61,14 @@ public class PluginDescriptor {
     /**
      * Returns the version of this plugin.
      */
-    public PluginVersion getVersion() {
+    public Version getVersion() {
         return version;
     }
 
     /**
      * Returns the requires of this plugin.
      */
-    public PluginVersion getRequires() {
+    public Version getRequires() {
         return requires;
     }
 
@@ -107,7 +107,7 @@ public class PluginDescriptor {
         this.pluginClass = pluginClassName;
     }
 
-    void setPluginVersion(PluginVersion version) {
+    void setPluginVersion(Version version) {
         this.version = version;
     }
 
@@ -115,7 +115,7 @@ public class PluginDescriptor {
         this.provider = provider;
     }
 
-    void setRequires(PluginVersion requires) {
+    void setRequires(Version requires) {
         this.requires = requires;
     }
 

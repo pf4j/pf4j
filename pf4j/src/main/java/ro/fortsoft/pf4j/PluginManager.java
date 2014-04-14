@@ -149,12 +149,12 @@ public interface PluginManager {
      * @default 0.0.0
      * @param version
      */
-    public void setSystemVersion(PluginVersion version);
+    public void setSystemVersion(Version version);
 
     /**
      * Returns the system version.
      *
      * * @return the system version
      */
-    public PluginVersion getSystemVersion();
+    public Version getSystemVersion();
 }

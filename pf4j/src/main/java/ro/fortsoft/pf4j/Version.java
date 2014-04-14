@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import ro.fortsoft.pf4j.util.StringUtils;
 
 /**
- * Represents the version of a Plugin and allows versions to be compared.
  * Version following semantic defined by <a href="http://semver.org/">Semantic Versioning</a> document.
  * Version identifiers have four components.
  *
@@ -31,9 +30,9 @@ import ro.fortsoft.pf4j.util.StringUtils;
  *
  * @author Decebal Suiu
  */
-public class PluginVersion implements Comparable<PluginVersion> {
+public class Version implements Comparable<Version> {
 
-	public static final PluginVersion ZERO = new PluginVersion(0, 0, 0);
+	public static final Version ZERO = new Version(0, 0, 0);
 
     private static final String FORMAT = "(\\d+)\\.(\\d+)(?:\\.)?(\\d*)(\\.|-|\\+)?([0-9A-Za-z-.]*)?";
     private static final Pattern PATTERN = Pattern.compile(FORMAT);
@@ -44,13 +43,13 @@ public class PluginVersion implements Comparable<PluginVersion> {
     private String separator;
 	private String qualifier;
 
-	public PluginVersion(int major, int minor, int patch) {
+	public Version(int major, int minor, int patch) {
 		this.major = major;
 		this.minor = minor;
 		this.patch = patch;
 	}
 
-	public PluginVersion(int major, int minor, int patch, String separator, String qualifier) {
+	public Version(int major, int minor, int patch, String separator, String qualifier) {
 		this.major = major;
 		this.minor = minor;
 		this.patch = patch;
@@ -58,7 +57,7 @@ public class PluginVersion implements Comparable<PluginVersion> {
 		this.qualifier = qualifier;
 	}
 
-	public static PluginVersion createVersion(String version) {
+	public static Version createVersion(String version) {
         Matcher matcher = PATTERN.matcher(version);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("'" + version + "' does not match format '" + FORMAT + "'");
@@ -78,7 +77,7 @@ public class PluginVersion implements Comparable<PluginVersion> {
         String separator = matcher.group(4);
         String qualifier = matcher.group(5);
 
-        return new PluginVersion(major, minor, patch, separator, "".equals(qualifier) ? null : qualifier);
+        return new Version(major, minor, patch, separator, "".equals(qualifier) ? null : qualifier);
     }
 
 	public int getMajor() {
@@ -116,7 +115,7 @@ public class PluginVersion implements Comparable<PluginVersion> {
     }
 
     @Override
-    public int compareTo(PluginVersion version) {
+    public int compareTo(Version version) {
         if (version.major > major) {
             return 1;
         } else if (version.major < major) {
@@ -142,21 +141,21 @@ public class PluginVersion implements Comparable<PluginVersion> {
     	return compareTo(ZERO) == 0;
     }
 
-    public boolean atLeast(PluginVersion v) {
+    public boolean atLeast(Version v) {
     	return compareTo(v) <= 0;
     }
 
-    public boolean exceeds(PluginVersion v) {
+    public boolean exceeds(Version v) {
     	return compareTo(v) > 0;
     }
 
     // for test only
     public static void main(String[] args) {
-        PluginVersion v = PluginVersion.createVersion("1.2.3-SNAPSHOT");
+        Version v = Version.createVersion("1.2.3-SNAPSHOT");
         System.out.println(v.toString());
-        PluginVersion v1 = PluginVersion.createVersion("4.1.0");
+        Version v1 = Version.createVersion("4.1.0");
         System.out.println(v1.toString());
-        PluginVersion v2  = PluginVersion.createVersion("4.0.32");
+        Version v2  = Version.createVersion("4.0.32");
         System.out.println(v2.toString());
         System.out.println(v1.compareTo(v2));
     }

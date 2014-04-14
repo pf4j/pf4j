@@ -92,7 +92,7 @@ public class DefaultPluginManager implements PluginManager {
     /**
      * The system version used for comparisons to the plugin requires attribute.
      */
-    private PluginVersion systemVersion = PluginVersion.ZERO;
+    private Version systemVersion = Version.ZERO;
 
     /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
@@ -116,12 +116,12 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     @Override
-    public void setSystemVersion(PluginVersion version) {
+    public void setSystemVersion(Version version) {
     	systemVersion = version;
     }
 
     @Override
-    public PluginVersion getSystemVersion() {
+    public Version getSystemVersion() {
     	return systemVersion;
     }
 
@@ -657,8 +657,8 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     protected boolean isPluginValid(PluginWrapper pluginWrapper) {
-    	PluginVersion requires = pluginWrapper.getDescriptor().getRequires();
-    	PluginVersion system = getSystemVersion();
+    	Version requires = pluginWrapper.getDescriptor().getRequires();
+    	Version system = getSystemVersion();
     	if (system.isZero() || system.atLeast(requires)) {
     		return true;
     	}
