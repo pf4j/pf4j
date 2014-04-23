@@ -604,6 +604,20 @@ public class DefaultPluginManager implements PluginManager {
         pluginStateListeners.remove(listener);
     }
 
+    public Version getVersion() {
+        String version = null;
+
+        Package pf4jPackage = getClass().getPackage();
+        if (pf4jPackage != null) {
+            version = pf4jPackage.getImplementationVersion();
+            if (version == null) {
+                version = pf4jPackage.getSpecificationVersion();
+            }
+        }
+
+        return (version != null) ? Version.createVersion(version) : Version.ZERO;
+    }
+
     /**
 	 * Add the possibility to override the PluginDescriptorFinder.
 	 * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
