@@ -12,6 +12,10 @@
  */
 package ro.fortsoft.pf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
@@ -22,6 +26,8 @@ import java.util.List;
  * @author Decebal Suiu
  */
 public class PluginClassLoader extends URLClassLoader {
+
+    private static final Logger log = LoggerFactory.getLogger(PluginClassLoader.class);
 
 //	private static final String JAVA_PACKAGE_PREFIX = "java.";
 //	private static final String JAVAX_PACKAGE_PREFIX = "javax.";
@@ -90,4 +96,19 @@ public class PluginClassLoader extends URLClassLoader {
         // use the standard URLClassLoader (which follows normal parent delegation)
         return super.loadClass(className);
     }
+
+    /**
+     * Release all resources acquired by this class loader.
+     * The current implementation is incomplete.
+     * For now, this instance can no longer be used to load
+     * new classes or resources that are defined by this loader.
+     */
+    public void dispose() {
+        try {
+            close();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
 }

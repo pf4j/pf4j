@@ -411,11 +411,7 @@ public class DefaultPluginManager implements PluginManager {
     		// remove the classloader
     		if (pluginClassLoaders.containsKey(pluginId)) {
     			PluginClassLoader classLoader = pluginClassLoaders.remove(pluginId);
-    			try {
-    				classLoader.close();
-    			} catch (IOException e) {
-    				log.error(e.getMessage(), e);
-    			}
+                classLoader.dispose();
     		}
 
     		return true;
@@ -803,6 +799,7 @@ public class DefaultPluginManager implements PluginManager {
             unzip.setDestination(pluginDirectory);
             unzip.extract();
         }
+
         return pluginDirectory;
     }
 
