@@ -60,6 +60,15 @@ public class PluginClassLoader extends URLClassLoader {
 		}
 		*/
 
+        // if the class it's a part of the plugin engine use parent class loader
+        if (className.startsWith(PLUGIN_PACKAGE_PREFIX)) {
+            try {
+                return PluginClassLoader.class.getClassLoader().loadClass(className);
+            } catch (ClassNotFoundException e) {
+                // try next step
+            }
+        }
+
         // second check whether it's already been loaded
         Class<?> loadedClass = findLoadedClass(className);
         if (loadedClass != null) {
@@ -71,15 +80,6 @@ public class PluginClassLoader extends URLClassLoader {
         	return findClass(className);
         } catch (ClassNotFoundException e) {
         	// try next step
-        }
-
-        // if the class it's a part of the plugin engine use parent class loader
-        if (className.startsWith(PLUGIN_PACKAGE_PREFIX)) {
-        	try {
-        		return PluginClassLoader.class.getClassLoader().loadClass(className);
-        	} catch (ClassNotFoundException e) {
-        		// try next step
-        	}
         }
 
         // look in dependencies
