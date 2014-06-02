@@ -139,7 +139,7 @@ public class PluginWrapper {
         int modifiers = pluginClass.getModifiers();
         if (Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)
                 || (!Plugin.class.isAssignableFrom(pluginClass))) {
-            throw new PluginException("The plugin class '" + pluginClassName + "' is not compatible.");
+            throw new PluginException("The plugin class '" + pluginClassName + "' is not valid.");
         }
 
         // create the plugin instance
