@@ -160,7 +160,7 @@ For more information please see the demo sources.
 Plugin assembly
 ------------------------------
 
-After you developed a plugin the next step is to deploy it in your application. For this task, you must create a zip file with a structure described in section "How to use" from the beginning of the document.  
+After you developed a plugin the next step is to deploy it in your application. For this task, one option is to create a zip file with a structure described in section "How to use" from the beginning of the document.  
 If you use `apache maven` as build manger than your pom.xml file must looks like [this](https://github.com/decebals/pf4j/blob/master/demo/plugins/plugin1/pom.xml). This file it's very simple and it's self explanatory.  
 If you use `apache ant` than your buil.xml file must looks like [this](https://github.com/gitblit/gitblit-powertools-plugin/blob/master/build.xml). In this case please look at the "build" target.  
 
