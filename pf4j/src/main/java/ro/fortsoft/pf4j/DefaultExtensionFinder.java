@@ -57,16 +57,24 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
         for (Map.Entry<String, Set<String>> entry : entries.entrySet()) {
             String pluginId = entry.getKey();
 
-            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
-            if (PluginState.STARTED != pluginWrapper.getPluginState()) {
-            	continue;
+            if (pluginId != null) {
+                PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
+                if (PluginState.STARTED != pluginWrapper.getPluginState()) {
+                    continue;
+                }
             }
 
             Set<String> extensionClassNames = entry.getValue();
 
             for (String className : extensionClassNames) {
                 try {
-                    Class<?> extensionType = pluginManager.getPluginClassLoader(pluginId).loadClass(className);
+                    Class<?> extensionType;
+                    if (pluginId != null) {
+                        extensionType = pluginManager.getPluginClassLoader(pluginId).loadClass(className);
+                    } else {
+                        extensionType = getClass().getClassLoader().loadClass(className);
+                    }
+
                     log.debug("Checking extension type '{}'", extensionType.getName());
                     if (type.isAssignableFrom(extensionType)) {
                         Object instance = extensionFactory.create(extensionType);
@@ -140,36 +148,71 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
             return entries;
         }
 
-        entries = new HashMap<String, Set<String>>();
+        entries = new LinkedHashMap<String, Set<String>>();
+
+        readClasspathIndexFiles();
+        readPluginsIndexFiles();
+
+        return entries;
+    }
+
+    private void readClasspathIndexFiles() {
+        log.debug("Reading extensions index files from classpath");
+
+        Set<String> bucket = new HashSet<String>();
+        try {
+            Enumeration<URL> urls = getClass().getClassLoader().getResources(ExtensionsIndexer.EXTENSIONS_RESOURCE);
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                log.debug("Read '{}'", url.getFile());
+                Reader reader = new InputStreamReader(url.openStream(), "UTF-8");
+                ExtensionsIndexer.readIndex(reader, bucket);
+            }
+
+            if (bucket.isEmpty()) {
+                log.debug("No extensions found");
+            } else {
+                log.debug("Found possible {} extensions:", bucket.size());
+                for (String entry : bucket) {
+                    log.debug("   " + entry);
+                }
+            }
+
+            entries.put(null, bucket);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    private void readPluginsIndexFiles() {
+        log.debug("Reading extensions index files from plugins");
 
         List<PluginWrapper> plugins = pluginManager.getPlugins();
         for (PluginWrapper plugin : plugins) {
             String pluginId = plugin.getDescriptor().getPluginId();
             log.debug("Reading extensions index file for plugin '{}'", pluginId);
-            Set<String> entriesPerPlugin = new HashSet<String>();
+            Set<String> bucket = new HashSet<String>();
 
             try {
                 URL url = plugin.getPluginClassLoader().getResource(ExtensionsIndexer.EXTENSIONS_RESOURCE);
                 log.debug("Read '{}'", url.getFile());
                 Reader reader = new InputStreamReader(url.openStream(), "UTF-8");
-                ExtensionsIndexer.readIndex(reader, entriesPerPlugin);
+                ExtensionsIndexer.readIndex(reader, bucket);
 
-                if (entriesPerPlugin.isEmpty()) {
+                if (bucket.isEmpty()) {
                     log.debug("No extensions found");
                 } else {
-                    log.debug("Found possible {} extensions:", entriesPerPlugin.size());
-                    for (String entry : entriesPerPlugin) {
+                    log.debug("Found possible {} extensions:", bucket.size());
+                    for (String entry : bucket) {
                         log.debug("   " + entry);
                     }
                 }
 
-                entries.put(pluginId, entriesPerPlugin);
+                entries.put(pluginId, bucket);
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
             }
         }
-
-        return entries;
     }
 
     private boolean isExtensionPoint(Class<?> type) {

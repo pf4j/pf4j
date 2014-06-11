@@ -29,8 +29,6 @@ public class PluginClassLoader extends URLClassLoader {
 
     private static final Logger log = LoggerFactory.getLogger(PluginClassLoader.class);
 
-//	private static final String JAVA_PACKAGE_PREFIX = "java.";
-//	private static final String JAVAX_PACKAGE_PREFIX = "javax.";
 	private static final String PLUGIN_PACKAGE_PREFIX = "ro.fortsoft.pf4j.";
 
 	private PluginManager pluginManager;
@@ -48,41 +46,45 @@ public class PluginClassLoader extends URLClassLoader {
 		super.addURL(url);
 	}
 
+    /**
+     * This implementation of loadClass uses a child first delegation model rather than the standard parent first.
+     * If the requested class cannot be found in this class loader, the parent class loader will be consulted
+     * via the standard ClassLoader.loadClass(String) mechanism.
+     */
 	@Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
-//		System.out.println(">>>" + className);
-
-		/*
-		 // javax.mail is not in JDK ?!
-		// first check whether it's a system class, delegate to the system loader
-		if (className.startsWith(JAVA_PACKAGE_PREFIX) || className.startsWith(JAVAX_PACKAGE_PREFIX)) {
-			return findSystemClass(className);
-		}
-		*/
-
+        log.debug("Received request to load class '{}'", className);
         // if the class it's a part of the plugin engine use parent class loader
         if (className.startsWith(PLUGIN_PACKAGE_PREFIX)) {
+            log.debug("Delegate the loading of class '{}' to parent", className);
             try {
-                return PluginClassLoader.class.getClassLoader().loadClass(className);
+                return getClass().getClassLoader().loadClass(className);
             } catch (ClassNotFoundException e) {
                 // try next step
+                // TODO if I uncomment below lines (the correct approach) I received ClassNotFoundException for demo (ro.fortsoft.pf4j.demo)
+//                log.error(e.getMessage(), e);
+//                throw e;
             }
         }
 
         // second check whether it's already been loaded
-        Class<?> loadedClass = findLoadedClass(className);
-        if (loadedClass != null) {
-        	return loadedClass;
+        Class<?> clazz = findLoadedClass(className);
+        if (clazz != null) {
+            log.debug("Found loaded class '{}'", className);
+        	return clazz;
         }
 
         // nope, try to load locally
         try {
-        	return findClass(className);
+            clazz = findClass(className);
+            log.debug("Found class '{}' in plugin classpath", className);
+            return clazz;
         } catch (ClassNotFoundException e) {
         	// try next step
         }
 
         // look in dependencies
+        log.debug("Look in dependencies for class '{}'", className);
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
         for (PluginDependency dependency : dependencies) {
         	PluginClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
@@ -93,8 +95,31 @@ public class PluginClassLoader extends URLClassLoader {
         	}
         }
 
+        log.debug("Couldn't find class '{}' in plugin classpath. Delegating to parent");
+
         // use the standard URLClassLoader (which follows normal parent delegation)
         return super.loadClass(className);
+    }
+
+    /**
+     * Load the named resource from this plugin. This implementation checks the plugin's classpath first
+     * then delegates to the parent.
+     *
+     * @param name the name of the resource.
+     * @return the URL to the resource, <code>null</code> if the resource was not found.
+     */
+    @Override
+    public URL getResource(String name) {
+        log.debug("Trying to find resource '{}' in plugin classpath", name);
+        URL url = findResource(name);
+        if (url != null) {
+            log.debug("Found resource '{}' in plugin classpath", name);
+            return url;
+        }
+
+        log.debug("Couldn't find resource '{}' in plugin classpath. Delegating to parent");
+
+        return super.getResource(name);
     }
 
     /**

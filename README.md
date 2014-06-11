@@ -138,6 +138,8 @@ The output is:
     >>> Welcome
     >>> Hello
 
+**NOTE:** Starting with version 0.9 you can define an extension directly in a jar (in classpath). See [WhazzupGreeting](https://github.com/decebals/pf4j/blob/master/demo/app/src/main/java/ro/fortsoft/pf4j/WhazzupGreeting.java) for a real example.
+
 You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder, PluginClasspath, ...) in DefaultPluginManager just override `create...` methods (factory method pattern).
 
 Example:
