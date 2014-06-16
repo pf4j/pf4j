@@ -10,8 +10,13 @@ Current build status:  [![Build Status](https://buildhive.cloudbees.com/job/dece
 Features/Benefits
 -------------------
 With PF4J you can easily transform a monolithic java application in a modular application.  
-PF4J is an open source (Apache license) lightweight (around 50KB) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see PluginDescriptorFinder and ExtensionFinder). The PF4J aims is to keep the core simple but extensible.   
+PF4J is an open source (Apache license) lightweight (around 50KB) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see PluginDescriptorFinder and ExtensionFinder).   
 
+Practically PF4J is a microframework and the aim is to keep the core simple but extensible. I try to create a little ecosystem (extensions) based on this core with the help of the comunity.  
+For now are available these extensions:
+- [wicket-plugin](https://github.com/decebals/wicket-plugin)
+- [pf4j-spring](https://github.com/decebals/pf4j-spring)
+- [pf4j-web](https://github.com/rmrodrigues/pf4j-web)
 
 No XML, only Java.
 
