@@ -3,12 +3,15 @@ Plugin Framework for Java (PF4J)
 A plugin is a way for a third party to extend the functionality of an application. A plugin implements extension points
 declared by application or other plugins. Also a plugin can define extension points.  
 
+**NOTE:** Starting with version 0.9 you can define an extension directly in a jar (in classpath). See [WhazzupGreeting](https://github.com/decebals/pf4j/blob/master/demo/app/src/main/java/ro/fortsoft/pf4j/demo/WhazzupGreeting.java) for a real example.  
+
 Current build status:  [![Build Status](https://buildhive.cloudbees.com/job/decebals/job/pf4j/badge/icon)](https://buildhive.cloudbees.com/job/decebals/job/pf4j/)
 
 Features/Benefits
 -------------------
-With PF4J you can easily transform a monolithic java application in a modular application. 
-PF4J is an open source (Apache license) lightweight (around 50KB) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see PluginDescriptorFinder and ExtensionFinder).
+With PF4J you can easily transform a monolithic java application in a modular application.  
+PF4J is an open source (Apache license) lightweight (around 50KB) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see PluginDescriptorFinder and ExtensionFinder). The PF4J aims is to keep the core simple but extensible.   
+
 
 No XML, only Java.
 
@@ -137,8 +140,6 @@ The output is:
 
     >>> Welcome
     >>> Hello
-
-**NOTE:** Starting with version 0.9 you can define an extension directly in a jar (in classpath). See [WhazzupGreeting](https://github.com/decebals/pf4j/blob/master/demo/app/src/main/java/ro/fortsoft/pf4j/demo/WhazzupGreeting.java) for a real example.  
 
 You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder, PluginClasspath, ...) in DefaultPluginManager just override `create...` methods (factory method pattern).
 
