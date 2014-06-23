@@ -273,6 +273,20 @@ To run the demo application use:
     ./run-demo.sh (for Linux/Unix)
     ./run-demo.bat (for Windows)
 
+How to build
+-------------------
+Requirements: 
+- [Git](http://git-scm.com/) 
+- JDK 1.7 (test with `java -version`)
+- [Apache Maven 3](http://maven.apache.org/) (test with `mvn -version`)
+
+Steps:
+- create a local clone of this repository (with `git clone https://github.com/decebals/pf4j.git`)
+- go to project's folder (with `cd pf4j`) 
+- build the artifacts (with `mvn clean package` or `mvn clean install`)
+
+After above steps a folder _pf4j/target_ is created and all goodies are in that folder.
+
 Mailing list
 --------------
 
