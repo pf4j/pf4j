@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 Decebal Suiu
- * 
+ * Copyright 2014 Decebal Suiu
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -13,29 +13,43 @@
 package ro.fortsoft.pf4j;
 
 /**
+ * A wrapper over extension instance.
+ *
  * @author Decebal Suiu
  */
 public class ExtensionWrapper<T> implements Comparable<ExtensionWrapper<T>> {
 
-	private final T instance;
-	private final int ordinal;
-	
-	public ExtensionWrapper(T instance, int ordinal) {
-		this.instance = instance;
-		this.ordinal = ordinal;
+    ExtensionDescriptor descriptor;
+    ExtensionFactory extensionFactory;
+    T extension; // cache
+
+	public ExtensionWrapper(ExtensionDescriptor descriptor) {
+        this.descriptor = descriptor;
 	}
 
-	public T getInstance() {
-		return instance;
+	public T getExtension() {
+        if (extension == null) {
+            extension = (T) extensionFactory.create(descriptor.getExtensionClass());
+        }
+
+        return extension;
 	}
 
-	public int getOrdinal() {
-		return ordinal;
+    public ExtensionDescriptor getDescriptor() {
+        return descriptor;
+    }
+
+    public int getOrdinal() {
+		return descriptor.getOrdinal();
 	}
 
 	@Override
 	public int compareTo(ExtensionWrapper<T> o) {
-		return (ordinal - o.getOrdinal());
+		return (getOrdinal() - o.getOrdinal());
 	}
+
+    void setExtensionFactory(ExtensionFactory extensionFactory) {
+        this.extensionFactory = extensionFactory;
+    }
 
 }

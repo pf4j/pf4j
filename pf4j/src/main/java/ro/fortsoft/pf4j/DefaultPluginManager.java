@@ -94,6 +94,9 @@ public class DefaultPluginManager implements PluginManager {
      */
     private Version systemVersion = Version.ZERO;
 
+    private PluginFactory pluginFactory;
+    private ExtensionFactory extensionFactory;
+
     /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
      */
@@ -167,6 +170,8 @@ public class DefaultPluginManager implements PluginManager {
 		if ((pluginArchiveFile == null) || !pluginArchiveFile.exists()) {
 			throw new IllegalArgumentException(String.format("Specified plugin %s does not exist!", pluginArchiveFile));
 		}
+
+        log.debug("Loading plugin from '{}'", pluginArchiveFile);
 
 		File pluginDirectory = null;
 		try {
@@ -361,7 +366,7 @@ public class DefaultPluginManager implements PluginManager {
         if (directories == null) {
         	directories = new File[0];
         }
-        log.debug("Found possible {} plugins: {}", directories.length, directories);
+        log.debug("Found {} possible plugins: {}", directories.length, directories);
         if (directories.length == 0) {
         	log.info("No plugins");
         	return;
@@ -554,7 +559,7 @@ public class DefaultPluginManager implements PluginManager {
 		List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
 		List<T> extensions = new ArrayList<T>(extensionsWrapper.size());
 		for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-			extensions.add(extensionWrapper.getInstance());
+			extensions.add(extensionWrapper.getExtension());
 		}
 
 		return extensions;
@@ -633,7 +638,7 @@ public class DefaultPluginManager implements PluginManager {
      * Add the possibility to override the ExtensionFinder.
      */
     protected ExtensionFinder createExtensionFinder() {
-    	DefaultExtensionFinder extensionFinder = new DefaultExtensionFinder(this);
+    	DefaultExtensionFinder extensionFinder = new DefaultExtensionFinder(this, extensionFactory);
         addPluginStateListener(extensionFinder);
 
         return extensionFinder;
@@ -702,7 +707,21 @@ public class DefaultPluginManager implements PluginManager {
     	return new File(pluginsDir);
     }
 
-	private void initialize() {
+    /**
+     * Add the possibility to override the PluginFactory..
+     */
+    protected PluginFactory createPluginFactory() {
+        return new DefaultPluginFactory();
+    }
+
+    /**
+     * Add the possibility to override the ExtensionFactory.
+     */
+    protected ExtensionFactory createExtensionFactory() {
+        return new DefaultExtensionFactory();
+    }
+
+    private void initialize() {
 		plugins = new HashMap<String, PluginWrapper>();
         pluginClassLoaders = new HashMap<String, PluginClassLoader>();
         pathToIdMap = new HashMap<String, String>();
@@ -716,6 +735,8 @@ public class DefaultPluginManager implements PluginManager {
         log.info("PF4J version {} in '{}' mode", getVersion(), getRuntimeMode());
 
         pluginClasspath = createPluginClasspath();
+        pluginFactory = createPluginFactory();
+        extensionFactory = createExtensionFactory();
         pluginDescriptorFinder = createPluginDescriptorFinder();
         extensionFinder = createExtensionFinder();
 
@@ -760,6 +781,7 @@ public class DefaultPluginManager implements PluginManager {
         // create the plugin wrapper
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
         PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor, pluginPath, pluginLoader.getPluginClassLoader());
+        pluginWrapper.setPluginFactory(pluginFactory);
         pluginWrapper.setRuntimeMode(getRuntimeMode());
 
         // test for disabled plugin

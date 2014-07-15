@@ -36,9 +36,9 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 	private ExtensionFactory extensionFactory;
     private volatile Map<String, Set<String>> entries; // cache by pluginId
 
-	public DefaultExtensionFinder(PluginManager pluginManager) {
+	public DefaultExtensionFinder(PluginManager pluginManager, ExtensionFactory extensionFactory) {
         this.pluginManager = pluginManager;
-		this.extensionFactory = createExtensionFactory();
+		this.extensionFactory = extensionFactory;
 	}
 
     @Override
@@ -68,23 +68,26 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 
             for (String className : extensionClassNames) {
                 try {
-                    Class<?> extensionType;
+                    Class<?> extensionClass;
                     if (pluginId != null) {
-                        extensionType = pluginManager.getPluginClassLoader(pluginId).loadClass(className);
+                        extensionClass = pluginManager.getPluginClassLoader(pluginId).loadClass(className);
                     } else {
-                        extensionType = getClass().getClassLoader().loadClass(className);
+                        extensionClass = getClass().getClassLoader().loadClass(className);
                     }
 
-                    log.debug("Checking extension type '{}'", extensionType.getName());
-                    if (type.isAssignableFrom(extensionType)) {
-                        Object instance = extensionFactory.create(extensionType);
-                        if (instance != null) {
-                            Extension extension = extensionType.getAnnotation(Extension.class);
-                            log.debug("Added extension '{}' with ordinal {}", extensionType.getName(), extension.ordinal());
-                            result.add(new ExtensionWrapper<T>(type.cast(instance), extension.ordinal()));
-                        }
+                    log.debug("Checking extension type '{}'", className);
+                    if (type.isAssignableFrom(extensionClass) && extensionClass.isAnnotationPresent(Extension.class)) {
+                        Extension extension = extensionClass.getAnnotation(Extension.class);
+                        ExtensionDescriptor descriptor = new ExtensionDescriptor();
+                        descriptor.setOrdinal(extension.ordinal());
+                        descriptor.setExtensionClass(extensionClass);
+
+                        ExtensionWrapper extensionWrapper = new ExtensionWrapper<T>(descriptor);
+                        extensionWrapper.setExtensionFactory(extensionFactory);
+                        result.add(extensionWrapper);
+                        log.debug("Added extension '{}' with ordinal {}", className, extension.ordinal());
                     } else {
-                        log.debug("'{}' is not an extension for extension point '{}'", extensionType.getName(), type.getName());
+                        log.debug("'{}' is not an extension for extension point '{}'", className, type.getName());
                     }
                 } catch (ClassNotFoundException e) {
                     log.error(e.getMessage(), e);
@@ -116,31 +119,6 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
         // clear cache
         entries = null;
     }
-
-    /**
-     * Add the possibility to override the ExtensionFactory.
-     * The default implementation uses Class.newInstance() method.
-     */
-	protected ExtensionFactory createExtensionFactory() {
-		return new ExtensionFactory() {
-
-			@Override
-			public Object create(Class<?> extensionType) {
-				log.debug("Create instance for extension '{}'", extensionType.getName());
-
-				try {
-					return extensionType.newInstance();
-				} catch (InstantiationException e) {
-					log.error(e.getMessage(), e);
-				} catch (IllegalAccessException e) {
-					log.error(e.getMessage(), e);
-				}
-
-				return null;
-			}
-
-		};
-	}
 
     private Map<String, Set<String>> readIndexFiles() {
         // checking cache
@@ -218,14 +196,5 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
     private boolean isExtensionPoint(Class<?> type) {
         return ExtensionPoint.class.isAssignableFrom(type);
     }
-
-	/**
-	 * Creates an extension instance.
-	 */
-	public static interface ExtensionFactory {
-
-		public Object create(Class<?> extensionType);
-
-	}
 
 }

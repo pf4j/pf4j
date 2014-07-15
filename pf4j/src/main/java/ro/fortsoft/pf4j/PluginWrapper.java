@@ -12,9 +12,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-
 /**
  * A wrapper over plugin instance.
  *
@@ -25,21 +22,15 @@ public class PluginWrapper {
 	PluginDescriptor descriptor;
 	String pluginPath;
 	PluginClassLoader pluginClassLoader;
-	Plugin plugin;
+	PluginFactory pluginFactory;
 	PluginState pluginState;
 	RuntimeMode runtimeMode;
+    Plugin plugin; // cache
 
 	public PluginWrapper(PluginDescriptor descriptor, String pluginPath, PluginClassLoader pluginClassLoader) {
 		this.descriptor = descriptor;
 		this.pluginPath = pluginPath;
 		this.pluginClassLoader = pluginClassLoader;
-
-		// TODO
-		try {
-			plugin = createPluginInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 		pluginState = PluginState.CREATED;
 	}
@@ -68,7 +59,11 @@ public class PluginWrapper {
     }
 
     public Plugin getPlugin() {
-		return plugin;
+        if (plugin == null) {
+            plugin = pluginFactory.create(this);
+        }
+
+        return plugin;
 	}
 
 	public PluginState getPluginState() {
@@ -130,23 +125,8 @@ public class PluginWrapper {
 		this.runtimeMode = runtimeMode;
 	}
 
-	private Plugin createPluginInstance() throws Exception {
-    	String pluginClassName = descriptor.getPluginClass();
-        Class<?> pluginClass = pluginClassLoader.loadClass(pluginClassName);
-
-        // once we have the class, we can do some checks on it to ensure
-        // that it is a valid implementation of a plugin.
-        int modifiers = pluginClass.getModifiers();
-        if (Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)
-                || (!Plugin.class.isAssignableFrom(pluginClass))) {
-            throw new PluginException("The plugin class '" + pluginClassName + "' is not valid.");
-        }
-
-        // create the plugin instance
-        Constructor<?> constructor = pluginClass.getConstructor(new Class[] { PluginWrapper.class });
-        Plugin plugin = (Plugin) constructor.newInstance(new Object[] { this });
-
-        return plugin;
+    void setPluginFactory(PluginFactory pluginFactory) {
+        this.pluginFactory = pluginFactory;
     }
 
 }
