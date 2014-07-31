@@ -114,8 +114,6 @@ Another important internal component is **ExtensionFinder** that describes how t
 **DefaultExtensionFinder** looks up extensions using **Extension** annotation.   
 DefaultExtensionFinder looks up extensions in all extensions index files `META-INF/extensions.idx`. PF4J uses Java Annotation Processing to process at compile time all classes annotated with @Extension and to produce the extensions index file.
 
-You can control extension instance creation overriding `createExtensionFactory` method from DefaultExtensionFinder.
-
     public class WelcomePlugin extends Plugin {
 
         public WelcomePlugin(PluginWrapper wrapper) {
@@ -163,6 +161,8 @@ and in plugin respository you must have a plugin.properties file with the below 
     plugin.provider=Decebal Suiu
     plugin.version=0.0.1
     
+You can control extension instance creation overriding `createExtensionFactory` method from DefaultExtensionFinder. 
+Also, you can control plugin instance creation overriding `createPluginFactory` method from DefaultExtensionFinder. 
 
 For more information please see the demo sources.
 
