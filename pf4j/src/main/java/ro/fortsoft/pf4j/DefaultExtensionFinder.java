@@ -68,12 +68,14 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 
             for (String className : extensionClassNames) {
                 try {
-                    Class<?> extensionClass;
+                    ClassLoader classLoader;
                     if (pluginId != null) {
-                        extensionClass = pluginManager.getPluginClassLoader(pluginId).loadClass(className);
+                        classLoader = pluginManager.getPluginClassLoader(pluginId);
                     } else {
-                        extensionClass = getClass().getClassLoader().loadClass(className);
+                        classLoader = getClass().getClassLoader();
                     }
+                    log.debug("Loading class '{}' using class loader '{}'", className, classLoader);
+                    Class<?> extensionClass = classLoader.loadClass(className);
 
                     log.debug("Checking extension type '{}'", className);
                     if (type.isAssignableFrom(extensionClass) && extensionClass.isAnnotationPresent(Extension.class)) {
