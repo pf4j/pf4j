@@ -175,9 +175,13 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 
             try {
                 URL url = plugin.getPluginClassLoader().getResource(ExtensionsIndexer.EXTENSIONS_RESOURCE);
-                log.debug("Read '{}'", url.getFile());
-                Reader reader = new InputStreamReader(url.openStream(), "UTF-8");
-                ExtensionsIndexer.readIndex(reader, bucket);
+                if (url != null) {
+                    log.debug("Read '{}'", url.getFile());
+                    Reader reader = new InputStreamReader(url.openStream(), "UTF-8");
+                    ExtensionsIndexer.readIndex(reader, bucket);
+                } else {
+                    log.debug("Cannot find '{}'", ExtensionsIndexer.EXTENSIONS_RESOURCE);
+                }
 
                 if (bucket.isEmpty()) {
                     log.debug("No extensions found");
