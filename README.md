@@ -212,7 +212,7 @@ Your application, as a PF4J consumer, has full control over each plugin (state).
 Development mode
 --------------------------
 PF4J can run in two modes: **DEVELOPMENT** and **DEPLOYMENT**.  
-The DEPLOYMENT(default) mode is the standard workflow for plugins creation: create a new maven module for each plugin, codding the plugin (declares new extension points and/or 
+The DEPLOYMENT(default) mode is the standard workflow for plugins creation: create a new Maven module for each plugin, codding the plugin (declares new extension points and/or 
 add new extensions), pack the plugin in a zip file, deploy the zip file to plugins folder. These operations are time consuming and from this reason I introduced the DEVELOPMENT runtime mode.  
 The main advantage of DEVELOPMENT runtime mode for a plugin developer is that he/she is not enforced to pack and deploy the plugins. In DEVELOPMENT mode you can developing plugins in a simple and fast mode.   
 
@@ -224,8 +224,9 @@ You can retrieve the current runtime mode using `PluginManager.getRuntimeMode()`
 The DefaultPluginManager determines automatically the correct runtime mode and for DEVELOPMENT mode overrides some components(pluginsDirectory is __"../plugins"__, __PropertiesPluginDescriptorFinder__ as PluginDescriptorFinder, __DevelopmentPluginClasspath__ as PluginClassPath).  
 Another advantage of DEVELOPMENT runtime mode is that you can execute some code lines only in this mode (for example more debug messages). 
 
-If you use maven as build manger, after each dependency modification in your plugin (maven module) you must run Maven>Update Project...   
-
+**Note:** If you use Eclipse than make sure annotation processing is enabled at least for any projects registering objects using annotations. In the properties for your new project go to __Java Compiler > Annotation Processing__
+Check the __“Enable Project Specific Settings”__ and make sure __“Enable annotation processing”__ is checked.  
+If you use Maven as build manger, after each dependency modification in your plugin (Maven module) you must run __Maven > Update Project...__   
 
 For more details see the demo application. 
 
@@ -278,7 +279,7 @@ How to build
 -------------------
 Requirements: 
 - [Git](http://git-scm.com/) 
-- JDK 1.7 (test with `java -version`)
+- JDK 7 (test with `java -version`)
 - [Apache Maven 3](http://maven.apache.org/) (test with `mvn -version`)
 
 Steps:
