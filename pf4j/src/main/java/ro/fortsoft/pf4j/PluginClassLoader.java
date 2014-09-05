@@ -22,6 +22,8 @@ import java.util.List;
 
 /**
  * One instance of this class should be created by plugin manager for every available plug-in.
+ * This class loader is a Parent Last ClassLoader - it loads the classes from the plugin's jars before delegating
+ * to the parent class loader.
  *
  * @author Decebal Suiu
  */
