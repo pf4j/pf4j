@@ -72,7 +72,7 @@ In above code, I created a **DefaultPluginManager** (it's the default implementa
 **PluginManager** interface) that loads and starts all active(resolved) plugins.  
 Each available plugin is loaded using a different java class loader, **PluginClassLoader**.   
 The **PluginClassLoader** contains only classes found in **PluginClasspath** (default _classes_ and _lib_ folders) of plugin and runtime classes and libraries of the required/dependent plugins.  
-This class loader is a Parent Last ClassLoader - it loads the classes from the plugin's jars before delegating to the parent class loader.
+This class loader is a _Parent Last ClassLoader_ - it loads the classes from the plugin's jars before delegating to the parent class loader.   
 The plugins are stored in a folder. You can specify the plugins folder in the constructor of DefaultPluginManager. If the plugins folder is not specified 
 than the location is returned by `System.getProperty("pf4j.pluginsDir", "plugins")`.
 
