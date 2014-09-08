@@ -32,56 +32,74 @@ public class PluginDescriptor {
 	private String provider;
 	private List<PluginDependency> dependencies;
 
+	/**
+	 * Constructor that sets default required version,
+	 * and creates an empty list of plug-in dependency.
+	 */
 	public PluginDescriptor() {
 		requires = Version.ZERO;
 		dependencies = new ArrayList<PluginDependency>();
 	}
 
 	/**
-	 * Returns the unique identifier of this plugin.
+	 * Get the unique identifier of this plug-in.
+	 * 
+	 * @return The unique identifier of this plug-in.
 	 */
 	public String getPluginId() {
 		return pluginId;
 	}
 
 	/**
-	 * Returns the description of this plugin.
+	 * Get the description of this plug-in.
+	 * 
+	 * @return The description of this plug-in.
 	 */
 	public String getPluginDescription() {
 		return pluginDescription;
 	}
 
 	/**
-	 * Returns the name of the class that implements Plugin interface.
+	 * Get the name of a class that extends Plugin abstract class.
+	 * 
+	 * @return The name of a class that extends Plugin abstract class.
 	 */
 	public String getPluginClass() {
 		return pluginClass;
 	}
 
 	/**
-	 * Returns the version of this plugin.
+	 * Get the version of this plug-in.
+	 * 
+	 * @return The version of this plug-in.
 	 */
 	public Version getVersion() {
 		return version;
 	}
 
 	/**
-	 * Returns the requires of this plugin.
+	 * Get the required version of this plug-in
+	 * 
+	 * @return The required version of this plug-in.
 	 */
 	public Version getRequires() {
 		return requires;
 	}
 
 	/**
-	 * Returns the provider name of this plugin.
+	 * Get the provider name of this plug-in.
+	 * 
+	 * @return The provider name of this plug-in.
 	 */
 	public String getProvider() {
 		return provider;
 	}
 
 	/**
-	 * Returns all dependencies declared by this plugin.
-	 * Returns an empty array if this plugin does not declare any require.
+	 * Get a list of all dependencies declared by this plug-in.
+	 * 
+	 * @return A list of all dependencies declared by this plug-in or an empty list if the plug-in does not declar any
+	 *         requirement.
 	 */
 	public List<PluginDependency> getDependencies() {
 		return dependencies;

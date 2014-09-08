@@ -20,14 +20,22 @@ import java.util.Set;
  */
 public interface ExtensionFinder {
 
-    /**
-     * Retrieves a list with all extensions found for an extension point.
-     */
-    public <T> List<ExtensionWrapper<T>> find(Class<T> type);
+	/**
+	 * Retrieves a list of all extensions found for an extension point.
+	 * 
+	 * @param extensionPoint
+	 *          An extension point.
+	 * @return A list of all extensions found for an extension point
+	 */
+	public <T> List<ExtensionWrapper<T>> find(Class<T> extensionPoint);
 
-    /**
-     * Retrieves a list with all extension class names found for a plugin.
-     */
-    public Set<String> findClassNames(String pluginId);
+	/**
+	 * Retrieves a list of all extension class names found for a plug-in.
+	 * 
+	 * @param pluginId
+	 *          The unique ID of a plug-in.
+	 * @return A list of all extension class names found for a plug-in.
+	 */
+	public Set<String> findClassNames(String pluginId);
 
 }

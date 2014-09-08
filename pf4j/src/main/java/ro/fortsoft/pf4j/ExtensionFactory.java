@@ -17,6 +17,12 @@ package ro.fortsoft.pf4j;
  */
 public interface ExtensionFactory {
 
-    public Object create(Class<?> extensionClass);
-
+	/**
+	 * Creates an extension class object.
+	 * 
+	 * @param extensionClass
+	 *          An extension class.
+	 * @return An extension class object.
+	 */
+	public Object create(Class<?> extensionClass);
 }

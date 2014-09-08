@@ -18,28 +18,29 @@ import org.slf4j.LoggerFactory;
 /**
  * The default implementation for ExtensionFactory.
  * It uses Class.newInstance() method.
- *
+ * 
  * @author Decebal Suiu
  */
 public class DefaultExtensionFactory implements ExtensionFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultExtensionFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionFactory.class);
 
-    /**
-     * Creates an extension instance. If an error occurs than that error is logged and the method returns null.
-     * @param extensionClass
-     * @return
-     */
-    @Override
-    public Object create(Class<?> extensionClass) {
-        log.debug("Create instance for extension '{}'", extensionClass.getName());
-        try {
-            return extensionClass.newInstance();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-
-        return null;
-    }
+	/**
+	 * Creates an extension instance. If an error occurs, then the error is logged and the method returns null.
+	 * 
+	 * @param extensionClass
+	 *          An extension class.
+	 * @return An extension class object or null if an error occurs.
+	 */
+	@Override
+	public Object create(Class<?> extensionClass) {
+		LOGGER.debug("Create an instance for extension '{}'", extensionClass.getName());
+		try {
+			return extensionClass.newInstance();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		return null;
+	}
 
 }
