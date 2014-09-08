@@ -25,90 +25,92 @@ import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.util.StringUtils;
 
 /**
- * Read the plugin descriptor from the manifest file.
- *
+ * Read the plug-in descriptor from the manifest (META-INF) file.
+ * 
  * @author Decebal Suiu
  */
 public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
-
-	private static final Logger log = LoggerFactory.getLogger(ManifestPluginDescriptorFinder.class);
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManifestPluginDescriptorFinder.class);
 	private PluginClasspath pluginClasspath;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param pluginClasspath
+	 *          The classpath of a plug-in after it is unpacked.
+	 */
 	public ManifestPluginDescriptorFinder(PluginClasspath pluginClasspath) {
 		this.pluginClasspath = pluginClasspath;
 	}
 
 	@Override
 	public PluginDescriptor find(File pluginRepository) throws PluginException {
-    	// TODO it's ok with first classes directory? Another idea is to specify in PluginClasspath the folder.
+		// TODO it's ok with first classes directory? Another idea is to specify in PluginClasspath the folder.
 		String classes = pluginClasspath.getClassesDirectories().get(0);
-        File manifestFile = new File(pluginRepository, classes + "/META-INF/MANIFEST.MF");
-        log.debug("Lookup plugin descriptor in '{}'", manifestFile);
-        if (!manifestFile.exists()) {
-            throw new PluginException("Cannot find '" + manifestFile + "' file");
-        }
+		File manifestFile = new File(pluginRepository, classes + "/META-INF/MANIFEST.MF");
+		LOGGER.debug("Lookup plugin descriptor in '{}'", manifestFile);
+		if (!manifestFile.exists()) {
+			throw new PluginException("Cannot find '" + manifestFile + "' file");
+		}
 
-    	FileInputStream input = null;
+		FileInputStream input = null;
 		try {
 			input = new FileInputStream(manifestFile);
 		} catch (FileNotFoundException e) {
 			// not happening
 		}
 
-    	Manifest manifest = null;
-        try {
-            manifest = new Manifest(input);
-        } catch (IOException e) {
-            throw new PluginException(e.getMessage(), e);
-        } finally {
-            try {
+		Manifest manifest = null;
+		try {
+			manifest = new Manifest(input);
+		} catch (IOException e) {
+			throw new PluginException(e.getMessage(), e);
+		} finally {
+			try {
 				input.close();
 			} catch (IOException e) {
 				throw new PluginException(e.getMessage(), e);
 			}
-        }
+		}
 
-        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+		PluginDescriptor pluginDescriptor = new PluginDescriptor();
 
-        // TODO validate !!!
-        Attributes attrs = manifest.getMainAttributes();
-        String id = attrs.getValue("Plugin-Id");
-        if (StringUtils.isEmpty(id)) {
-        	throw new PluginException("Plugin-Id cannot be empty");
-        }
-        pluginDescriptor.setPluginId(id);
+		// TODO validate !!!
+		Attributes attrs = manifest.getMainAttributes();
+		String id = attrs.getValue("Plugin-Id");
+		if (StringUtils.isEmpty(id)) {
+			throw new PluginException("Plugin-Id cannot be empty");
+		}
+		pluginDescriptor.setPluginId(id);
 
-        String description = attrs.getValue("Plugin-Description");
-        if (StringUtils.isEmpty(description)) {
-        	pluginDescriptor.setPluginDescription("");
-        } else {
-            pluginDescriptor.setPluginDescription(description);
-        }
+		String description = attrs.getValue("Plugin-Description");
+		if (StringUtils.isEmpty(description)) {
+			pluginDescriptor.setPluginDescription("");
+		} else {
+			pluginDescriptor.setPluginDescription(description);
+		}
 
-        String clazz = attrs.getValue("Plugin-Class");
-        if (StringUtils.isEmpty(clazz)) {
-        	throw new PluginException("Plugin-Class cannot be empty");
-        }
-        pluginDescriptor.setPluginClass(clazz);
+		String clazz = attrs.getValue("Plugin-Class");
+		if (StringUtils.isEmpty(clazz)) {
+			throw new PluginException("Plugin-Class cannot be empty");
+		}
+		pluginDescriptor.setPluginClass(clazz);
 
-        String version = attrs.getValue("Plugin-Version");
-        if (StringUtils.isEmpty(version)) {
-        	throw new PluginException("Plugin-Version cannot be empty");
-        }
-        pluginDescriptor.setPluginVersion(Version.createVersion(version));
+		String version = attrs.getValue("Plugin-Version");
+		if (StringUtils.isEmpty(version)) {
+			throw new PluginException("Plugin-Version cannot be empty");
+		}
+		pluginDescriptor.setPluginVersion(Version.createVersion(version));
 
-        String provider = attrs.getValue("Plugin-Provider");
-        pluginDescriptor.setProvider(provider);
-        String dependencies = attrs.getValue("Plugin-Dependencies");
-        pluginDescriptor.setDependencies(dependencies);
+		String provider = attrs.getValue("Plugin-Provider");
+		pluginDescriptor.setProvider(provider);
+		String dependencies = attrs.getValue("Plugin-Dependencies");
+		pluginDescriptor.setDependencies(dependencies);
 
-        String requires = attrs.getValue("Plugin-Requires");
-        if (StringUtils.isNotEmpty(requires)) {
-        	pluginDescriptor.setRequires(Version.createVersion(requires));
-        }
-
+		String requires = attrs.getValue("Plugin-Requires");
+		if (StringUtils.isNotEmpty(requires)) {
+			pluginDescriptor.setRequires(Version.createVersion(requires));
+		}
 		return pluginDescriptor;
 	}
-
 }

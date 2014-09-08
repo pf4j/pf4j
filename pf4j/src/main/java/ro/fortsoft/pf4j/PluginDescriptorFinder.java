@@ -23,6 +23,14 @@ import java.io.File;
  */
 public interface PluginDescriptorFinder {
 
+	/**
+	 * Find a plug-in descriptor in a plug-in repository.
+	 * 
+	 * @param pluginRepository
+	 *          A plug-in repository where a plug-in descriptor is in.
+	 * @return A plug-in descriptor in the plug-in repository.
+	 * @throws PluginException
+	 */
 	public PluginDescriptor find(File pluginRepository) throws PluginException;
-	
+
 }

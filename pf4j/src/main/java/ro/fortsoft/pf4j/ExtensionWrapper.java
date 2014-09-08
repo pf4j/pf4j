@@ -14,32 +14,32 @@ package ro.fortsoft.pf4j;
 
 /**
  * A wrapper over extension instance.
- *
+ * 
  * @author Decebal Suiu
  */
 public class ExtensionWrapper<T> implements Comparable<ExtensionWrapper<T>> {
 
-    ExtensionDescriptor descriptor;
-    ExtensionFactory extensionFactory;
-    T extension; // cache
+	ExtensionDescriptor descriptor;
+	ExtensionFactory extensionFactory;
+	T extension; // cache
 
 	public ExtensionWrapper(ExtensionDescriptor descriptor) {
-        this.descriptor = descriptor;
+		this.descriptor = descriptor;
 	}
 
+	@SuppressWarnings("unchecked")
 	public T getExtension() {
-        if (extension == null) {
-            extension = (T) extensionFactory.create(descriptor.getExtensionClass());
-        }
-
-        return extension;
+		if (extension == null) {
+			extension = (T) extensionFactory.create(descriptor.getExtensionClass());
+		}
+		return extension;
 	}
 
-    public ExtensionDescriptor getDescriptor() {
-        return descriptor;
-    }
+	public ExtensionDescriptor getDescriptor() {
+		return descriptor;
+	}
 
-    public int getOrdinal() {
+	public int getOrdinal() {
 		return descriptor.getOrdinal();
 	}
 
@@ -48,8 +48,7 @@ public class ExtensionWrapper<T> implements Comparable<ExtensionWrapper<T>> {
 		return (getOrdinal() - o.getOrdinal());
 	}
 
-    void setExtensionFactory(ExtensionFactory extensionFactory) {
-        this.extensionFactory = extensionFactory;
-    }
-
+	void setExtensionFactory(ExtensionFactory extensionFactory) {
+		this.extensionFactory = extensionFactory;
+	}
 }
