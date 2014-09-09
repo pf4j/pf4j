@@ -21,11 +21,11 @@ import java.util.Set;
 public interface ExtensionFinder {
 
 	/**
-	 * Retrieves a list of all extensions found for an extension point.
+	 * Retrieves a list of all extensions found for the extension point.
 	 * 
 	 * @param extensionPoint
 	 *          An extension point.
-	 * @return A list of all extensions found for an extension point
+	 * @return A list of all extensions found for the extension point
 	 */
 	public <T> List<ExtensionWrapper<T>> find(Class<T> extensionPoint);
 

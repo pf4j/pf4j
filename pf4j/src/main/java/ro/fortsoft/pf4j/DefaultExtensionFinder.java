@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The default implementation for ExtensionFinder.
- * All extensions declared in a plugin are indexed in a file "META-INF/extensions.idx".
+ * All extensions declared in a plug-in are indexed in a file "META-INF/extensions.idx".
  * This class lookup extensions in all extensions index files "META-INF/extensions.idx".
  * 
  * @author Decebal Suiu
@@ -31,11 +31,20 @@ import org.slf4j.LoggerFactory;
 public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionFinder.class);
+	private static final String UTF8 = "UTF-8";
 
 	private PluginManager pluginManager;
 	private ExtensionFactory extensionFactory;
 	private volatile Map<String, Set<String>> entries; // cache by pluginId
 
+	/**
+	 * Constructor to set PluginManager and ExtensionFactory.
+	 * 
+	 * @param pluginManager
+	 *          PluginManager that provides functionalities for plug-in management.
+	 * @param extensionFactory
+	 *          ExtensionFactory that creates an instance of extension object.
+	 */
 	public DefaultExtensionFinder(PluginManager pluginManager, ExtensionFactory extensionFactory) {
 		this.pluginManager = pluginManager;
 		this.extensionFactory = extensionFactory;
@@ -43,13 +52,13 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 
 	@Override
 	public <T> List<ExtensionWrapper<T>> find(Class<T> extensionPoint) {
-		// The name of the extension point class.
+		// The name of the extension point.
 		String extensionPointName = extensionPoint.getName();
 
 		LOGGER.debug("Checking extension point '{}'", extensionPointName);
 		if (!isExtensionPoint(extensionPoint)) {
 			LOGGER.warn("'{}' is not an extension point", extensionPointName);
-			return Collections.emptyList(); // or return null ?!
+			return Collections.emptyList(); // TODO : decide to return emptyList or null.
 		}
 
 		LOGGER.debug("Finding extensions for extension point '{}'", extensionPointName);
@@ -76,6 +85,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 					} else {
 						classLoader = getClass().getClassLoader();
 					}
+
 					LOGGER.debug("Loading class '{}' using class loader '{}'", className, classLoader);
 					Class<?> extensionClass = classLoader.loadClass(className);
 
@@ -124,12 +134,18 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 		entries = null;
 	}
 
+	/**
+	 * Private helper method to find extension(s) for an extension point.
+	 * 
+	 * @return The cache Map with plug-in id as a key.
+	 */
 	private Map<String, Set<String>> readIndexFiles() {
-		// checking cache
+		LOGGER.debug("Checking cache. Return the cache if it is not null.");
 		if (entries != null) {
 			return entries;
 		}
 
+		LOGGER.debug("Cache is null. Create a new LinkedHashMap.");
 		entries = new LinkedHashMap<String, Set<String>>();
 
 		readClasspathIndexFiles();
@@ -138,16 +154,19 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 		return entries;
 	}
 
+	/**
+	 * Private helper method to read the classpath index file (META-INF/extensions.idx).
+	 */
 	private void readClasspathIndexFiles() {
 		LOGGER.debug("Reading extensions index files from classpath");
-
 		Set<String> bucket = new HashSet<String>();
+
 		try {
 			Enumeration<URL> urls = getClass().getClassLoader().getResources(ExtensionsIndexer.EXTENSIONS_RESOURCE);
 			while (urls.hasMoreElements()) {
 				URL url = urls.nextElement();
 				LOGGER.debug("Read '{}'", url.getFile());
-				Reader reader = new InputStreamReader(url.openStream(), "UTF-8");
+				Reader reader = new InputStreamReader(url.openStream(), UTF8);
 				ExtensionsIndexer.readIndex(reader, bucket);
 			}
 
@@ -201,6 +220,14 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 		}
 	}
 
+	/**
+	 * Private helper method to determine if the class or interface represented by this Class object is either the same
+	 * as, or is a superclass or superinterface of, the class or interface represented by the specified Class parameter.
+	 * 
+	 * @param extensionPoint
+	 *          Extension point class.
+	 * @return True if same, false otherwise.
+	 */
 	private boolean isExtensionPoint(Class<?> extensionPoint) {
 		return ExtensionPoint.class.isAssignableFrom(extensionPoint);
 	}

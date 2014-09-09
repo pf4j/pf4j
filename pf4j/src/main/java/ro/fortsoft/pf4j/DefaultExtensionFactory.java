@@ -42,5 +42,4 @@ public class DefaultExtensionFactory implements ExtensionFactory {
 		}
 		return null;
 	}
-
 }
