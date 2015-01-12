@@ -12,17 +12,16 @@
  */
 package ro.fortsoft.pf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ro.fortsoft.pf4j.util.DirectoryFileFilter;
+import ro.fortsoft.pf4j.util.JarFileFilter;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Vector;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ro.fortsoft.pf4j.util.DirectoryFileFilter;
-import ro.fortsoft.pf4j.util.JarFileFilter;
 
 /**
  * Load all informations needed by a plugin.
@@ -42,14 +41,14 @@ class PluginLoader {
     private File pluginRepository;
 
     private PluginClasspath pluginClasspath;
-    private PluginClassLoader pluginClassLoader;
+    private IzouPluginClassLoader pluginClassLoader;
 
     public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository, PluginClasspath pluginClasspath) {
         this.pluginRepository = pluginRepository;
         this.pluginClasspath = pluginClasspath;
 
         ClassLoader parent = getClass().getClassLoader();
-        pluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, parent);
+        pluginClassLoader = new IzouPluginClassLoader(pluginManager, pluginDescriptor, parent);
         log.debug("Created class loader '{}'", pluginClassLoader);
     }
 
@@ -61,7 +60,7 @@ class PluginLoader {
         return loadClassesAndJars();
     }
 
-    public PluginClassLoader getPluginClassLoader() {
+    public IzouPluginClassLoader getPluginClassLoader() {
 		return pluginClassLoader;
 	}
 

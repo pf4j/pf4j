@@ -89,7 +89,7 @@ public class PluginClassLoader extends URLClassLoader {
         log.debug("Look in dependencies for class '{}'", className);
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
         for (PluginDependency dependency : dependencies) {
-        	PluginClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
+        	IzouPluginClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
         	try {
         		return classLoader.loadClass(className);
         	} catch (ClassNotFoundException e) {
@@ -138,4 +138,11 @@ public class PluginClassLoader extends URLClassLoader {
         }
     }
 
+    /**
+     * the descriptor of the associated plugin
+     * @return the Descriptor
+     */
+    public PluginDescriptor getPluginDescriptor() {
+        return pluginDescriptor;
+    }
 }

@@ -21,13 +21,13 @@ public class PluginWrapper {
 
 	PluginDescriptor descriptor;
 	String pluginPath;
-	PluginClassLoader pluginClassLoader;
+	IzouPluginClassLoader pluginClassLoader;
 	PluginFactory pluginFactory;
 	PluginState pluginState;
 	RuntimeMode runtimeMode;
     Plugin plugin; // cache
 
-	public PluginWrapper(PluginDescriptor descriptor, String pluginPath, PluginClassLoader pluginClassLoader) {
+	public PluginWrapper(PluginDescriptor descriptor, String pluginPath, IzouPluginClassLoader pluginClassLoader) {
 		this.descriptor = descriptor;
 		this.pluginPath = pluginPath;
 		this.pluginClassLoader = pluginClassLoader;
@@ -54,7 +54,7 @@ public class PluginWrapper {
 	 * for this plug-in. The class loader can be used to directly access
 	 * plug-in resources and classes.
 	 */
-    public PluginClassLoader getPluginClassLoader() {
+    public IzouPluginClassLoader getPluginClassLoader() {
     	return pluginClassLoader;
     }
 

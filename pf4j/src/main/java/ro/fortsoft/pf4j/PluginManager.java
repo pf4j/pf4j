@@ -126,7 +126,7 @@ public interface PluginManager {
      */
     public boolean deletePlugin(String pluginId);
 
-	public PluginClassLoader getPluginClassLoader(String pluginId);
+	public IzouPluginClassLoader getPluginClassLoader(String pluginId);
 
 	public <T> List<T> getExtensions(Class<T> type);
 
