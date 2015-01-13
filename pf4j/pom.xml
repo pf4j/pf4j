@@ -1,18 +1,36 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <parent>
+   <!--<parent>
         <groupId>ro.fortsoft.pf4j</groupId>
         <artifactId>pf4j-parent</artifactId>
         <version>0.10.0-SNAPSHOT</version>
-    </parent>
+    </parent>-->
 
     <modelVersion>4.0.0</modelVersion>
+    <groupId>intellimate.izou</groupId>
     <artifactId>pf4j</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
+    <version>0.8-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>PF4J</name>
     <description>Plugin Framework for Java</description>
+
+    <properties>
+        <!-- github server corresponds to entry in ~/.m2/settings.xml -->
+        <github.global.server>github</github.global.server>
+    </properties>
+
+
+    <repositories>
+        <repository>
+            <id>Izou</id>
+            <url>https://raw.github.com/intellimate/Izou/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 
 	<build>
 		<plugins>
@@ -21,9 +39,76 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<compilerArgument>-proc:none</compilerArgument>
+                    <source>1.8</source>
+                    <target>1.8</target>
 				</configuration>
 			</plugin>
-		</plugins>
+
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>deploy</phase>
+                        <goals><goal>jar</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <failOnError>false</failOnError>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>deploy</phase>
+                        <goals><goal>jar</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.1</version>
+                <configuration>
+                    <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>deploy</id>
+                        <phase>deploy</phase>
+                        <goals><goal>deploy</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.10</version>
+                <configuration>
+                    <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
+                    <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
+                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+                    <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
+                    <!--<includes><include>**/*</include></includes>-->
+                    <merge>true</merge>
+                    <repositoryName>izou-pf4j</repositoryName>      <!-- github repo name -->
+                    <repositoryOwner>intellimate</repositoryOwner>    <!-- github username  -->
+                </configuration>
+                <executions>
+                    <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
 	</build>
 
     <dependencies>
@@ -38,6 +123,11 @@
             <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
+        <!--<dependency>
+            <groupId>intellimate.izou</groupId>
+            <artifactId>Izou</artifactId>
+            <version>0.9.9.9-SNAPSHOT</version>
+        </dependency>-->
     </dependencies>
 
 </project>

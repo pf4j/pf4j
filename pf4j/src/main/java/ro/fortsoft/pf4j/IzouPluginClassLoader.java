@@ -65,6 +65,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
      */
     @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
+        //jundl77.izou.izouclock.TTSOutputExtension
         log.debug("Received request to load class '{}'", className);
         // if the class it's a part of the plugin engine use parent class loader
         if (className.startsWith(PLUGIN_PACKAGE_PREFIX_PF4J)) {
@@ -88,16 +89,11 @@ public class IzouPluginClassLoader extends URLClassLoader {
             }
         }
 
-        // second check whether it's already been loaded
-        Class<?> clazz = findLoadedClass(className);
-        if (clazz != null) {
-            log.debug("Found loaded class '{}'", className);
-            return clazz;
-        }
+        Class<?> clazz = null;
 
         // nope, try to load locally from classes
         try {
-            loadClassFromClasses(className);
+            return loadClassFromClasses(className);
         } catch (ClassNotFoundException e) {
             //try next step
         }
@@ -108,15 +104,17 @@ public class IzouPluginClassLoader extends URLClassLoader {
         for (PluginDependency dependency : dependencies) {
             IzouPluginClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
             try {
-                return classLoader.loadClass(className);
+                clazz =  classLoader.loadClassFromClasses(className);
+                log.debug("class '{}' found in dependency '{}'", className, dependency.getPluginId());
+                return clazz;
             } catch (ClassNotFoundException e) {
-                // try next dependency
             }
         }
 
         // try to load locally from lib
         try {
             clazz = libClassLoader.findClass(className);
+            clazz = findClass(className);
             log.debug("Found class '{}' in plugin classpath", className);
             return clazz;
         } catch (ClassNotFoundException e) {
@@ -136,8 +134,22 @@ public class IzouPluginClassLoader extends URLClassLoader {
      * @throws ClassNotFoundException if the class is not found
      */
     public Class<?> loadClassFromClasses(String className) throws ClassNotFoundException {
-        Class<?> clazz;
-        clazz = classLoader.findClass(className);
+        // second check whether it's already been loaded
+        Class<?> clazz = findLoadedClass(className);
+        if (clazz != null) {
+            log.debug("Found loaded class '{}'", className);
+            return clazz;
+        }
+        try {
+            clazz = classLoader.findClass(className);
+        } catch (ClassNotFoundException e) {
+            if (e.getMessage().equals(className))
+                throw e;
+        } catch (NoClassDefFoundError e) {
+            if (e.getMessage().equals(className))
+                throw e;
+        }
+        clazz = findClass(className);
         log.debug("Found class '{}' in plugin classpath", className);
         return clazz;
     }
