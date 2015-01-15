@@ -108,6 +108,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
                 log.debug("class '{}' found in dependency '{}'", className, dependency.getPluginId());
                 return clazz;
             } catch (ClassNotFoundException e) {
+                //try next dependency
             }
         }
 
@@ -142,10 +143,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
         }
         try {
             clazz = classLoader.findClass(className);
-        } catch (ClassNotFoundException e) {
-            if (e.getMessage().equals(className))
-                throw e;
-        } catch (NoClassDefFoundError e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
             if (e.getMessage().equals(className))
                 throw e;
         }
@@ -164,10 +162,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
     @Override
     public URL getResource(String name) {
         log.debug("Trying to find resource '{}' in plugin classpath", name);
-        URL url = classLoader.findResource(name);
-        if (url == null)
-            url = libClassLoader.findResource(name);
-
+        URL url = findResource(name);
         if (url != null) {
             log.debug("Found resource '{}' in plugin classpath", name);
             return url;
