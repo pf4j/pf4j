@@ -627,10 +627,10 @@ public class DefaultPluginManager implements PluginManager {
 	 */
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
     	if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
-    		return new PropertiesPluginDescriptorFinder();
+    		return new PropertiesPluginDescriptorFinder(this);
     	}
 
-    	return new DefaultPluginDescriptorFinder(pluginClasspath);
+    	return new DefaultPluginDescriptorFinder(pluginClasspath, this);
     }
 
     /**

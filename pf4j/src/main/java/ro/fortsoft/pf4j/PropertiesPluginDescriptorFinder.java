@@ -12,17 +12,12 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ro.fortsoft.pf4j.util.StringUtils;
+
+import java.io.*;
+import java.util.Properties;
 
 /**
  * Find a plugin descriptor in a properties file (in plugin repository).
@@ -36,13 +31,15 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 	private static final String DEFAULT_PROPERTIES_FILE_NAME = "plugin.properties";
 
 	private String propertiesFileName;
+        private PluginManager pluginManager;
 
-	public PropertiesPluginDescriptorFinder() {
-		this(DEFAULT_PROPERTIES_FILE_NAME);
+	public PropertiesPluginDescriptorFinder(PluginManager pluginManager) {
+		this(DEFAULT_PROPERTIES_FILE_NAME, pluginManager);
 	}
 
-	public PropertiesPluginDescriptorFinder(String propertiesFileName) {
+	public PropertiesPluginDescriptorFinder(String propertiesFileName, PluginManager pluginManager) {
 		this.propertiesFileName = propertiesFileName;
+            this.pluginManager = pluginManager;
 	}
 
 	@Override
@@ -73,7 +70,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 			}
         }
 
-        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        PluginDescriptor pluginDescriptor = new PluginDescriptor(pluginManager);
 
         // TODO validate !!!
         String id = properties.getProperty("plugin.id");

@@ -20,8 +20,8 @@ package ro.fortsoft.pf4j;
  */
 public class DefaultPluginDescriptorFinder extends ManifestPluginDescriptorFinder {
 
-	public DefaultPluginDescriptorFinder(PluginClasspath pluginClasspath) {
-		super(pluginClasspath);
+	public DefaultPluginDescriptorFinder(PluginClasspath pluginClasspath, PluginManager pluginManager) {
+		super(pluginClasspath, pluginManager);
 	}
     	
 }

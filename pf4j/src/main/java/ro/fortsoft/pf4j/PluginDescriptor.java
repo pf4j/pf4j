@@ -15,6 +15,7 @@ package ro.fortsoft.pf4j;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A plugin descriptor contains information about a plug-in obtained
@@ -31,10 +32,12 @@ public class PluginDescriptor {
     private Version requires;
     private String provider;
     private List<PluginDependency> dependencies;
+    private PluginManager pluginManager;
 
-    public PluginDescriptor() {
+    public PluginDescriptor(PluginManager pluginManager) {
     	requires = Version.ZERO;
         dependencies = new ArrayList<PluginDependency>();
+        this.pluginManager = pluginManager;
     }
 
     /**
@@ -84,7 +87,9 @@ public class PluginDescriptor {
      * Returns an empty array if this plugin does not declare any require.
      */
     public List<PluginDependency> getDependencies() {
-        return dependencies;
+        return dependencies.stream()
+                .filter(dependency -> pluginManager.getPlugin(dependency.getPluginId()) != null)
+                .collect(Collectors.toList());
     }
 
     @Override

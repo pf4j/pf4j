@@ -12,17 +12,16 @@
  */
 package ro.fortsoft.pf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ro.fortsoft.pf4j.util.StringUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ro.fortsoft.pf4j.util.StringUtils;
 
 /**
  * Read the plugin descriptor from the manifest file.
@@ -34,9 +33,11 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 	private static final Logger log = LoggerFactory.getLogger(ManifestPluginDescriptorFinder.class);
 
 	private PluginClasspath pluginClasspath;
+        private PluginManager pluginManager;
 
-	public ManifestPluginDescriptorFinder(PluginClasspath pluginClasspath) {
+	public ManifestPluginDescriptorFinder(PluginClasspath pluginClasspath, PluginManager pluginManager) {
 		this.pluginClasspath = pluginClasspath;
+            this.pluginManager = pluginManager;
 	}
 
 	@Override
@@ -69,7 +70,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 			}
         }
 
-        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        PluginDescriptor pluginDescriptor = new PluginDescriptor(pluginManager);
 
         // TODO validate !!!
         Attributes attrs = manifest.getMainAttributes();
