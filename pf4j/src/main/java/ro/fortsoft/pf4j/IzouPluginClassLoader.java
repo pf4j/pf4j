@@ -137,14 +137,16 @@ public class IzouPluginClassLoader extends URLClassLoader {
     public Class<?> loadClassFromClasses(String className) throws ClassNotFoundException {
         // second check whether it's already been loaded
         Class<?> clazz = findLoadedClass(className);
+        Class<?> ignoreClass = null;
         if (clazz != null) {
             log.debug("Found loaded class '{}'", className);
             return clazz;
         }
         try {
-            clazz = classLoader.findClass(className);
+            if (classLoader.findLoadedClassHack(className) == null)
+                ignoreClass = classLoader.findClass(className);
         } catch (ClassNotFoundException | NoClassDefFoundError e) {
-            if (e.getMessage().equals(className))
+            if (e.getMessage().equals(className) || e.getCause().getMessage().equals(className))
                 throw e;
         }
         clazz = findClass(className);
@@ -227,6 +229,10 @@ public class IzouPluginClassLoader extends URLClassLoader {
         @Override
         protected Class<?> findClass(String name) throws ClassNotFoundException {
             return super.findClass(name);
+        }
+
+        public java.lang.Class<?> findLoadedClassHack(java.lang.String name) {
+            return findLoadedClass(name);
         }
     }
 }
