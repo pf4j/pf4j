@@ -143,10 +143,14 @@ public class IzouPluginClassLoader extends URLClassLoader {
             return clazz;
         }
         try {
-            if (classLoader.findLoadedClassHack(className) == null)
+            if (classLoader.findLoadedClassHack(className) == null) {
                 ignoreClass = classLoader.findClass(className);
+            } else if (classLoader.findLoadedClassHack(className).getClassLoader() == null ||
+                    !classLoader.findLoadedClassHack(className).getClassLoader().equals(classLoader)) {
+                throw new ClassNotFoundException();
+            }
         } catch (ClassNotFoundException | NoClassDefFoundError e) {
-            if (e.getMessage().equals(className) || e.getCause().getMessage().equals(className))
+            if (e.getMessage() == null || e.getMessage().equals(className) || e.getCause().getMessage().equals(className))
                 throw e;
         }
         clazz = findClass(className);

@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>intellimate.izou</groupId>
     <artifactId>pf4j</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
+    <version>0.9.6-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>PF4J</name>
     <description>Plugin Framework for Java</description>
