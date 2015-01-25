@@ -2,7 +2,7 @@ Plugin Framework for Java (PF4J) - Version for Izou
 =====================
 See [PF4J](https://github.com/decebals/pf4j) for the original Version!
 
-License
+License for the original PF4J:
 --------------
 Copyright 2012 Decebal Suiu
  
