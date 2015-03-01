@@ -1,3 +1,7 @@
+apply plugin:'application'
+
+mainClassName = 'ro.fortsoft.pf4j.demo.Boot'
+
 dependencies {
   compile project(':api')
   compile 'ro.fortsoft.pf4j:pf4j:0.4'
