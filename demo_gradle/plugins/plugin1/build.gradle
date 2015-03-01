@@ -5,7 +5,7 @@ jar {
     attributes 'Plugin-Class' : 'ro.fortsoft.pf4j.demo.welcome.WelcomePlugin',
       'Plugin-Id' : 'WelcomePlugin',
       'Plugin-Version' : '1.0',
-      'Plugin-Provider' : 'Yannick Bäumer'
+      'Plugin-Provider' : 'Decebal Suiu'
   }
 }
 
