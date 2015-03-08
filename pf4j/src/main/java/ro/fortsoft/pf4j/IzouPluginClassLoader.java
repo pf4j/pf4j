@@ -2,13 +2,14 @@ package ro.fortsoft.pf4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.Resource;
+import sun.misc.URLClassPath;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLStreamHandlerFactory;
 import java.util.List;
 
 /**
@@ -27,14 +28,10 @@ public class IzouPluginClassLoader extends URLClassLoader {
     private PluginManager pluginManager;
     private PluginDescriptor pluginDescriptor;
 
-    private AccessibleURLClassLoader classLoader;
-    private AccessibleURLClassLoader libClassLoader;
+    private URLClassPath classesClassPath = new URLClassPath(new URL[0]);
 
     public IzouPluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
         super(new URL[0], parent);
-        classLoader = new AccessibleURLClassLoader(new URL[0], parent);
-        libClassLoader = new AccessibleURLClassLoader(new URL[0], parent);
-
         this.pluginManager = pluginManager;
         this.pluginDescriptor = pluginDescriptor;
     }
@@ -51,9 +48,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
         if (!file.isDirectory())
             file = file.getParentFile();
         if (file.getName().equals("classes")) {
-            classLoader.addURL(url);
-        } else {
-            libClassLoader.addURL(url);
+            classesClassPath.addURL(url);
         }
         super.addURL(url);
     }
@@ -65,6 +60,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
      */
     @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
+        Class<?> ignoreClass = null;
         //jundl77.izou.izouclock.TTSOutputExtension
         log.debug("Received request to load class '{}'", className);
         // if the class it's a part of the plugin engine use parent class loader
@@ -114,7 +110,6 @@ public class IzouPluginClassLoader extends URLClassLoader {
 
         // try to load locally from lib
         try {
-            clazz = libClassLoader.findClass(className);
             clazz = findClass(className);
             log.debug("Found class '{}' in plugin classpath", className);
             return clazz;
@@ -137,21 +132,14 @@ public class IzouPluginClassLoader extends URLClassLoader {
     public Class<?> loadClassFromClasses(String className) throws ClassNotFoundException {
         // second check whether it's already been loaded
         Class<?> clazz = findLoadedClass(className);
-        Class<?> ignoreClass = null;
         if (clazz != null) {
             log.debug("Found loaded class '{}'", className);
             return clazz;
         }
-        try {
-            if (classLoader.findLoadedClassHack(className) == null) {
-                ignoreClass = classLoader.findClass(className);
-            } else if (classLoader.findLoadedClassHack(className).getClassLoader() == null ||
-                    !classLoader.findLoadedClassHack(className).getClassLoader().equals(classLoader)) {
-                throw new ClassNotFoundException();
-            }
-        } catch (ClassNotFoundException | NoClassDefFoundError e) {
-            if (e.getMessage() == null || e.getMessage().equals(className) || e.getCause().getMessage().equals(className))
-                throw e;
+        String path = className.replace('.', '/').concat(".class");
+        Resource resource = classesClassPath.getResource(path, false);
+        if (resource == null) {
+            throw new ClassNotFoundException();
         }
         clazz = findClass(className);
         log.debug("Found class '{}' in plugin classpath", className);
@@ -186,16 +174,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
      * new classes or resources that are defined by this loader.
      */
     public void dispose() {
-        try {
-            classLoader.close();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-        try {
-            libClassLoader.close();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
+        classesClassPath.closeLoaders();
         try {
             close();
         } catch (IOException e) {
@@ -209,34 +188,5 @@ public class IzouPluginClassLoader extends URLClassLoader {
      */
     public PluginDescriptor getPluginDescriptor() {
         return pluginDescriptor;
-    }
-
-    private class AccessibleURLClassLoader extends URLClassLoader {
-
-        public AccessibleURLClassLoader(URL[] urls, ClassLoader parent) {
-            super(urls, parent);
-        }
-
-        public AccessibleURLClassLoader(URL[] urls) {
-            super(urls);
-        }
-
-        public AccessibleURLClassLoader(URL[] urls, ClassLoader parent, URLStreamHandlerFactory factory) {
-            super(urls, parent, factory);
-        }
-
-        @Override
-        protected void addURL(URL url) {
-            super.addURL(url);
-        }
-
-        @Override
-        protected Class<?> findClass(String name) throws ClassNotFoundException {
-            return super.findClass(name);
-        }
-
-        public java.lang.Class<?> findLoadedClassHack(java.lang.String name) {
-            return findLoadedClass(name);
-        }
     }
 }
