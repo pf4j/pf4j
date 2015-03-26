@@ -1,122 +1,40 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-   <!--<parent>
-        <groupId>ro.fortsoft.pf4j</groupId>
-        <artifactId>pf4j-parent</artifactId>
-        <version>0.10.0-SNAPSHOT</version>
-    </parent>-->
-
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>intellimate.izou</groupId>
+    <groupId>org.intellimate.izou</groupId>
     <artifactId>pf4j</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
-    <name>PF4J</name>
-    <description>Plugin Framework for Java</description>
+    <name>PF4J-Izou Fork</name>
+    <description>Plugin Framework for Java, for from: https://github.com/decebals/pf4j
+        with minor changes to work with Izou</description>
+    <url>https://github.com/intellimate/izou-pf4j</url>
+new
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-    <properties>
-        <!-- github server corresponds to entry in ~/.m2/settings.xml -->
-        <github.global.server>github</github.global.server>
-    </properties>
-    
+    <scm>
+        <connection>scm:git:git@github.com:intellimate/izou-pf4j.git</connection>
+        <developerConnection>scm:git:git@github.com:intellimate/izou-pf4j.git</developerConnection>
+        <url>https://github.com/intellimate/izou-pf4j</url>
+    </scm>
+
     <distributionManagement>
         <repository>
-            <id>internal.repo</id>
-            <name>Temporary Staging Repository</name>
-            <url>file://${project.build.directory}/mvn-repo</url>
+            <id>oss.sonatype.org</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
+        <snapshotRepository>
+            <id>oss.sonatype.org</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>Izou</id>
-            <url>https://raw.github.com/intellimate/Izou/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<compilerArgument>-proc:none</compilerArgument>
-                    <source>1.8</source>
-                    <target>1.8</target>
-				</configuration>
-			</plugin>
-
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>deploy</phase>
-                        <goals><goal>jar</goal></goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <failOnError>false</failOnError>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>deploy</phase>
-                        <goals><goal>jar</goal></goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.1</version>
-                <configuration>
-                    <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>deploy</id>
-                        <phase>deploy</phase>
-                        <goals><goal>deploy</goal></goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <version>0.10</version>
-                <configuration>
-                    <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-                    <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-                    <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
-                    <!--<includes><include>**/*</include></includes>-->
-                    <merge>true</merge>
-                    <repositoryName>izou-pf4j</repositoryName>      <!-- github repo name -->
-                    <repositoryOwner>intellimate</repositoryOwner>    <!-- github username  -->
-                </configuration>
-                <executions>
-                    <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
-                    <execution>
-                        <goals>
-                            <goal>site</goal>
-                        </goals>
-                        <phase>deploy</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
-        </plugins>
-	</build>
 
     <dependencies>
         <dependency>
