@@ -6,7 +6,6 @@ decrypt:
   pubring.gpg: "repo/pubring.gpg.asc"
   secring.gpg: "repo/secring.gpg.asc"
 docker:
-  as_root: true
   image: hanswesterbeek/google-debian-oracle-jdk:8
 release:
   script: |
