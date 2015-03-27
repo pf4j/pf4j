@@ -6,7 +6,7 @@ decrypt:
   pubring.gpg: "repo/pubring.gpg.asc"
   secring.gpg: "repo/secring.gpg.asc"
 docker:
-  image: "stephenreed/jenkins-java8-maven-git"
+  image: "jamesdbloom/docker-java8-maven"
 release:
   script: |-
     mvn versions:set "-DnewVersion=${tag}"
