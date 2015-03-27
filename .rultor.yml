@@ -7,7 +7,7 @@ decrypt:
   secring.gpg: "repo/secring.gpg.asc"
 docker:
   as_root: true
-  image: hanswesterbeek/google-debian-oracle-jdk:8
+  image: mostalive/ubuntu-14.04-oracle-jdk8
 release:
   script: |
     mvn versions:set "-DnewVersion=${tag}"
