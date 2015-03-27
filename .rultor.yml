@@ -6,7 +6,7 @@ decrypt:
   pubring.gpg: "repo/pubring.gpg.asc"
   secring.gpg: "repo/secring.gpg.asc"
 docker:
-  image: "lwieske/java-8"
+  image: "mostalive/ubuntu-14.04-oracle-jdk8"
 release:
   script: |
     mvn versions:set "-DnewVersion=${tag}"
