@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.intellimate.izou</groupId>
     <artifactId>pf4j</artifactId>
-    <version>1.1</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
     <name>PF4J-Izou Fork</name>
     <description>Plugin Framework for Java, fork from: https://github.com/decebals/pf4j
