@@ -1,3 +1,6 @@
+architect:
+  - LeanderK
+  - jundl77
 decrypt:
   settings.xml: "repo/settings.xml.asc"
   pubring.gpg: "repo/pubring.gpg.asc"
