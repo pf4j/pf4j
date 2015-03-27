@@ -11,7 +11,7 @@
     <description>Plugin Framework for Java, for from: https://github.com/decebals/pf4j
         with minor changes to work with Izou</description>
     <url>https://github.com/intellimate/izou-pf4j</url>
-new
+
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
@@ -24,6 +24,11 @@ new
         <developerConnection>scm:git:git@github.com:intellimate/izou-pf4j.git</developerConnection>
         <url>https://github.com/intellimate/izou-pf4j</url>
     </scm>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+    </properties>
 
     <distributionManagement>
         <repository>
