@@ -5,6 +5,8 @@ decrypt:
   settings.xml: "repo/settings.xml.asc"
   pubring.gpg: "repo/pubring.gpg.asc"
   secring.gpg: "repo/secring.gpg.asc"
+docker:
+  image: "lwieske/java-8"
 release:
   script: |
     mvn versions:set "-DnewVersion=${tag}"
