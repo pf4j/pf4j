@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Default implementation of the PluginManager interface.
@@ -32,6 +34,7 @@ public class DefaultPluginManager implements PluginManager {
 
 	public static final String DEFAULT_PLUGINS_DIRECTORY = "plugins";
 	public static final String DEVELOPMENT_PLUGINS_DIRECTORY = "../plugins";
+    private static final String PLUGIN_PACKAGE_PREFIX_IZOU_SDK = "org.intellimate.izou.sdk";
 
     /**
      * The plugins repository.
@@ -58,6 +61,11 @@ public class DefaultPluginManager implements PluginManager {
      * A map of plugin class loaders (he key is the 'pluginId').
      */
     private Map<String, IzouPluginClassLoader> pluginClassLoaders;
+
+    /**
+     * A map of sdks (also plugins) paired with their class loaders
+     */
+    private Map<String, IzouPluginClassLoader> sdkClassLoaders;
 
     /**
      * A relation between 'pluginPath' and 'pluginId'
@@ -118,7 +126,6 @@ public class DefaultPluginManager implements PluginManager {
      */
     public DefaultPluginManager(File pluginsDirectory) {
         this.pluginsDirectory = pluginsDirectory;
-        this.izouPluginMap = new HashMap<>();
         initialize();
     }
 
@@ -130,6 +137,11 @@ public class DefaultPluginManager implements PluginManager {
     @Override
     public Map<String, IzouPlugin> getIzouPluginMap() {
         return izouPluginMap;
+    }
+
+    @Override
+    public Map<String, IzouPluginClassLoader> getSdkClassLoaders() {
+        return sdkClassLoaders;
     }
 
     @Override
@@ -743,6 +755,8 @@ public class DefaultPluginManager implements PluginManager {
         resolvedPlugins = new ArrayList<PluginWrapper>();
         startedPlugins = new ArrayList<PluginWrapper>();
         disabledPlugins = new ArrayList<String>();
+        this.izouPluginMap = new HashMap<>();
+        this.sdkClassLoaders = new HashMap<>();
 
         pluginStateListeners = new ArrayList<PluginStateListener>();
 
@@ -820,6 +834,27 @@ public class DefaultPluginManager implements PluginManager {
 
         // add plugin class loader to the list with class loaders
         IzouPluginClassLoader pluginClassLoader = pluginLoader.getPluginClassLoader();
+
+        if (pluginId.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU_SDK)) {
+            String sdkVersion = "";
+
+            Pattern pattern = Pattern.compile("([a-zA-Z]+\\-)(([0-9]+\\.)*[0-9]+)(\\-[a-zA-Z]+)?");
+            Matcher matcher = pattern.matcher(pluginName);
+            if (matcher.matches()) {
+                String nameParts[] = pluginName.split("\\-");
+                for (String part : nameParts) {
+                    pattern = Pattern.compile("(([0-9]+\\.)*[0-9]+)");
+                    matcher = pattern.matcher(part);
+                    if (matcher.matches()) {
+                        sdkVersion = part;
+                        break;
+                    }
+                }
+            }
+
+            String pluginIDWithVersion = pluginId + ":" + sdkVersion;
+            sdkClassLoaders.put(pluginIDWithVersion, pluginClassLoader);
+        }
         pluginClassLoaders.put(pluginId, pluginClassLoader);
 
         return pluginWrapper;

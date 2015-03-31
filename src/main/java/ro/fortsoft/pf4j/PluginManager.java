@@ -49,6 +49,11 @@ public interface PluginManager {
     public Map<String, IzouPlugin> getIzouPluginMap();
 
     /**
+     * Gets all sdks paired with their class loaders
+     */
+    public Map<String, IzouPluginClassLoader> getSdkClassLoaders();
+
+    /**
      * Retrieves all resolved plugins (with resolved dependency).
      */
   	public List<PluginWrapper> getResolvedPlugins();

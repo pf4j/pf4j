@@ -29,6 +29,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
     private static final String PLUGIN_PACKAGE_PREFIX_IZOU_SDK = "org.intellimate.izou.sdk";
     private static final String PLUGIN_PACKAGE_PREFIX_LOG_SL4J = "org.slf4j";
     private static final String PLUGIN_PACKAGE_PREFIX_LOG_LOG4J = "org.apache.logging.log4j";
+    private static final String PLUGIN_ZIP_FILE_MANAGER = "ZipFileManager";
 
     private PluginManager pluginManager;
     private PluginDescriptor pluginDescriptor;
@@ -77,7 +78,12 @@ public class IzouPluginClassLoader extends URLClassLoader {
 //                throw e;
             }
         } else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU_SDK)) {
-
+            IzouPluginClassLoader classLoader = getSDKClassLoader(className);
+            if (classLoader != null) {
+                return classLoader.loadClass(className);
+            } else {
+                throw new ClassNotFoundException();
+            }
         } else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_SL4J) ||
                 className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU) ||
                 className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_LOG4J)) {
@@ -87,11 +93,30 @@ public class IzouPluginClassLoader extends URLClassLoader {
             } catch (ClassNotFoundException e) {
                 //try next step
             }
-        } else if (className.contains("ZipFileManager")) {
+        } else if (className.contains(PLUGIN_ZIP_FILE_MANAGER)) {
             return loadAndRegisterIzouPlugin(className);
         }
 
         return loadCustomClass(className);
+    }
+
+    private IzouPluginClassLoader getSDKClassLoader(String className) {
+        String pluginSDKVersion = pluginManager.getIzouPluginMap().get(className).getSDKVersion();
+        String sdkVersionParts[] = pluginSDKVersion.split("\\.");
+        String relevantSDKVersion = sdkVersionParts[0];
+        if (sdkVersionParts.length > 1) {
+            relevantSDKVersion += "." + sdkVersionParts[1];
+        }
+
+        IzouPluginClassLoader classLoader = null;
+        for (String pluginName : pluginManager.getSdkClassLoaders().keySet()) {
+            String[] parts = pluginName.split(":");
+            String version = parts[1];
+            if (version.startsWith(relevantSDKVersion)) {
+                classLoader = pluginManager.getSdkClassLoaders().get(pluginName);
+            }
+        }
+        return classLoader;
     }
 
     /**
