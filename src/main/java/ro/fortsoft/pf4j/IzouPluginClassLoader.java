@@ -80,7 +80,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
         } else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU_SDK)) {
             IzouPluginClassLoader classLoader = getSDKClassLoader(className);
             if (classLoader != null) {
-                return classLoader.loadClass(className);
+                return classLoader.loadCustomClass(className);
             } else {
                 throw new ClassNotFoundException();
             }
