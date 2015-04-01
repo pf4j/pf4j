@@ -14,6 +14,7 @@ package ro.fortsoft.pf4j;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,6 +36,24 @@ public interface PluginManager {
     public List<PluginWrapper> getPlugins(PluginState pluginState);
 
     /**
+     * Gets all plugin names paired with the corresponding plugin
+     * @return all plugin names
+     */
+    public Map<String, PluginWrapper> getPluginMap();
+
+    /**
+     * Gets each instance of {@link IzouPlugin} for every addOn registered with izou.
+     *
+     * @return each instance of {@link IzouPlugin} for every addOn registered with izou
+     */
+    public Map<String, IzouPlugin> getIzouPluginMap();
+
+    /**
+     * Gets all sdks paired with their class loaders
+     */
+    public Map<String, IzouPluginClassLoader> getSdkClassLoaders();
+
+    /**
      * Retrieves all resolved plugins (with resolved dependency).
      */
   	public List<PluginWrapper> getResolvedPlugins();
@@ -52,7 +71,7 @@ public interface PluginManager {
     /**
      * Retrieves the plugin with this id.
      *
-     * @param pluginId
+     * @param pluginId the plugin id
      * @return the plugin
      */
     public PluginWrapper getPlugin(String pluginId);

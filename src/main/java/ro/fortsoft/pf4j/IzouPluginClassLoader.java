@@ -7,10 +7,14 @@ import sun.misc.URLClassPath;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author LeanderK
@@ -21,13 +25,14 @@ public class IzouPluginClassLoader extends URLClassLoader {
     private static final Logger log = LoggerFactory.getLogger(IzouPluginClassLoader.class);
 
     private static final String PLUGIN_PACKAGE_PREFIX_PF4J = "ro.fortsoft.pf4j.";
-    private static final String PLUGIN_PACKAGE_PREFIX_IZOU = "intellimate.izou";
+    private static final String PLUGIN_PACKAGE_PREFIX_IZOU = "org.intellimate.izou";
+    private static final String PLUGIN_PACKAGE_PREFIX_IZOU_SDK = "org.intellimate.izou.sdk";
     private static final String PLUGIN_PACKAGE_PREFIX_LOG_SL4J = "org.slf4j";
     private static final String PLUGIN_PACKAGE_PREFIX_LOG_LOG4J = "org.apache.logging.log4j";
+    private static final String PLUGIN_ZIP_FILE_MANAGER = "ZipFileManager";
 
     private PluginManager pluginManager;
     private PluginDescriptor pluginDescriptor;
-
     private URLClassPath classesClassPath = new URLClassPath(new URL[0]);
 
     public IzouPluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
@@ -60,8 +65,6 @@ public class IzouPluginClassLoader extends URLClassLoader {
      */
     @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
-        Class<?> ignoreClass = null;
-        //jundl77.izou.izouclock.TTSOutputExtension
         log.debug("Received request to load class '{}'", className);
         // if the class it's a part of the plugin engine use parent class loader
         if (className.startsWith(PLUGIN_PACKAGE_PREFIX_PF4J)) {
@@ -74,8 +77,15 @@ public class IzouPluginClassLoader extends URLClassLoader {
 //                log.error(e.getMessage(), e);
 //                throw e;
             }
-        } else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_SL4J) |
-                className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU) |
+        } else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU_SDK)) {
+            IzouPluginClassLoader classLoader = getSDKClassLoader(className);
+            if (classLoader != null) {
+                return classLoader.loadCustomClass(className);
+            } else {
+                throw new ClassNotFoundException();
+            }
+        } else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_SL4J) ||
+                className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU) ||
                 className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_LOG4J)) {
             try {
                 //directing to parent
@@ -83,9 +93,42 @@ public class IzouPluginClassLoader extends URLClassLoader {
             } catch (ClassNotFoundException e) {
                 //try next step
             }
+        } else if (className.contains(PLUGIN_ZIP_FILE_MANAGER)) {
+            return loadAndRegisterIzouPlugin(className);
         }
 
-        Class<?> clazz = null;
+        return loadCustomClass(className);
+    }
+
+    private IzouPluginClassLoader getSDKClassLoader(String className) {
+        String pluginSDKVersion = pluginManager.getIzouPluginMap().get(className).getSDKVersion();
+        String sdkVersionParts[] = pluginSDKVersion.split("\\.");
+        String relevantSDKVersion = sdkVersionParts[0];
+        if (sdkVersionParts.length > 1) {
+            relevantSDKVersion += "." + sdkVersionParts[1];
+        }
+
+        IzouPluginClassLoader classLoader = null;
+        for (String pluginName : pluginManager.getSdkClassLoaders().keySet()) {
+            String[] parts = pluginName.split(":");
+            String version = parts[1];
+            if (version.startsWith(relevantSDKVersion)) {
+                classLoader = pluginManager.getSdkClassLoaders().get(pluginName);
+            }
+        }
+        return classLoader;
+    }
+
+    /**
+     * Same as the {@link #loadClass} method, except that it guarantees to load a class on its own, and not delegate the
+     * task to a parent
+     *
+     * @param className the name of the class to load
+     * @return the loaded class
+     * @throws ClassNotFoundException thrown when the class was not able to be loaded
+     */
+    private Class<?> loadCustomClass(String className) throws ClassNotFoundException {
+        Class<?> clazz;
 
         // nope, try to load locally from classes
         try {
@@ -121,6 +164,55 @@ public class IzouPluginClassLoader extends URLClassLoader {
 
         // use the standard URLClassLoader (which follows normal parent delegation)
         return super.loadClass(className);
+    }
+
+    /**
+     * Adds all ZipFileManager (which are extened by IzouPlugin) classes to a map in the plugin manager paired with the
+     * class name as the key. This is used in order to be able to access certain information such as the izou sdk
+     * version or other useful information stored in the ZipFileManager.
+     *
+     * @param className the name of the class, should contain 'ZipFileManager' and ZipFileManager should extend
+     *                  IzouPlugin
+     * @throws ClassNotFoundException thrown if the class is not found
+     */
+    private Class<?> loadAndRegisterIzouPlugin(String className) throws ClassNotFoundException {
+        // Load the ZipFileManager
+        String path = ((PluginWrapper)((ArrayList) this.pluginManager.getStartedPlugins()).get(0))
+                .descriptor.getPluginClass();
+        Class clazz = loadCustomClass(path);
+
+        // Get the PluginWrapper associated with the ZipFileManager
+        Map<String, PluginWrapper> pluginMap = this.pluginManager.getPluginMap();
+        String plugin = "";
+        for (String pluginName : pluginMap.keySet()) {
+            if (className.contains(pluginName)) {
+                plugin = pluginName;
+            }
+        }
+        PluginWrapper wrapper = pluginMap.get(plugin);
+
+        // Create an object of the ZipFileManager
+        Constructor<?> cons = null;
+        try {
+            cons = clazz.getConstructor(PluginWrapper.class);
+        } catch (NoSuchMethodException e) {
+            log.error("Unable to find class: " + className, e);
+        }
+        Object object = null;
+        try {
+            if (cons != null) {
+                object = cons.newInstance(wrapper);
+            }
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            log.error("Unable create a new instance of class: " + className, e);
+        }
+        IzouPlugin izouPlugin = (IzouPlugin) object;
+
+        // Add the ZipFileManager in the form of its super class, IzouPlugin to the izouPluginList in the plugin manager
+        pluginManager.getIzouPluginMap().put(className, izouPlugin);
+
+        // Return the original class found
+        return clazz;
     }
 
     /**
