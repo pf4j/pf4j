@@ -42,11 +42,11 @@ public interface PluginManager {
     public Map<String, PluginWrapper> getPluginMap();
 
     /**
-     * Gets each instance of {@link IzouPlugin} for every addOn registered with izou.
+     * Gets each instance of {@link Plugin} for every addOn registered with izou.
      *
-     * @return each instance of {@link IzouPlugin} for every addOn registered with izou
+     * @return each instance of {@link Plugin} for every addOn registered with izou
      */
-    public Map<String, IzouPlugin> getIzouPluginMap();
+    public Map<String, Plugin> getIzouPluginMap();
 
     /**
      * Gets all sdks paired with their class loaders

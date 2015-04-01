@@ -74,8 +74,8 @@ public class IzouPluginClassLoader extends URLClassLoader {
             } catch (ClassNotFoundException e) {
                 // try next step
                 // TODO if I uncomment below lines (the correct approach) I received ClassNotFoundException for demo (ro.fortsoft.pf4j.demo)
-//                log.error(e.getMessage(), e);
-//                throw e;
+                //  log.error(e.getMessage(), e);
+                //  throw e;
             }
         } else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU_SDK)) {
             IzouPluginClassLoader classLoader = getSDKClassLoader(className);
@@ -206,7 +206,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             log.error("Unable create a new instance of class: " + className, e);
         }
-        IzouPlugin izouPlugin = (IzouPlugin) object;
+        Plugin izouPlugin = (Plugin) object;
 
         // Add the ZipFileManager in the form of its super class, IzouPlugin to the izouPluginList in the plugin manager
         pluginManager.getIzouPluginMap().put(className, izouPlugin);

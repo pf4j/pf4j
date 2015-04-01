@@ -65,4 +65,10 @@ public abstract class Plugin {
     public void stop() throws PluginException {
     }
 
+    /**
+     * Gets the izou sdk version of the plugin
+     *
+     * @return the izou sdk version of the plugin
+     */
+    public abstract String getSDKVersion();
 }
