@@ -1,0 +1,18 @@
+install: |-
+  sudo apt-get install -y bsdmainutils
+  sudo gem install pdd
+  sudo gem install est
+architect:
+  - LeanderK
+  - jundl77
+decrypt:
+  settings.xml: "repo/settings.xml.asc"
+  pubring.gpg: "repo/pubring.gpg.asc"
+  secring.gpg: "repo/secring.gpg.asc"
+docker:
+  image: "teamed/docker-java-8"
+release:
+  script: |-
+    mvn versions:set "-DnewVersion=${tag}"
+    git commit -am "${tag}"
+    mvn clean deploy --settings /home/r/settings.xml
