@@ -55,7 +55,7 @@ public class DefaultPluginManager implements PluginManager {
     /**
      * A map of the plugin
      */
-    private Map<String, IzouPlugin> izouPluginMap;
+    private Map<String, Plugin> izouPluginMap;
 
     /**
      * A map of plugin class loaders (he key is the 'pluginId').
@@ -135,7 +135,7 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     @Override
-    public Map<String, IzouPlugin> getIzouPluginMap() {
+    public Map<String, Plugin> getIzouPluginMap() {
         return izouPluginMap;
     }
 
