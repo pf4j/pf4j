@@ -12,6 +12,9 @@ decrypt:
 docker:
   image: "teamed/docker-java-8"
 release:
+  commanders:
+      - LeanderK
+      - jundl77
   script: |-
     mvn versions:set "-DnewVersion=${tag}"
     git commit -am "${tag}"
