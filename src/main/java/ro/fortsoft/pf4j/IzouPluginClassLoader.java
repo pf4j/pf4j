@@ -181,6 +181,10 @@ public class IzouPluginClassLoader extends URLClassLoader {
                 .descriptor.getPluginClass();
         Class clazz = loadCustomClass(path);
 
+        if (pluginManager.getIzouPluginMap().get(className) != null) {
+            return clazz;
+        }
+
         // Get the PluginWrapper associated with the ZipFileManager
         Map<String, PluginWrapper> pluginMap = this.pluginManager.getPluginMap();
         String plugin = "";
