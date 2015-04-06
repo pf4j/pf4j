@@ -12,7 +12,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -177,9 +176,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
      */
     private Class<?> loadAndRegisterIzouPlugin(String className) throws ClassNotFoundException {
         // Load the ZipFileManager
-        String path = ((PluginWrapper)((ArrayList) this.pluginManager.getStartedPlugins()).get(0))
-                .descriptor.getPluginClass();
-        Class clazz = loadCustomClass(path);
+        Class clazz = loadCustomClass(className);
 
         if (pluginManager.getIzouPluginMap().get(className) != null) {
             return clazz;
