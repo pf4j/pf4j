@@ -176,4 +176,10 @@ public interface PluginManager {
      * * @return the system version
      */
     public Version getSystemVersion();
+
+    /**
+     * returns the directory the plugins are loaded from
+     * @return a file
+     */
+    public File getPluginDirectory();
 }

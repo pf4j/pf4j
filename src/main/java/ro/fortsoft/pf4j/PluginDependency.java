@@ -41,6 +41,10 @@ public class PluginDependency {
 		return pluginVersion;
 	}
 
+	public void setPluginVersion(Version pluginVersion) {
+		this.pluginVersion = pluginVersion;
+	}
+
 	@Override
 	public String toString() {
 		return "PluginDependency [pluginId=" + pluginId + ", pluginVersion=" + pluginVersion + "]";

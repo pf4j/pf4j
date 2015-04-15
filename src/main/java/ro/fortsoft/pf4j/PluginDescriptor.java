@@ -12,9 +12,16 @@
  */
 package ro.fortsoft.pf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
@@ -24,15 +31,17 @@ import java.util.stream.Collectors;
  * @author Decebal Suiu
  */
 public class PluginDescriptor {
-
+    private final static String SDK_PLUGIN_ID = "org.intellimate.izou.sdk";
 	private String pluginId;
 	private String pluginDescription;
     private String pluginClass;
     private Version version;
+    private String rawVersion;
     private Version requires;
     private String provider;
     private List<PluginDependency> dependencies;
     private PluginManager pluginManager;
+    private static final Logger log = LoggerFactory.getLogger(IzouPluginClassLoader.class);
 
     public PluginDescriptor(PluginManager pluginManager) {
     	requires = Version.ZERO;
@@ -112,8 +121,9 @@ public class PluginDescriptor {
         this.pluginClass = pluginClassName;
     }
 
-    void setPluginVersion(Version version) {
+    void setPluginVersion(Version version, String raw) {
         this.version = version;
+        this.rawVersion = raw;
     }
 
     void setProvider(String provider) {
@@ -128,9 +138,9 @@ public class PluginDescriptor {
     	if (dependencies != null) {
     		dependencies = dependencies.trim();
     		if (dependencies.isEmpty()) {
-    			this.dependencies = Collections.emptyList();
+    			this.dependencies = new ArrayList<>();
     		} else {
-	    		this.dependencies = new ArrayList<PluginDependency>();
+	    		this.dependencies = new ArrayList<>();
 	    		String[] tokens = dependencies.split(",");
 	    		for (String dependency : tokens) {
 	    			dependency = dependency.trim();
@@ -143,8 +153,53 @@ public class PluginDescriptor {
 	    		}
     		}
     	} else {
-    		this.dependencies = Collections.emptyList();
+    		this.dependencies = new ArrayList<>();
     	}
+        addSDKDependency();
     }
 
+    private void addSDKDependency() {
+        if (pluginId.equals(SDK_PLUGIN_ID))
+            return;
+        String[] split = pluginId.split("\\.");
+        File descriptorFile = new File(pluginManager.getPluginDirectory().getPath() + File.separator +
+                split[split.length - 1] + "-" + rawVersion + File.separator + "classes" + File.separator + "addon_config.properties");
+        if (descriptorFile.exists()) {
+            FileInputStream fileInput = null;
+            Properties properties = null;
+            try {
+                fileInput = new FileInputStream(descriptorFile);
+                properties = new Properties();
+                properties.load(fileInput);
+                fileInput.close();
+                String sdkVersion = properties.getProperty("sdkVersion");
+                if (sdkVersion == null) {
+                    log.error("Error, sdk-version property not found for " + pluginId);
+                    addDefaultSDKDependency();
+                    return;
+                }
+                String mainVersion = sdkVersion.split("\\.")[0];
+                if (!mainVersion.matches("\\d+")) {
+                    log.error("Error, sdk-version is in an illegal format " + pluginId);
+                    addDefaultSDKDependency();
+                    return;
+                }
+                PluginDependency pluginDependency = new PluginDependency(SDK_PLUGIN_ID);
+                pluginDependency.setPluginVersion(new Version(Integer.parseInt(mainVersion), 0, 0));
+                dependencies.add(pluginDependency);
+            } catch (IOException e) {
+                log.error("Error while trying to read class_loader_config.properties file for addOn:" + pluginId
+                        + ", is it a resource in your addOn? Are all required properties there and filled out?", e);
+            }
+        } else {
+            if (!pluginId.equals(SDK_PLUGIN_ID)) {
+                log.error("Error, no config file found for plugin: " + pluginId);
+                addDefaultSDKDependency();
+            }
+        }
+    }
+
+    public void addDefaultSDKDependency() {
+        dependencies.add(new PluginDependency(SDK_PLUGIN_ID));
+    }
 }

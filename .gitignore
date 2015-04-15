@@ -6,3 +6,7 @@ target/
 *.iml
 
 .gnupg
+resources
+lib
+logs
+properties

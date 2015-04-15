@@ -89,7 +89,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         if (StringUtils.isEmpty(version)) {
         	throw new PluginException("plugin.version cannot be empty");
         }
-        pluginDescriptor.setPluginVersion(Version.createVersion(version));
+        pluginDescriptor.setPluginVersion(Version.createVersion(version), version);
 
         String provider = properties.getProperty("plugin.provider");
         pluginDescriptor.setProvider(provider);

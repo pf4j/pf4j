@@ -154,7 +154,17 @@ public class DefaultPluginManager implements PluginManager {
     	return systemVersion;
     }
 
-	@Override
+    /**
+     * returns the directory the plugins are loaded from
+     *
+     * @return a file
+     */
+    @Override
+    public File getPluginDirectory() {
+        return pluginsDirectory;
+    }
+
+    @Override
     public List<PluginWrapper> getPlugins() {
         return new ArrayList<PluginWrapper>(plugins.values());
     }

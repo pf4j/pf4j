@@ -75,14 +75,25 @@ public class IzouPluginClassLoader extends URLClassLoader {
                 //  log.error(e.getMessage(), e);
                 //  throw e;
             }
-        } else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU_SDK)) {
-            IzouPluginClassLoader classLoader = getSDKClassLoader(className);
-            if (classLoader != null) {
-                return classLoader.loadCustomClass(className);
-            } else {
-                throw new ClassNotFoundException();
-            }
-        } else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_SL4J) ||
+        }
+//        else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU_SDK)) {
+//            if (className.contains(PLUGIN_ZIP_FILE_MANAGER)) {
+//                try {
+//                    return loadAndRegisterIzouPluginConfig(className);
+//                } catch (ClassFormatError e) {
+//                    // Rethrow exception as class not found so that it will be skipped
+//                    throw new ClassNotFoundException(e.getMessage());
+//                }
+//            } else {
+//                IzouPluginClassLoader classLoader = getSDKClassLoader(className);
+//                if (classLoader != null) {
+//                    return classLoader.loadCustomClass(className);
+//                } else {
+//                    throw new ClassNotFoundException();
+//                }
+//            }
+//        }
+        else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_SL4J) ||
                 className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU) ||
                 className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_LOG4J)) {
             try {
@@ -90,13 +101,6 @@ public class IzouPluginClassLoader extends URLClassLoader {
                 return super.getParent().loadClass(className);
             } catch (ClassNotFoundException e) {
                 //try next step
-            }
-        } else if (className.contains(PLUGIN_ZIP_FILE_MANAGER)) {
-            try {
-                return loadAndRegisterIzouPluginConfig(className);
-            } catch (ClassFormatError e) {
-                // Rethrow exception as class not found so that it will be skipped
-                throw new ClassNotFoundException(e.getMessage());
             }
         }
 
@@ -179,13 +183,6 @@ public class IzouPluginClassLoader extends URLClassLoader {
      * @throws ClassNotFoundException thrown if the class is not found
      */
     private Class<?> loadAndRegisterIzouPluginConfig(String className) throws ClassNotFoundException, ClassFormatError {
-        // Load the ZipFileManager
-        Class clazz = loadCustomClass(className);
-
-        if (pluginManager.getIzouPluginConfigMap().get(className) != null) {
-            return clazz;
-        }
-
         File file = new File("test.properties");
         FileInputStream fileInput = null;
         Properties properties = null;
@@ -205,6 +202,12 @@ public class IzouPluginClassLoader extends URLClassLoader {
         }
         // Add the ZipFileManager in the form of its super class, IzouPlugin to the izouPluginList in the plugin manager
         pluginManager.getIzouPluginConfigMap().put(className, properties);
+
+        // Load the ZipFileManager
+        Class clazz = loadCustomClass(className);
+        if (pluginManager.getIzouPluginConfigMap().get(className) != null) {
+            return clazz;
+        }
 
         // Return the original class found
         return clazz;
