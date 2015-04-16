@@ -6,13 +6,11 @@ import sun.misc.Resource;
 import sun.misc.URLClassPath;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author LeanderK
@@ -76,23 +74,6 @@ public class IzouPluginClassLoader extends URLClassLoader {
                 //  throw e;
             }
         }
-//        else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU_SDK)) {
-//            if (className.contains(PLUGIN_ZIP_FILE_MANAGER)) {
-//                try {
-//                    return loadAndRegisterIzouPluginConfig(className);
-//                } catch (ClassFormatError e) {
-//                    // Rethrow exception as class not found so that it will be skipped
-//                    throw new ClassNotFoundException(e.getMessage());
-//                }
-//            } else {
-//                IzouPluginClassLoader classLoader = getSDKClassLoader(className);
-//                if (classLoader != null) {
-//                    return classLoader.loadCustomClass(className);
-//                } else {
-//                    throw new ClassNotFoundException();
-//                }
-//            }
-//        }
         else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_SL4J) ||
                 className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU) ||
                 className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_LOG4J)) {
@@ -105,25 +86,6 @@ public class IzouPluginClassLoader extends URLClassLoader {
         }
 
         return loadCustomClass(className);
-    }
-
-    private IzouPluginClassLoader getSDKClassLoader(String className) {
-        String pluginSDKVersion = pluginManager.getIzouPluginConfigMap().get(className).getProperty("sdkVersion");
-        String sdkVersionParts[] = pluginSDKVersion.split("\\.");
-        String relevantSDKVersion = sdkVersionParts[0];
-        if (sdkVersionParts.length > 1) {
-            relevantSDKVersion += "." + sdkVersionParts[1];
-        }
-
-        IzouPluginClassLoader classLoader = null;
-        for (String pluginName : pluginManager.getSdkClassLoaders().keySet()) {
-            String[] parts = pluginName.split(":");
-            String version = parts[1];
-            if (version.startsWith(relevantSDKVersion)) {
-                classLoader = pluginManager.getSdkClassLoaders().get(pluginName);
-            }
-        }
-        return classLoader;
     }
 
     /**
@@ -171,46 +133,6 @@ public class IzouPluginClassLoader extends URLClassLoader {
 
         // use the standard URLClassLoader (which follows normal parent delegation)
         return super.loadClass(className);
-    }
-
-    /**
-     * Adds all class_loader_config.properties to a map in the plugin manager paired with the
-     * class name as the key. This is used in order to be able to access certain information such as the izou sdk
-     * version or other useful information stored in the properties file.
-     *
-     * @param className the name of the class, should contain 'ZipFileManager' and ZipFileManager should extend
-     *                  IzouPlugin (since it is the first occurrence of the addOn)
-     * @throws ClassNotFoundException thrown if the class is not found
-     */
-    private Class<?> loadAndRegisterIzouPluginConfig(String className) throws ClassNotFoundException, ClassFormatError {
-        File file = new File("test.properties");
-        FileInputStream fileInput = null;
-        Properties properties = null;
-        try {
-            fileInput = new FileInputStream(file);
-            properties = new Properties();
-            properties.load(fileInput);
-            fileInput.close();
-        } catch (IOException e) {
-            log.error("Error while trying to read class_loader_config.properties file for addOn:" + className
-                    + ", is it a resource in your addOn? Are all required properties there and filled out?", e);
-        }
-
-        if (properties == null) {
-            throw new ClassFormatError("Error while trying to read class_loader_config.properties file for addOn:"
-                    + className + ", unable to load class.");
-        }
-        // Add the ZipFileManager in the form of its super class, IzouPlugin to the izouPluginList in the plugin manager
-        pluginManager.getIzouPluginConfigMap().put(className, properties);
-
-        // Load the ZipFileManager
-        Class clazz = loadCustomClass(className);
-        if (pluginManager.getIzouPluginConfigMap().get(className) != null) {
-            return clazz;
-        }
-
-        // Return the original class found
-        return clazz;
     }
 
     /**

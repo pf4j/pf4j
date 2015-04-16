@@ -41,6 +41,7 @@ public class PluginDescriptor {
     private String provider;
     private List<PluginDependency> dependencies;
     private PluginManager pluginManager;
+    private Properties addOnProperties;
     private static final Logger log = LoggerFactory.getLogger(IzouPluginClassLoader.class);
 
     public PluginDescriptor(PluginManager pluginManager) {
@@ -172,6 +173,7 @@ public class PluginDescriptor {
                 properties = new Properties();
                 properties.load(fileInput);
                 fileInput.close();
+                addOnProperties = properties;
                 String sdkVersion = properties.getProperty("sdkVersion");
                 if (sdkVersion == null) {
                     log.error("Error, sdk-version property not found for " + pluginId);
@@ -201,5 +203,13 @@ public class PluginDescriptor {
 
     public void addDefaultSDKDependency() {
         dependencies.add(new PluginDependency(SDK_PLUGIN_ID));
+    }
+
+    /**
+     * Gets the properties object associated with this plugin (addOn)
+     * @return the properties object associated with this plugin (addOn) 
+     */
+    public Properties getAddOnProperties() {
+        return addOnProperties;
     }
 }

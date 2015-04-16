@@ -135,16 +135,6 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     @Override
-    public Map<String, Properties> getIzouPluginConfigMap() {
-        return izouPluginConfigMap;
-    }
-
-    @Override
-    public Map<String, IzouPluginClassLoader> getSdkClassLoaders() {
-        return sdkClassLoaders;
-    }
-
-    @Override
     public void setSystemVersion(Version version) {
     	systemVersion = version;
     }
