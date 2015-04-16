@@ -63,11 +63,6 @@
             <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.intellimate.izou</groupId>
-            <artifactId>Izou</artifactId>
-            <version>[1.5,1.6)</version>
-        </dependency>
     </dependencies>
 
     <build>
