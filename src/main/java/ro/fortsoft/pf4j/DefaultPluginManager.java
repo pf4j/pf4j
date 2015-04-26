@@ -130,11 +130,6 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     @Override
-    public Map<String, PluginWrapper> getPluginMap() {
-        return plugins;
-    }
-
-    @Override
     public void setSystemVersion(Version version) {
     	systemVersion = version;
     }
@@ -169,6 +164,10 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         return plugins;
+    }
+    @Override
+    public Map<String, Properties> getIzouPluginConfigMap() {
+        return izouPluginConfigMap;
     }
 
     @Override

@@ -15,6 +15,7 @@ package ro.fortsoft.pf4j;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -36,10 +37,11 @@ public interface PluginManager {
     public List<PluginWrapper> getPlugins(PluginState pluginState);
 
     /**
-     * Gets all plugin names paired with the corresponding plugin
-     * @return all plugin names
+     * Returns the configuration map associated with each izou plugin
+     *
+     * @return the configuration map associated with each izou plugin
      */
-    public Map<String, PluginWrapper> getPluginMap();
+    public Map<String, Properties> getIzouPluginConfigMap();
 
     /**
      * Retrieves all resolved plugins (with resolved dependency).
