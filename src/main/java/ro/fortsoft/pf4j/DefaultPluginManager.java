@@ -53,11 +53,6 @@ public class DefaultPluginManager implements PluginManager {
     private Map<String, PluginWrapper> plugins;
 
     /**
-     * A map of the plugin
-     */
-    private Map<String, Properties> izouPluginConfigMap;
-
-    /**
      * A map of plugin class loaders (he key is the 'pluginId').
      */
     private Map<String, IzouPluginClassLoader> pluginClassLoaders;
@@ -164,10 +159,6 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         return plugins;
-    }
-    @Override
-    public Map<String, Properties> getIzouPluginConfigMap() {
-        return izouPluginConfigMap;
     }
 
     @Override
@@ -754,7 +745,6 @@ public class DefaultPluginManager implements PluginManager {
         resolvedPlugins = new ArrayList<PluginWrapper>();
         startedPlugins = new ArrayList<PluginWrapper>();
         disabledPlugins = new ArrayList<String>();
-        this.izouPluginConfigMap = new HashMap<>();
         this.sdkClassLoaders = new HashMap<>();
 
         pluginStateListeners = new ArrayList<PluginStateListener>();

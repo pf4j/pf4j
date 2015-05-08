@@ -20,12 +20,12 @@ public class IzouPluginClassLoader extends URLClassLoader {
 
     private static final Logger log = LoggerFactory.getLogger(IzouPluginClassLoader.class);
 
-    private static final String PLUGIN_PACKAGE_PREFIX_PF4J = "ro.fortsoft.pf4j.";
-    private static final String PLUGIN_PACKAGE_PREFIX_IZOU = "org.intellimate.izou";
-    private static final String PLUGIN_PACKAGE_PREFIX_IZOU_SDK = "org.intellimate.izou.sdk";
-    private static final String PLUGIN_PACKAGE_PREFIX_LOG_SL4J = "org.slf4j";
-    private static final String PLUGIN_PACKAGE_PREFIX_LOG_LOG4J = "org.apache.logging.log4j";
-    private static final String PLUGIN_ZIP_FILE_MANAGER = "ZipFileManager";
+    public static final String PLUGIN_PACKAGE_PREFIX_PF4J = "ro.fortsoft.pf4j.";
+    public static final String PLUGIN_PACKAGE_PREFIX_IZOU = "org.intellimate.izou";
+    public static final String PLUGIN_PACKAGE_PREFIX_IZOU_SDK = "org.intellimate.izou.sdk";
+    public static final String PLUGIN_PACKAGE_PREFIX_LOG_SL4J = "org.slf4j";
+    public static final String PLUGIN_PACKAGE_PREFIX_LOG_LOG4J = "org.apache.logging.log4j";
+    public static final String PLUGIN_ZIP_FILE_MANAGER = "ZipFileManager";
 
     private PluginManager pluginManager;
     private PluginDescriptor pluginDescriptor;
