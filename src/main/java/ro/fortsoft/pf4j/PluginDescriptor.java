@@ -159,12 +159,22 @@ public class PluginDescriptor {
         addSDKDependency();
     }
 
+    private void registerAddOn() {
+        try {
+            IzouRegistrarService registrarService = new IzouRegistrarService();
+            registrarService.register(this);
+        } catch (NullPointerException e) {
+            log.error("Unable to get Izou SecurityManager", e);
+        }
+    }
+
     private void addSDKDependency() {
         if (pluginId.equals(SDK_PLUGIN_ID))
             return;
         String[] split = pluginId.split("\\.");
         File descriptorFile = new File(pluginManager.getPluginDirectory().getPath() + File.separator +
-                split[split.length - 1] + "-" + rawVersion + File.separator + "classes" + File.separator + "addon_config.properties");
+                split[split.length - 1] + "-" + rawVersion + File.separator + "classes" + File.separator
+                + "addon_config.properties");
         if (descriptorFile.exists()) {
             FileInputStream fileInput = null;
             Properties properties = null;
@@ -174,6 +184,7 @@ public class PluginDescriptor {
                 properties.load(fileInput);
                 fileInput.close();
                 addOnProperties = properties;
+                registerAddOn();
                 String sdkVersion = properties.getProperty("sdkVersion");
                 if (sdkVersion == null) {
                     log.error("Error, sdk-version property not found for " + pluginId);

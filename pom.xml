@@ -53,6 +53,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.intellimate.izou</groupId>
+            <artifactId>izou</artifactId>
+            <version>1.6</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.5</version>
