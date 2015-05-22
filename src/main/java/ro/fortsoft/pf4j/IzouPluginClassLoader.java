@@ -1,10 +1,12 @@
 package ro.fortsoft.pf4j;
 
+import org.aspectj.weaver.loadtime.WeavingURLClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Resource;
 import sun.misc.URLClassPath;
 
+import javax.sound.sampled.Mixer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,11 +32,13 @@ public class IzouPluginClassLoader extends URLClassLoader {
     private PluginManager pluginManager;
     private PluginDescriptor pluginDescriptor;
     private URLClassPath classesClassPath = new URLClassPath(new URL[0]);
+    private WeavingURLClassLoader weaver;
 
     public IzouPluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
         super(new URL[0], parent);
         this.pluginManager = pluginManager;
         this.pluginDescriptor = pluginDescriptor;
+        weaver = new WeavingURLClassLoader(parent);
     }
 
     @Override
@@ -63,6 +67,9 @@ public class IzouPluginClassLoader extends URLClassLoader {
     public Class<?> loadClass(String className) throws ClassNotFoundException {
         log.debug("Received request to load class '{}'", className);
         // if the class it's a part of the plugin engine use parent class loader
+        if (className.equals(Mixer.class.getName())) {
+            return weaver.loadClass(className);
+        }
         if (className.startsWith(PLUGIN_PACKAGE_PREFIX_PF4J)) {
             log.debug("Delegate the loading of class '{}' to parent", className);
             try {
