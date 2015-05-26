@@ -6,12 +6,17 @@ import org.slf4j.LoggerFactory;
 import sun.misc.Resource;
 import sun.misc.URLClassPath;
 
-import javax.sound.sampled.Mixer;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.CodeSource;
+import java.security.cert.Certificate;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -22,23 +27,26 @@ public class IzouPluginClassLoader extends URLClassLoader {
 
     private static final Logger log = LoggerFactory.getLogger(IzouPluginClassLoader.class);
 
-    private static final String PLUGIN_PACKAGE_PREFIX_PF4J = "ro.fortsoft.pf4j.";
-    private static final String PLUGIN_PACKAGE_PREFIX_IZOU = "org.intellimate.izou";
-    private static final String PLUGIN_PACKAGE_PREFIX_IZOU_SDK = "org.intellimate.izou.sdk";
-    private static final String PLUGIN_PACKAGE_PREFIX_LOG_SL4J = "org.slf4j";
-    private static final String PLUGIN_PACKAGE_PREFIX_LOG_LOG4J = "org.apache.logging.log4j";
-    private static final String PLUGIN_ZIP_FILE_MANAGER = "ZipFileManager";
+    public static final String PLUGIN_PACKAGE_PREFIX_PF4J = "ro.fortsoft.pf4j.";
+    public static final String PLUGIN_PACKAGE_PREFIX_IZOU = "org.intellimate.izou";
+    public static final String PLUGIN_PACKAGE_PREFIX_IZOU_SDK = "org.intellimate.izou.sdk";
+    public static final String PLUGIN_PACKAGE_PREFIX_LOG_SL4J = "org.slf4j";
+    public static final String PLUGIN_PACKAGE_PREFIX_LOG_LOG4J = "org.apache.logging.log4j";
+    public static final String PLUGIN_ZIP_FILE_MANAGER = "ZipFileManager";
 
+    private final HashMap<URL, Class<?>> aspectAffectedWeaved = new LinkedHashMap<>();
     private PluginManager pluginManager;
     private PluginDescriptor pluginDescriptor;
     private URLClassPath classesClassPath = new URLClassPath(new URL[0]);
-    private WeavingURLClassLoader weaver;
+    private WeavingURLClassLoaderHelper weaver;
 
-    public IzouPluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
+    public IzouPluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, List<URL> aspectsAndAffected) {
         super(new URL[0], parent);
         this.pluginManager = pluginManager;
         this.pluginDescriptor = pluginDescriptor;
-        weaver = new WeavingURLClassLoader(parent);
+        aspectsAndAffected.forEach(url -> aspectAffectedWeaved.put(url, null));
+        weaver = new WeavingURLClassLoaderHelper(new URL[0], this);
+        aspectsAndAffected.forEach(weaver::addURL);
     }
 
     @Override
@@ -66,10 +74,9 @@ public class IzouPluginClassLoader extends URLClassLoader {
     @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
         log.debug("Received request to load class '{}'", className);
+        Class<?> weaved = checkAndWeave(className);
+        if (weaved != null) return weaved;
         // if the class it's a part of the plugin engine use parent class loader
-        if (className.equals(Mixer.class.getName())) {
-            return weaver.loadClass(className);
-        }
         if (className.startsWith(PLUGIN_PACKAGE_PREFIX_PF4J)) {
             log.debug("Delegate the loading of class '{}' to parent", className);
             try {
@@ -93,6 +100,51 @@ public class IzouPluginClassLoader extends URLClassLoader {
         }
 
         return loadCustomClass(className);
+    }
+
+    /**
+     * checks if the class should be weaved and weaves it
+     * @param className the classname
+     * @return null if not eligible or an error occurred
+     */
+    private Class<?> checkAndWeave(String className) {
+        URL resource = getResource(className.replace('.', '/') + ".class");
+        return aspectAffectedWeaved.entrySet().stream()
+                .filter(entry -> entry.getKey().sameFile(resource))
+                .map(entry -> {
+                    if (entry.getValue() != null)
+                        return entry.getValue();
+                    InputStream is = this.getResourceAsStream(className.replace('.', '/') + ".class");
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+                    int nRead;
+                    byte[] data = new byte[16384];
+
+                    try {
+                        while ((nRead = is.read(data, 0, data.length)) != -1) {
+                            buffer.write(data, 0, nRead);
+                        }
+                    } catch (IOException e) {
+                        return null;
+                    }
+
+                    try {
+                        buffer.flush();
+                    } catch (IOException e) {
+                        return null;
+                    }
+                    byte[] array = buffer.toByteArray();
+                    try {
+                        Class weaved = weaver.defineClass(className, array,
+                                new CodeSource(entry.getKey(), (Certificate[]) null));
+                        aspectAffectedWeaved.put(entry.getKey(), weaved);
+                        return weaved;
+                    } catch (IOException e) {
+                        return null;
+                    }
+                })
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -207,5 +259,33 @@ public class IzouPluginClassLoader extends URLClassLoader {
      */
     public PluginDescriptor getPluginDescriptor() {
         return pluginDescriptor;
+    }
+
+    private class WeavingURLClassLoaderHelper extends WeavingURLClassLoader {
+
+        public WeavingURLClassLoaderHelper(URL[] classURLs, URL[] aspectURLs, ClassLoader parent) {
+            super(classURLs, aspectURLs, parent);
+        }
+
+        public WeavingURLClassLoaderHelper(URL[] urls, ClassLoader parent) {
+            super(urls, parent);
+        }
+
+        /**
+         * Override to weave class using WeavingAdaptor
+         *
+         * @param name
+         * @param b
+         * @param cs
+         */
+        @Override
+        public Class defineClass(String name, byte[] b, CodeSource cs) throws IOException {
+            return super.defineClass(name, b, cs);
+        }
+
+        @Override
+        protected void addURL(URL url) {
+            super.addURL(url);
+        }
     }
 }
