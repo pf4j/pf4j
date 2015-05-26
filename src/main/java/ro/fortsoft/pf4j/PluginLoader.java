@@ -20,6 +20,8 @@ import ro.fortsoft.pf4j.util.JarFileFilter;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.Vector;
 
@@ -43,12 +45,21 @@ class PluginLoader {
     private PluginClasspath pluginClasspath;
     private IzouPluginClassLoader pluginClassLoader;
 
-    public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository, PluginClasspath pluginClasspath) {
+    public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository, PluginClasspath pluginClasspath, List<URL> aspectsAndAffected) {
         this.pluginRepository = pluginRepository;
         this.pluginClasspath = pluginClasspath;
 
         ClassLoader parent = getClass().getClassLoader();
-        pluginClassLoader = new IzouPluginClassLoader(pluginManager, pluginDescriptor, parent);
+        URL mixerAspect = parent.getResource("org/intellimate/izou/security/replaced/MixerAspect.class");
+        URL[] aspurls = new URL[1];
+        aspurls[0] = null;
+        try {
+            URL aspectURL = aspectURL = new File(mixerAspect.toURI()).getParentFile().toPath().toUri().toURL();
+            aspurls[0] = aspectURL;
+        } catch (MalformedURLException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+        pluginClassLoader = new IzouPluginClassLoader(pluginManager, pluginDescriptor, parent, aspectsAndAffected);
         log.debug("Created class loader '{}'", pluginClassLoader);
     }
 

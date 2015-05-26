@@ -19,6 +19,7 @@ import ro.fortsoft.pf4j.util.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,6 +36,7 @@ public class DefaultPluginManager implements PluginManager {
 	public static final String DEFAULT_PLUGINS_DIRECTORY = "plugins";
 	public static final String DEVELOPMENT_PLUGINS_DIRECTORY = "../plugins";
     private static final String PLUGIN_PACKAGE_PREFIX_IZOU_SDK = "org.intellimate.izou.sdk";
+    private final List<URL> aspectsAndAffected;
 
     /**
      * The plugins repository.
@@ -105,22 +107,15 @@ public class DefaultPluginManager implements PluginManager {
     private ExtensionFactory extensionFactory;
 
     /**
-     * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
-     */
-    public DefaultPluginManager() {
-    	this.pluginsDirectory = createPluginsDirectory();
-
-    	initialize();
-    }
-
-    /**
      * Constructs DefaultPluginManager which the given plugins directory.
      *
      * @param pluginsDirectory
      *            the directory to search for plugins
+     * @param aspectsAndAffected the URl to the aspect-classes & the affected classes
      */
-    public DefaultPluginManager(File pluginsDirectory) {
+    public DefaultPluginManager(File pluginsDirectory, List<URL> aspectsAndAffected) {
         this.pluginsDirectory = pluginsDirectory;
+        this.aspectsAndAffected = aspectsAndAffected;
         initialize();
     }
 
@@ -791,7 +786,7 @@ public class DefaultPluginManager implements PluginManager {
 
         // load plugin
         log.debug("Loading plugin '{}'", pluginPath);
-        PluginLoader pluginLoader = new PluginLoader(this, pluginDescriptor, pluginDirectory, pluginClasspath);
+        PluginLoader pluginLoader = new PluginLoader(this, pluginDescriptor, pluginDirectory, pluginClasspath, aspectsAndAffected);
         pluginLoader.load();
         log.debug("Loaded plugin '{}'", pluginPath);
 
