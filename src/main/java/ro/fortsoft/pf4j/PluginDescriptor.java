@@ -37,6 +37,8 @@ public class PluginDescriptor {
     private String pluginClass;
     private Version version;
     private String rawVersion;
+    private String secureID;
+    private boolean secureIDSet = false;
     private Version requires;
     private String provider;
     private List<PluginDependency> dependencies;
@@ -164,7 +166,8 @@ public class PluginDescriptor {
             return;
         String[] split = pluginId.split("\\.");
         File descriptorFile = new File(pluginManager.getPluginDirectory().getPath() + File.separator +
-                split[split.length - 1] + "-" + rawVersion + File.separator + "classes" + File.separator + "addon_config.properties");
+                split[split.length - 1] + "-" + rawVersion + File.separator + "classes" + File.separator
+                + "addon_config.properties");
         if (descriptorFile.exists()) {
             FileInputStream fileInput = null;
             Properties properties = null;
@@ -201,6 +204,31 @@ public class PluginDescriptor {
         }
     }
 
+    /**
+     * Sets the secure (unique) ID of this plugin
+     * <p>
+     *     This method can only be called once per object
+     * </p>
+     */
+    public void setSecureID(String id) {
+        if (!secureIDSet) {
+            secureID = id;
+            secureIDSet = true;
+        }
+    }
+
+    /**
+     * Gets the secure (unique) ID of this plugin
+     *
+     * @return ts the secure (unique) ID of this plugin
+     */
+    public String getSecureID() {
+        return secureID;
+    }
+
+    /**
+     * Adds the sdk as a dependency
+     */
     public void addDefaultSDKDependency() {
         dependencies.add(new PluginDependency(SDK_PLUGIN_ID));
     }
