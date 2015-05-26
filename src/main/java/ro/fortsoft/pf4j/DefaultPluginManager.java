@@ -111,7 +111,7 @@ public class DefaultPluginManager implements PluginManager {
      *
      * @param pluginsDirectory
      *            the directory to search for plugins
-     * @param aspectsAndAffected the URl to the aspect-classes & the affected classes
+     * @param aspectsAndAffected the URl to the aspect-classes and the affected classes
      */
     public DefaultPluginManager(File pluginsDirectory, List<URL> aspectsAndAffected) {
         this.pluginsDirectory = pluginsDirectory;
