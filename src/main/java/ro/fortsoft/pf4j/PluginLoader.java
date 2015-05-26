@@ -20,7 +20,6 @@ import ro.fortsoft.pf4j.util.JarFileFilter;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Vector;
@@ -50,15 +49,6 @@ class PluginLoader {
         this.pluginClasspath = pluginClasspath;
 
         ClassLoader parent = getClass().getClassLoader();
-        URL mixerAspect = parent.getResource("org/intellimate/izou/security/replaced/MixerAspect.class");
-        URL[] aspurls = new URL[1];
-        aspurls[0] = null;
-        try {
-            URL aspectURL = aspectURL = new File(mixerAspect.toURI()).getParentFile().toPath().toUri().toURL();
-            aspurls[0] = aspectURL;
-        } catch (MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
-        }
         pluginClassLoader = new IzouPluginClassLoader(pluginManager, pluginDescriptor, parent, aspectsAndAffected);
         log.debug("Created class loader '{}'", pluginClassLoader);
     }
