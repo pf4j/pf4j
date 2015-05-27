@@ -12,8 +12,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.util.List;
-
 /**
  * @author Decebal Suiu
  * @author Mário Franco
@@ -21,13 +19,27 @@ import java.util.List;
 public interface PluginStatusProvider {
 
     /**
-     * Retrieves a list with plugin identifiers that should be only accepted by this manager
+     * Checks if the plugin is disabled or not
+     *
+     * @param pluginId the plugin id
+     * @return if the plugin is disabled or not
      */
-    public List<String> getEnabledPlugins();
+    public boolean isPluginDisabled(String pluginId);
 
     /**
-     * Retrieves a list with plugin identifiers that should not be accepted by this manager
+     * Disables a plugin from being loaded.
+     *
+     * @param pluginId
+     * @return true if plugin is disabled
      */
-    public List<String> getDisabledPlugins();
+    public boolean disablePlugin(String pluginId);
+
+    /**
+     * Enables a plugin that has previously been disabled.
+     *
+     * @param pluginId
+     * @return true if plugin is enabled
+     */
+    public boolean enablePlugin(String pluginId);
 
 }

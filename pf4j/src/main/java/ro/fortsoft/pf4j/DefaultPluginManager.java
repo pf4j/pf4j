@@ -75,9 +75,6 @@ public class DefaultPluginManager implements PluginManager {
      */
     private List<PluginWrapper> startedPlugins;
 
-    private List<String> enabledPlugins;
-    private List<String> disabledPlugins;
-
     /**
      * The registered {@link PluginStateListener}s.
      */
@@ -96,6 +93,7 @@ public class DefaultPluginManager implements PluginManager {
 
     private PluginFactory pluginFactory;
     private ExtensionFactory extensionFactory;
+    private PluginStatusProvider pluginStatusProvider;
 
     /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
@@ -446,14 +444,10 @@ public class DefaultPluginManager implements PluginManager {
 
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, PluginState.STOPPED));
 
-            if (disabledPlugins.add(pluginId)) {
-                try {
-                    FileUtils.writeLines(disabledPlugins, new File(pluginsDirectory, "disabled.txt"));
-                } catch (IOException e) {
-                    log.error("Failed to disable plugin {}", pluginId, e);
-                    return false;
-                }
+            if (!pluginStatusProvider.disablePlugin(pluginId)) {
+                return false;
             }
+            
             log.info("Disabled plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
 
             return true;
@@ -482,12 +476,7 @@ public class DefaultPluginManager implements PluginManager {
             return true;
         }
 
-        try {
-            if (disabledPlugins.remove(pluginId)) {
-                FileUtils.writeLines(disabledPlugins, new File(pluginsDirectory, "disabled.txt"));
-            }
-        } catch (IOException e) {
-            log.error("Failed to enable plugin {}", pluginId, e);
+        if (!pluginStatusProvider.enablePlugin(pluginId)) {
             return false;
         }
 
@@ -659,42 +648,12 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     protected PluginStatusProvider createPluginStatusProvider() {
-        return new PluginStatusProvider() {
-
-            @Override
-            public List<String> getEnabledPlugins() {
-                List<String> enabledPlugins = Collections.emptyList();
-                try {
-                    // create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
-                    enabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true);
-                    log.info("Enabled plugins: {}", enabledPlugins);
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
-                }
-                return enabledPlugins;
-            }
-
-            @Override
-            public List<String> getDisabledPlugins() {
-                List<String> disabledPlugins = Collections.emptyList();
-                try {
-                    // create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
-                    disabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true);
-                    log.info("Disabled plugins: {}", disabledPlugins);
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
-                }
-                return disabledPlugins;
-            }
-        };
+        return new DefaultPluginStatusProvider(pluginsDirectory);
     }
 
     protected boolean isPluginDisabled(String pluginId) {
-    	if (enabledPlugins.isEmpty()) {
-    		return disabledPlugins.contains(pluginId);
-    	}
 
-    	return !enabledPlugins.contains(pluginId);
+    	return pluginStatusProvider.isPluginDisabled(pluginId);
     }
 
     protected boolean isPluginValid(PluginWrapper pluginWrapper) {
@@ -759,7 +718,6 @@ public class DefaultPluginManager implements PluginManager {
         unresolvedPlugins = new ArrayList<PluginWrapper>();
         resolvedPlugins = new ArrayList<PluginWrapper>();
         startedPlugins = new ArrayList<PluginWrapper>();
-        disabledPlugins = new ArrayList<String>();
 
         pluginStateListeners = new ArrayList<PluginStateListener>();
 
@@ -770,11 +728,7 @@ public class DefaultPluginManager implements PluginManager {
         extensionFactory = createExtensionFactory();
         pluginDescriptorFinder = createPluginDescriptorFinder();
         extensionFinder = createExtensionFinder();
-
-        PluginStatusProvider statusLists = createPluginStatusProvider();
-
-        enabledPlugins = statusLists.getEnabledPlugins();
-        disabledPlugins = statusLists.getDisabledPlugins();
+        pluginStatusProvider = createPluginStatusProvider();
 
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
 	}
