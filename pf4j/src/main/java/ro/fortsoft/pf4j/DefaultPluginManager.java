@@ -658,6 +658,37 @@ public class DefaultPluginManager implements PluginManager {
     	return new PluginClasspath();
     }
 
+    protected PluginStatusProvider createPluginStatusProvider() {
+        return new PluginStatusProvider() {
+
+            @Override
+            public List<String> getEnabledPlugins() {
+                List<String> enabledPlugins = Collections.emptyList();
+                try {
+                    // create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
+                    enabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true);
+                    log.info("Enabled plugins: {}", enabledPlugins);
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+                return enabledPlugins;
+            }
+
+            @Override
+            public List<String> getDisabledPlugins() {
+                List<String> disabledPlugins = Collections.emptyList();
+                try {
+                    // create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
+                    disabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true);
+                    log.info("Disabled plugins: {}", disabledPlugins);
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+                return disabledPlugins;
+            }
+        };
+    }
+
     protected boolean isPluginDisabled(String pluginId) {
     	if (enabledPlugins.isEmpty()) {
     		return disabledPlugins.contains(pluginId);
@@ -740,17 +771,10 @@ public class DefaultPluginManager implements PluginManager {
         pluginDescriptorFinder = createPluginDescriptorFinder();
         extensionFinder = createExtensionFinder();
 
-        try {
-        	// create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
-        	enabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true);
-        	log.info("Enabled plugins: {}", enabledPlugins);
+        PluginStatusProvider statusLists = createPluginStatusProvider();
 
-        	// create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
-        	disabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true);
-        	log.info("Disabled plugins: {}", disabledPlugins);
-        } catch (IOException e) {
-        	log.error(e.getMessage(), e);
-        }
+        enabledPlugins = statusLists.getEnabledPlugins();
+        disabledPlugins = statusLists.getDisabledPlugins();
 
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
 	}
