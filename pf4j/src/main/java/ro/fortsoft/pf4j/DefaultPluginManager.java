@@ -101,10 +101,10 @@ public class DefaultPluginManager implements PluginManager {
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
      */
     public DefaultPluginManager() {
-    	this.pluginsDirectory = createPluginsDirectory();
+        this.pluginsDirectory = createPluginsDirectory();
         this.source = new PluginDirectorySource(this.pluginsDirectory);
 
-    	initialize();
+        initialize();
     }
 
     /**
