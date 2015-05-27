@@ -37,6 +37,7 @@ public class DefaultPluginManager implements PluginManager {
     /**
      * The plugins repository.
      */
+    private PluginSource source;
     private File pluginsDirectory;
 
     private ExtensionFinder extensionFinder;
@@ -94,24 +95,39 @@ public class DefaultPluginManager implements PluginManager {
     private PluginFactory pluginFactory;
     private ExtensionFactory extensionFactory;
     private PluginStatusProvider pluginStatusProvider;
+    private FileFilter fileFilter;
 
     /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
      */
     public DefaultPluginManager() {
-    	this.pluginsDirectory = createPluginsDirectory();
+        this.pluginsDirectory = createPluginsDirectory();
+        this.source = new PluginDirectorySource(this.pluginsDirectory);
 
-    	initialize();
+        initialize();
     }
 
     /**
      * Constructs DefaultPluginManager which the given plugins directory.
      *
-     * @param pluginsDirectory
-     *            the directory to search for plugins
+     * @param pluginsDirectory the directory to search for plugins
      */
     public DefaultPluginManager(File pluginsDirectory) {
         this.pluginsDirectory = pluginsDirectory;
+        this.source = new PluginDirectorySource(this.pluginsDirectory);
+
+        initialize();
+    }
+
+    /**
+     * Constructs DefaultPluginManager which the given plugins directory.
+     *
+     * @param pluginsDirectory the directory to search for plugins
+     * @param source the plugins archives source
+     */
+    public DefaultPluginManager(File pluginsDirectory, PluginSource source) {
+        this.pluginsDirectory = pluginsDirectory;
+        this.source = source;
 
         initialize();
     }
@@ -343,16 +359,13 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         // expand all plugin archives
-        FileFilter zipFilter = new ZipFileFilter();
-        File[] zipFiles = pluginsDirectory.listFiles(zipFilter);
-        if (zipFiles != null) {
-        	for (File zipFile : zipFiles) {
-        		try {
-        			expandPluginArchive(zipFile);
-        		} catch (IOException e) {
-        			log.error(e.getMessage(), e);
-        		}
-        	}
+        List<File> pluginArchives = source.getPluginArchives(fileFilter);
+        for (File archiveFile : pluginArchives) {
+            try {
+                expandPluginArchive(archiveFile);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
         }
 
         // check for no plugins
@@ -447,7 +460,7 @@ public class DefaultPluginManager implements PluginManager {
             if (!pluginStatusProvider.disablePlugin(pluginId)) {
                 return false;
             }
-            
+
             log.info("Disabled plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
 
             return true;
@@ -508,29 +521,12 @@ public class DefaultPluginManager implements PluginManager {
 		}
 
 		File pluginFolder = new File(pluginsDirectory, pluginWrapper.getPluginPath());
-		File pluginZip = null;
-
-		FileFilter zipFilter = new ZipFileFilter();
-        File[] zipFiles = pluginsDirectory.listFiles(zipFilter);
-        if (zipFiles != null) {
-        	// strip prepended / from the plugin path
-        	String dirName = pluginWrapper.getPluginPath().substring(1);
-        	// find the zip file that matches the plugin path
-        	for (File zipFile : zipFiles) {
-        		String name = zipFile.getName().substring(0, zipFile.getName().lastIndexOf('.'));
-        		if (name.equals(dirName)) {
-        			pluginZip = zipFile;
-        			break;
-        		}
-        	}
-        }
 
 		if (pluginFolder.exists()) {
 			FileUtils.delete(pluginFolder);
 		}
-		if (pluginZip != null && pluginZip.exists()) {
-			FileUtils.delete(pluginZip);
-		}
+
+        source.deletePluginArchive(pluginWrapper, fileFilter);
 
 		return true;
 	}
@@ -609,7 +605,15 @@ public class DefaultPluginManager implements PluginManager {
         return (version != null) ? Version.createVersion(version) : Version.ZERO;
     }
 
-    /**
+    public FileFilter getFileFilter() {
+        return fileFilter;
+    }
+
+    public void setZipFilter(FileFilter fileFilter) {
+        this.fileFilter = fileFilter;
+    }
+
+   /**
 	 * Add the possibility to override the PluginDescriptorFinder.
 	 * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
 	 * PropertiesPluginDescriptorFinder is returned else this method returns
@@ -712,6 +716,7 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     private void initialize() {
+		fileFilter = new ZipFileFilter();
 		plugins = new HashMap<String, PluginWrapper>();
         pluginClassLoaders = new HashMap<String, PluginClassLoader>();
         pathToIdMap = new HashMap<String, String>();
