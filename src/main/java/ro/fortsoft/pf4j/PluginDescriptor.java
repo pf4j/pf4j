@@ -15,6 +15,7 @@ package ro.fortsoft.pf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class PluginDescriptor {
     private String pluginClass;
     private Version version;
     private String rawVersion;
-    private String secureID;
+    private SecretKey secureID;
     private boolean secureIDSet = false;
     private Version requires;
     private String provider;
@@ -210,7 +211,7 @@ public class PluginDescriptor {
      *     This method can only be called once per object
      * </p>
      */
-    public void setSecureID(String id) {
+    public void setSecureID(SecretKey id) {
         if (!secureIDSet) {
             secureID = id;
             secureIDSet = true;
@@ -222,7 +223,7 @@ public class PluginDescriptor {
      *
      * @return ts the secure (unique) ID of this plugin
      */
-    public String getSecureID() {
+    public SecretKey getSecureID() {
         return secureID;
     }
 
