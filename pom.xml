@@ -6,7 +6,7 @@
 
     <groupId>org.intellimate.izou</groupId>
     <artifactId>pf4j</artifactId>
-    <version>1.1</version>
+    <version>1.1.50</version>
     <packaging>jar</packaging>
     <name>PF4J-Izou Fork</name>
     <description>Plugin Framework for Java, fork from: https://github.com/decebals/pf4j
@@ -62,6 +62,16 @@
             <artifactId>junit</artifactId>
             <version>4.8.1</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.8.5</version>
+        </dependency>
+        <dependency>
+            <groupId>aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>1.5.4</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
