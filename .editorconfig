@@ -1,0 +1,17 @@
+# Pippo code formatting styles
+# Checkout http://editorconfig.org/ for more information and how to use it
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+
+#[{*.java,*.xml,*.js,*.css]
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.md]
+trim_trailing_whitespace = false
