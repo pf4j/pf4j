@@ -12,6 +12,8 @@
  */
 package ro.fortsoft.pf4j;
 
+import com.github.zafarkhaja.semver.Version;
+import com.github.zafarkhaja.semver.expr.Expression;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -86,7 +88,7 @@ public class DefaultPluginManager implements PluginManager {
     /**
      * The system version used for comparisons to the plugin requires attribute.
      */
-    private Version systemVersion = Version.ZERO;
+    private Version systemVersion = Version.forIntegers(0, 0, 0);
 
     private PluginFactory pluginFactory;
     private ExtensionFactory extensionFactory;
@@ -587,7 +589,7 @@ public class DefaultPluginManager implements PluginManager {
             }
         }
 
-        return (version != null) ? Version.createVersion(version) : Version.ZERO;
+        return (version != null) ? Version.valueOf(version) : Version.forIntegers(0, 0, 0);
     }
 
     /**
@@ -641,9 +643,9 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     protected boolean isPluginValid(PluginWrapper pluginWrapper) {
-    	Version requires = pluginWrapper.getDescriptor().getRequires();
+    	Expression requires = pluginWrapper.getDescriptor().getRequires();
     	Version system = getSystemVersion();
-    	if (system.isZero() || system.atLeast(requires)) {
+    	if (requires.interpret(system)) {
     		return true;
     	}
 

@@ -12,6 +12,7 @@
  */
 package ro.fortsoft.pf4j;
 
+import com.github.zafarkhaja.semver.Version;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -96,7 +97,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         if (StringUtils.isEmpty(version)) {
         	throw new PluginException("Plugin-Version cannot be empty");
         }
-        pluginDescriptor.setPluginVersion(Version.createVersion(version));
+        pluginDescriptor.setPluginVersion(Version.valueOf(version));
 
         String provider = attrs.getValue("Plugin-Provider");
         pluginDescriptor.setProvider(provider);
@@ -105,7 +106,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
         String requires = attrs.getValue("Plugin-Requires");
         if (StringUtils.isNotEmpty(requires)) {
-        	pluginDescriptor.setRequires(Version.createVersion(requires));
+        	pluginDescriptor.setRequires(requires);
         }
 
 		return pluginDescriptor;
