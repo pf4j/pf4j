@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * @author Decebal Suiu
- * @author MÃ¡rio Franco
+ * @author Mário Franco
  */
 public class DefaultPluginRepository implements PluginRepository {
 
