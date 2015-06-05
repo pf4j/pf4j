@@ -28,7 +28,7 @@ public class FileUtils {
 			return Collections.emptyList();
 		}
 
-		List<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<>();
 
 		BufferedReader reader = null;
 		try {

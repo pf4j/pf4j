@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public class CompoundClassLoader extends ClassLoader {
 
-	private Set<ClassLoader> loaders = new HashSet<ClassLoader>();
+	private Set<ClassLoader> loaders = new HashSet<>();
 
 	public void addLoader(ClassLoader loader) {
 		loaders.add(loader);
@@ -65,7 +65,7 @@ public class CompoundClassLoader extends ClassLoader {
 
 	@Override
 	protected Enumeration<URL> findResources(String name) throws IOException {
-		List<URL> resources = new ArrayList<URL>();
+		List<URL> resources = new ArrayList<>();
 		for (ClassLoader loader : loaders) {
 			resources.addAll(Collections.list(loader.getResources(name)));
 		}

@@ -53,7 +53,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 		log.debug("Finding extensions for extension point '{}'", type.getName());
         readIndexFiles();
 
-        List<ExtensionWrapper<T>> result = new ArrayList<ExtensionWrapper<T>>();
+        List<ExtensionWrapper<T>> result = new ArrayList<>();
         for (Map.Entry<String, Set<String>> entry : entries.entrySet()) {
             String pluginId = entry.getKey();
 
@@ -84,7 +84,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
                         descriptor.setOrdinal(extension.ordinal());
                         descriptor.setExtensionClass(extensionClass);
 
-                        ExtensionWrapper extensionWrapper = new ExtensionWrapper<T>(descriptor);
+                        ExtensionWrapper extensionWrapper = new ExtensionWrapper<>(descriptor);
                         extensionWrapper.setExtensionFactory(extensionFactory);
                         result.add(extensionWrapper);
                         log.debug("Added extension '{}' with ordinal {}", className, extension.ordinal());
@@ -128,7 +128,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
             return entries;
         }
 
-        entries = new LinkedHashMap<String, Set<String>>();
+        entries = new LinkedHashMap<>();
 
         readClasspathIndexFiles();
         readPluginsIndexFiles();
@@ -139,7 +139,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
     private void readClasspathIndexFiles() {
         log.debug("Reading extensions index files from classpath");
 
-        Set<String> bucket = new HashSet<String>();
+        Set<String> bucket = new HashSet<>();
         try {
             Enumeration<URL> urls = getClass().getClassLoader().getResources(ExtensionsIndexer.EXTENSIONS_RESOURCE);
             while (urls.hasMoreElements()) {
@@ -171,7 +171,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
         for (PluginWrapper plugin : plugins) {
             String pluginId = plugin.getDescriptor().getPluginId();
             log.debug("Reading extensions index file for plugin '{}'", pluginId);
-            Set<String> bucket = new HashSet<String>();
+            Set<String> bucket = new HashSet<>();
 
             try {
                 URL url = plugin.getPluginClassLoader().getResource(ExtensionsIndexer.EXTENSIONS_RESOURCE);

@@ -32,8 +32,8 @@ public class PluginClasspath {
 	protected List<String> libDirectories;
 
 	public PluginClasspath() {
-		classesDirectories = new ArrayList<String>();
-		libDirectories = new ArrayList<String>();
+		classesDirectories = new ArrayList<>();
+		libDirectories = new ArrayList<>();
 
 		addResources();
 	}

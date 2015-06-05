@@ -106,7 +106,7 @@ class PluginLoader {
 	        File file = new File(pluginRepository, libDirectory).getAbsoluteFile();
 
 	        // collect all jars from current lib directory in jars variable
-	        Vector<File> jars = new Vector<File>();
+	        Vector<File> jars = new Vector<>();
 	        getJars(jars, file);
 	        for (File jar : jars) {
 	            try {

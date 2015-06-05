@@ -38,7 +38,7 @@ public class ExtensionsIndexer extends AbstractProcessor {
 
 	public static final String EXTENSIONS_RESOURCE = "META-INF/extensions.idx";
 
-	private List<TypeElement> extensions = new ArrayList<TypeElement>();
+	private List<TypeElement> extensions = new ArrayList<>();
 
 	@Override
 	public SourceVersion getSupportedSourceVersion() {
@@ -47,7 +47,7 @@ public class ExtensionsIndexer extends AbstractProcessor {
 
 	@Override
 	public Set<String> getSupportedAnnotationTypes() {
-		Set<String> annotationTypes = new HashSet<String>();
+		Set<String> annotationTypes = new HashSet<>();
         annotationTypes.add(Extension.class.getName());
 
         return annotationTypes;
@@ -83,7 +83,7 @@ public class ExtensionsIndexer extends AbstractProcessor {
 	}
 
 	private void write() {
-		Set<String> entries = new HashSet<String>();
+		Set<String> entries = new HashSet<>();
 		for (TypeElement typeElement : extensions) {
 			entries.add(processingEnv.getElementUtils().getBinaryName(typeElement).toString());
 		}

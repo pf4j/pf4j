@@ -26,7 +26,7 @@ public enum RuntimeMode {
 
     private final String name;
 
-	private static final Map<String, RuntimeMode> map = new HashMap<String, RuntimeMode>();
+	private static final Map<String, RuntimeMode> map = new HashMap<>();
 
 	static {
 		for (RuntimeMode mode : RuntimeMode.values()) {

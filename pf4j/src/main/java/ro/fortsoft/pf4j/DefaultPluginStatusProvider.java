@@ -32,8 +32,8 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
 
     private final File pluginsDirectory;
 
-    private List<String> enabledPlugins = new ArrayList<String>();
-    private List<String> disabledPlugins = new ArrayList<String>();
+    private List<String> enabledPlugins = new ArrayList<>();
+    private List<String> disabledPlugins = new ArrayList<>();
 
     public DefaultPluginStatusProvider(File pluginsDirectory) {
         this.pluginsDirectory = pluginsDirectory;

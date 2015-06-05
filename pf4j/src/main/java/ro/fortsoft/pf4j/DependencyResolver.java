@@ -37,7 +37,7 @@ class DependencyResolver {
 	 * Get the list of plugins in dependency sorted order.
 	 */
 	public List<PluginWrapper> getSortedPlugins() throws PluginException {
-		DirectedGraph<String> graph = new DirectedGraph<String>();
+		DirectedGraph<String> graph = new DirectedGraph<>();
 		for (PluginWrapper pluginWrapper : plugins) {
 			PluginDescriptor descriptor = pluginWrapper.getDescriptor();
 			String pluginId = descriptor.getPluginId();
@@ -59,7 +59,7 @@ class DependencyResolver {
 		}
 
 		log.debug("Plugins order: {}", pluginsId);
-		List<PluginWrapper> sortedPlugins = new ArrayList<PluginWrapper>();
+		List<PluginWrapper> sortedPlugins = new ArrayList<>();
 		for (String pluginId : pluginsId) {
 			sortedPlugins.add(getPlugin(pluginId));
 		}

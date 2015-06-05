@@ -34,11 +34,11 @@ public class AndFileFilter implements FileFilter {
     private List<FileFilter> fileFilters;
 
     public AndFileFilter() {
-        this.fileFilters = new ArrayList<FileFilter>();
+        this.fileFilters = new ArrayList<>();
     }
 
     public AndFileFilter(List<FileFilter> fileFilters) {
-        this.fileFilters = new ArrayList<FileFilter>(fileFilters);
+        this.fileFilters = new ArrayList<>(fileFilters);
     }
 
     public void addFileFilter(FileFilter fileFilter) {
@@ -54,7 +54,7 @@ public class AndFileFilter implements FileFilter {
     }
 
     public void setFileFilters(List<FileFilter> fileFilters) {
-        this.fileFilters = new ArrayList<FileFilter>(fileFilters);
+        this.fileFilters = new ArrayList<>(fileFilters);
     }
 
     @Override
@@ -63,8 +63,7 @@ public class AndFileFilter implements FileFilter {
             return false;
         }
 
-        for (Iterator<FileFilter> iter = this.fileFilters.iterator(); iter.hasNext();) {
-            FileFilter fileFilter = (FileFilter) iter.next();
+        for (FileFilter fileFilter : this.fileFilters) {
             if (!fileFilter.accept(file)) {
                 return false;
             }

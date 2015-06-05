@@ -129,12 +129,12 @@ public class DefaultPluginManager implements PluginManager {
 
 	@Override
     public List<PluginWrapper> getPlugins() {
-        return new ArrayList<PluginWrapper>(plugins.values());
+        return new ArrayList<>(plugins.values());
     }
 
     @Override
     public List<PluginWrapper> getPlugins(PluginState pluginState) {
-        List<PluginWrapper> plugins= new ArrayList<PluginWrapper>();
+        List<PluginWrapper> plugins= new ArrayList<>();
         for (PluginWrapper plugin : getPlugins()) {
             if (pluginState.equals(plugin.getPluginState())) {
                 plugins.add(plugin);
@@ -354,7 +354,7 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         // check for no plugins
-        List<FileFilter> filterList = new ArrayList<FileFilter>();
+        List<FileFilter> filterList = new ArrayList<>();
         filterList.add(new DirectoryFileFilter());
         filterList.add(new NotFileFilter(createHiddenPluginFilter()));
         FileFilter pluginsFilter = new AndFileFilter(filterList);
@@ -527,7 +527,7 @@ public class DefaultPluginManager implements PluginManager {
     @Override
 	public <T> List<T> getExtensions(Class<T> type) {
 		List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
-		List<T> extensions = new ArrayList<T>(extensionsWrapper.size());
+		List<T> extensions = new ArrayList<>(extensionsWrapper.size());
 		for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
 			extensions.add(extensionWrapper.getExtension());
 		}
@@ -696,14 +696,14 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     private void initialize() {
-		plugins = new HashMap<String, PluginWrapper>();
-        pluginClassLoaders = new HashMap<String, PluginClassLoader>();
-        pathToIdMap = new HashMap<String, String>();
-        unresolvedPlugins = new ArrayList<PluginWrapper>();
-        resolvedPlugins = new ArrayList<PluginWrapper>();
-        startedPlugins = new ArrayList<PluginWrapper>();
+		plugins = new HashMap<>();
+        pluginClassLoaders = new HashMap<>();
+        pathToIdMap = new HashMap<>();
+        unresolvedPlugins = new ArrayList<>();
+        resolvedPlugins = new ArrayList<>();
+        startedPlugins = new ArrayList<>();
 
-        pluginStateListeners = new ArrayList<PluginStateListener>();
+        pluginStateListeners = new ArrayList<>();
 
         log.info("PF4J version {} in '{}' mode", getVersion(), getRuntimeMode());
 

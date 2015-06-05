@@ -34,7 +34,7 @@ public class PluginDescriptor {
 
     public PluginDescriptor() {
     	requires = Version.ZERO;
-        dependencies = new ArrayList<PluginDependency>();
+        dependencies = new ArrayList<>();
     }
 
     /**
@@ -125,7 +125,7 @@ public class PluginDescriptor {
     		if (dependencies.isEmpty()) {
     			this.dependencies = Collections.emptyList();
     		} else {
-	    		this.dependencies = new ArrayList<PluginDependency>();
+	    		this.dependencies = new ArrayList<>();
 	    		String[] tokens = dependencies.split(",");
 	    		for (String dependency : tokens) {
 	    			dependency = dependency.trim();
