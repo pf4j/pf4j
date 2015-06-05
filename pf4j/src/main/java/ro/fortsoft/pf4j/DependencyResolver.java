@@ -28,29 +28,18 @@ class DependencyResolver {
 	private static final Logger log = LoggerFactory.getLogger(DependencyResolver.class);
 
     private List<PluginWrapper> plugins;
+    private DirectedGraph<String> graph;
 
 	public DependencyResolver(List<PluginWrapper> plugins) {
 		this.plugins = plugins;
+
+        initGraph();
 	}
 
 	/**
 	 * Get the list of plugins in dependency sorted order.
 	 */
 	public List<PluginWrapper> getSortedPlugins() throws PluginException {
-		DirectedGraph<String> graph = new DirectedGraph<>();
-		for (PluginWrapper pluginWrapper : plugins) {
-			PluginDescriptor descriptor = pluginWrapper.getDescriptor();
-			String pluginId = descriptor.getPluginId();
-			List<PluginDependency> dependencies = descriptor.getDependencies();
-			if (!dependencies.isEmpty()) {
-				for (PluginDependency dependency : dependencies) {
-					graph.addEdge(pluginId, dependency.getPluginId());
-				}
-			} else {
-				graph.addVertex(pluginId);
-			}
-		}
-
 		log.debug("Graph: {}", graph);
 		List<String> pluginsId = graph.reverseTopologicalSort();
 
@@ -67,7 +56,26 @@ class DependencyResolver {
 		return sortedPlugins;
 	}
 
-	private PluginWrapper getPlugin(String pluginId) throws PluginNotFoundException {
+    private void initGraph() {
+        // create graph
+        graph = new DirectedGraph<>();
+
+        // populate graph
+        for (PluginWrapper pluginWrapper : plugins) {
+            PluginDescriptor descriptor = pluginWrapper.getDescriptor();
+            String pluginId = descriptor.getPluginId();
+            List<PluginDependency> dependencies = descriptor.getDependencies();
+            if (!dependencies.isEmpty()) {
+                for (PluginDependency dependency : dependencies) {
+                    graph.addEdge(pluginId, dependency.getPluginId());
+                }
+            } else {
+                graph.addVertex(pluginId);
+            }
+        }
+    }
+
+    private PluginWrapper getPlugin(String pluginId) throws PluginNotFoundException {
 		for (PluginWrapper pluginWrapper : plugins) {
 			if (pluginId.equals(pluginWrapper.getDescriptor().getPluginId())) {
 				return pluginWrapper;
