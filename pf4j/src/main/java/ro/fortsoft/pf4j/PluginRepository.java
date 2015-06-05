@@ -19,7 +19,7 @@ import java.util.List;
  * Directory whose contents are .zip files used as plugins.
  *
  * @author Decebal Suiu
- * @author Mário Franco
+ * @author MÃ¡rio Franco
  */
 public interface PluginRepository {
 

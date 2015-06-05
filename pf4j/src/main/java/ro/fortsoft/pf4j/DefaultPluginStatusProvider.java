@@ -24,7 +24,7 @@ import ro.fortsoft.pf4j.util.FileUtils;
  * The default implementation for PluginStatusProvider.
  *
  * @author Decebal Suiu
- * @author Mário Franco
+ * @author MÃ¡rio Franco
  */
 public class DefaultPluginStatusProvider implements PluginStatusProvider {
 

@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * @author Decebal Suiu
- * @author Mário Franco
+ * @author MÃ¡rio Franco
  */
 public class CompoundPluginRepository implements PluginRepository {
 
