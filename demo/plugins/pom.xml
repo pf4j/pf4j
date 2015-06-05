@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    
+
     <parent>
         <groupId>ro.fortsoft.pf4j.demo</groupId>
         <artifactId>pf4j-demo-parent</artifactId>
@@ -27,7 +27,7 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
-        
+
         <plugins>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -93,7 +93,7 @@
             <artifactId>pf4j</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-        </dependency>    
+        </dependency>
 
         <dependency>
             <groupId>ro.fortsoft.pf4j.demo</groupId>
@@ -102,5 +102,5 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-    
+
 </project>

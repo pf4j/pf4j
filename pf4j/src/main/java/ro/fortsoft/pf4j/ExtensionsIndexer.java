@@ -1,11 +1,11 @@
 /*
  * Copyright 2013 Decebal Suiu
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with
  * the License. You may obtain a copy of the License in the LICENSE file, or at:
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -37,9 +37,9 @@ import javax.tools.StandardLocation;
 public class ExtensionsIndexer extends AbstractProcessor {
 
 	public static final String EXTENSIONS_RESOURCE = "META-INF/extensions.idx";
-	
+
 	private List<TypeElement> extensions = new ArrayList<TypeElement>();
-	
+
 	@Override
 	public SourceVersion getSupportedSourceVersion() {
 		return SourceVersion.latest();
@@ -49,16 +49,16 @@ public class ExtensionsIndexer extends AbstractProcessor {
 	public Set<String> getSupportedAnnotationTypes() {
 		Set<String> annotationTypes = new HashSet<String>();
         annotationTypes.add(Extension.class.getName());
-        
+
         return annotationTypes;
 	}
-	
+
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		if (roundEnv.processingOver()) {
             return false;
         }
-		
+
 		for (Element element : roundEnv.getElementsAnnotatedWith(Extension.class)) {
 			if (!(element instanceof TypeElement)) {
 				continue;
@@ -69,7 +69,7 @@ public class ExtensionsIndexer extends AbstractProcessor {
 			processingEnv.getMessager().printMessage(Kind.NOTE, message);
 			extensions.add(typeElement);
         }
-		
+
 		/*
 		if (!roundEnv.processingOver()) {
 			return false;
@@ -77,17 +77,17 @@ public class ExtensionsIndexer extends AbstractProcessor {
 		*/
 
 		write();
-		
+
 		return false;
 //		return true; // no further processing of this annotation type
 	}
-	
+
 	private void write() {
 		Set<String> entries = new HashSet<String>();
 		for (TypeElement typeElement : extensions) {
 			entries.add(processingEnv.getElementUtils().getBinaryName(typeElement).toString());
 		}
-		
+
 		read(entries); // read old entries
 		write(entries); // write entries
 	}
@@ -107,7 +107,7 @@ public class ExtensionsIndexer extends AbstractProcessor {
 			processingEnv.getMessager().printMessage(Kind.ERROR, e.toString());
 		}
 	}
-	
+
 	private void read(Set<String> entries) {
 		try {
 			FileObject file = processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", EXTENSIONS_RESOURCE);
@@ -119,17 +119,17 @@ public class ExtensionsIndexer extends AbstractProcessor {
 			// java6 does not support reading old index files
 		}
 	}
-	
+
 	public static void readIndex(Reader reader, Set<String> entries) throws IOException {
 		BufferedReader bufferedReader = new BufferedReader(reader);
-		
+
 		String line;
 		while ((line = bufferedReader.readLine()) != null) {
 			entries.add(line);
 		}
-		
+
 		reader.close();
 	}
-	
+
 }
- 
+
