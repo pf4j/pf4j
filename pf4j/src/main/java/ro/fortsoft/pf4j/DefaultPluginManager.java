@@ -34,9 +34,6 @@ public class DefaultPluginManager implements PluginManager {
 	public static final String DEFAULT_PLUGINS_DIRECTORY = "plugins";
 	public static final String DEVELOPMENT_PLUGINS_DIRECTORY = "../plugins";
 
-    /**
-     * The plugins repository.
-     */
     private File pluginsDirectory;
 
     private ExtensionFinder extensionFinder;
@@ -96,19 +93,23 @@ public class DefaultPluginManager implements PluginManager {
     private PluginStatusProvider pluginStatusProvider;
 
     /**
+     * The plugins repository.
+     */
+    private PluginRepository pluginRepository;
+
+    /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
      */
     public DefaultPluginManager() {
-    	this.pluginsDirectory = createPluginsDirectory();
+        this.pluginsDirectory = createPluginsDirectory();
 
-    	initialize();
+        initialize();
     }
 
     /**
      * Constructs DefaultPluginManager which the given plugins directory.
      *
-     * @param pluginsDirectory
-     *            the directory to search for plugins
+     * @param pluginsDirectory the directory to search for plugins
      */
     public DefaultPluginManager(File pluginsDirectory) {
         this.pluginsDirectory = pluginsDirectory;
@@ -343,16 +344,13 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         // expand all plugin archives
-        FileFilter zipFilter = new ZipFileFilter();
-        File[] zipFiles = pluginsDirectory.listFiles(zipFilter);
-        if (zipFiles != null) {
-        	for (File zipFile : zipFiles) {
-        		try {
-        			expandPluginArchive(zipFile);
-        		} catch (IOException e) {
-        			log.error(e.getMessage(), e);
-        		}
-        	}
+        List<File> pluginArchives = pluginRepository.getPluginArchives();
+        for (File archiveFile : pluginArchives) {
+            try {
+                expandPluginArchive(archiveFile);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
         }
 
         // check for no plugins
@@ -447,7 +445,7 @@ public class DefaultPluginManager implements PluginManager {
             if (!pluginStatusProvider.disablePlugin(pluginId)) {
                 return false;
             }
-            
+
             log.info("Disabled plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
 
             return true;
@@ -508,29 +506,12 @@ public class DefaultPluginManager implements PluginManager {
 		}
 
 		File pluginFolder = new File(pluginsDirectory, pluginWrapper.getPluginPath());
-		File pluginZip = null;
-
-		FileFilter zipFilter = new ZipFileFilter();
-        File[] zipFiles = pluginsDirectory.listFiles(zipFilter);
-        if (zipFiles != null) {
-        	// strip prepended / from the plugin path
-        	String dirName = pluginWrapper.getPluginPath().substring(1);
-        	// find the zip file that matches the plugin path
-        	for (File zipFile : zipFiles) {
-        		String name = zipFile.getName().substring(0, zipFile.getName().lastIndexOf('.'));
-        		if (name.equals(dirName)) {
-        			pluginZip = zipFile;
-        			break;
-        		}
-        	}
-        }
 
 		if (pluginFolder.exists()) {
 			FileUtils.delete(pluginFolder);
 		}
-		if (pluginZip != null && pluginZip.exists()) {
-			FileUtils.delete(pluginZip);
-		}
+
+        pluginRepository.deletePluginArchive(pluginWrapper.getPluginPath());
 
 		return true;
 	}
@@ -651,8 +632,11 @@ public class DefaultPluginManager implements PluginManager {
         return new DefaultPluginStatusProvider(pluginsDirectory);
     }
 
-    protected boolean isPluginDisabled(String pluginId) {
+    protected PluginRepository createPluginRepository() {
+        return new DefaultPluginRepository(pluginsDirectory, new ZipFileFilter());
+    }
 
+    protected boolean isPluginDisabled(String pluginId) {
     	return pluginStatusProvider.isPluginDisabled(pluginId);
     }
 
@@ -729,11 +713,12 @@ public class DefaultPluginManager implements PluginManager {
         pluginDescriptorFinder = createPluginDescriptorFinder();
         extensionFinder = createExtensionFinder();
         pluginStatusProvider = createPluginStatusProvider();
+        pluginRepository = createPluginRepository();
 
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
 	}
 
-	private PluginWrapper loadPluginDirectory(File pluginDirectory) throws PluginException {
+    private PluginWrapper loadPluginDirectory(File pluginDirectory) throws PluginException {
         // try to load the plugin
 		String pluginName = pluginDirectory.getName();
         String pluginPath = "/".concat(pluginName);
