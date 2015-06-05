@@ -14,7 +14,7 @@ package ro.fortsoft.pf4j;
 
 /**
  * @author Decebal Suiu
- * @author MÃ¡rio Franco
+ * @author Mário Franco
  */
 public interface PluginStatusProvider {
 
