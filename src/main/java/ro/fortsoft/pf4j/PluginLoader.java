@@ -20,7 +20,6 @@ import ro.fortsoft.pf4j.util.JarFileFilter;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Vector;
 
@@ -44,12 +43,12 @@ class PluginLoader {
     private PluginClasspath pluginClasspath;
     private IzouPluginClassLoader pluginClassLoader;
 
-    public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository, PluginClasspath pluginClasspath, List<URL> aspectsAndAffected) {
+    public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository, PluginClasspath pluginClasspath, List<AspectOrAffected> aspectOrAffectedList) {
         this.pluginRepository = pluginRepository;
         this.pluginClasspath = pluginClasspath;
 
         ClassLoader parent = getClass().getClassLoader();
-        pluginClassLoader = new IzouPluginClassLoader(pluginManager, pluginDescriptor, parent, aspectsAndAffected);
+        pluginClassLoader = new IzouPluginClassLoader(pluginManager, pluginDescriptor, parent, aspectOrAffectedList);
         log.debug("Created class loader '{}'", pluginClassLoader);
     }
 
