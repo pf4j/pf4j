@@ -1,0 +1,58 @@
+package ro.fortsoft.pf4j;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Optional;
+import java.util.function.Function;
+
+/**
+ * this class contains information about aspect.
+ * @author LeanderK
+ * @version 1.0
+ */
+public class AspectOrAffected {
+    private final URL path;
+    private final String className;
+    private final Function<Class<?>, Class<?>> callback;
+    private final boolean isAspect;
+    private static final Logger log = LoggerFactory.getLogger(IzouPluginClassLoader.class);
+
+
+    public AspectOrAffected(URL path, String className, Function<Class<?>, Class<?>> callback, boolean isAspect) {
+        this.path = path;
+        this.className = className;
+        this.callback = callback;
+        this.isAspect = isAspect;
+    }
+
+    public URL getPath() {
+        return path;
+    }
+
+    public Optional<URL> getDirectory() {
+        URL finalURL = path;
+        if (!new File(finalURL.getFile()).isDirectory())
+            try {
+                return Optional.of(new File(path.getFile()).getParentFile().toURI().toURL());
+            } catch (MalformedURLException e) {
+                log.error("illegal url");
+            }
+        return Optional.empty();
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public Function<Class<?>, Class<?>> getCallback() {
+        return callback;
+    }
+
+    public boolean isAspect() {
+        return isAspect;
+    }
+}
