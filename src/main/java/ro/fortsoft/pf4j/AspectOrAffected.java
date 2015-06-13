@@ -55,4 +55,25 @@ public class AspectOrAffected {
     public boolean isAspect() {
         return isAspect;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AspectOrAffected)) return false;
+
+        AspectOrAffected that = (AspectOrAffected) o;
+
+        if (isAspect != that.isAspect) return false;
+        if (path != null ? !path.equals(that.path) : that.path != null) return false;
+        return !(className != null ? !className.equals(that.className) : that.className != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = path != null ? path.hashCode() : 0;
+        result = 31 * result + (className != null ? className.hashCode() : 0);
+        result = 31 * result + (isAspect ? 1 : 0);
+        return result;
+    }
 }
