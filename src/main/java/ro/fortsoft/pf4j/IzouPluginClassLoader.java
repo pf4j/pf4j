@@ -18,6 +18,7 @@ import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -58,8 +59,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
                 .forEach(weaver::addURL);
         aspectOrAffectedMap = aspectOrAffectedList.stream()
                 .collect(Collectors.toMap(AspectOrAffected::getClassName, Function.identity()));
-        aspectsOrAffectedClass = aspectOrAffectedList.stream()
-                .collect(Collectors.toConcurrentMap(AspectOrAffected::getClassName, aspectOrAffected -> (Class) null));
+        aspectsOrAffectedClass = new ConcurrentHashMap<>();
     }
 
     @Override
