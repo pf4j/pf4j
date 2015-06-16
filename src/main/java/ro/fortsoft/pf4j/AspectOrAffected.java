@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
@@ -34,14 +36,27 @@ public class AspectOrAffected {
     }
 
     public Optional<URL> getDirectory() {
-        URL finalURL = path;
-        if (!new File(finalURL.getFile()).isDirectory())
+        if (!path.getProtocol().equals("jar")) {
+            URL finalURL = path;
+            if (!new File(finalURL.getFile()).isDirectory())
+                try {
+                    File file = new File(path.getFile());
+                    return Optional.of(file.getParentFile().toURI().toURL());
+                } catch (MalformedURLException e) {
+                    log.error("illegal url");
+                }
+            return Optional.empty();
+        } else {
+            final JarURLConnection connection;
             try {
-                return Optional.of(new File(path.getFile()).getParentFile().toURI().toURL());
-            } catch (MalformedURLException e) {
-                log.error("illegal url");
+                connection = (JarURLConnection) path.openConnection();
+            } catch (IOException e) {
+                log.error("an error occured while trying to fetch directory");
+                return Optional.empty();
             }
-        return Optional.empty();
+            URL url = connection.getJarFileURL();
+            return Optional.of(url);
+        }
     }
 
     public String getClassName() {

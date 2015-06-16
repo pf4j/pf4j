@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
  * @author LeanderK
  * @version 1.0
  */
+//TODO remove laziness!
 public class IzouPluginClassLoader extends URLClassLoader {
 
     private static final Logger log = LoggerFactory.getLogger(IzouPluginClassLoader.class);
@@ -60,6 +61,39 @@ public class IzouPluginClassLoader extends URLClassLoader {
         aspectOrAffectedMap = aspectOrAffectedList.stream()
                 .collect(Collectors.toMap(AspectOrAffected::getClassName, Function.identity()));
         aspectsOrAffectedClass = new ConcurrentHashMap<>();
+        ConcurrentMap<String, Class<?>> classes = aspectOrAffectedList.stream()
+                .collect(Collectors.toConcurrentMap(AspectOrAffected::getClassName, aspectOrAffected1 -> {
+                    if (aspectsOrAffectedClass.get(aspectOrAffected1.getClassName()) != null)
+                        return aspectsOrAffectedClass.get(aspectOrAffected1.getClassName());
+                    InputStream is = this.getResourceAsStream(aspectOrAffected1.getClassName().replace('.', '/') + ".class");
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+                    int nRead;
+                    byte[] data = new byte[16384];
+
+                    try {
+                        while ((nRead = is.read(data, 0, data.length)) != -1) {
+                            buffer.write(data, 0, nRead);
+                        }
+                    } catch (IOException e) {
+                        return null;
+                    }
+
+                    try {
+                        buffer.flush();
+                    } catch (IOException e) {
+                        return null;
+                    }
+                    byte[] array = buffer.toByteArray();
+                    try {
+                        Class aClass = weaver.defineClass(aspectOrAffected1.getClassName(), array,
+                                new CodeSource(aspectOrAffected1.getPath(), (Certificate[]) null));
+                        return aspectOrAffected1.getCallback().apply(aClass);
+                    } catch (IOException e) {
+                        return null;
+                    }
+                }));
+        aspectsOrAffectedClass.putAll(classes);
     }
 
     @Override
@@ -121,38 +155,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
      * @return null if not eligible or an error occurred
      */
     private Class<?> checkAndWeave(String className) {
-        return aspectsOrAffectedClass.computeIfAbsent(className, s1 -> {
-            AspectOrAffected aspectOrAffected = aspectOrAffectedMap.get(className);
-            if (aspectOrAffected == null)
-                return null;
-            InputStream is = this.getResourceAsStream(className.replace('.', '/') + ".class");
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-            int nRead;
-            byte[] data = new byte[16384];
-
-            try {
-                while ((nRead = is.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, nRead);
-                }
-            } catch (IOException e) {
-                return null;
-            }
-
-            try {
-                buffer.flush();
-            } catch (IOException e) {
-                return null;
-            }
-            byte[] array = buffer.toByteArray();
-            try {
-                Class aClass = weaver.defineClass(className, array,
-                        new CodeSource(aspectOrAffected.getPath(), (Certificate[]) null));
-                return aspectOrAffected.getCallback().apply(aClass);
-            } catch (IOException e) {
-                return null;
-            }
-        });
+        return aspectsOrAffectedClass.get(className);
     }
 
     /**
