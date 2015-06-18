@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @author LeanderK
  * @version 1.0
  */
-//TODO remove laziness!
+//TODO performance improvements by changing the model: system -> weaver -> Izou instead of sys -> izou -> (mutiple) weaver
 public class IzouPluginClassLoader extends URLClassLoader {
 
     private static final Logger log = LoggerFactory.getLogger(IzouPluginClassLoader.class);
@@ -146,7 +146,13 @@ public class IzouPluginClassLoader extends URLClassLoader {
             }
         }
 
-        return loadCustomClass(className);
+        try {
+            return loadCustomClass(className);
+        } catch (LinkageError e) {
+            System.err.println("WTF");
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     /**
@@ -212,20 +218,22 @@ public class IzouPluginClassLoader extends URLClassLoader {
      * @throws ClassNotFoundException if the class is not found
      */
     public Class<?> loadClassFromClasses(String className) throws ClassNotFoundException {
-        // second check whether it's already been loaded
-        Class<?> clazz = findLoadedClass(className);
-        if (clazz != null) {
-            log.debug("Found loaded class '{}'", className);
+        synchronized (getClassLoadingLock(className)) {
+            // second check whether it's already been loaded
+            Class<?> clazz = findLoadedClass(className);
+            if (clazz != null) {
+                log.debug("Found loaded class '{}'", className);
+                return clazz;
+            }
+            String path = className.replace('.', '/').concat(".class");
+            Resource resource = classesClassPath.getResource(path, false);
+            if (resource == null) {
+                throw new ClassNotFoundException();
+            }
+            clazz = findClass(className);
+            log.debug("Found class '{}' in plugin classpath", className);
             return clazz;
         }
-        String path = className.replace('.', '/').concat(".class");
-        Resource resource = classesClassPath.getResource(path, false);
-        if (resource == null) {
-            throw new ClassNotFoundException();
-        }
-        clazz = findClass(className);
-        log.debug("Found class '{}' in plugin classpath", className);
-        return clazz;
     }
 
     /**
