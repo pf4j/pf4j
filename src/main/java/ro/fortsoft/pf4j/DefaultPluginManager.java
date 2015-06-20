@@ -102,7 +102,8 @@ public class DefaultPluginManager implements PluginManager {
     private Version systemVersion = Version.ZERO;
 
     private PluginFactory pluginFactory;
-    private List<AspectOrAffected> aspectOrAffectedList;
+    private final List<AspectOrAffected> aspectOrAffectedList;
+    private final IzouWeavingClassLoader weavingClassloader;
     private ExtensionFactory extensionFactory;
 
     /**
@@ -115,6 +116,8 @@ public class DefaultPluginManager implements PluginManager {
     public DefaultPluginManager(File pluginsDirectory, List<AspectOrAffected> aspectOrAffectedList) {
         this.pluginsDirectory = pluginsDirectory;
         this.aspectOrAffectedList = aspectOrAffectedList;
+        ClassLoader parent = this.getClass().getClassLoader();
+        this.weavingClassloader = new IzouWeavingClassLoader(parent, aspectOrAffectedList);
         initialize();
     }
 
@@ -732,6 +735,7 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     private void initialize() {
+
 		plugins = new HashMap<String, PluginWrapper>();
         pluginClassLoaders = new HashMap<String, IzouPluginClassLoader>();
         pathToIdMap = new HashMap<String, String>();
@@ -785,7 +789,7 @@ public class DefaultPluginManager implements PluginManager {
 
         // load plugin
         log.debug("Loading plugin '{}'", pluginPath);
-        PluginLoader pluginLoader = new PluginLoader(this, pluginDescriptor, pluginDirectory, pluginClasspath, aspectOrAffectedList);
+        PluginLoader pluginLoader = new PluginLoader(this, pluginDescriptor, pluginDirectory, pluginClasspath, weavingClassloader);
         pluginLoader.load();
         log.debug("Loaded plugin '{}'", pluginPath);
 

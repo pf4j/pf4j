@@ -1,33 +1,21 @@
 package ro.fortsoft.pf4j;
 
-import org.aspectj.weaver.loadtime.WeavingURLClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Resource;
 import sun.misc.URLClassPath;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.CodeSource;
-import java.security.cert.Certificate;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author LeanderK
  * @version 1.0
  */
-//TODO performance improvements by changing the model: system -> weaver -> Izou instead of sys -> izou -> (mutiple) weaver
 public class IzouPluginClassLoader extends URLClassLoader {
 
     private static final Logger log = LoggerFactory.getLogger(IzouPluginClassLoader.class);
@@ -39,61 +27,14 @@ public class IzouPluginClassLoader extends URLClassLoader {
     public static final String PLUGIN_PACKAGE_PREFIX_LOG_LOG4J = "org.apache.logging.log4j";
     public static final String PLUGIN_ZIP_FILE_MANAGER = "ZipFileManager";
 
-    private final ConcurrentMap<String, Class<?>> aspectsOrAffectedClass;
-    private final Map<String, AspectOrAffected> aspectOrAffectedMap;
     private PluginManager pluginManager;
     private PluginDescriptor pluginDescriptor;
     private URLClassPath classesClassPath = new URLClassPath(new URL[0]);
-    private WeavingURLClassLoaderHelper weaver;
 
-    public IzouPluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, List<AspectOrAffected> aspectOrAffectedList) {
+    public IzouPluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
         super(new URL[0], parent);
         this.pluginManager = pluginManager;
         this.pluginDescriptor = pluginDescriptor;
-        //aspects.forEach(url -> this.aspectsOrAffected.put(url, null));
-        weaver = new WeavingURLClassLoaderHelper(new URL[0], this);
-        aspectOrAffectedList.stream()
-                .filter(AspectOrAffected::isAspect)
-                .map(AspectOrAffected::getDirectory)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(weaver::addURL);
-        aspectOrAffectedMap = aspectOrAffectedList.stream()
-                .collect(Collectors.toMap(AspectOrAffected::getClassName, Function.identity()));
-        aspectsOrAffectedClass = new ConcurrentHashMap<>();
-        ConcurrentMap<String, Class<?>> classes = aspectOrAffectedList.stream()
-                .collect(Collectors.toConcurrentMap(AspectOrAffected::getClassName, aspectOrAffected1 -> {
-                    if (aspectsOrAffectedClass.get(aspectOrAffected1.getClassName()) != null)
-                        return aspectsOrAffectedClass.get(aspectOrAffected1.getClassName());
-                    InputStream is = this.getResourceAsStream(aspectOrAffected1.getClassName().replace('.', '/') + ".class");
-                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-                    int nRead;
-                    byte[] data = new byte[16384];
-
-                    try {
-                        while ((nRead = is.read(data, 0, data.length)) != -1) {
-                            buffer.write(data, 0, nRead);
-                        }
-                    } catch (IOException e) {
-                        return null;
-                    }
-
-                    try {
-                        buffer.flush();
-                    } catch (IOException e) {
-                        return null;
-                    }
-                    byte[] array = buffer.toByteArray();
-                    try {
-                        Class aClass = weaver.defineClass(aspectOrAffected1.getClassName(), array,
-                                new CodeSource(aspectOrAffected1.getPath(), (Certificate[]) null));
-                        return aspectOrAffected1.getCallback().apply(aClass);
-                    } catch (IOException e) {
-                        return null;
-                    }
-                }));
-        aspectsOrAffectedClass.putAll(classes);
     }
 
     @Override
@@ -121,8 +62,6 @@ public class IzouPluginClassLoader extends URLClassLoader {
     @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
         log.debug("Received request to load class '{}'", className);
-        Class<?> weaved = checkAndWeave(className);
-        if (weaved != null) return weaved;
         // if the class it's a part of the plugin engine use parent class loader
         if (className.startsWith(PLUGIN_PACKAGE_PREFIX_PF4J)) {
             log.debug("Delegate the loading of class '{}' to parent", className);
@@ -153,15 +92,6 @@ public class IzouPluginClassLoader extends URLClassLoader {
             e.printStackTrace();
             throw e;
         }
-    }
-
-    /**
-     * checks if the class should be weaved and weaves it
-     * @param className the classname
-     * @return null if not eligible or an error occurred
-     */
-    private Class<?> checkAndWeave(String className) {
-        return aspectsOrAffectedClass.get(className);
     }
 
     /**
@@ -280,55 +210,5 @@ public class IzouPluginClassLoader extends URLClassLoader {
      */
     public PluginDescriptor getPluginDescriptor() {
         return pluginDescriptor;
-    }
-
-    private class WeavingURLClassLoaderHelper extends WeavingURLClassLoader {
-
-        public WeavingURLClassLoaderHelper(URL[] classURLs, URL[] aspectURLs, ClassLoader parent) {
-            super(classURLs, aspectURLs, parent);
-        }
-
-        public WeavingURLClassLoaderHelper(URL[] urls, ClassLoader parent) {
-            super(urls, parent);
-        }
-
-        /**
-         * Override to weave class using WeavingAdaptor
-         *
-         * @param name
-         * @param b
-         * @param cs
-         */
-        @Override
-        public Class defineClass(String name, byte[] b, CodeSource cs) throws IOException {
-            return super.defineClass(name, b, cs);
-        }
-
-        @Override
-        protected void addURL(URL url) {
-            super.addURL(url);
-        }
-
-        /**
-         * Loads the class with the specified <a href="#name">binary name</a>.
-         * This method searches for classes in the same manner as the {@link
-         * #loadClass(String, boolean)} method.  It is invoked by the Java virtual
-         * machine to resolve class references.  Invoking this method is equivalent
-         * to invoking {@link #loadClass(String, boolean) <tt>loadClass(name,
-         * false)</tt>}.
-         *
-         * @param name The <a href="#name">binary name</a> of the class
-         * @return The resulting <tt>Class</tt> object
-         * @throws ClassNotFoundException If the class was not found
-         */
-        @Override
-        public Class<?> loadClass(String name) throws ClassNotFoundException {
-            Class<?> aClass = checkAndWeave(name);
-            if (aClass != null) {
-                return aClass;
-            } else {
-                return super.loadClass(name);
-            }
-        }
     }
 }

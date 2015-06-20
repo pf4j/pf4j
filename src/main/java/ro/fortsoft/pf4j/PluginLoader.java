@@ -43,12 +43,11 @@ class PluginLoader {
     private PluginClasspath pluginClasspath;
     private IzouPluginClassLoader pluginClassLoader;
 
-    public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository, PluginClasspath pluginClasspath, List<AspectOrAffected> aspectOrAffectedList) {
+    public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository, PluginClasspath pluginClasspath, ClassLoader parent) {
         this.pluginRepository = pluginRepository;
         this.pluginClasspath = pluginClasspath;
 
-        ClassLoader parent = getClass().getClassLoader();
-        pluginClassLoader = new IzouPluginClassLoader(pluginManager, pluginDescriptor, parent, aspectOrAffectedList);
+        pluginClassLoader = new IzouPluginClassLoader(pluginManager, pluginDescriptor, parent);
         log.debug("Created class loader '{}'", pluginClassLoader);
     }
 
