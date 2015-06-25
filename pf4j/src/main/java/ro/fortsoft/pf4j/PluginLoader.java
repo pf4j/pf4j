@@ -25,7 +25,7 @@ import ro.fortsoft.pf4j.util.DirectoryFileFilter;
 import ro.fortsoft.pf4j.util.JarFileFilter;
 
 /**
- * Load all informations needed by a plugin.
+ * Load all information needed by a plugin.
  * This means add all jar files from 'lib' directory, 'classes'
  * to classpath.
  * It's a class for only the internal use.
