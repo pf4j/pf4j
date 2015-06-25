@@ -12,6 +12,7 @@
  */
 package ro.fortsoft.pf4j;
 
+import com.github.zafarkhaja.semver.Version;
 import java.io.File;
 import java.util.List;
 import java.util.Set;

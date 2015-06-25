@@ -12,38 +12,38 @@
  */
 package ro.fortsoft.pf4j;
 
+import com.github.zafarkhaja.semver.Version;
+
 /**
  * @author Decebal Suiu
  */
 public class PluginDependency {
 
-	private String pluginId;
-	private Version pluginVersion;
+    private String pluginId;
+    private String pluginVersionSupport;
 
-	public PluginDependency(String dependency) {
-		/*
-		 int index = dependency.indexOf(':');
-		 if (index == -1) {
-			 throw new IllegalArgumentException("Illegal dependency specifier "+ dependency);
-		 }
+    public PluginDependency(String dependency) {
+        int index = dependency.indexOf('@');
+        if (index == -1) {
+            this.pluginId = dependency;
+        } else {
 
-		 this.pluginId = dependency.substring(0, index);
-		 this.pluginVersion = Version.createVersion(dependency.substring(index + 1));
-		 */
-		this.pluginId = dependency;
-	}
+            this.pluginId = dependency.substring(0, index);
+            this.pluginVersionSupport = dependency.substring(index + 1);
+        }
+    }
 
-	public String getPluginId() {
-		return pluginId;
-	}
+    public String getPluginId() {
+        return pluginId;
+    }
 
-	public Version getPluginVersion() {
-		return pluginVersion;
-	}
+    public String getPluginVersionSupport() {
+        return pluginVersionSupport;
+    }
 
-	@Override
-	public String toString() {
-		return "PluginDependency [pluginId=" + pluginId + ", pluginVersion=" + pluginVersion + "]";
-	}
+    @Override
+    public String toString() {
+        return "PluginDependency [pluginId=" + pluginId + ", pluginVersionSupport=" + pluginVersionSupport + "]";
+    }
 
 }
