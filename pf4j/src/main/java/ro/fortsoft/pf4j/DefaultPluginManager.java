@@ -717,6 +717,11 @@ public class DefaultPluginManager implements PluginManager {
         pluginStatusProvider = createPluginStatusProvider();
         pluginRepository = createPluginRepository();
 
+        try {
+            pluginsDirectory = pluginsDirectory.getCanonicalFile();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
 	}
 
