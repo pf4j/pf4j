@@ -98,7 +98,9 @@ public class DefaultPluginManager implements PluginManager {
      * The plugins repository.
      */
     private PluginRepository pluginRepository;
-
+    
+    private PluginClassLoaderFactory pluginClassLoaderFactory;
+    
     /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
      */
@@ -211,6 +213,11 @@ public class DefaultPluginManager implements PluginManager {
                 try {
                     PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
                     log.info("Start plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+                    if (pluginWrapper.getPlugin() == null)
+                    {
+                        pluginWrapper.setPluginState(PluginState.DISABLED);
+                        continue;
+                    }
                     pluginWrapper.getPlugin().start();
                     pluginWrapper.setPluginState(PluginState.STARTED);
                     startedPlugins.add(pluginWrapper);
@@ -637,6 +644,11 @@ public class DefaultPluginManager implements PluginManager {
     protected PluginRepository createPluginRepository() {
         return new DefaultPluginRepository(pluginsDirectory, new ZipFileFilter());
     }
+    
+    protected PluginClassLoaderFactory createPluginClassLoaderFactory()
+    {
+       return new DefaultPluginClassLoaderFactory();
+    }
 
     protected boolean isPluginDisabled(String pluginId) {
     	return pluginStatusProvider.isPluginDisabled(pluginId);
@@ -828,4 +840,11 @@ public class DefaultPluginManager implements PluginManager {
         }
     }
 
+    @Override
+    public PluginClassLoaderFactory getPluginClassLoaderFactory() {
+        if (pluginClassLoaderFactory == null ) {
+            pluginClassLoaderFactory = createPluginClassLoaderFactory();
+        }
+        return pluginClassLoaderFactory;
+    }
 }

@@ -158,4 +158,6 @@ public interface PluginManager {
      * * @return the system version
      */
     public Version getSystemVersion();
+
+    public PluginClassLoaderFactory getPluginClassLoaderFactory();
 }

@@ -49,7 +49,7 @@ class PluginLoader {
         this.pluginClasspath = pluginClasspath;
 
         ClassLoader parent = getClass().getClassLoader();
-        pluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, parent);
+        pluginClassLoader = pluginManager.getPluginClassLoaderFactory().getPluginClassLoader(pluginManager, pluginDescriptor, parent);
         log.debug("Created class loader '{}'", pluginClassLoader);
     }
 
