@@ -325,7 +325,7 @@ public class DefaultPluginManager implements PluginManager {
             while (!dependents.isEmpty()) {
                 String dependent = dependents.remove(0);
                 stopPlugin(dependent, false);
-                dependents.addAll(dependencyResolver.getDependents(dependent));
+                dependents.addAll(0, dependencyResolver.getDependents(dependent));
             }
         }
 
