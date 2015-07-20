@@ -28,7 +28,8 @@ class DependencyResolver {
 	private static final Logger log = LoggerFactory.getLogger(DependencyResolver.class);
 
     private List<PluginWrapper> plugins;
-    private DirectedGraph<String> graph;
+    private DirectedGraph<String> dependenciesGraph;
+    private DirectedGraph<String> dependentsGraph;
 
 	public DependencyResolver(List<PluginWrapper> plugins) {
 		this.plugins = plugins;
@@ -36,15 +37,23 @@ class DependencyResolver {
         initGraph();
 	}
 
+    public List<String> getDependecies(String pluginsId) {
+        return dependenciesGraph.getNeighbors(pluginsId);
+    }
+
+    public List<String> getDependents(String pluginsId) {
+        return dependentsGraph.getNeighbors(pluginsId);
+    }
+
 	/**
 	 * Get the list of plugins in dependency sorted order.
 	 */
 	public List<PluginWrapper> getSortedPlugins() throws PluginException {
-		log.debug("Graph: {}", graph);
-		List<String> pluginsId = graph.reverseTopologicalSort();
+		log.debug("Graph: {}", dependenciesGraph);
+		List<String> pluginsId = dependenciesGraph.reverseTopologicalSort();
 
 		if (pluginsId == null) {
-			throw new CyclicDependencyException("Cyclic dependencies !!!" + graph.toString());
+			throw new CyclicDependencyException("Cyclic dependencies !!!" + dependenciesGraph.toString());
 		}
 
 		log.debug("Plugins order: {}", pluginsId);
@@ -58,7 +67,8 @@ class DependencyResolver {
 
     private void initGraph() {
         // create graph
-        graph = new DirectedGraph<>();
+        dependenciesGraph = new DirectedGraph<>();
+        dependentsGraph = new DirectedGraph<>();
 
         // populate graph
         for (PluginWrapper pluginWrapper : plugins) {
@@ -67,10 +77,12 @@ class DependencyResolver {
             List<PluginDependency> dependencies = descriptor.getDependencies();
             if (!dependencies.isEmpty()) {
                 for (PluginDependency dependency : dependencies) {
-                    graph.addEdge(pluginId, dependency.getPluginId());
+                    dependenciesGraph.addEdge(pluginId, dependency.getPluginId());
+                    dependentsGraph.addEdge(dependency.getPluginId(), pluginId);
                 }
             } else {
-                graph.addVertex(pluginId);
+                dependenciesGraph.addVertex(pluginId);
+                dependentsGraph.addVertex(pluginId);
             }
         }
     }
