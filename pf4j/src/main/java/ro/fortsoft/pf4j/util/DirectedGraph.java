@@ -69,6 +69,13 @@ public class DirectedGraph<V> {
         neighbors.get(from).remove(to);
     }
 
+    public List<V> getNeighbors(V vertex) {
+        if (neighbors.containsKey(vertex)) {
+        	return new ArrayList<V>();
+        }
+        return neighbors.get(vertex);
+    }
+
     /**
      * Report (as a Map) the out-degree of each vertex.
      */

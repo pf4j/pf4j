@@ -93,6 +93,7 @@ public class DefaultPluginManager implements PluginManager {
     private PluginFactory pluginFactory;
     private ExtensionFactory extensionFactory;
     private PluginStatusProvider pluginStatusProvider;
+    private DependencyResolver dependencyResolver;
 
     /**
      * The plugins repository.
@@ -297,6 +298,10 @@ public class DefaultPluginManager implements PluginManager {
      */
     @Override
     public PluginState stopPlugin(String pluginId) {
+        return stopPlugin(pluginId, true);
+    }
+
+    private PluginState stopPlugin(String pluginId, boolean stopDependents) {
     	if (!plugins.containsKey(pluginId)) {
     		throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
     	}
@@ -315,9 +320,14 @@ public class DefaultPluginManager implements PluginManager {
             return pluginState;
         }
 
-    	for (PluginDependency dependency : pluginDescriptor.getDependencies()) {
-    		stopPlugin(dependency.getPluginId());
-    	}
+        if (stopDependents) {
+            List<String> dependents = dependencyResolver.getDependents(pluginId);
+            while (!dependents.isEmpty()) {
+                String dependent = dependents.remove(0);
+                stopPlugin(dependent, false);
+                dependents.addAll(dependencyResolver.getDependents(dependent));
+            }
+        }
 
     	try {
     		log.info("Stop plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
@@ -813,7 +823,7 @@ public class DefaultPluginManager implements PluginManager {
 	}
 
 	private void resolveDependencies() throws PluginException {
-		DependencyResolver dependencyResolver = new DependencyResolver(unresolvedPlugins);
+		dependencyResolver = new DependencyResolver(unresolvedPlugins);
 		resolvedPlugins = dependencyResolver.getSortedPlugins();
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
         	unresolvedPlugins.remove(pluginWrapper);
