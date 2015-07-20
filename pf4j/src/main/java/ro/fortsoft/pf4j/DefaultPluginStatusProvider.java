@@ -56,11 +56,11 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
 
     @Override
     public boolean isPluginDisabled(String pluginId) {
-        if (enabledPlugins.isEmpty()) {
-            return disabledPlugins.contains(pluginId);
+        if (disabledPlugins.contains(pluginId)) {
+            return true;
         }
 
-        return !enabledPlugins.contains(pluginId);
+        return !enabledPlugins.isEmpty() && !enabledPlugins.contains(pluginId);
     }
 
     @Override
