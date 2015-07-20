@@ -76,6 +76,8 @@ public class DefaultPluginRepositoryTest {
 
         assertEquals(true, instance.deletePluginArchive("/plugin-1"));
 
+        assertEquals(false, instance.deletePluginArchive("/plugin-3"));
+
         List<File> result = instance.getPluginArchives();
 
         assertEquals(1, result.size());
