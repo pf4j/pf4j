@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Mario Franco.
+ * Copyright 2015 Decebal Suiu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  *
@@ -71,9 +74,9 @@ public class DefaultPluginStatusProviderTest {
         setUpEnabled();
         DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
 
-        assertEquals(false, instance.isPluginDisabled("plugin-1"));
-        assertEquals(true, instance.isPluginDisabled("plugin-2"));
-        assertEquals(true, instance.isPluginDisabled("plugin-3"));
+        assertFalse(instance.isPluginDisabled("plugin-1"));
+        assertTrue(instance.isPluginDisabled("plugin-2"));
+        assertTrue(instance.isPluginDisabled("plugin-3"));
     }
 
     /**
@@ -83,9 +86,9 @@ public class DefaultPluginStatusProviderTest {
     public void testIsPluginDisabledWithEnableEmpty() {
         DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
 
-        assertEquals(false, instance.isPluginDisabled("plugin-1"));
-        assertEquals(true, instance.isPluginDisabled("plugin-2"));
-        assertEquals(false, instance.isPluginDisabled("plugin-3"));
+        assertFalse(instance.isPluginDisabled("plugin-1"));
+        assertTrue(instance.isPluginDisabled("plugin-2"));
+        assertFalse(instance.isPluginDisabled("plugin-3"));
     }
 
     /**
@@ -96,10 +99,10 @@ public class DefaultPluginStatusProviderTest {
         setUpEnabled();
         DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
 
-        assertEquals(true, instance.disablePlugin("plugin-1"));
-        assertEquals(true, instance.isPluginDisabled("plugin-1"));
-        assertEquals(true, instance.isPluginDisabled("plugin-2"));
-        assertEquals(true, instance.isPluginDisabled("plugin-3"));
+        assertTrue(instance.disablePlugin("plugin-1"));
+        assertTrue(instance.isPluginDisabled("plugin-1"));
+        assertTrue(instance.isPluginDisabled("plugin-2"));
+        assertTrue(instance.isPluginDisabled("plugin-3"));
     }
 
     /**
@@ -109,10 +112,10 @@ public class DefaultPluginStatusProviderTest {
     public void testDisablePluginWithEnableEmpty() {
         DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
 
-        assertEquals(true, instance.disablePlugin("plugin-1"));
-        assertEquals(true, instance.isPluginDisabled("plugin-1"));
-        assertEquals(true, instance.isPluginDisabled("plugin-2"));
-        assertEquals(false, instance.isPluginDisabled("plugin-3"));
+        assertTrue(instance.disablePlugin("plugin-1"));
+        assertTrue(instance.isPluginDisabled("plugin-1"));
+        assertTrue(instance.isPluginDisabled("plugin-2"));
+        assertFalse(instance.isPluginDisabled("plugin-3"));
     }
 
     /**
@@ -123,10 +126,10 @@ public class DefaultPluginStatusProviderTest {
         setUpEnabled();
         DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
 
-        assertEquals(true, instance.enablePlugin("plugin-2"));
-        assertEquals(false, instance.isPluginDisabled("plugin-1"));
-        assertEquals(false, instance.isPluginDisabled("plugin-2"));
-        assertEquals(true, instance.isPluginDisabled("plugin-3"));
+        assertTrue(instance.enablePlugin("plugin-2"));
+        assertFalse(instance.isPluginDisabled("plugin-1"));
+        assertFalse(instance.isPluginDisabled("plugin-2"));
+        assertTrue(instance.isPluginDisabled("plugin-3"));
     }
 
     /**
@@ -136,10 +139,10 @@ public class DefaultPluginStatusProviderTest {
     public void testEnablePluginWithEnableEmpty() {
         DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
 
-        assertEquals(true, instance.enablePlugin("plugin-2"));
-        assertEquals(false, instance.isPluginDisabled("plugin-1"));
-        assertEquals(false, instance.isPluginDisabled("plugin-2"));
-        assertEquals(false, instance.isPluginDisabled("plugin-3"));
+        assertTrue(instance.enablePlugin("plugin-2"));
+        assertFalse(instance.isPluginDisabled("plugin-1"));
+        assertFalse(instance.isPluginDisabled("plugin-2"));
+        assertFalse(instance.isPluginDisabled("plugin-3"));
     }
 
 }

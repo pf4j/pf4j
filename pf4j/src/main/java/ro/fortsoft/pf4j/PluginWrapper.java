@@ -54,7 +54,7 @@ public class PluginWrapper {
 	 * for this plug-in. The class loader can be used to directly access
 	 * plug-in resources and classes.
 	 */
-    public PluginClassLoader getPluginClassLoader() {
+    public ClassLoader getPluginClassLoader() {
     	return pluginClassLoader;
     }
 
