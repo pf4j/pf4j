@@ -14,15 +14,26 @@ package ro.fortsoft.pf4j;
 
 import com.github.zafarkhaja.semver.Version;
 import com.github.zafarkhaja.semver.expr.Expression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ro.fortsoft.pf4j.util.AndFileFilter;
+import ro.fortsoft.pf4j.util.DirectoryFileFilter;
+import ro.fortsoft.pf4j.util.FileUtils;
+import ro.fortsoft.pf4j.util.HiddenFilter;
+import ro.fortsoft.pf4j.util.NotFileFilter;
+import ro.fortsoft.pf4j.util.Unzip;
+import ro.fortsoft.pf4j.util.ZipFileFilter;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ro.fortsoft.pf4j.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Default implementation of the PluginManager interface.
