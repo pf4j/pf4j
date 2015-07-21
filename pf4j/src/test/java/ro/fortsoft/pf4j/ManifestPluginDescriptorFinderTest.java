@@ -18,8 +18,6 @@ package ro.fortsoft.pf4j;
 import com.github.zafarkhaja.semver.Version;
 import java.io.File;
 import java.net.URL;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,14 +28,6 @@ import static org.junit.Assert.assertTrue;
  * @author Mario Franco
  */
 public class ManifestPluginDescriptorFinderTest {
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test of find method, of class ManifestPluginDescriptorFinder.

@@ -20,7 +20,7 @@ import com.github.zafarkhaja.semver.Version;
 public class PluginDependency {
 
     private String pluginId;
-    private String pluginVersionSupport;
+    private String pluginVersionSupport = "*";
 
     public PluginDependency(String dependency) {
         int index = dependency.indexOf('@');
@@ -29,7 +29,9 @@ public class PluginDependency {
         } else {
 
             this.pluginId = dependency.substring(0, index);
-            this.pluginVersionSupport = dependency.substring(index + 1);
+            if (dependency.length() > index + 1) {
+                this.pluginVersionSupport = dependency.substring(index + 1);
+            }
         }
     }
 
