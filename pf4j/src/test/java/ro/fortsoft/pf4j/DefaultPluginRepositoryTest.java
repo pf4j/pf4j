@@ -15,23 +15,21 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import ro.fortsoft.pf4j.util.ZipFileFilter;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 /**
- *
  * @author Mario Franco
  */
 public class DefaultPluginRepositoryTest {
@@ -51,14 +49,13 @@ public class DefaultPluginRepositoryTest {
      */
     @Test
     public void testGetPluginArchives() {
-
         DefaultPluginRepository instance = new DefaultPluginRepository(testFolder.getRoot(), new ZipFileFilter());
 
         List<File> result = instance.getPluginArchives();
 
         assertEquals(2, result.size());
-        assertEquals(result.get(0).getName(), "plugin-1.zip");
-        assertEquals(result.get(1).getName(), "plugin-2.zip");
+        assertFileExists(result, "plugin-1.zip");
+        assertFileExists(result, "plugin-2.zip");
     }
 
     /**
@@ -69,14 +66,25 @@ public class DefaultPluginRepositoryTest {
         DefaultPluginRepository instance = new DefaultPluginRepository(testFolder.getRoot(), new ZipFileFilter());
 
         assertTrue(instance.deletePluginArchive("/plugin-1"));
-
         assertFalse(instance.deletePluginArchive("/plugin-3"));
 
         List<File> result = instance.getPluginArchives();
 
         assertEquals(1, result.size());
         assertEquals(result.get(0).getName(), "plugin-2.zip");
+    }
 
+    public static void assertFileExists(List<File> files, String file) {
+        boolean found = false;
+
+        for (File f : files) {
+            if (f.getName().equals(file)) {
+                found = true;
+                break;
+            }
+        }
+
+        assertTrue("The directory must contains the file " + file, found);
     }
 
 }
