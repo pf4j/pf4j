@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Implementation-Title: Test Plugin #2
+Implementation-Version: 0.10.0-SNAPSHOT
+Archiver-Version: Plexus Archiver
+Built-By: Mario Franco
+Specification-Title: Test Plugin #2
+Implementation-Vendor-Id: ro.fortsoft.pf4j.demo
+Plugin-Provider: Decebal Suiu
+Plugin-Class: ro.fortsoft.pf4j.plugin.TestPlugin
+Created-By: Apache Maven 3.0.5
+Build-Jdk: 1.8.0_45
+Specification-Version: 0.10.0-SNAPSHOT
+

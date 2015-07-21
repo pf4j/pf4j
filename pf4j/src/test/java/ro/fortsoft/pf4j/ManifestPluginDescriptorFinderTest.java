@@ -85,6 +85,17 @@ public class ManifestPluginDescriptorFinderTest {
      * Test of find method, of class ManifestPluginDescriptorFinder.
      */
     @Test(expected = PluginException.class)
+    public void testFindMissingPluginId() throws Exception {
+
+        ManifestPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
+        URL url = getClass().getResource("/test-plugin-6");
+        PluginDescriptor result = instance.find(new File(url.getPath()));
+    }
+
+    /**
+     * Test of find method, of class ManifestPluginDescriptorFinder.
+     */
+    @Test(expected = PluginException.class)
     public void testFindMissingPluginClass() throws Exception {
 
         ManifestPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
