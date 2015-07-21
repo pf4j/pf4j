@@ -18,6 +18,7 @@ package ro.fortsoft.pf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import ro.fortsoft.pf4j.plugin.AnotherFailTestPlugin;
 import ro.fortsoft.pf4j.plugin.FailTestPlugin;
 import ro.fortsoft.pf4j.plugin.TestPlugin;
 
@@ -81,4 +82,23 @@ public class DefaultPluginFactoryTest {
         Plugin result = instance.create(pluginWrapper);
         assertNull(result);
     }
+
+    /**
+     * Test of create method, of class DefaultPluginFactory.
+     */
+    @Test
+    public void testCreateFailConstructor() {
+        PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
+        when(pluginDescriptor.getPluginClass()).thenReturn(AnotherFailTestPlugin.class.getName());
+
+        PluginWrapper pluginWrapper = mock(PluginWrapper.class);
+        when(pluginWrapper.getDescriptor()).thenReturn(pluginDescriptor);
+        when(pluginWrapper.getPluginClassLoader()).thenReturn(getClass().getClassLoader());
+
+        DefaultPluginFactory instance = new DefaultPluginFactory();
+
+        Plugin result = instance.create(pluginWrapper);
+        assertNull(result);
+    }
+
 }
