@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -40,9 +39,6 @@ public class DefaultPluginStatusProviderTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-
-    public DefaultPluginStatusProviderTest() {
-    }
 
     @Before
     public void setUp() throws IOException {
@@ -60,10 +56,6 @@ public class DefaultPluginStatusProviderTest {
             writer.write("plugin-1\r\n");
             writer.write("plugin-2\r\n");
         }
-    }
-
-    @After
-    public void tearDown() {
     }
 
     /**

@@ -28,17 +28,6 @@ import static org.junit.Assert.*;
  */
 public class DefaultExtensionFactoryTest {
 
-    public DefaultExtensionFactoryTest() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test of create method, of class DefaultExtensionFactory.
      */

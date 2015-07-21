@@ -39,18 +39,11 @@ public class DefaultPluginRepositoryTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    public DefaultPluginRepositoryTest() {
-    }
-
     @Before
     public void setUp() throws IOException {
         testFolder.newFile("plugin-1.zip");
         testFolder.newFile("plugin-2.zip");
         testFolder.newFile("plugin-3.zi_");
-    }
-
-    @After
-    public void tearDown() {
     }
 
     /**

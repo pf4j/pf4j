@@ -35,17 +35,6 @@ import static org.mockito.Mockito.when;
  */
 public class DefaultPluginFactoryTest {
 
-    public DefaultPluginFactoryTest() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test of create method, of class DefaultPluginFactory.
      */
