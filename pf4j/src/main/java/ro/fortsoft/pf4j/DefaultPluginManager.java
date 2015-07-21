@@ -31,10 +31,10 @@ import ro.fortsoft.pf4j.util.*;
  */
 public class DefaultPluginManager implements PluginManager {
 
-	private static final Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
 
-	public static final String DEFAULT_PLUGINS_DIRECTORY = "plugins";
-	public static final String DEVELOPMENT_PLUGINS_DIRECTORY = "../plugins";
+    public static final String DEFAULT_PLUGINS_DIRECTORY = "plugins";
+    public static final String DEVELOPMENT_PLUGINS_DIRECTORY = "../plugins";
 
     private File pluginsDirectory;
 
@@ -80,8 +80,7 @@ public class DefaultPluginManager implements PluginManager {
     private List<PluginStateListener> pluginStateListeners;
 
     /**
-     * Cache value for the runtime mode. No need to re-read it because it wont change at
-	 * runtime.
+     * Cache value for the runtime mode. No need to re-read it because it wont change at runtime.
      */
     private RuntimeMode runtimeMode;
 
@@ -98,9 +97,9 @@ public class DefaultPluginManager implements PluginManager {
      * The plugins repository.
      */
     private PluginRepository pluginRepository;
-    
+
     private PluginClassLoaderFactory pluginClassLoaderFactory;
-    
+
     /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
      */
@@ -113,7 +112,8 @@ public class DefaultPluginManager implements PluginManager {
     /**
      * Constructs DefaultPluginManager which the given plugins directory.
      *
-     * @param pluginsDirectory the directory to search for plugins
+     * @param pluginsDirectory
+     *            the directory to search for plugins
      */
     public DefaultPluginManager(File pluginsDirectory) {
         this.pluginsDirectory = pluginsDirectory;
@@ -123,22 +123,22 @@ public class DefaultPluginManager implements PluginManager {
 
     @Override
     public void setSystemVersion(Version version) {
-    	systemVersion = version;
+        systemVersion = version;
     }
 
     @Override
     public Version getSystemVersion() {
-    	return systemVersion;
+        return systemVersion;
     }
 
-	@Override
+    @Override
     public List<PluginWrapper> getPlugins() {
         return new ArrayList<>(plugins.values());
     }
 
     @Override
     public List<PluginWrapper> getPlugins(PluginState pluginState) {
-        List<PluginWrapper> plugins= new ArrayList<>();
+        List<PluginWrapper> plugins = new ArrayList<>();
         for (PluginWrapper plugin : getPlugins()) {
             if (pluginState.equals(plugin.getPluginState())) {
                 plugins.add(plugin);
@@ -149,103 +149,109 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     @Override
-	public List<PluginWrapper> getResolvedPlugins() {
-		return resolvedPlugins;
-	}
+    public List<PluginWrapper> getResolvedPlugins() {
+        return resolvedPlugins;
+    }
 
-	@Override
+    @Override
     public List<PluginWrapper> getUnresolvedPlugins() {
-		return unresolvedPlugins;
-	}
+        return unresolvedPlugins;
+    }
 
-	@Override
-	public List<PluginWrapper> getStartedPlugins() {
-		return startedPlugins;
-	}
+    @Override
+    public List<PluginWrapper> getStartedPlugins() {
+        return startedPlugins;
+    }
 
     @Override
     public PluginWrapper getPlugin(String pluginId) {
         return plugins.get(pluginId);
     }
 
-	@Override
-	public String loadPlugin(File pluginArchiveFile) {
-		if ((pluginArchiveFile == null) || !pluginArchiveFile.exists()) {
-			throw new IllegalArgumentException(String.format("Specified plugin %s does not exist!", pluginArchiveFile));
-		}
+    @Override
+    public String loadPlugin(File pluginArchiveFile) {
+        if ((pluginArchiveFile == null) || !pluginArchiveFile.exists()) {
+            throw new IllegalArgumentException(String.format("Specified plugin %s does not exist!", pluginArchiveFile));
+        }
 
         log.debug("Loading plugin from '{}'", pluginArchiveFile);
 
-		File pluginDirectory = null;
-		try {
-			pluginDirectory = expandPluginArchive(pluginArchiveFile);
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		}
-		if ((pluginDirectory == null) || !pluginDirectory.exists()) {
-			throw new IllegalArgumentException(String.format("Failed to expand %s", pluginArchiveFile));
-		}
+        File pluginDirectory = null;
+        try {
+            pluginDirectory = expandPluginArchive(pluginArchiveFile);
+        }
+        catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        if ((pluginDirectory == null) || !pluginDirectory.exists()) {
+            throw new IllegalArgumentException(String.format("Failed to expand %s", pluginArchiveFile));
+        }
 
-		try {
-			PluginWrapper pluginWrapper = loadPluginDirectory(pluginDirectory);
-			// TODO uninstalled plugin dependencies?
-        	unresolvedPlugins.remove(pluginWrapper);
-        	resolvedPlugins.add(pluginWrapper);
+        try {
+            PluginWrapper pluginWrapper = loadPluginDirectory(pluginDirectory);
+            // TODO uninstalled plugin dependencies?
+            unresolvedPlugins.remove(pluginWrapper);
+            resolvedPlugins.add(pluginWrapper);
 
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, null));
 
-			return pluginWrapper.getDescriptor().getPluginId();
-		} catch (PluginException e) {
-			log.error(e.getMessage(), e);
-		}
+            return pluginWrapper.getDescriptor().getPluginId();
+        }
+        catch (PluginException e) {
+            log.error(e.getMessage(), e);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
     /**
      * Start all active plugins.
      */
-	@Override
+    @Override
     public void startPlugins() {
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
             PluginState pluginState = pluginWrapper.getPluginState();
-            if ((PluginState.DISABLED != pluginState) && (PluginState.STARTED != pluginState)) {
-                try {
-                    PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
-                    log.info("Start plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
-                    if (pluginWrapper.getPlugin() == null)
-                    {
-                        pluginWrapper.setPluginState(PluginState.DISABLED);
-                        continue;
-                    }
-                    pluginWrapper.getPlugin().start();
-                    pluginWrapper.setPluginState(PluginState.STARTED);
-                    startedPlugins.add(pluginWrapper);
 
-                    firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-                } catch (PluginException e) {
-                    log.error(e.getMessage(), e);
+            if ((PluginState.DISABLED != pluginState) && (PluginState.STARTED != pluginState)) {
+
+                PluginState newState;
+
+                try {
+                    pluginWrapper.getPlugin().start();
+                    startedPlugins.add(pluginWrapper);
+                    newState = PluginState.STARTED;
+                    log.info("Started plugin '{}:{}'", pluginWrapper.getDescriptor().getPluginId(), pluginWrapper
+                            .getDescriptor().getVersion());
                 }
+                catch (Exception e) {
+                    // catch all exceptions as we still want to try and start other plugins
+                    newState = PluginState.DISABLED;
+                    log.warn(String.format("Unable to start '%s:%s'...", pluginWrapper.getDescriptor().getPluginId(),
+                            pluginWrapper.getDescriptor().getVersion()), e);
+                }
+
+                pluginWrapper.setPluginState(newState);
+                firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
             }
         }
     }
 
-	/**
+    /**
      * Start the specified plugin and it's dependencies.
      */
     @Override
     public PluginState startPlugin(String pluginId) {
-    	if (!plugins.containsKey(pluginId)) {
-    		throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
-    	}
+        if (!plugins.containsKey(pluginId)) {
+            throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
+        }
 
-    	PluginWrapper pluginWrapper = getPlugin(pluginId);
-    	PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
+        PluginWrapper pluginWrapper = getPlugin(pluginId);
+        PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
-    	if (PluginState.STARTED == pluginState) {
-    		log.debug("Already started plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
-    		return PluginState.STARTED;
-    	}
+        if (PluginState.STARTED == pluginState) {
+            log.debug("Already started plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            return PluginState.STARTED;
+        }
 
         if (PluginState.DISABLED == pluginState) {
             // automatically enable plugin on manual plugin start
@@ -255,21 +261,22 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         for (PluginDependency dependency : pluginDescriptor.getDependencies()) {
-    		startPlugin(dependency.getPluginId());
-    	}
+            startPlugin(dependency.getPluginId());
+        }
 
-    	try {
-    		log.info("Start plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
-    		pluginWrapper.getPlugin().start();
-    		pluginWrapper.setPluginState(PluginState.STARTED);
-    		startedPlugins.add(pluginWrapper);
+        try {
+            log.info("Start plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            pluginWrapper.getPlugin().start();
+            pluginWrapper.setPluginState(PluginState.STARTED);
+            startedPlugins.add(pluginWrapper);
 
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-        } catch (PluginException e) {
-    		log.error(e.getMessage(), e);
-    	}
+        }
+        catch (PluginException e) {
+            log.error(e.getMessage(), e);
+        }
 
-    	return pluginWrapper.getPluginState();
+        return pluginWrapper.getPluginState();
     }
 
     /**
@@ -277,11 +284,11 @@ public class DefaultPluginManager implements PluginManager {
      */
     @Override
     public void stopPlugins() {
-    	// stop started plugins in reverse order
-    	Collections.reverse(startedPlugins);
-    	Iterator<PluginWrapper> itr = startedPlugins.iterator();
+        // stop started plugins in reverse order
+        Collections.reverse(startedPlugins);
+        Iterator<PluginWrapper> itr = startedPlugins.iterator();
         while (itr.hasNext()) {
-        	PluginWrapper pluginWrapper = itr.next();
+            PluginWrapper pluginWrapper = itr.next();
             PluginState pluginState = pluginWrapper.getPluginState();
             if (PluginState.STARTED == pluginState) {
                 try {
@@ -292,7 +299,8 @@ public class DefaultPluginManager implements PluginManager {
                     itr.remove();
 
                     firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-                } catch (PluginException e) {
+                }
+                catch (PluginException e) {
                     log.error(e.getMessage(), e);
                 }
             }
@@ -304,17 +312,17 @@ public class DefaultPluginManager implements PluginManager {
      */
     @Override
     public PluginState stopPlugin(String pluginId) {
-    	if (!plugins.containsKey(pluginId)) {
-    		throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
-    	}
+        if (!plugins.containsKey(pluginId)) {
+            throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
+        }
 
-    	PluginWrapper pluginWrapper = getPlugin(pluginId);
-    	PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
+        PluginWrapper pluginWrapper = getPlugin(pluginId);
+        PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
-    	if (PluginState.STOPPED == pluginState) {
-    		log.debug("Already stopped plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
-    		return PluginState.STOPPED;
-    	}
+        if (PluginState.STOPPED == pluginState) {
+            log.debug("Already stopped plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            return PluginState.STOPPED;
+        }
 
         // test for disabled plugin
         if (PluginState.DISABLED == pluginState) {
@@ -322,22 +330,23 @@ public class DefaultPluginManager implements PluginManager {
             return pluginState;
         }
 
-    	for (PluginDependency dependency : pluginDescriptor.getDependencies()) {
-    		stopPlugin(dependency.getPluginId());
-    	}
+        for (PluginDependency dependency : pluginDescriptor.getDependencies()) {
+            stopPlugin(dependency.getPluginId());
+        }
 
-    	try {
-    		log.info("Stop plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
-    		pluginWrapper.getPlugin().stop();
-    		pluginWrapper.setPluginState(PluginState.STOPPED);
-    		startedPlugins.remove(pluginWrapper);
+        try {
+            log.info("Stop plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            pluginWrapper.getPlugin().stop();
+            pluginWrapper.setPluginState(PluginState.STOPPED);
+            startedPlugins.remove(pluginWrapper);
 
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-    	} catch (PluginException e) {
-    		log.error(e.getMessage(), e);
-    	}
+        }
+        catch (PluginException e) {
+            log.error(e.getMessage(), e);
+        }
 
-    	return pluginWrapper.getPluginState();
+        return pluginWrapper.getPluginState();
     }
 
     /**
@@ -345,8 +354,8 @@ public class DefaultPluginManager implements PluginManager {
      */
     @Override
     public void loadPlugins() {
-    	log.debug("Lookup plugins in '{}'", pluginsDirectory.getAbsolutePath());
-    	// check for plugins directory
+        log.debug("Lookup plugins in '{}'", pluginsDirectory.getAbsolutePath());
+        // check for plugins directory
         if (!pluginsDirectory.exists() || !pluginsDirectory.isDirectory()) {
             log.error("No '{}' directory", pluginsDirectory.getAbsolutePath());
             return;
@@ -357,7 +366,8 @@ public class DefaultPluginManager implements PluginManager {
         for (File archiveFile : pluginArchives) {
             try {
                 expandPluginArchive(archiveFile);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 log.error(e.getMessage(), e);
             }
         }
@@ -369,67 +379,70 @@ public class DefaultPluginManager implements PluginManager {
         FileFilter pluginsFilter = new AndFileFilter(filterList);
         File[] directories = pluginsDirectory.listFiles(pluginsFilter);
         if (directories == null) {
-        	directories = new File[0];
+            directories = new File[0];
         }
         log.debug("Found {} possible plugins: {}", directories.length, directories);
         if (directories.length == 0) {
-        	log.info("No plugins");
-        	return;
+            log.info("No plugins");
+            return;
         }
 
         // load any plugin from plugins directory
-       	for (File directory : directories) {
-       		try {
-       			loadPluginDirectory(directory);
-    		} catch (PluginException e) {
-    			log.error(e.getMessage(), e);
-    		}
-       	}
+        for (File directory : directories) {
+            try {
+                loadPluginDirectory(directory);
+            }
+            catch (PluginException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
 
         // resolve 'unresolvedPlugins'
         try {
-			resolvePlugins();
-		} catch (PluginException e) {
-			log.error(e.getMessage(), e);
-		}
+            resolvePlugins();
+        }
+        catch (PluginException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     @Override
     public boolean unloadPlugin(String pluginId) {
-    	try {
-    		PluginState pluginState = stopPlugin(pluginId);
-    		if (PluginState.STARTED == pluginState) {
-    			return false;
-    		}
+        try {
+            PluginState pluginState = stopPlugin(pluginId);
+            if (PluginState.STARTED == pluginState) {
+                return false;
+            }
 
-    		PluginWrapper pluginWrapper = getPlugin(pluginId);
-    		PluginDescriptor descriptor = pluginWrapper.getDescriptor();
-    		List<PluginDependency> dependencies = descriptor.getDependencies();
-    		for (PluginDependency dependency : dependencies) {
-    			if (!unloadPlugin(dependency.getPluginId())) {
-    				return false;
-    			}
-    		}
+            PluginWrapper pluginWrapper = getPlugin(pluginId);
+            PluginDescriptor descriptor = pluginWrapper.getDescriptor();
+            List<PluginDependency> dependencies = descriptor.getDependencies();
+            for (PluginDependency dependency : dependencies) {
+                if (!unloadPlugin(dependency.getPluginId())) {
+                    return false;
+                }
+            }
 
-    		// remove the plugin
-    		plugins.remove(pluginId);
-    		resolvedPlugins.remove(pluginWrapper);
-    		pathToIdMap.remove(pluginWrapper.getPluginPath());
+            // remove the plugin
+            plugins.remove(pluginId);
+            resolvedPlugins.remove(pluginWrapper);
+            pathToIdMap.remove(pluginWrapper.getPluginPath());
 
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
 
-    		// remove the classloader
-    		if (pluginClassLoaders.containsKey(pluginId)) {
-    			PluginClassLoader classLoader = pluginClassLoaders.remove(pluginId);
+            // remove the classloader
+            if (pluginClassLoaders.containsKey(pluginId)) {
+                PluginClassLoader classLoader = pluginClassLoaders.remove(pluginId);
                 classLoader.dispose();
-    		}
+            }
 
-    		return true;
-    	} catch (IllegalArgumentException e) {
-    		// ignore not found exceptions because this method is recursive
-    	}
+            return true;
+        }
+        catch (IllegalArgumentException e) {
+            // ignore not found exceptions because this method is recursive
+        }
 
-    	return false;
+        return false;
     }
 
     @Override
@@ -442,8 +455,8 @@ public class DefaultPluginManager implements PluginManager {
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
         if (PluginState.DISABLED == pluginState) {
-        	log.debug("Already disabled plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
-           	return true;
+            log.debug("Already disabled plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            return true;
         }
 
         if (PluginState.STOPPED == stopPlugin(pluginId)) {
@@ -470,9 +483,9 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
-       	if (!isPluginValid(pluginWrapper)) {
-        	log.warn("Plugin '{}:{}' can not be enabled", pluginWrapper.getPluginId(),
-        			pluginWrapper.getDescriptor().getVersion());
+        if (!isPluginValid(pluginWrapper)) {
+            log.warn("Plugin '{}:{}' can not be enabled", pluginWrapper.getPluginId(), pluginWrapper.getDescriptor()
+                    .getVersion());
             return false;
         }
 
@@ -497,52 +510,52 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     @Override
-	public boolean deletePlugin(String pluginId) {
-    	if (!plugins.containsKey(pluginId)) {
-    		throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
-    	}
+    public boolean deletePlugin(String pluginId) {
+        if (!plugins.containsKey(pluginId)) {
+            throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
+        }
 
-		PluginWrapper pluginWrapper = getPlugin(pluginId);
-		PluginState pluginState = stopPlugin(pluginId);
-		if (PluginState.STARTED == pluginState) {
-			log.error("Failed to stop plugin {} on delete", pluginId);
-			return false;
-		}
+        PluginWrapper pluginWrapper = getPlugin(pluginId);
+        PluginState pluginState = stopPlugin(pluginId);
+        if (PluginState.STARTED == pluginState) {
+            log.error("Failed to stop plugin {} on delete", pluginId);
+            return false;
+        }
 
-		if (!unloadPlugin(pluginId)) {
-			log.error("Failed to unload plugin {} on delete", pluginId);
-			return false;
-		}
+        if (!unloadPlugin(pluginId)) {
+            log.error("Failed to unload plugin {} on delete", pluginId);
+            return false;
+        }
 
-		File pluginFolder = new File(pluginsDirectory, pluginWrapper.getPluginPath());
+        File pluginFolder = new File(pluginsDirectory, pluginWrapper.getPluginPath());
 
-		if (pluginFolder.exists()) {
-			FileUtils.delete(pluginFolder);
-		}
+        if (pluginFolder.exists()) {
+            FileUtils.delete(pluginFolder);
+        }
 
         pluginRepository.deletePluginArchive(pluginWrapper.getPluginPath());
 
-		return true;
-	}
+        return true;
+    }
 
     /**
      * Get plugin class loader for this path.
      */
     @Override
     public PluginClassLoader getPluginClassLoader(String pluginId) {
-    	return pluginClassLoaders.get(pluginId);
+        return pluginClassLoaders.get(pluginId);
     }
 
     @Override
-	public <T> List<T> getExtensions(Class<T> type) {
-		List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
-		List<T> extensions = new ArrayList<>(extensionsWrapper.size());
-		for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-			extensions.add(extensionWrapper.getExtension());
-		}
+    public <T> List<T> getExtensions(Class<T> type) {
+        List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
+        List<T> extensions = new ArrayList<>(extensionsWrapper.size());
+        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
+            extensions.add(extensionWrapper.getExtension());
+        }
 
-		return extensions;
-	}
+        return extensions;
+    }
 
     @Override
     public Set<String> getExtensionClassNames(String pluginId) {
@@ -550,15 +563,15 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     @Override
-	public RuntimeMode getRuntimeMode() {
-    	if (runtimeMode == null) {
-        	// retrieves the runtime mode from system
-        	String modeAsString = System.getProperty("pf4j.mode", RuntimeMode.DEPLOYMENT.toString());
-        	runtimeMode = RuntimeMode.byName(modeAsString);
-    	}
+    public RuntimeMode getRuntimeMode() {
+        if (runtimeMode == null) {
+            // retrieves the runtime mode from system
+            String modeAsString = System.getProperty("pf4j.mode", RuntimeMode.DEPLOYMENT.toString());
+            runtimeMode = RuntimeMode.byName(modeAsString);
+        }
 
-		return runtimeMode;
-	}
+        return runtimeMode;
+    }
 
     /**
      * Retrieves the {@link PluginWrapper} that loaded the given class 'clazz'.
@@ -567,7 +580,7 @@ public class DefaultPluginManager implements PluginManager {
         ClassLoader classLoader = clazz.getClassLoader();
         for (PluginWrapper plugin : resolvedPlugins) {
             if (plugin.getPluginClassLoader() == classLoader) {
-            	return plugin;
+                return plugin;
             }
         }
         log.warn("Failed to find the plugin for {}", clazz);
@@ -600,41 +613,38 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     /**
-	 * Add the possibility to override the PluginDescriptorFinder.
-	 * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
-	 * PropertiesPluginDescriptorFinder is returned else this method returns
-	 * DefaultPluginDescriptorFinder.
-	 */
+     * Add the possibility to override the PluginDescriptorFinder. By default if getRuntimeMode() returns
+     * RuntimeMode.DEVELOPMENT than a PropertiesPluginDescriptorFinder is returned else this method returns
+     * DefaultPluginDescriptorFinder.
+     */
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
-    	if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
-    		return new PropertiesPluginDescriptorFinder();
-    	}
+        if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
+            return new PropertiesPluginDescriptorFinder();
+        }
 
-    	return new DefaultPluginDescriptorFinder(pluginClasspath);
+        return new DefaultPluginDescriptorFinder(pluginClasspath);
     }
 
     /**
      * Add the possibility to override the ExtensionFinder.
      */
     protected ExtensionFinder createExtensionFinder() {
-    	DefaultExtensionFinder extensionFinder = new DefaultExtensionFinder(this, extensionFactory);
+        DefaultExtensionFinder extensionFinder = new DefaultExtensionFinder(this, extensionFactory);
         addPluginStateListener(extensionFinder);
 
         return extensionFinder;
     }
 
     /**
-     * Add the possibility to override the PluginClassPath.
-     * By default if getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
-	 * DevelopmentPluginClasspath is returned else this method returns
-	 * PluginClasspath.
+     * Add the possibility to override the PluginClassPath. By default if getRuntimeMode() returns
+     * RuntimeMode.DEVELOPMENT than a DevelopmentPluginClasspath is returned else this method returns PluginClasspath.
      */
     protected PluginClasspath createPluginClasspath() {
-    	if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
-    		return new DevelopmentPluginClasspath();
-    	}
+        if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
+            return new DevelopmentPluginClasspath();
+        }
 
-    	return new PluginClasspath();
+        return new PluginClasspath();
     }
 
     protected PluginStatusProvider createPluginStatusProvider() {
@@ -646,48 +656,45 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     protected boolean isPluginDisabled(String pluginId) {
-    	return pluginStatusProvider.isPluginDisabled(pluginId);
+        return pluginStatusProvider.isPluginDisabled(pluginId);
     }
 
     protected boolean isPluginValid(PluginWrapper pluginWrapper) {
-    	Expression requires = pluginWrapper.getDescriptor().getRequires();
-    	Version system = getSystemVersion();
-    	if (requires.interpret(system)) {
-    		return true;
-    	}
+        Expression requires = pluginWrapper.getDescriptor().getRequires();
+        Version system = getSystemVersion();
+        if (requires.interpret(system)) {
+            return true;
+        }
 
-    	log.warn("Plugin '{}:{}' requires a minimum system version of {}",
-    			pluginWrapper.getPluginId(),
-    			pluginWrapper.getDescriptor().getVersion(),
-    			requires);
+        log.warn("Plugin '{}:{}' requires a minimum system version of {}", pluginWrapper.getPluginId(), pluginWrapper
+                .getDescriptor().getVersion(), requires);
 
-    	return false;
+        return false;
     }
 
     protected FileFilter createHiddenPluginFilter() {
-    	return new HiddenFilter();
+        return new HiddenFilter();
     }
 
     /**
-     * Add the possibility to override the plugins directory.
-     * If a "pf4j.pluginsDir" system property is defined than this method returns
-     * that directory.
-     * If getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
-	 * DEVELOPMENT_PLUGINS_DIRECTORY ("../plugins") is returned else this method returns
-	 * DEFAULT_PLUGINS_DIRECTORY ("plugins").
+     * Add the possibility to override the plugins directory. If a "pf4j.pluginsDir" system property is defined than
+     * this method returns that directory. If getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
+     * DEVELOPMENT_PLUGINS_DIRECTORY ("../plugins") is returned else this method returns DEFAULT_PLUGINS_DIRECTORY
+     * ("plugins").
+     * 
      * @return
      */
     protected File createPluginsDirectory() {
-    	String pluginsDir = System.getProperty("pf4j.pluginsDir");
-    	if (pluginsDir == null) {
-    		if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
-    			pluginsDir = DEVELOPMENT_PLUGINS_DIRECTORY;
-    		} else {
-    			pluginsDir = DEFAULT_PLUGINS_DIRECTORY;
-    		}
-    	}
+        String pluginsDir = System.getProperty("pf4j.pluginsDir");
+        if (pluginsDir == null) {
+            if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
+                pluginsDir = DEVELOPMENT_PLUGINS_DIRECTORY;
+            } else {
+                pluginsDir = DEFAULT_PLUGINS_DIRECTORY;
+            }
+        }
 
-    	return new File(pluginsDir);
+        return new File(pluginsDir);
     }
 
     /**
@@ -705,7 +712,7 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     private void initialize() {
-		plugins = new HashMap<>();
+        plugins = new HashMap<>();
         pluginClassLoaders = new HashMap<>();
         pathToIdMap = new HashMap<>();
         unresolvedPlugins = new ArrayList<>();
@@ -726,15 +733,16 @@ public class DefaultPluginManager implements PluginManager {
 
         try {
             pluginsDirectory = pluginsDirectory.getCanonicalFile();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             log.error(e.getMessage(), e);
         }
         System.setProperty("pf4j.pluginsDir", pluginsDirectory.getAbsolutePath());
-	}
+    }
 
     private PluginWrapper loadPluginDirectory(File pluginDirectory) throws PluginException {
         // try to load the plugin
-		String pluginName = pluginDirectory.getName();
+        String pluginName = pluginDirectory.getName();
         String pluginPath = "/".concat(pluginName);
 
         // test for plugin duplication
@@ -747,7 +755,7 @@ public class DefaultPluginManager implements PluginManager {
         PluginDescriptor pluginDescriptor = pluginDescriptorFinder.find(pluginDirectory);
         log.debug("Descriptor " + pluginDescriptor);
         String pluginClassName = pluginDescriptor.getPluginClass();
-        log.debug("Class '{}' for plugin '{}'",  pluginClassName, pluginPath);
+        log.debug("Class '{}' for plugin '{}'", pluginClassName, pluginPath);
 
         // load plugin
         log.debug("Loading plugin '{}'", pluginPath);
@@ -757,7 +765,8 @@ public class DefaultPluginManager implements PluginManager {
 
         // create the plugin wrapper
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
-        PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor, pluginPath, pluginLoader.getPluginClassLoader());
+        PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor, pluginPath,
+                pluginLoader.getPluginClassLoader());
         pluginWrapper.setPluginFactory(pluginFactory);
         pluginWrapper.setRuntimeMode(getRuntimeMode());
 
@@ -769,8 +778,8 @@ public class DefaultPluginManager implements PluginManager {
 
         // validate the plugin
         if (!isPluginValid(pluginWrapper)) {
-        	log.info("Plugin '{}' is disabled", pluginPath);
-        	pluginWrapper.setPluginState(PluginState.DISABLED);
+            log.info("Plugin '{}' is disabled", pluginPath);
+            pluginWrapper.setPluginState(PluginState.DISABLED);
         }
 
         log.debug("Created wrapper '{}' for plugin '{}'", pluginWrapper, pluginPath);
@@ -789,18 +798,18 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     private File expandPluginArchive(File pluginArchiveFile) throws IOException {
-    	String fileName = pluginArchiveFile.getName();
+        String fileName = pluginArchiveFile.getName();
         long pluginArchiveDate = pluginArchiveFile.lastModified();
         String pluginName = fileName.substring(0, fileName.length() - 4);
         File pluginDirectory = new File(pluginsDirectory, pluginName);
         // check if exists directory or the '.zip' file is "newer" than directory
         if (!pluginDirectory.exists() || (pluginArchiveDate > pluginDirectory.lastModified())) {
-        	log.debug("Expand plugin archive '{}' in '{}'", pluginArchiveFile, pluginDirectory);
+            log.debug("Expand plugin archive '{}' in '{}'", pluginArchiveFile, pluginDirectory);
 
-        	// do not overwrite an old version, remove it
-        	if (pluginDirectory.exists()) {
-        		FileUtils.delete(pluginDirectory);
-        	}
+            // do not overwrite an old version, remove it
+            if (pluginDirectory.exists()) {
+                FileUtils.delete(pluginDirectory);
+            }
             // create directory for plugin
             pluginDirectory.mkdirs();
 
@@ -814,18 +823,18 @@ public class DefaultPluginManager implements PluginManager {
         return pluginDirectory;
     }
 
-	private void resolvePlugins() throws PluginException {
-		resolveDependencies();
-	}
+    private void resolvePlugins() throws PluginException {
+        resolveDependencies();
+    }
 
-	private void resolveDependencies() throws PluginException {
-		DependencyResolver dependencyResolver = new DependencyResolver(unresolvedPlugins);
-		resolvedPlugins = dependencyResolver.getSortedPlugins();
+    private void resolveDependencies() throws PluginException {
+        DependencyResolver dependencyResolver = new DependencyResolver(unresolvedPlugins);
+        resolvedPlugins = dependencyResolver.getSortedPlugins();
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
-        	unresolvedPlugins.remove(pluginWrapper);
-        	log.info("Plugin '{}' resolved", pluginWrapper.getDescriptor().getPluginId());
+            unresolvedPlugins.remove(pluginWrapper);
+            log.info("Plugin '{}' resolved", pluginWrapper.getDescriptor().getPluginId());
         }
-	}
+    }
 
     private synchronized void firePluginStateEvent(PluginStateEvent event) {
         for (PluginStateListener listener : pluginStateListeners) {
@@ -836,7 +845,7 @@ public class DefaultPluginManager implements PluginManager {
 
     @Override
     public PluginClassLoaderFactory getPluginClassLoaderFactory() {
-        if (pluginClassLoaderFactory == null ) {
+        if (pluginClassLoaderFactory == null) {
             pluginClassLoaderFactory = new DefaultPluginClassLoaderFactory();
         }
         return pluginClassLoaderFactory;
