@@ -76,6 +76,24 @@ public class DefaultPluginFactoryTest {
      * Test of create method, of class DefaultPluginFactory.
      */
     @Test
+    public void testCreateFailNotFound() {
+        PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
+        when(pluginDescriptor.getPluginClass()).thenReturn("ro.fortsoft.pf4j.plugin.NotFoundTestPlugin");
+
+        PluginWrapper pluginWrapper = mock(PluginWrapper.class);
+        when(pluginWrapper.getDescriptor()).thenReturn(pluginDescriptor);
+        when(pluginWrapper.getPluginClassLoader()).thenReturn(getClass().getClassLoader());
+
+        DefaultPluginFactory instance = new DefaultPluginFactory();
+
+        Plugin result = instance.create(pluginWrapper);
+        assertNull(result);
+    }
+
+    /**
+     * Test of create method, of class DefaultPluginFactory.
+     */
+    @Test
     public void testCreateFailConstructor() {
         PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         when(pluginDescriptor.getPluginClass()).thenReturn(AnotherFailTestPlugin.class.getName());
