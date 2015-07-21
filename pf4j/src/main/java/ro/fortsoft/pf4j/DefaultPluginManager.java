@@ -644,11 +644,6 @@ public class DefaultPluginManager implements PluginManager {
     protected PluginRepository createPluginRepository() {
         return new DefaultPluginRepository(pluginsDirectory, new ZipFileFilter());
     }
-    
-    protected PluginClassLoaderFactory createPluginClassLoaderFactory()
-    {
-       return new DefaultPluginClassLoaderFactory();
-    }
 
     protected boolean isPluginDisabled(String pluginId) {
     	return pluginStatusProvider.isPluginDisabled(pluginId);
@@ -806,7 +801,6 @@ public class DefaultPluginManager implements PluginManager {
         	if (pluginDirectory.exists()) {
         		FileUtils.delete(pluginDirectory);
         	}
-
             // create directory for plugin
             pluginDirectory.mkdirs();
 
@@ -843,7 +837,7 @@ public class DefaultPluginManager implements PluginManager {
     @Override
     public PluginClassLoaderFactory getPluginClassLoaderFactory() {
         if (pluginClassLoaderFactory == null ) {
-            pluginClassLoaderFactory = createPluginClassLoaderFactory();
+            pluginClassLoaderFactory = new DefaultPluginClassLoaderFactory();
         }
         return pluginClassLoaderFactory;
     }
