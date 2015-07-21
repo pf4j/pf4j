@@ -31,7 +31,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class ManifestPluginDescriptorFinderTest {
 
-
     @Before
     public void setUp() {
     }
@@ -45,7 +44,7 @@ public class ManifestPluginDescriptorFinderTest {
      */
     @Test
     public void testFind() throws Exception {
-        ManifestPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
+        DefaultPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
         URL url = getClass().getResource("/test-plugin-1");
         PluginDescriptor plugin1 = instance.find(new File(url.getPath()));
         url = getClass().getResource("/test-plugin-2");
@@ -74,11 +73,33 @@ public class ManifestPluginDescriptorFinderTest {
     /**
      * Test of find method, of class ManifestPluginDescriptorFinder.
      */
-    @Test(expected=PluginException.class)
+    @Test(expected = PluginException.class)
     public void testFindNotFound() throws Exception {
 
         ManifestPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
         URL url = getClass().getResource("/test-plugin-3");
+        PluginDescriptor result = instance.find(new File(url.getPath()));
+    }
+
+    /**
+     * Test of find method, of class ManifestPluginDescriptorFinder.
+     */
+    @Test(expected = PluginException.class)
+    public void testFindMissingPluginClass() throws Exception {
+
+        ManifestPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
+        URL url = getClass().getResource("/test-plugin-4");
+        PluginDescriptor result = instance.find(new File(url.getPath()));
+    }
+
+    /**
+     * Test of find method, of class ManifestPluginDescriptorFinder.
+     */
+    @Test(expected = PluginException.class)
+    public void testFindMissingPluginVersion() throws Exception {
+
+        ManifestPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
+        URL url = getClass().getResource("/test-plugin-5");
         PluginDescriptor result = instance.find(new File(url.getPath()));
     }
 
