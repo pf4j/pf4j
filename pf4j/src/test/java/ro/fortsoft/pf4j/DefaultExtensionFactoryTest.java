@@ -18,6 +18,7 @@ package ro.fortsoft.pf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import ro.fortsoft.pf4j.plugin.FailTestExtension;
 import ro.fortsoft.pf4j.plugin.TestExtension;
 
 import static org.junit.Assert.*;
@@ -36,6 +37,16 @@ public class DefaultExtensionFactoryTest {
         DefaultExtensionFactory instance = new DefaultExtensionFactory();
         Object result = instance.create(TestExtension.class);
         assertNotNull(result);
+    }
+
+    /**
+     * Test of create method, of class DefaultExtensionFactory.
+     */
+    @Test
+    public void testCreateFailConstructor() {
+        DefaultExtensionFactory instance = new DefaultExtensionFactory();
+        Object result = instance.create(FailTestExtension.class);
+        assertNull(result);
     }
 
 }
