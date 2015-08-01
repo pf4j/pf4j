@@ -62,6 +62,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
     @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
         log.debug("Received request to load class '{}'", className);
+
         // if the class it's a part of the plugin engine use parent class loader
         if (className.startsWith(PLUGIN_PACKAGE_PREFIX_PF4J)) {
             log.debug("Delegate the loading of class '{}' to parent", className);
@@ -86,7 +87,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
         }
 
         try {
-            return loadCustomClass(className);
+            return customLoadClass(className);
         } catch (LinkageError e) {
             System.err.println("WTF");
             e.printStackTrace();
@@ -102,7 +103,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
      * @return the loaded class
      * @throws ClassNotFoundException thrown when the class was not able to be loaded
      */
-    private Class<?> loadCustomClass(String className) throws ClassNotFoundException {
+    private Class<?> customLoadClass(String className) throws ClassNotFoundException {
         Class<?> clazz;
 
         // nope, try to load locally from classes
