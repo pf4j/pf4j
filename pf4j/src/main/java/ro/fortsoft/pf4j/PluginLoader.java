@@ -12,22 +12,20 @@
  */
 package ro.fortsoft.pf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ro.fortsoft.pf4j.util.DirectoryFileFilter;
+import ro.fortsoft.pf4j.util.JarFileFilter;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Vector;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ro.fortsoft.pf4j.util.DirectoryFileFilter;
-import ro.fortsoft.pf4j.util.JarFileFilter;
-
 /**
  * Load all information needed by a plugin.
- * This means add all jar files from 'lib' directory, 'classes'
- * to classpath.
+ * This means add all jar files from 'lib' directory, 'classes' to classpath.
  * It's a class for only the internal use.
  *
  * @author Decebal Suiu
@@ -44,26 +42,15 @@ class PluginLoader {
     private PluginClasspath pluginClasspath;
     private PluginClassLoader pluginClassLoader;
 
-    public PluginLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, File pluginRepository, PluginClasspath pluginClasspath) {
+    public PluginLoader(File pluginRepository, PluginClassLoader pluginClassLoader, PluginClasspath pluginClasspath) {
         this.pluginRepository = pluginRepository;
+        this.pluginClassLoader = pluginClassLoader;
         this.pluginClasspath = pluginClasspath;
-
-        ClassLoader parent = getClass().getClassLoader();
-        pluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, parent);
-        log.debug("Created class loader '{}'", pluginClassLoader);
-    }
-
-    public File getPluginRepository() {
-        return pluginRepository;
     }
 
     public boolean load() {
         return loadClassesAndJars();
     }
-
-    public PluginClassLoader getPluginClassLoader() {
-		return pluginClassLoader;
-	}
 
 	private boolean loadClassesAndJars() {
        return loadClasses() && loadJars();

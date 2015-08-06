@@ -718,6 +718,13 @@ public class DefaultPluginManager implements PluginManager {
         return new DefaultExtensionFactory();
     }
 
+    /**
+     * Add the possibility to override the PluginClassLoader.
+     */
+    protected PluginClassLoader createPluginClassLoader(PluginDescriptor pluginDescriptor) {
+        return new PluginClassLoader(this, pluginDescriptor, getClass().getClassLoader());
+    }
+
     private void initialize() {
 		plugins = new HashMap<>();
         pluginClassLoaders = new HashMap<>();
@@ -765,13 +772,15 @@ public class DefaultPluginManager implements PluginManager {
 
         // load plugin
         log.debug("Loading plugin '{}'", pluginPath);
-        PluginLoader pluginLoader = new PluginLoader(this, pluginDescriptor, pluginDirectory, pluginClasspath);
+        PluginClassLoader pluginClassLoader = createPluginClassLoader(pluginDescriptor);
+        log.debug("Created class loader '{}'", pluginClassLoader);
+        PluginLoader pluginLoader = new PluginLoader(pluginDirectory, pluginClassLoader, pluginClasspath);
         pluginLoader.load();
         log.debug("Loaded plugin '{}'", pluginPath);
 
         // create the plugin wrapper
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
-        PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor, pluginPath, pluginLoader.getPluginClassLoader());
+        PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor, pluginPath, pluginClassLoader);
         pluginWrapper.setPluginFactory(pluginFactory);
         pluginWrapper.setRuntimeMode(getRuntimeMode());
 
@@ -796,7 +805,6 @@ public class DefaultPluginManager implements PluginManager {
         unresolvedPlugins.add(pluginWrapper);
 
         // add plugin class loader to the list with class loaders
-        PluginClassLoader pluginClassLoader = pluginLoader.getPluginClassLoader();
         pluginClassLoaders.put(pluginId, pluginClassLoader);
 
         return pluginWrapper;
