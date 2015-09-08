@@ -31,7 +31,7 @@ public class DefaultPluginFactory implements PluginFactory {
     /**
      * Creates a plugin instance. If an error occurs than that error is logged and the method returns null.
      * @param pluginWrapper
-     * @return
+     * @return a plugin instance
      */
     @Override
     public Plugin create(final PluginWrapper pluginWrapper) {

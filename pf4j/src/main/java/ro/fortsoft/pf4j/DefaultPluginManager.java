@@ -131,6 +131,23 @@ public class DefaultPluginManager implements PluginManager {
         initialize();
     }
 
+    /**
+     * Returns the currently used direcotry containing the plugins
+     * @return File pointing to the plugins directory
+     */
+    public File getPluginsDirectory() {
+        return pluginsDirectory;
+    }
+
+    /**
+     * Returns the PluginClasspath used by this plugin manager
+     * @return  the classpath used by this manager
+     */
+    protected PluginClasspath getPluginClasspath() {
+        return pluginClasspath;
+    }
+    
+
     @Override
     public void setSystemVersion(Version version) {
     	systemVersion = version;
@@ -689,7 +706,7 @@ public class DefaultPluginManager implements PluginManager {
      * If getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
 	 * DEVELOPMENT_PLUGINS_DIRECTORY ("../plugins") is returned else this method returns
 	 * DEFAULT_PLUGINS_DIRECTORY ("plugins").
-     * @return
+     * @return File pointing to the plugins directory
      */
     protected File createPluginsDirectory() {
     	String pluginsDir = System.getProperty("pf4j.pluginsDir");

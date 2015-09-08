@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Provides the functionality for plugin management such as load,
- * start and stop the plugins.
+ * Provides the functionality for plugin management such as load, start and stop
+ * the plugins.
  *
  * @author Decebal Suiu
  */
@@ -38,12 +38,12 @@ public interface PluginManager {
     /**
      * Retrieves all resolved plugins (with resolved dependency).
      */
-  	public List<PluginWrapper> getResolvedPlugins();
+    public List<PluginWrapper> getResolvedPlugins();
 
-	/**
-	 * Retrieves all unresolved plugins (with unresolved dependency).
-	 */
-  	public List<PluginWrapper> getUnresolvedPlugins();
+    /**
+     * Retrieves all unresolved plugins (with unresolved dependency).
+     */
+    public List<PluginWrapper> getUnresolvedPlugins();
 
     /**
      * Retrieves all started plugins.
@@ -69,7 +69,7 @@ public interface PluginManager {
      * @param pluginArchiveFile
      * @return the pluginId of the installed plugin or null
      */
-	public String loadPlugin(File pluginArchiveFile);
+    public String loadPlugin(File pluginArchiveFile);
 
     /**
      * Start all active plugins.
@@ -127,27 +127,27 @@ public interface PluginManager {
      */
     public boolean deletePlugin(String pluginId);
 
-	public PluginClassLoader getPluginClassLoader(String pluginId);
+    public PluginClassLoader getPluginClassLoader(String pluginId);
 
-	public <T> List<T> getExtensions(Class<T> type);
+    public <T> List<T> getExtensions(Class<T> type);
 
     public Set<String> getExtensionClassNames(String pluginId);
 
     /**
-	 * The runtime mode. Must currently be either DEVELOPMENT or DEPLOYMENT.
-	 */
-	public RuntimeMode getRuntimeMode();
+     * The runtime mode. Must currently be either DEVELOPMENT or DEPLOYMENT.
+     * @return the runtime mode
+     */
+    public RuntimeMode getRuntimeMode();
 
     public void addPluginStateListener(PluginStateListener listener);
 
     public void removePluginStateListener(PluginStateListener listener);
 
     /**
-     * Set the system version.  This is used to compare against the plugin
-     * requires attribute.  The default system version is 0.0.0 which
-     * disables all version checking.
+     * Set the system version. This is used to compare against the plugin
+     * requires attribute. The default system version is 0.0.0 which disables
+     * all version checking.
      *
-     * @default 0.0.0
      * @param version
      */
     public void setSystemVersion(Version version);
