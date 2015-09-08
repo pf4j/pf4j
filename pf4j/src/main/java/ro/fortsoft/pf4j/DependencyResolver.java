@@ -23,7 +23,7 @@ import ro.fortsoft.pf4j.util.DirectedGraph;
 /**
  * @author Decebal Suiu
  */
-class DependencyResolver {
+public class DependencyResolver {
 
 	private static final Logger log = LoggerFactory.getLogger(DependencyResolver.class);
 

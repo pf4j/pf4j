@@ -47,7 +47,7 @@ public class DefaultPluginManager implements PluginManager {
 	public static final String DEFAULT_PLUGINS_DIRECTORY = "plugins";
 	public static final String DEVELOPMENT_PLUGINS_DIRECTORY = "../plugins";
 
-    private File pluginsDirectory;
+    protected File pluginsDirectory;
 
     private ExtensionFinder extensionFinder;
 
