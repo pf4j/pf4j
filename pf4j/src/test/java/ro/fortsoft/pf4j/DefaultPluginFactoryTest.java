@@ -15,8 +15,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import ro.fortsoft.pf4j.plugin.AnotherFailTestPlugin;
 import ro.fortsoft.pf4j.plugin.FailTestPlugin;
