@@ -33,6 +33,7 @@
         <module>app</module>
         <module>api</module>
         <module>plugins</module>
+        <module>assembly</module>
     </modules>
 
 </project>

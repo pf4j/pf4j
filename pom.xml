@@ -113,6 +113,7 @@
     <modules>
         <module>pf4j</module>
         <module>demo</module>
+        <module>pf4jplugin</module>
     </modules>
 
     <profiles>

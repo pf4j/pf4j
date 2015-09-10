@@ -1,0 +1,38 @@
+<assembly>
+    <id>assembly</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <dependencySets>
+        <!-- Get the plugins and place them into their folder. -->
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>false</useTransitiveDependencies>
+            <outputDirectory>plugins</outputDirectory>
+            <unpack>false</unpack>
+            <includes>
+                <include>*:zip:pf4jplugin</include>
+            </includes>
+        </dependencySet>
+        <!-- Get the main module and place it in the root dir. -->
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>false</useTransitiveDependencies>
+            <unpack>false</unpack>
+            <includes>
+                <include>${project.groupId}:pf4j-demo-app:jar</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <outputDirectory>lib</outputDirectory>
+            <unpack>false</unpack>
+            <excludes>
+                <exclude>*:zip:pf4jplugin</exclude>
+                <exclude>${project.groupId}:pf4j-demo-app:*</exclude>
+            </excludes>
+        </dependencySet>
+    </dependencySets>
+</assembly>
