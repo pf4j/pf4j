@@ -1,0 +1,121 @@
+<!--
+~ Copyright (c) 2012-2015, Luigi R. Viggiano
+~ All rights reserved.
+~
+~ This software is distributable under the BSD license.
+~ See the terms of the BSD license in the documentation provided with this software.
+-->
+
+<project name="site" basedir=".." default="help">
+    <property environment="env"/>
+    <property name="build.directory" value="${basedir}/target"/>
+    <property name="site.directory" value="${basedir}/site"/>
+    <property name="gh-pages.directory" value="${build.directory}/gh-pages"/>
+
+    <target name="test-gh-pages">
+        <available file="${gh-pages.directory}" type="dir" property="gh-pages.available"/>
+    </target>
+
+    <target name="clone" depends="test-gh-pages" unless="gh-pages.available">
+        <mkdir dir="${build.directory}"/>
+        <git dir="${build.directory}" command="clone git@github.com:decebals/pf4j --branch gh-pages gh-pages"/>
+    </target>
+
+    <target name="pull" depends="clone" if="gh-pages.available">
+        <git dir="${gh-pages.directory}" command="pull origin gh-pages"/>
+    </target>
+
+    <target name="copy" depends="pull">
+        <copy todir="${gh-pages.directory}" overwrite="true">
+            <fileset dir="${site.directory}" excludes="build.xml"/>
+        </copy>
+        <copy file="${site.directory}/.gitignore" todir="${gh-pages.directory}"/>
+    </target>
+
+    <target name="commit" depends="copy">
+        <git dir="${gh-pages.directory}" command="add ."/>
+        <git-hash dir="${basedir}" property="sha"/>
+        <git dir="${gh-pages.directory}" command="commit -m 'Updating to ${sha}.'"/>
+    </target>
+
+    <target name="push" depends="commit">
+        <git dir="${gh-pages.directory}" command="push origin gh-pages"/>
+    </target>
+
+    <target name="publish" depends="push"/>
+
+    <target name="clean">
+        <delete dir="${gh-pages.directory}"/>
+    </target>
+
+    <target name="run-drafts">
+        <jekyll-serve options="-w --drafts" />
+    </target>
+
+    <target name="run">
+        <jekyll-serve options="-w" />
+    </target>
+
+    <target name="build">
+        <property name="site.destination.directory" value="${build.directory}/www"/>
+        <tempfile deleteonexit="true" destdir="${site.directory}" prefix="_build-" suffix=".yml" property="build.file"/>
+        <echo file="${build.file}" message="url: file://${site.destination.directory}"/>
+        <jekyll dir="${site.directory}" command="build" options="--destination ${site.destination.directory} --config _config.yml,${build.file}" />
+    </target>
+
+    <target name="help">
+        <echo>
+            ant clean                           - cleans up the target dir
+            ant build                           - generates the website in the _site dir
+            ant publish                         - publish site to gh-pages
+            ant run-drafts                      - run jekyll serve (with '-w --drafts' options)
+            ant run                             - run jekyll serve (with '-w' option)
+        </echo>
+    </target>
+
+    <macrodef name="git">
+        <attribute name="dir"/>
+        <attribute name="command"/>
+        <element name="elements" optional="true" implicit="true"/>
+        <sequential>
+            <exec dir="@{dir}" executable="git" taskname="git">
+                <arg line="@{command}"/>
+                <elements/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="git-hash">
+        <attribute name="dir"/>
+        <attribute name="property"/>
+        <sequential>
+            <git dir="@{dir}" command="log -1 --pretty=%h">
+                <redirector outputproperty="@{property}"/>
+            </git>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jekyll-serve">
+        <attribute name="options"/>
+        <sequential>
+            <tempfile deleteonexit="true" destdir="${site.directory}" prefix="_serve-" suffix=".yml" property="serve.file"/>
+            <echo file="${serve.file}" message="url: http://localhost:4000"/>
+            <jekyll dir="${site.directory}" command="serve" options="@{options} --config _config.yml,${serve.file}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jekyll">
+        <attribute name="dir"/>
+        <attribute name="command"/>
+        <attribute name="options"/>
+        <sequential>
+            <condition property="jekyll.executable" value="jekyll.bat" else="jekyll">
+                <os family="windows" />
+            </condition>
+            <exec dir="@{dir}" executable="${jekyll.executable}" taskname="jekyll" >
+                <arg line="@{command} @{options} ${env.JEKYLL_OPTS}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+</project>
