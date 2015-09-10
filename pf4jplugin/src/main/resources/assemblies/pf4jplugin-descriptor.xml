@@ -33,5 +33,11 @@
 			<directory>target/plugin-classes</directory>
 			<outputDirectory>classes</outputDirectory>
 		</fileSet>
-	</fileSets>
+        <!-- Add external resources -->
+        <fileSet>
+            <directory>src/main/external-resources</directory>
+            <outputDirectory>resources</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
+    </fileSets>
 </assembly>
