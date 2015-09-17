@@ -12,8 +12,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
-
 /**
  * @author Decebal Suiu
  */
