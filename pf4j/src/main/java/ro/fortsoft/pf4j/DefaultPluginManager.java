@@ -49,67 +49,67 @@ public class DefaultPluginManager implements PluginManager {
 
     protected File pluginsDirectory;
 
-    private ExtensionFinder extensionFinder;
+    protected ExtensionFinder extensionFinder;
 
-    private PluginDescriptorFinder pluginDescriptorFinder;
+    protected PluginDescriptorFinder pluginDescriptorFinder;
 
-    private PluginClasspath pluginClasspath;
+    protected PluginClasspath pluginClasspath;
 
     /**
      * A map of plugins this manager is responsible for (the key is the 'pluginId').
      */
-    private Map<String, PluginWrapper> plugins;
+    protected Map<String, PluginWrapper> plugins;
 
     /**
      * A map of plugin class loaders (he key is the 'pluginId').
      */
-    private Map<String, PluginClassLoader> pluginClassLoaders;
+    protected Map<String, PluginClassLoader> pluginClassLoaders;
 
     /**
      * A relation between 'pluginPath' and 'pluginId'
      */
-    private Map<String, String> pathToIdMap;
+    protected Map<String, String> pathToIdMap;
 
     /**
      * A list with unresolved plugins (unresolved dependency).
      */
-    private List<PluginWrapper> unresolvedPlugins;
+    protected List<PluginWrapper> unresolvedPlugins;
 
     /**
      * A list with resolved plugins (resolved dependency).
      */
-    private List<PluginWrapper> resolvedPlugins;
+    protected List<PluginWrapper> resolvedPlugins;
 
     /**
      * A list with started plugins.
      */
-    private List<PluginWrapper> startedPlugins;
+    protected List<PluginWrapper> startedPlugins;
 
     /**
      * The registered {@link PluginStateListener}s.
      */
-    private List<PluginStateListener> pluginStateListeners;
+    protected List<PluginStateListener> pluginStateListeners;
 
     /**
      * Cache value for the runtime mode. No need to re-read it because it wont change at
 	 * runtime.
      */
-    private RuntimeMode runtimeMode;
+    protected RuntimeMode runtimeMode;
 
     /**
      * The system version used for comparisons to the plugin requires attribute.
      */
-    private Version systemVersion = Version.forIntegers(0, 0, 0);
+    protected Version systemVersion = Version.forIntegers(0, 0, 0);
 
-    private PluginFactory pluginFactory;
-    private ExtensionFactory extensionFactory;
-    private PluginStatusProvider pluginStatusProvider;
-    private DependencyResolver dependencyResolver;
+    protected PluginFactory pluginFactory;
+    protected ExtensionFactory extensionFactory;
+    protected PluginStatusProvider pluginStatusProvider;
+    protected DependencyResolver dependencyResolver;
 
     /**
      * The plugins repository.
      */
-    private PluginRepository pluginRepository;
+    protected PluginRepository pluginRepository;
 
     /**
      * The plugins directory is supplied by System.getProperty("pf4j.pluginsDir", "plugins").
