@@ -100,7 +100,9 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         pluginDescriptor.setPluginClass(clazz);
 
         String version = attributes.getValue("Plugin-Version");
-        pluginDescriptor.setPluginVersion(Version.valueOf(version));
+        if (StringUtils.isNotEmpty(version)) {
+            pluginDescriptor.setPluginVersion(Version.valueOf(version));
+        }
 
         String provider = attributes.getValue("Plugin-Provider");
         pluginDescriptor.setProvider(provider);
@@ -121,6 +123,9 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         }
         if (StringUtils.isEmpty(pluginDescriptor.getPluginClass())) {
             throw new PluginException("Plugin-Class cannot be empty");
+        }
+        if (pluginDescriptor.getVersion() == null) {
+            throw new PluginException("Plugin-Version cannot be empty");
         }
     }
 

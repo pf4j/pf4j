@@ -96,7 +96,9 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         pluginDescriptor.setPluginClass(clazz);
 
         String version = properties.getProperty("plugin.version");
-        pluginDescriptor.setPluginVersion(Version.valueOf(version));
+        if (StringUtils.isNotEmpty(version)) {
+            pluginDescriptor.setPluginVersion(Version.valueOf(version));
+        }
 
         String provider = properties.getProperty("plugin.provider");
         pluginDescriptor.setProvider(provider);
@@ -110,10 +112,12 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     protected void validatePluginDescriptor(PluginDescriptor pluginDescriptor) throws PluginException {
         if (StringUtils.isEmpty(pluginDescriptor.getPluginId())) {
             throw new PluginException("plugin.id cannot be empty");
-
         }
         if (StringUtils.isEmpty(pluginDescriptor.getPluginClass())) {
             throw new PluginException("plugin.class cannot be empty");
+        }
+        if (pluginDescriptor.getVersion() == null) {
+            throw new PluginException("plugin.version cannot be empty");
         }
     }
 
