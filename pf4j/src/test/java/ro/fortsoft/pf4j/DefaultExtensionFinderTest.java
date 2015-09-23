@@ -88,6 +88,7 @@ public class DefaultExtensionFinderTest {
                 Set<String> bucket = new HashSet<>();
                 bucket.add("ro.fortsoft.pf4j.plugin.TestExtension");
                 bucket.add("ro.fortsoft.pf4j.plugin.FailTestExtension");
+                bucket.add("ro.fortsoft.pf4j.plugin.NonExistentExtension");
                 entries.put(null, bucket);
                 return entries;
             }
@@ -108,6 +109,7 @@ public class DefaultExtensionFinderTest {
                 Set<String> bucket = new HashSet<>();
                 bucket.add("ro.fortsoft.pf4j.plugin.TestExtension");
                 bucket.add("ro.fortsoft.pf4j.plugin.FailTestExtension");
+                bucket.add("ro.fortsoft.pf4j.plugin.NonExistentExtension");
                 entries.put("plugin1", bucket);
                 bucket = new HashSet<>();
                 bucket.add("ro.fortsoft.pf4j.plugin.TestExtension");
