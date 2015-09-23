@@ -27,7 +27,9 @@ import ro.fortsoft.pf4j.plugin.FailTestPlugin;
 import ro.fortsoft.pf4j.plugin.TestExtensionInterface;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -42,7 +44,19 @@ public class DefaultExtensionFinderTest {
 
     @Before
     public void setUp() {
+        PluginWrapper pluginStarted = mock(PluginWrapper.class);
+        when(pluginStarted.getPluginClassLoader()).thenReturn(getClass().getClassLoader());
+        when(pluginStarted.getPluginState()).thenReturn(PluginState.STARTED);
+
+        PluginWrapper pluginStopped = mock(PluginWrapper.class);
+        when(pluginStopped.getPluginClassLoader()).thenReturn(getClass().getClassLoader());
+        when(pluginStopped.getPluginState()).thenReturn(PluginState.STOPPED);
+
         pluginManager = mock(PluginManager.class);
+        when(pluginManager.getPlugin(eq("plugin1"))).thenReturn(pluginStarted);
+        when(pluginManager.getPlugin(eq("plugin2"))).thenReturn(pluginStopped);
+        when(pluginManager.getPluginClassLoader(eq("plugin1"))).thenReturn(getClass().getClassLoader());
+
         extensionFactory = new DefaultExtensionFactory();
     }
 
@@ -66,7 +80,7 @@ public class DefaultExtensionFinderTest {
      * Test of find method, of class DefaultExtensionFinder.
      */
     @Test
-    public void testFind() {
+    public void testFindFromClasspath() {
         DefaultExtensionFinder instance = new DefaultExtensionFinder(pluginManager, extensionFactory) {
             @Override
             protected Map<String, Set<String>> readIndexFiles() {
@@ -75,6 +89,29 @@ public class DefaultExtensionFinderTest {
                 bucket.add("ro.fortsoft.pf4j.plugin.TestExtension");
                 bucket.add("ro.fortsoft.pf4j.plugin.FailTestExtension");
                 entries.put(null, bucket);
+                return entries;
+            }
+        };
+        List<ExtensionWrapper<TestExtensionInterface>> list = instance.find(TestExtensionInterface.class);
+        assertEquals(2, list.size());
+    }
+
+    /**
+     * Test of find method, of class DefaultExtensionFinder.
+     */
+    @Test
+    public void testFindFromPlugin() {
+        DefaultExtensionFinder instance = new DefaultExtensionFinder(pluginManager, extensionFactory) {
+            @Override
+            protected Map<String, Set<String>> readIndexFiles() {
+                Map<String, Set<String>> entries = new LinkedHashMap<>();
+                Set<String> bucket = new HashSet<>();
+                bucket.add("ro.fortsoft.pf4j.plugin.TestExtension");
+                bucket.add("ro.fortsoft.pf4j.plugin.FailTestExtension");
+                entries.put("plugin1", bucket);
+                bucket = new HashSet<>();
+                bucket.add("ro.fortsoft.pf4j.plugin.TestExtension");
+                entries.put("plugin2", bucket);
                 return entries;
             }
         };

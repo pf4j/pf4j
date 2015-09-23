@@ -93,7 +93,7 @@ public class PluginClassLoader extends URLClassLoader {
             log.trace("Search in dependencies for class '{}'", className);
             List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
             for (PluginDependency dependency : dependencies) {
-                PluginClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
+                ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
                 try {
                     return classLoader.loadClass(className);
                 } catch (ClassNotFoundException e) {
