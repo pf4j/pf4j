@@ -12,14 +12,21 @@
  */
 package ro.fortsoft.pf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.util.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The default implementation for ExtensionFinder.
@@ -32,9 +39,9 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultExtensionFinder.class);
 
-    private PluginManager pluginManager;
-	private ExtensionFactory extensionFactory;
-    private volatile Map<String, Set<String>> entries; // cache by pluginId
+    protected PluginManager pluginManager;
+	protected ExtensionFactory extensionFactory;
+    protected volatile Map<String, Set<String>> entries; // cache by pluginId
 
 	public DefaultExtensionFinder(PluginManager pluginManager, ExtensionFactory extensionFactory) {
         this.pluginManager = pluginManager;
@@ -51,7 +58,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
         }
 
 		log.debug("Finding extensions for extension point '{}'", type.getName());
-        readIndexFiles();
+        Map<String, Set<String>> entries = getEntries();
 
         List<ExtensionWrapper<T>> result = new ArrayList<>();
         for (Map.Entry<String, Set<String>> entry : entries.entrySet()) {
@@ -64,9 +71,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
                 }
             }
 
-            Set<String> extensionClassNames = entry.getValue();
-
-            for (String className : extensionClassNames) {
+            for (String className : entry.getValue()) {
                 try {
                     ClassLoader classLoader;
                     if (pluginId != null) {
@@ -100,7 +105,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
         if (entries.isEmpty()) {
         	log.debug("No extensions found for extension point '{}'", type.getName());
         } else {
-        	log.debug("Found {} extensions for extension point '{}'", entries.size(), type.getName());
+        	log.debug("Found {} extensions for extension point '{}'", result.size(), type.getName());
         }
 
         // sort by "ordinal" property
@@ -111,8 +116,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 
     @Override
     public Set<String> findClassNames(String pluginId) {
-    	readIndexFiles();
-        return entries.get(pluginId);
+        return getEntries().get(pluginId);
     }
 
     @Override
@@ -122,22 +126,19 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
         entries = null;
     }
 
-    private Map<String, Set<String>> readIndexFiles() {
-        // checking cache
-        if (entries != null) {
-            return entries;
-        }
+    protected Map<String, Set<String>> readIndexFiles() {
+        Map<String, Set<String>> result = new LinkedHashMap<>();
 
-        entries = new LinkedHashMap<>();
+        result.putAll(readClasspathIndexFiles());
+        result.putAll(readPluginsIndexFiles());
 
-        readClasspathIndexFiles();
-        readPluginsIndexFiles();
-
-        return entries;
+        return result;
     }
 
-    private void readClasspathIndexFiles() {
+    private Map<String, Set<String>> readClasspathIndexFiles() {
         log.debug("Reading extensions index files from classpath");
+
+        Map<String, Set<String>> result = new LinkedHashMap<>();
 
         Set<String> bucket = new HashSet<>();
         try {
@@ -158,14 +159,18 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
                 }
             }
 
-            entries.put(null, bucket);
+            result.put(null, bucket);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
+
+        return result;
     }
 
-    private void readPluginsIndexFiles() {
+    private Map<String, Set<String>> readPluginsIndexFiles() {
         log.debug("Reading extensions index files from plugins");
+
+        Map<String, Set<String>> result = new LinkedHashMap<>();
 
         List<PluginWrapper> plugins = pluginManager.getPlugins();
         for (PluginWrapper plugin : plugins) {
@@ -192,15 +197,25 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
                     }
                 }
 
-                entries.put(pluginId, bucket);
+                result.put(pluginId, bucket);
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
             }
         }
+
+        return result;
     }
 
     private boolean isExtensionPoint(Class<?> type) {
         return ExtensionPoint.class.isAssignableFrom(type);
+    }
+
+    private Map<String, Set<String>> getEntries() {
+        if (entries == null) {
+            entries = readIndexFiles();
+        }
+
+        return entries;
     }
 
 }
