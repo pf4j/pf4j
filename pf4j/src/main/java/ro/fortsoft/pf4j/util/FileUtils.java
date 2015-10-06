@@ -58,7 +58,7 @@ public class FileUtils {
             writer = new BufferedWriter(new FileWriter(file));
             for (String line : lines) {
                 writer.write(line);
-                writer.write('\n');
+                writer.newLine();
             }
         } finally {
             if (writer != null) {

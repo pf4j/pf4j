@@ -18,13 +18,12 @@ package ro.fortsoft.pf4j;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import ro.fortsoft.pf4j.util.FileUtils;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -133,20 +132,23 @@ public class DefaultPluginStatusProviderTest {
     }
 
     private void createDisabledFile() throws IOException {
-        File file = testFolder.newFile("disabled.txt");
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"))) {
-            writer.write("plugin-2\r\n");
-        }
-        file.createNewFile();
+        List<String> plugins = new ArrayList<>();
+        plugins.add("plugin-2");
+
+        writeLines(plugins, "disabled.txt");
     }
 
     private void createEnabledFile() throws IOException {
-        File file = testFolder.newFile("enabled.txt");
-        file.createNewFile();
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"))) {
-            writer.write("plugin-1\r\n");
-            writer.write("plugin-2\r\n");
-        }
+        List<String> plugins = new ArrayList<>();
+        plugins.add("plugin-1");
+        plugins.add("plugin-2");
+
+        writeLines(plugins, "enabled.txt");
+    }
+
+    private void writeLines(List<String> lines, String fileName) throws IOException {
+        File file = testFolder.newFile(fileName);
+        FileUtils.writeLines(lines, file);
     }
 
 }
