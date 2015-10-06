@@ -17,7 +17,7 @@ package ro.fortsoft.pf4j;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -43,7 +43,5 @@ public class PluginDependencyTest {
         assertEquals("1.0", instance.getPluginVersionSupport());
         assertEquals("PluginDependency [pluginId=test, pluginVersionSupport=1.0]", instance.toString());
     }
-
-
 
 }
