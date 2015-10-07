@@ -780,7 +780,7 @@ public class DefaultPluginManager implements PluginManager {
 
         // create the plugin wrapper
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
-        PluginWrapper pluginWrapper = new PluginWrapper(pluginDescriptor, pluginPath, pluginClassLoader);
+        PluginWrapper pluginWrapper = new PluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
         pluginWrapper.setPluginFactory(pluginFactory);
         pluginWrapper.setRuntimeMode(getRuntimeMode());
 

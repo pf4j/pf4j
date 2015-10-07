@@ -19,6 +19,7 @@ package ro.fortsoft.pf4j;
  */
 public class PluginWrapper {
 
+    PluginManager pluginManager;
 	PluginDescriptor descriptor;
 	String pluginPath;
 	PluginClassLoader pluginClassLoader;
@@ -27,13 +28,21 @@ public class PluginWrapper {
 	RuntimeMode runtimeMode;
     Plugin plugin; // cache
 
-	public PluginWrapper(PluginDescriptor descriptor, String pluginPath, PluginClassLoader pluginClassLoader) {
+	public PluginWrapper(PluginManager pluginManager, PluginDescriptor descriptor, String pluginPath, PluginClassLoader pluginClassLoader) {
+        this.pluginManager = pluginManager;
 		this.descriptor = descriptor;
 		this.pluginPath = pluginPath;
 		this.pluginClassLoader = pluginClassLoader;
 
 		pluginState = PluginState.CREATED;
 	}
+
+    /**
+     * Returns the plugin manager.
+     */
+    public PluginManager getPluginManager() {
+        return pluginManager;
+    }
 
     /**
      * Returns the plugin descriptor.
