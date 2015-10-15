@@ -55,6 +55,19 @@ public class IzouPluginClassLoader extends URLClassLoader {
     }
 
     /**
+     * checks whether the Addon is allowed to access the class
+     * @param parentResult the resulting class
+     * @return the Class or an Exception
+     */
+    private Class<?> checkAccess(Class<?> parentResult, String classname) throws LinkageError {
+        if (parentResult.isAnnotationPresent(AddonAccessible.class) && parentResult.isInterface()) {
+            return parentResult;
+        } else {
+            throw new LinkageError("Requested class: " + classname + " is not accessible for addons");
+        }
+    }
+
+    /**
      * This implementation of loadClass uses a child first delegation model rather than the standard parent first.
      * If the requested class cannot be found in this class loader, the parent class loader will be consulted
      * via the standard ClassLoader.loadClass(String) mechanism.
@@ -67,7 +80,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
         if (className.startsWith(PLUGIN_PACKAGE_PREFIX_PF4J)) {
             log.debug("Delegate the loading of class '{}' to parent", className);
             try {
-                return getClass().getClassLoader().loadClass(className);
+                return checkAccess(super.getParent().loadClass(className), className);
             } catch (ClassNotFoundException e) {
                 // try next step
                 // TODO if I uncomment below lines (the correct approach) I received ClassNotFoundException for demo (ro.fortsoft.pf4j.demo)
@@ -80,7 +93,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
                 className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_LOG4J)) {
             try {
                 //directing to parent
-                return super.getParent().loadClass(className);
+                return checkAccess(super.getParent().loadClass(className), className);
             } catch (ClassNotFoundException e) {
                 //try next step
             }
@@ -139,7 +152,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
         log.debug("Couldn't find class '{}' in plugin classpath. Delegating to parent");
 
         // use the standard URLClassLoader (which follows normal parent delegation)
-        return super.loadClass(className);
+        return checkAccess(super.getParent().loadClass(className), className);
     }
 
     /**
