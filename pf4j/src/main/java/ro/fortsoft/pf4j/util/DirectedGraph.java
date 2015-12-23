@@ -38,6 +38,7 @@ public class DirectedGraph<V> {
         if (neighbors.containsKey(vertex)) {
         	return;
         }
+
         neighbors.put(vertex, new ArrayList<V>());
     }
 
@@ -66,13 +67,15 @@ public class DirectedGraph<V> {
         if (!(this.containsVertex(from) && this.containsVertex(to))) {
             throw new IllegalArgumentException("Nonexistent vertex");
         }
+
         neighbors.get(from).remove(to);
     }
 
     public List<V> getNeighbors(V vertex) {
-        if (neighbors.containsKey(vertex)) {
+        if (!neighbors.containsKey(vertex)) {
         	return new ArrayList<V>();
         }
+
         return neighbors.get(vertex);
     }
 
