@@ -18,6 +18,7 @@ package ro.fortsoft.pf4j.util;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -37,15 +38,21 @@ public class AndFileFilter implements FileFilter {
     private List<FileFilter> fileFilters;
 
     public AndFileFilter() {
-        this.fileFilters = new ArrayList<>();
+        this(new ArrayList<FileFilter>());
+    }
+
+    public AndFileFilter(FileFilter... fileFilters) {
+        this(Arrays.asList(fileFilters));
     }
 
     public AndFileFilter(List<FileFilter> fileFilters) {
         this.fileFilters = new ArrayList<>(fileFilters);
     }
 
-    public void addFileFilter(FileFilter fileFilter) {
+    public AndFileFilter addFileFilter(FileFilter fileFilter) {
         fileFilters.add(fileFilter);
+
+        return this;
     }
 
     public List<FileFilter> getFileFilters() {
