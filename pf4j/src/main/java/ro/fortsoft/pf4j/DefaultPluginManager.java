@@ -23,7 +23,9 @@ import ro.fortsoft.pf4j.util.AndFileFilter;
 import ro.fortsoft.pf4j.util.DirectoryFileFilter;
 import ro.fortsoft.pf4j.util.FileUtils;
 import ro.fortsoft.pf4j.util.HiddenFilter;
+import ro.fortsoft.pf4j.util.NameFileFilter;
 import ro.fortsoft.pf4j.util.NotFileFilter;
+import ro.fortsoft.pf4j.util.OrFileFilter;
 import ro.fortsoft.pf4j.util.Unzip;
 import ro.fortsoft.pf4j.util.ZipFileFilter;
 
@@ -380,10 +382,8 @@ public class DefaultPluginManager implements PluginManager {
         }
 
         // check for no plugins
-        List<FileFilter> filterList = new ArrayList<>();
-        filterList.add(new DirectoryFileFilter());
-        filterList.add(new NotFileFilter(createHiddenPluginFilter()));
-        FileFilter pluginsFilter = new AndFileFilter(filterList);
+        AndFileFilter pluginsFilter = new AndFileFilter(new DirectoryFileFilter());
+        pluginsFilter.addFileFilter(new NotFileFilter(createHiddenPluginFilter()));
         File[] directories = pluginsDirectory.listFiles(pluginsFilter);
         if (directories == null) {
         	directories = new File[0];
@@ -682,7 +682,13 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     protected FileFilter createHiddenPluginFilter() {
-    	return new HiddenFilter();
+    	OrFileFilter hiddenPluginFilter = new OrFileFilter(new HiddenFilter());
+
+        if (RuntimeMode.DEVELOPMENT.equals(getRuntimeMode())) {
+            hiddenPluginFilter.addFileFilter(new NameFileFilter("target"));
+        }
+
+        return hiddenPluginFilter;
     }
 
     /**
