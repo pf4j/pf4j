@@ -587,7 +587,6 @@ public class DefaultPluginManager implements PluginManager {
             	return plugin;
             }
         }
-        log.warn("Failed to find the plugin for {}", clazz);
 
         return null;
     }
