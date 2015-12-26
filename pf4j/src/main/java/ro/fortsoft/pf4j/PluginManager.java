@@ -141,6 +141,11 @@ public interface PluginManager {
 	 */
 	public RuntimeMode getRuntimeMode();
 
+    /**
+     * Retrieves the {@link PluginWrapper} that loaded the given class 'clazz'.
+     */
+    public PluginWrapper whichPlugin(Class<?> clazz);
+
     public void addPluginStateListener(PluginStateListener listener);
 
     public void removePluginStateListener(PluginStateListener listener);
@@ -161,4 +166,5 @@ public interface PluginManager {
      * * @return the system version
      */
     public Version getSystemVersion();
+
 }

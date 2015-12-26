@@ -577,9 +577,7 @@ public class DefaultPluginManager implements PluginManager {
 		return runtimeMode;
 	}
 
-    /**
-     * Retrieves the {@link PluginWrapper} that loaded the given class 'clazz'.
-     */
+    @Override
     public PluginWrapper whichPlugin(Class<?> clazz) {
         ClassLoader classLoader = clazz.getClassLoader();
         for (PluginWrapper plugin : resolvedPlugins) {
