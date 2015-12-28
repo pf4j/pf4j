@@ -17,10 +17,10 @@ PF4J is an open source (Apache license) lightweight (around 50KB) plugin framewo
 
 Practically PF4J is a microframework and the aim is to keep the core simple but extensible. I try to create a little ecosystem (extensions) based on this core with the help of the comunity.  
 For now are available these extensions:
-- [wicket-plugin](https://github.com/decebals/wicket-plugin)
-- [pf4j-spring](https://github.com/decebals/pf4j-spring)
-- [pf4j-web](https://github.com/rmrodrigues/pf4j-web)
-- [pf4j-update](https://github.com/decebals/pf4j-update)
+- [pf4j-update](https://github.com/decebals/pf4j-update) (update mechanism for PF4J)
+- [pf4j-spring](https://github.com/decebals/pf4j-spring) (PF4J - Spring Framework integration)
+- [pf4j-web](https://github.com/rmrodrigues/pf4j-web) (PF4J in web applications)
+- [wicket-plugin](https://github.com/decebals/wicket-plugin) (Wicket Plugin Framework based on PF4J)
 
 No XML, only Java.
 
@@ -61,15 +61,17 @@ How to use
 -------------------
 It's very simple to add pf4j in your application:
 
-    public static void main(String[] args) {
-        ...
-        
-        PluginManager pluginManager = new DefaultPluginManager();
-        pluginManager.loadPlugins();
-        pluginManager.startPlugins();
+```java
+public static void main(String[] args) {
+    ...
+    
+    PluginManager pluginManager = new DefaultPluginManager();
+    pluginManager.loadPlugins();
+    pluginManager.startPlugins();
 
-        ...
-    }
+    ...
+}
+```
 
 In above code, I created a **DefaultPluginManager** (it's the default implementation for
 **PluginManager** interface) that loads and starts all active(resolved) plugins.  
@@ -91,78 +93,92 @@ The plugin manager searches plugins metadata using a **PluginDescriptorFinder**.
 **DefaultPluginDescriptorFinder** is a "link" to **ManifestPluginDescriptorFinder** that lookups plugins descriptors in MANIFEST.MF file.
 In this case the `classes/META-INF/MANIFEST.MF` file looks like:
 
-    Manifest-Version: 1.0
-    Archiver-Version: Plexus Archiver
-    Created-By: Apache Maven
-    Built-By: decebal
-    Build-Jdk: 1.6.0_17
-    Plugin-Class: ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
-    Plugin-Dependencies: x, y, z
-    Plugin-Id: welcome-plugin
-    Plugin-Provider: Decebal Suiu
-    Plugin-Version: 0.0.1
+```
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: decebal
+Build-Jdk: 1.6.0_17
+Plugin-Class: ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
+Plugin-Dependencies: x, y, z
+Plugin-Id: welcome-plugin
+Plugin-Provider: Decebal Suiu
+Plugin-Version: 0.0.1
+```
 
 In above manifest I described a plugin with id `welcome-plugin`, with class `ro.fortsoft.pf4j.demo.welcome.WelcomePlugin`, with version `0.0.1` and with dependencies 
 to plugins `x, y, z`.
 
 You can define an extension point in your application using **ExtensionPoint** interface marker.
 
-    public interface Greeting extends ExtensionPoint {
+```java
+public interface Greeting extends ExtensionPoint {
 
-        public String getGreeting();
+    public String getGreeting();
 
-    }
+}
+```
 
 Another important internal component is **ExtensionFinder** that describes how the plugin manager discovers extensions for the extensions points.   
 **DefaultExtensionFinder** looks up extensions using **Extension** annotation.   
 DefaultExtensionFinder looks up extensions in all extensions index files `META-INF/extensions.idx`. PF4J uses Java Annotation Processing to process at compile time all classes annotated with @Extension and to produce the extensions index file.
 
-    public class WelcomePlugin extends Plugin {
+```java
+public class WelcomePlugin extends Plugin {
 
-        public WelcomePlugin(PluginWrapper wrapper) {
-            super(wrapper);
-        }
+    public WelcomePlugin(PluginWrapper wrapper) {
+        super(wrapper);
+    }
 
-        @Extension
-        public static class WelcomeGreeting implements Greeting {
+    @Extension
+    public static class WelcomeGreeting implements Greeting {
 
-            public String getGreeting() {
-                return "Welcome";
-            }
-
+        public String getGreeting() {
+            return "Welcome";
         }
 
     }
+
+}
+```
 
 In above code I supply an extension for the `Greeting` extension point.
 
 You can retrieve all extensions for an extension point with:
 
-    List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);
-    for (Greeting greeting : greetings) {
-        System.out.println(">>> " + greeting.getGreeting());
-    }
+```java
+List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);
+for (Greeting greeting : greetings) {
+    System.out.println(">>> " + greeting.getGreeting());
+}
+```
 
 The output is:
 
-    >>> Welcome
-    >>> Hello
+```
+>>> Welcome
+>>> Hello
+```
 
 You can inject your custom component (for example PluginDescriptorFinder, ExtensionFinder, PluginClasspath, ...) in DefaultPluginManager just override `create...` methods (factory method pattern).
 
 Example:
 
-    protected PluginDescriptorFinder createPluginDescriptorFinder() {
-        return new PropertiesPluginDescriptorFinder();
-    }
+```java
+protected PluginDescriptorFinder createPluginDescriptorFinder() {
+    return new PropertiesPluginDescriptorFinder();
+}
+```
     
 and in plugin respository you must have a plugin.properties file with the below content:
 
-    plugin.class=ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
-    plugin.dependencies=x, y, z
-    plugin.id=welcome-plugin
-    plugin.provider=Decebal Suiu
-    plugin.version=0.0.1
+```
+plugin.class=ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
+plugin.dependencies=x, y, z
+plugin.id=welcome-plugin
+plugin.provider=Decebal Suiu
+plugin.version=0.0.1
+```
     
 You can control extension instance creation overriding `createExtensionFactory` method from DefaultExtensionFinder. 
 Also, you can control plugin instance creation overriding `createPluginFactory` method from DefaultExtensionFinder. 
@@ -248,21 +264,25 @@ I want to go only with one extension ( **1:1** relation between extension point 
 For option two you must create a simple file **enabled.txt** or **disabled.txt** in your plugins folder.   
 The content for **enabled.txt** is similar with:
 
-    ########################################
-    # - load only these plugins
-    # - add one plugin id on each line
-    # - put this file in plugins folder
-    ########################################
-    welcome-plugin
+```
+########################################
+# - load only these plugins
+# - add one plugin id on each line
+# - put this file in plugins folder
+########################################
+welcome-plugin
+```
 
 The content for **disabled.txt** is similar with:
 
-    ########################################
-    # - load all plugins except these
-    # - add one plugin id on each line
-    # - put this file in plugins folder
-    ########################################
-    welcome-plugin
+```
+########################################
+# - load all plugins except these
+# - add one plugin id on each line
+# - put this file in plugins folder
+########################################
+welcome-plugin
+```
 
 All comment lines (line that start with # character) are ignored.   
 If a file with enabled.txt exists than disabled.txt is ignored. See enabled.txt and disabled.txt from the demo folder. 
@@ -275,8 +295,10 @@ In demo/plugins I implemented two plugins: plugin1, plugin2 (each plugin adds an
 
 To run the demo application use:  
  
-    ./run-demo.sh (for Linux/Unix)
-    ./run-demo.bat (for Windows)
+```
+./run-demo.sh (for Linux/Unix)
+./run-demo.bat (for Windows)
+```
 
 How to build
 -------------------
