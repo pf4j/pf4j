@@ -567,6 +567,11 @@ public class DefaultPluginManager implements PluginManager {
     }
 
     @Override
+    public ExtensionFactory getExtensionFactory() {
+        return extensionFactory;
+    }
+
+    @Override
 	public RuntimeMode getRuntimeMode() {
     	if (runtimeMode == null) {
         	// retrieves the runtime mode from system
@@ -631,7 +636,7 @@ public class DefaultPluginManager implements PluginManager {
      * Add the possibility to override the ExtensionFinder.
      */
     protected ExtensionFinder createExtensionFinder() {
-    	DefaultExtensionFinder extensionFinder = new DefaultExtensionFinder(this, extensionFactory);
+    	DefaultExtensionFinder extensionFinder = new DefaultExtensionFinder(this);
         addPluginStateListener(extensionFinder);
 
         return extensionFinder;

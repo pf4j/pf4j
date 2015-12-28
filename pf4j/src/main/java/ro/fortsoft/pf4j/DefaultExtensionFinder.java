@@ -43,12 +43,10 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 	private static final Logger log = LoggerFactory.getLogger(DefaultExtensionFinder.class);
 
     protected PluginManager pluginManager;
-	protected ExtensionFactory extensionFactory;
     protected volatile Map<String, Set<String>> entries; // cache by pluginId
 
-	public DefaultExtensionFinder(PluginManager pluginManager, ExtensionFactory extensionFactory) {
+	public DefaultExtensionFinder(PluginManager pluginManager) {
         this.pluginManager = pluginManager;
-		this.extensionFactory = extensionFactory;
 	}
 
     @Override
@@ -93,7 +91,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
                         descriptor.setExtensionClass(extensionClass);
 
                         ExtensionWrapper extensionWrapper = new ExtensionWrapper<>(descriptor);
-                        extensionWrapper.setExtensionFactory(extensionFactory);
+                        extensionWrapper.setExtensionFactory(pluginManager.getExtensionFactory());
                         result.add(extensionWrapper);
                         log.debug("Added extension '{}' with ordinal {}", className, extension.ordinal());
                     } else {

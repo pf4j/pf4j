@@ -136,6 +136,8 @@ public interface PluginManager {
 
     public Set<String> getExtensionClassNames(String pluginId);
 
+    public ExtensionFactory getExtensionFactory();
+
     /**
 	 * The runtime mode. Must currently be either DEVELOPMENT or DEPLOYMENT.
 	 */
