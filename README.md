@@ -1,6 +1,5 @@
 Plugin Framework for Java (PF4J)
 =====================
-
 [![Travis CI Build Status](https://travis-ci.org/decebals/pf4j.png)](https://travis-ci.org/decebals/pf4j)
 [![Coverage Status](https://coveralls.io/repos/decebals/pf4j/badge.svg?branch=master&service=github)](https://coveralls.io/github/decebals/pf4j?branch=master)
 [![Maven Central](http://img.shields.io/maven-central/v/ro.fortsoft.pf4j/pf4j.svg)](http://search.maven.org/#search|ga|1|pf4j)
@@ -187,7 +186,6 @@ For more information please see the demo sources.
 
 Plugin assembly
 ------------------------------
-
 After you developed a plugin the next step is to deploy it in your application. For this task, one option is to create a zip file with a structure described in section [How to use](https://github.com/decebals/pf4j/blob/master/README.md#how-to-use) from the beginning of the document.  
 If you use `apache maven` as build manger than your pom.xml file must looks like [this](https://github.com/decebals/pf4j/blob/master/demo/plugins/plugin1/pom.xml). This file it's very simple and it's self explanatory.  
 If you use `apache ant` then your build.xml file must looks like [this](https://github.com/gitblit/gitblit-powertools-plugin/blob/master/build.xml). In this case please look at the "build" target.  
@@ -287,6 +285,47 @@ welcome-plugin
 All comment lines (line that start with # character) are ignored.   
 If a file with enabled.txt exists than disabled.txt is ignored. See enabled.txt and disabled.txt from the demo folder. 
 
+Default/System extension
+-------------------
+Starting with version 0.9 you can define an extension directly in the application jar (you're not obligated 
+to put the extension in a plugin - you can see this extension as a default/system extension). 
+See [WhazzupGreeting](https://github.com/decebals/pf4j/blob/master/demo/app/src/main/java/ro/fortsoft/pf4j/demo/WhazzupGreeting.java) 
+for a real example.
+
+This is great for starting application phase. In this scenario you have a minimalist plugin framework with one class loader 
+(the application class loader), similar with Java ServiceLoader(https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html) 
+but with the following benefits:
+- no need to write provider-configuration files in the resource directory `META-INF/services`, you using the elegant
+ `@Extension` annotation from PF4J
+- anytime you can switch to the multiple class loader mechanism without to change one code line in your application  
+
+Of course the code present in the `Boot` class from the demo application it is functional but you can use a more minimalist code 
+skipping `pluginManager.loadPlugins()` and `pluginManager.startPlugins()`. 
+
+```java
+public static void main(String[] args) {
+    PluginManager pluginManager = new DefaultPluginManager();
+    pluginManager.loadPlugins();
+    pluginManager.startPlugins();
+    List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);
+    for (Greeting greeting : greetings) {
+        System.out.println(">>> " + greeting.getGreeting());
+    }
+}
+```
+
+The above code can be written:
+
+```java
+public static void main(String[] args) {
+    PluginManager pluginManager = new DefaultPluginManager();
+    List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);
+    for (Greeting greeting : greetings) {
+        System.out.println(">>> " + greeting.getGreeting());
+    }
+}
+```
+
 Demo
 -------------------
 I have a tiny demo application. The demo application is in demo folder.
@@ -316,7 +355,6 @@ After above steps a folder _pf4j/target_ is created and all goodies are in that 
 
 Mailing list
 --------------
-
 Much of the conversation between developers and users is managed through [mailing list] (http://groups.google.com/group/pf4j).
 
 Versioning
