@@ -293,7 +293,7 @@ See [WhazzupGreeting](https://github.com/decebals/pf4j/blob/master/demo/app/src/
 for a real example.
 
 This is great for starting application phase. In this scenario you have a minimalist plugin framework with one class loader 
-(the application class loader), similar with Java ServiceLoader(https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html) 
+(the application class loader), similar with Java [ServiceLoader](https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html) 
 but with the following benefits:
 - no need to write provider-configuration files in the resource directory `META-INF/services`, you using the elegant
  `@Extension` annotation from PF4J
