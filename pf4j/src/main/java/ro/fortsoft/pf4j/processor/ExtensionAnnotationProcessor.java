@@ -115,7 +115,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         for (Map.Entry<String, Set<String>> entry : oldExtensions.entrySet()) {
             String extensionPoint = entry.getKey();
             if (extensions.containsKey(extensionPoint)) {
-                entry.getValue().addAll(entry.getValue());
+                extensions.get(extensionPoint).addAll(entry.getValue());
             } else {
                 extensions.put(extensionPoint, entry.getValue());
             }
