@@ -78,16 +78,19 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                     Class<?> extensionClass = classLoader.loadClass(className);
 
                     log.debug("Checking extension type '{}'", className);
-                    if (type.isAssignableFrom(extensionClass) && extensionClass.isAnnotationPresent(Extension.class)) {
-                        Extension extension = extensionClass.getAnnotation(Extension.class);
+                    if (type.isAssignableFrom(extensionClass)) {
                         ExtensionDescriptor descriptor = new ExtensionDescriptor();
-                        descriptor.setOrdinal(extension.ordinal());
+                        int ordinal = 0;
+                        if (extensionClass.isAnnotationPresent(Extension.class)) {
+                            ordinal = extensionClass.getAnnotation(Extension.class).ordinal();
+                        }
+                        descriptor.setOrdinal(ordinal);
                         descriptor.setExtensionClass(extensionClass);
 
                         ExtensionWrapper extensionWrapper = new ExtensionWrapper<>(descriptor);
                         extensionWrapper.setExtensionFactory(pluginManager.getExtensionFactory());
                         result.add(extensionWrapper);
-                        log.debug("Added extension '{}' with ordinal {}", className, extension.ordinal());
+                        log.debug("Added extension '{}' with ordinal {}", className, ordinal);
                     } else {
                         log.debug("'{}' is not an extension for extension point '{}'", className, type.getName());
                     }
