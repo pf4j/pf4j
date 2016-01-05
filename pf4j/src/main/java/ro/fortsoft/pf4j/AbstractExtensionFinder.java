@@ -45,13 +45,6 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
     @Override
 	public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
-        log.debug("Checking extension point '{}'", type.getName());
-        if (!isExtensionPoint(type)) {
-            log.warn("'{}' is not an extension point", type.getName());
-
-            return Collections.emptyList(); // or return null ?!
-        }
-
 		log.debug("Finding extensions for extension point '{}'", type.getName());
         Map<String, Set<String>> entries = getEntries();
 
@@ -131,10 +124,6 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         result.putAll(readPluginsStorages());
 
         return result;
-    }
-
-    private boolean isExtensionPoint(Class<?> type) {
-        return ExtensionPoint.class.isAssignableFrom(type);
     }
 
     private Map<String, Set<String>> getEntries() {
