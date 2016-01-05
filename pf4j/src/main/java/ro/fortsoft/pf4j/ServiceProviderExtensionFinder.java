@@ -48,7 +48,6 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
     @Override
     public Map<String, Set<String>> readClasspathStorages() {
         log.debug("Reading extensions storages from classpath");
-
         Map<String, Set<String>> result = new LinkedHashMap<>();
 
         Set<String> bucket = new HashSet<>();
@@ -85,7 +84,6 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
     @Override
     public Map<String, Set<String>> readPluginsStorages() {
         log.debug("Reading extensions storages from plugins");
-
         Map<String, Set<String>> result = new LinkedHashMap<>();
 
         List<PluginWrapper> plugins = pluginManager.getPlugins();
@@ -95,7 +93,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
             Set<String> bucket = new HashSet<>();
 
             try {
-                URL url = plugin.getPluginClassLoader().getResource(getExtensionsResource());
+                URL url = ((PluginClassLoader) plugin.getPluginClassLoader()).findResource(getExtensionsResource());
                 if (url != null) {
                     File[] files = new File(url.toURI()).listFiles();
                     if (files != null) {
