@@ -50,8 +50,8 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
-//        storage = new LegacyExtensionStorage(this);
-        storage = new ServiceProviderExtensionStorage(this);
+        storage = new LegacyExtensionStorage(this);
+//        storage = new ServiceProviderExtensionStorage(this);
     }
 
     @Override
@@ -185,31 +185,10 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         return extensionPointElements;
     }
 
-    /*
-    private boolean isObject(TypeMirror typeMirror) {
-        if (typeMirror instanceof DeclaredType) {
-            DeclaredType declaredType = (DeclaredType) typeMirror;
-            return ((TypeElement) declaredType.asElement()).getQualifiedName().toString().equals("java.lang.Object");
-        }
-
-        return false;
-    }
-    */
-
     private boolean isExtension(TypeMirror typeMirror) {
         return processingEnv.getTypeUtils().isAssignable(typeMirror, getExtensionPointType());
     }
 
-    /*
-    private boolean isExtensionPoint(TypeMirror typeMirror) {
-        if (typeMirror instanceof DeclaredType) {
-            DeclaredType declaredType = (DeclaredType) typeMirror;
-            return ((TypeElement) declaredType.asElement()).equals(getExtensionPointType());
-        }
-
-        return false;
-    }
-    */
 
     private TypeMirror getExtensionPointType() {
         return processingEnv.getElementUtils().getTypeElement(ExtensionPoint.class.getName()).asType();
