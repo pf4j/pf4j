@@ -129,6 +129,11 @@ public class PluginClassLoader extends URLClassLoader {
         return super.getResource(name);
     }
 
+    @Override
+    public URL findResource(String name) {
+        return super.findResource(name);
+    }
+
     /**
      * Release all resources acquired by this class loader.
      * The current implementation is incomplete.
