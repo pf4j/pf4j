@@ -28,6 +28,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +42,8 @@ import java.util.TreeSet;
  */
 public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
+    private static final String STORAGE_CLASS_NAME = "pf4j.storageClassName";
+
     private Map<String, Set<String>> extensions = new HashMap<>(); // the key is the extension point
     private Map<String, Set<String>> oldExtensions = new HashMap<>(); // the key is the extension point
 
@@ -50,8 +53,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
-        storage = new LegacyExtensionStorage(this);
-//        storage = new ServiceProviderExtensionStorage(this);
+        storage = createStorage();
     }
 
     @Override
@@ -67,7 +69,15 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         return annotationTypes;
 	}
 
-	@Override
+    @Override
+    public Set<String> getSupportedOptions() {
+        Set<String> options = new HashSet<>();
+        options.add(STORAGE_CLASS_NAME);
+
+        return options;
+    }
+
+    @Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		if (roundEnv.processingOver()) {
             return false;
@@ -194,5 +204,33 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         return processingEnv.getElementUtils().getTypeElement(ExtensionPoint.class.getName()).asType();
     }
 
-}
+    private ExtensionStorage createStorage() {
+        ExtensionStorage storage = null;
 
+        // search in processing options
+        String storageClassName = processingEnv.getOptions().get(STORAGE_CLASS_NAME);
+        if (storageClassName == null) {
+            // search in system properties
+            storageClassName = System.getProperty(STORAGE_CLASS_NAME);
+        }
+
+        if (storageClassName != null) {
+            // use reflection to create the storage instance
+            try {
+                Class storageClass = getClass().getClassLoader().loadClass(storageClassName);
+                Constructor constructor = storageClass.getConstructor(ExtensionAnnotationProcessor.class);
+                storage = (ExtensionStorage) constructor.newInstance(this);
+            } catch (Exception e) {
+                error(e.getMessage());
+            }
+        }
+
+        if (storage == null) {
+            // default storage
+            storage = new LegacyExtensionStorage(this);
+        }
+
+        return storage;
+    }
+
+}
