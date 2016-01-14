@@ -22,6 +22,5 @@ import ro.fortsoft.pf4j.ExtensionPoint;
  */
 public interface Greeting extends ExtensionPoint {
 
-    public String getGreeting();
-
+  public String getGreeting();
 }
