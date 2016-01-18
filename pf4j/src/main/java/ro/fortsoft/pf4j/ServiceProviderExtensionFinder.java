@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -63,7 +64,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                         log.debug("Read '{}'", file);
-                        Reader reader = Files.newBufferedReader(file);
+                        Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8);
                         ServiceProviderExtensionStorage.read(reader, bucket);
                         return FileVisitResult.CONTINUE;
                     }
