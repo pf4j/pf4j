@@ -26,9 +26,21 @@ import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The ServiceLoader base implementation for ExtensionFinder.
@@ -61,6 +73,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
                     extensionPath = Paths.get(url.toURI());
                 }
                 Files.walkFileTree(extensionPath, Collections.<FileVisitOption>emptySet(), 1, new SimpleFileVisitor<Path>() {
+
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                         log.debug("Read '{}'", file);
@@ -68,6 +81,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
                         ServiceProviderExtensionStorage.read(reader, bucket);
                         return FileVisitResult.CONTINUE;
                     }
+
                 });
             }
 
