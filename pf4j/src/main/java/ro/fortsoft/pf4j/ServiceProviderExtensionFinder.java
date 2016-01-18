@@ -25,11 +25,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * The ServiceLoader base implementation for ExtensionFinder.
@@ -50,18 +49,26 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
         log.debug("Reading extensions storages from classpath");
         Map<String, Set<String>> result = new LinkedHashMap<>();
 
-        Set<String> bucket = new HashSet<>();
+        final Set<String> bucket = new HashSet<>();
         try {
             URL url = getClass().getClassLoader().getResource(getExtensionsResource());
             if (url != null) {
-                File[] files = new File(url.toURI()).listFiles();
-                if (files != null) {
-                    for (File file : files) {
-                        log.debug("Read '{}'", file);
-                        Reader reader = new FileReader(file);
-                        ServiceProviderExtensionStorage.read(reader, bucket);
-                    }
+                Path extensionPath;
+                if (url.toURI().getScheme().equals("jar")) {
+                    FileSystem fileSystem = FileSystems.newFileSystem(url.toURI(), Collections.<String, Object>emptyMap());
+                    extensionPath = fileSystem.getPath(getExtensionsResource());
+                } else {
+                    extensionPath = Paths.get(url.toURI());
                 }
+                Files.walkFileTree(extensionPath, Collections.<FileVisitOption>emptySet(), 1, new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        log.debug("Read '{}'", file);
+                        Reader reader = Files.newBufferedReader(file);
+                        ServiceProviderExtensionStorage.read(reader, bucket);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
             }
 
             if (bucket.isEmpty()) {
