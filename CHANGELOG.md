@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [0.12.0] - 2016-01-29
+
+#### Fixed
 - [#83]: `stopPlugin()` throws NPE for dependents check
 - In development mode hide `plugins/target` folder (it' is not a plugin)
 
@@ -61,7 +71,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
  
-[unreleased]: https://github.com/decebals/pf4j/compare/release-0.11.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-0.12.0...HEAD
+[0.12.0]: https://github.com/decebals/pf4j/compare/release-0.11.0...release-0.12.0
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
