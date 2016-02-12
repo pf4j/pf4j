@@ -101,7 +101,7 @@ public class PluginClassLoader extends URLClassLoader {
                 }
             }
 
-            log.debug("Couldn't find class '{}' in plugin classpath. Delegating to parent");
+            log.debug("Couldn't find class '{}' in plugin classpath. Delegating to parent", className);
 
             // use the standard URLClassLoader (which follows normal parent delegation)
             return super.loadClass(className);

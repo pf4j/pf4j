@@ -19,8 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.processor.ServiceProviderExtensionStorage;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URISyntaxException;
@@ -111,19 +109,29 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
         for (PluginWrapper plugin : plugins) {
             String pluginId = plugin.getDescriptor().getPluginId();
             log.debug("Reading extensions storages for plugin '{}'", pluginId);
-            Set<String> bucket = new HashSet<>();
+            final Set<String> bucket = new HashSet<>();
 
             try {
                 URL url = ((PluginClassLoader) plugin.getPluginClassLoader()).findResource(getExtensionsResource());
                 if (url != null) {
-                    File[] files = new File(url.toURI()).listFiles();
-                    if (files != null) {
-                        for (File file : files) {
-                            log.debug("Read '{}'", file);
-                            Reader reader = new FileReader(file);
-                            ServiceProviderExtensionStorage.read(reader, bucket);
-                        }
+                    Path extensionPath;
+                    if (url.toURI().getScheme().equals("jar")) {
+                        FileSystem fileSystem = FileSystems.newFileSystem(url.toURI(), Collections.<String, Object>emptyMap());
+                        extensionPath = fileSystem.getPath(getExtensionsResource());
+                    } else {
+                        extensionPath = Paths.get(url.toURI());
                     }
+                    Files.walkFileTree(extensionPath, Collections.<FileVisitOption>emptySet(), 1, new SimpleFileVisitor<Path>() {
+
+                        @Override
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                            log.debug("Read '{}'", file);
+                            Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8);
+                            ServiceProviderExtensionStorage.read(reader, bucket);
+                            return FileVisitResult.CONTINUE;
+                        }
+
+                    });
                 } else {
                     log.debug("Cannot find '{}'", getExtensionsResource());
                 }
