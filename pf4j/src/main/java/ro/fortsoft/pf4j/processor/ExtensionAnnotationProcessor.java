@@ -53,7 +53,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
-        info("%s%.init()", ExtensionAnnotationProcessor.class);
+        info("%s init", ExtensionAnnotationProcessor.class);
         storage = createStorage();
     }
 
@@ -84,7 +84,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             return false;
         }
 
-        info("Processing @%s%", Extension.class);
+        info("Processing @%s", Extension.class);
 		for (Element element : roundEnv.getElementsAnnotatedWith(Extension.class)) {
             // check if @Extension is put on class and not on method or constructor
             if (!(element instanceof TypeElement)) {
