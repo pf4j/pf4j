@@ -15,6 +15,7 @@
  */
 package ro.fortsoft.pf4j.processor;
 
+import javax.annotation.processing.FilerException;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import java.io.BufferedReader;
@@ -69,6 +70,8 @@ public class LegacyExtensionStorage extends ExtensionStorage {
             extensions.put(null, entries);
         } catch (FileNotFoundException e) {
             // ignore
+        } catch (FilerException e) {
+            // re-opening the file for reading or after writing is ignorable
         } catch (IOException e) {
             error(e.getMessage());
         }
@@ -93,6 +96,8 @@ public class LegacyExtensionStorage extends ExtensionStorage {
             writer.close();
         } catch (FileNotFoundException e) {
             // it's the first time, create the file
+        } catch (FilerException e) {
+            // re-opening the file for reading or after writing is ignorable
         } catch (IOException e) {
             error(e.toString());
         }
