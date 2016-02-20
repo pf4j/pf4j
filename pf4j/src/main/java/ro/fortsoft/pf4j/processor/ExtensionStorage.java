@@ -59,15 +59,15 @@ public abstract class ExtensionStorage {
     /**
      * Helper method.
      */
-    protected void note(String message, Object... args) {
-        processor.note(message, args);
+    protected void info(String message, Object... args) {
+        processor.info(message, args);
     }
 
     /**
      * Helper method.
      */
-    protected void note(Element element, String message, Object... args) {
-        processor.note(element, message, args);
+    protected void info(Element element, String message, Object... args) {
+        processor.info(element, message, args);
     }
 
 }

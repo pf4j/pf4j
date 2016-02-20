@@ -53,7 +53,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
-        note("{}.init()", ExtensionAnnotationProcessor.class);
+        info("{}.init()", ExtensionAnnotationProcessor.class);
         storage = createStorage();
     }
 
@@ -84,7 +84,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             return false;
         }
 
-        note("Processing @{}", Extension.class);
+        info("Processing @{}", Extension.class);
 		for (Element element : roundEnv.getElementsAnnotatedWith(Extension.class)) {
             // check if @Extension is put on class and not on method or constructor
             if (!(element instanceof TypeElement)) {
@@ -145,11 +145,11 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format(message, args), element);
     }
 
-    public void note(String message, Object... args) {
+    public void info(String message, Object... args) {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format(message, args));
     }
 
-    public void note(Element element, String message, Object... args) {
+    public void info(Element element, String message, Object... args) {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format(message, args), element);
     }
 
