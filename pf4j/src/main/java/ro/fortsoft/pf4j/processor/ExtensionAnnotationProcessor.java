@@ -114,12 +114,6 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             }
         }
 
-		/*
-		if (!roundEnv.processingOver()) {
-			return false;
-		}
-		*/
-
         // read old extensions
         oldExtensions = storage.read();
         for (Map.Entry<String, Set<String>> entry : oldExtensions.entrySet()) {
@@ -135,7 +129,6 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         storage.write(extensions);
 
 		return false;
-//		return true; // no further processing of this annotation type
 	}
 
     public ProcessingEnvironment getProcessingEnvironment() {
