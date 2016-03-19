@@ -60,8 +60,8 @@ public class DefaultPluginFactory implements PluginFactory {
 
         // create the plugin instance
         try {
-            Constructor<?> constructor = pluginClass.getConstructor(new Class[] { PluginWrapper.class });
-            return (Plugin) constructor.newInstance(new Object[] { pluginWrapper });
+            Constructor<?> constructor = pluginClass.getConstructor(PluginWrapper.class);
+            return (Plugin) constructor.newInstance(pluginWrapper);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
