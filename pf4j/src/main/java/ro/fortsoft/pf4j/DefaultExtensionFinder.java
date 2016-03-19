@@ -31,7 +31,8 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
     protected List<ExtensionFinder> finders = new ArrayList<>();
 
 	public DefaultExtensionFinder(PluginManager pluginManager) {
-        addDefaults(pluginManager);
+        addExtensionFinder(new LegacyExtensionFinder(pluginManager));
+//        addExtensionFinder(new ServiceProviderExtensionFinder(pluginManager));
     }
 
     @Override
@@ -63,9 +64,10 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
         }
     }
 
-    protected void addDefaults(PluginManager pluginManager) {
-        finders.add(new ServiceProviderExtensionFinder(pluginManager));
-        finders.add(new LegacyExtensionFinder(pluginManager));
+    public DefaultExtensionFinder addExtensionFinder(ExtensionFinder finder) {
+        finders.add(finder);
+
+        return this;
     }
 
 }
