@@ -31,7 +31,7 @@ public interface PluginRepository {
      *
      * @return a list of files
      */
-    public List<File> getPluginArchives();
+    List<File> getPluginArchives();
 
     /**
      * Removes a plugin from the repository.
@@ -39,6 +39,6 @@ public interface PluginRepository {
      * @param pluginPath the plugin path
      * @return true if deleted
      */
-    public boolean deletePluginArchive(String pluginPath);
+    boolean deletePluginArchive(String pluginPath);
 
 }

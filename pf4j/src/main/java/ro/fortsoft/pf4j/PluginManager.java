@@ -31,27 +31,27 @@ public interface PluginManager {
     /**
      * Retrieves all plugins.
      */
-    public List<PluginWrapper> getPlugins();
+    List<PluginWrapper> getPlugins();
 
     /**
      * Retrieves all plugins with this state.
      */
-    public List<PluginWrapper> getPlugins(PluginState pluginState);
+    List<PluginWrapper> getPlugins(PluginState pluginState);
 
     /**
      * Retrieves all resolved plugins (with resolved dependency).
      */
-  	public List<PluginWrapper> getResolvedPlugins();
+  	List<PluginWrapper> getResolvedPlugins();
 
 	/**
 	 * Retrieves all unresolved plugins (with unresolved dependency).
 	 */
-  	public List<PluginWrapper> getUnresolvedPlugins();
+  	List<PluginWrapper> getUnresolvedPlugins();
 
     /**
      * Retrieves all started plugins.
      */
-    public List<PluginWrapper> getStartedPlugins();
+    List<PluginWrapper> getStartedPlugins();
 
     /**
      * Retrieves the plugin with this id.
@@ -59,12 +59,12 @@ public interface PluginManager {
      * @param pluginId
      * @return the plugin
      */
-    public PluginWrapper getPlugin(String pluginId);
+    PluginWrapper getPlugin(String pluginId);
 
     /**
      * Load plugins.
      */
-    public void loadPlugins();
+    void loadPlugins();
 
     /**
      * Load a plugin.
@@ -72,31 +72,31 @@ public interface PluginManager {
      * @param pluginArchiveFile
      * @return the pluginId of the installed plugin or null
      */
-	public String loadPlugin(File pluginArchiveFile);
+	String loadPlugin(File pluginArchiveFile);
 
     /**
      * Start all active plugins.
      */
-    public void startPlugins();
+    void startPlugins();
 
     /**
      * Start the specified plugin and it's dependencies.
      *
      * @return the plugin state
      */
-    public PluginState startPlugin(String pluginId);
+    PluginState startPlugin(String pluginId);
 
     /**
      * Stop all active plugins.
      */
-    public void stopPlugins();
+    void stopPlugins();
 
     /**
      * Stop the specified plugin and it's dependencies.
      *
      * @return the plugin state
      */
-    public PluginState stopPlugin(String pluginId);
+    PluginState stopPlugin(String pluginId);
 
     /**
      * Unload a plugin.
@@ -104,7 +104,7 @@ public interface PluginManager {
      * @param pluginId
      * @return true if the plugin was unloaded
      */
-    public boolean unloadPlugin(String pluginId);
+    boolean unloadPlugin(String pluginId);
 
     /**
      * Disables a plugin from being loaded.
@@ -112,7 +112,7 @@ public interface PluginManager {
      * @param pluginId
      * @return true if plugin is disabled
      */
-    public boolean disablePlugin(String pluginId);
+    boolean disablePlugin(String pluginId);
 
     /**
      * Enables a plugin that has previously been disabled.
@@ -120,7 +120,7 @@ public interface PluginManager {
      * @param pluginId
      * @return true if plugin is enabled
      */
-    public boolean enablePlugin(String pluginId);
+    boolean enablePlugin(String pluginId);
 
     /**
      * Deletes a plugin.
@@ -128,29 +128,29 @@ public interface PluginManager {
      * @param pluginId
      * @return true if the plugin was deleted
      */
-    public boolean deletePlugin(String pluginId);
+    boolean deletePlugin(String pluginId);
 
-	public PluginClassLoader getPluginClassLoader(String pluginId);
+	PluginClassLoader getPluginClassLoader(String pluginId);
 
-	public <T> List<T> getExtensions(Class<T> type);
+	<T> List<T> getExtensions(Class<T> type);
 
-    public Set<String> getExtensionClassNames(String pluginId);
+    Set<String> getExtensionClassNames(String pluginId);
 
-    public ExtensionFactory getExtensionFactory();
+    ExtensionFactory getExtensionFactory();
 
     /**
 	 * The runtime mode. Must currently be either DEVELOPMENT or DEPLOYMENT.
 	 */
-	public RuntimeMode getRuntimeMode();
+	RuntimeMode getRuntimeMode();
 
     /**
      * Retrieves the {@link PluginWrapper} that loaded the given class 'clazz'.
      */
-    public PluginWrapper whichPlugin(Class<?> clazz);
+    PluginWrapper whichPlugin(Class<?> clazz);
 
-    public void addPluginStateListener(PluginStateListener listener);
+    void addPluginStateListener(PluginStateListener listener);
 
-    public void removePluginStateListener(PluginStateListener listener);
+    void removePluginStateListener(PluginStateListener listener);
 
     /**
      * Set the system version.  This is used to compare against the plugin
@@ -160,13 +160,13 @@ public interface PluginManager {
      * @default 0.0.0
      * @param version
      */
-    public void setSystemVersion(Version version);
+    void setSystemVersion(Version version);
 
     /**
      * Returns the system version.
      *
      * * @return the system version
      */
-    public Version getSystemVersion();
+    Version getSystemVersion();
 
 }

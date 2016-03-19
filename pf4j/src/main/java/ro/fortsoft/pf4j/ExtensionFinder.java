@@ -26,11 +26,11 @@ public interface ExtensionFinder {
     /**
      * Retrieves a list with all extensions found for an extension point.
      */
-    public <T> List<ExtensionWrapper<T>> find(Class<T> type);
+    <T> List<ExtensionWrapper<T>> find(Class<T> type);
 
     /**
      * Retrieves a list with all extension class names found for a plugin.
      */
-    public Set<String> findClassNames(String pluginId);
+    Set<String> findClassNames(String pluginId);
 
 }

@@ -20,6 +20,6 @@ package ro.fortsoft.pf4j;
  */
 public interface PluginFactory {
 
-    public Plugin create(PluginWrapper pluginWrapper);
+    Plugin create(PluginWrapper pluginWrapper);
 
 }

@@ -27,7 +27,7 @@ public interface PluginStatusProvider {
      * @param pluginId the plugin id
      * @return if the plugin is disabled or not
      */
-    public boolean isPluginDisabled(String pluginId);
+    boolean isPluginDisabled(String pluginId);
 
     /**
      * Disables a plugin from being loaded.
@@ -35,7 +35,7 @@ public interface PluginStatusProvider {
      * @param pluginId
      * @return true if plugin is disabled
      */
-    public boolean disablePlugin(String pluginId);
+    boolean disablePlugin(String pluginId);
 
     /**
      * Enables a plugin that has previously been disabled.
@@ -43,6 +43,6 @@ public interface PluginStatusProvider {
      * @param pluginId
      * @return true if plugin is enabled
      */
-    public boolean enablePlugin(String pluginId);
+    boolean enablePlugin(String pluginId);
 
 }

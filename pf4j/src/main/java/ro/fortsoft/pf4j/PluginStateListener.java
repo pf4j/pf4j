@@ -27,6 +27,6 @@ public interface PluginStateListener extends EventListener {
     /**
      * Invoked when a plugin's state (for example DISABLED, STARTED) is changed.
      */
-    public void pluginStateChanged(PluginStateEvent event);
+    void pluginStateChanged(PluginStateEvent event);
 
 }

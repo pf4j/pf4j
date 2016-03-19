@@ -26,6 +26,6 @@ import java.io.File;
  */
 public interface PluginDescriptorFinder {
 
-	public PluginDescriptor find(File pluginRepository) throws PluginException;
+	PluginDescriptor find(File pluginRepository) throws PluginException;
 
 }

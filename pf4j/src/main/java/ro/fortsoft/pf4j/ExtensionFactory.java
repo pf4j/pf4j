@@ -20,6 +20,6 @@ package ro.fortsoft.pf4j;
  */
 public interface ExtensionFactory {
 
-    public Object create(Class<?> extensionClass);
+    Object create(Class<?> extensionClass);
 
 }
