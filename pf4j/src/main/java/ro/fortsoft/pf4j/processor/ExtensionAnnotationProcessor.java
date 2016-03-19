@@ -199,6 +199,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         return processingEnv.getElementUtils().getTypeElement(ExtensionPoint.class.getName()).asType();
     }
 
+    @SuppressWarnings("unchecked")
     private ExtensionStorage createStorage() {
         ExtensionStorage storage = null;
 
