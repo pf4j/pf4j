@@ -44,6 +44,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
     public abstract Map<String, Set<String>> readClasspathStorages();
 
     @Override
+    @SuppressWarnings("unchecked")
 	public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
 		log.debug("Finding extensions for extension point '{}'", type.getName());
         Map<String, Set<String>> entries = getEntries();
@@ -85,7 +86,12 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                         result.add(extensionWrapper);
                         log.debug("Added extension '{}' with ordinal {}", className, ordinal);
                     } else {
-                        log.debug("'{}' is not an extension for extension point '{}'", className, type.getName());
+                        log.warn("'{}' is not an extension for extension point '{}'", className, type.getName());
+                        ClassLoader classLoader1 = type.getClassLoader();
+                        ClassLoader classLoader2 = extensionClass.getClassLoader();
+                        if (!classLoader1.equals(classLoader2)) {
+                            log.warn("Different class loaders: '{}' and '{}'", classLoader1, classLoader2);
+                        }
                     }
                 } catch (ClassNotFoundException e) {
                     log.error(e.getMessage(), e);
