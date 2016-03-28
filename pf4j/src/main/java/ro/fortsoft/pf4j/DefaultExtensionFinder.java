@@ -28,9 +28,14 @@ import java.util.Set;
  */
 public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListener {
 
+    protected PluginManager pluginManager;
     protected List<ExtensionFinder> finders = new ArrayList<>();
 
 	public DefaultExtensionFinder(PluginManager pluginManager) {
+        this.pluginManager = pluginManager;
+
+        finders = new ArrayList<>();
+
         addExtensionFinder(new LegacyExtensionFinder(pluginManager));
 //        addExtensionFinder(new ServiceProviderExtensionFinder(pluginManager));
     }
@@ -62,6 +67,10 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
                 ((PluginStateListener) finder).pluginStateChanged(event);
             }
         }
+    }
+
+    public DefaultExtensionFinder addServiceProviderExtensionFinder() {
+        return addExtensionFinder(new ServiceProviderExtensionFinder(pluginManager));
     }
 
     public DefaultExtensionFinder addExtensionFinder(ExtensionFinder finder) {
