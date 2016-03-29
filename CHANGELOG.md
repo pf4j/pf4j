@@ -24,7 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Added
 - Add `distributionManagement` section in `pom.xml`
-- Add defense to [#97] (Create ExtensionPoint in plugin and access that in a different one)
+- Add defense to [#97]
 - Add helper `DefaultExtensionFinder.addServiceProviderExtensionFinder()`
 
 #### Removed
