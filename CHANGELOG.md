@@ -12,6 +12,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
+### [0.13.0] - 2016-03-28
+
+#### Fixed
+- Fix issue with listing files from the jar file in `readPluginsStorages()`
+- [#89]: Fix "URI is not hierarchical" issue
+- [#91]: Using project lombok with pf4j causes javax.annotation.processing.FilerException
+
+#### Changed
+- Log with trace level on PluginClassLoader
+
+#### Added
+- Add `distributionManagement` section in `pom.xml`
+- Add defense to [#97] (Create ExtensionPoint in plugin and access that in a different one)
+- Add helper `DefaultExtensionFinder.addServiceProviderExtensionFinder()`
+
+#### Removed
+- Disable `ServiceProviderExtensionFinder` from `DefaultExtensionFinder`
+
 ### [0.12.0] - 2016-01-29
 
 #### Fixed
@@ -71,11 +89,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
  
-[unreleased]: https://github.com/decebals/pf4j/compare/release-0.12.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-0.13.0...HEAD
+[0.13.0]: https://github.com/decebals/pf4j/compare/release-0.12.0...release-0.13.0
 [0.12.0]: https://github.com/decebals/pf4j/compare/release-0.11.0...release-0.12.0
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#97]: https://github.com/decebals/pf4j/issues/97
+[#91]: https://github.com/decebals/pf4j/issues/91
+[#89]: https://github.com/decebals/pf4j/pull/89
 [#85]: https://github.com/decebals/pf4j/issues/85
 [#84]: https://github.com/decebals/pf4j/issues/84
 [#83]: https://github.com/decebals/pf4j/issues/83
