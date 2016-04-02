@@ -15,6 +15,7 @@
  */
 package ro.fortsoft.pf4j.demo.hello;
 
+import org.json.JSONObject;
 import ro.fortsoft.pf4j.Extension;
 import ro.fortsoft.pf4j.Plugin;
 import ro.fortsoft.pf4j.PluginWrapper;
@@ -46,7 +47,9 @@ public class HelloPlugin extends Plugin {
 
     	@Override
         public String getGreeting() {
-            return "Hello";
+            JSONObject json = new JSONObject("{'Class': 'HelloPlugin', 'Message': 'Hello'}");
+
+            return json.getString("Class") + ": " + json.getString("Message");
         }
 
     }
