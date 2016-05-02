@@ -19,10 +19,7 @@ import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +40,9 @@ public class PluginDescriptor {
     private Version requires;
     private String provider;
     private String title;
+    private String artifactID;
+    private int serverID;
+    private Version sdkVersion;
     private List<PluginDependency> dependencies;
     private PluginManager pluginManager;
     private Properties addOnProperties;
@@ -103,6 +103,22 @@ public class PluginDescriptor {
         return title;
     }
 
+    public Optional<Integer> getServerID() {
+        if (serverID != -1) {
+            return Optional.of(serverID);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Version getSdkVersion() {
+        return sdkVersion;
+    }
+
+    public String getArtifactID() {
+        return artifactID;
+    }
+
     /**
      * Returns all dependencies declared by this plugin.
      * Returns an empty array if this plugin does not declare any require.
@@ -146,6 +162,25 @@ public class PluginDescriptor {
         this.title = title;
     }
 
+    void setServerID(String serverID) {
+        if (serverID != null) {
+            try {
+                this.serverID = Integer.parseInt(serverID);
+            } catch (NumberFormatException e) {
+                log.error("Unable to parse server ID for addOn: " + title, e);
+            }
+        } else {
+            this.serverID = -1;
+        }
+    }
+
+    void setSDKVersion(String sdkVersion) {
+        this.sdkVersion = Version.createVersion(sdkVersion);
+    }
+
+    void setArtifactID(String artifactID) {
+        this.artifactID = artifactID;
+    }
 
     void setRequires(Version requires) {
         this.requires = requires;

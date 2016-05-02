@@ -23,5 +23,4 @@ public class DefaultPluginDescriptorFinder extends ManifestPluginDescriptorFinde
 	public DefaultPluginDescriptorFinder(PluginClasspath pluginClasspath, PluginManager pluginManager) {
 		super(pluginClasspath, pluginManager);
 	}
-    	
 }
