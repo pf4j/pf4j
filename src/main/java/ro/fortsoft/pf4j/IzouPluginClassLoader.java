@@ -216,8 +216,6 @@ public class IzouPluginClassLoader extends URLClassLoader {
         }
     }
 
-
-
     /**
      * the PluginDescriptor of the associated Plugin
      * @return the PluginDescriptor

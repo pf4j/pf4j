@@ -99,10 +99,11 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         }
         pluginDescriptor.setPluginVersion(Version.createVersion(version), version);
 
-        String provider = attrs.getValue("Plugin-Provider");
-        pluginDescriptor.setProvider(provider);
-        String dependencies = attrs.getValue("Plugin-Dependencies");
-        pluginDescriptor.setDependencies(dependencies);
+        pluginDescriptor.setProvider(attrs.getValue("Plugin-Provider"));
+
+        pluginDescriptor.setProvider(attrs.getValue("Implementation-Title"));
+
+        pluginDescriptor.setDependencies(attrs.getValue("Plugin-Dependencies"));
 
         String requires = attrs.getValue("Plugin-Requires");
         if (StringUtils.isNotEmpty(requires)) {

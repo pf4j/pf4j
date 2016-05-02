@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * A plugin descriptor contains information about a plug-in obtained
  * from the manifest (META-INF) file.
  *
- * @author Decebal Suiu
+ * @author Decebal Suiu, Leander Kurscheidt, Julian Brendl
  */
 public class PluginDescriptor {
     private final static String SDK_PLUGIN_ID = "org.intellimate.izou.sdk";
@@ -42,6 +42,7 @@ public class PluginDescriptor {
     private boolean secureIDSet = false;
     private Version requires;
     private String provider;
+    private String title;
     private List<PluginDependency> dependencies;
     private PluginManager pluginManager;
     private Properties addOnProperties;
@@ -96,6 +97,13 @@ public class PluginDescriptor {
     }
 
     /**
+     * Returns the implementation title from the manifest of this plugin.
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
      * Returns all dependencies declared by this plugin.
      * Returns an empty array if this plugin does not declare any require.
      */
@@ -133,6 +141,11 @@ public class PluginDescriptor {
     void setProvider(String provider) {
         this.provider = provider;
     }
+
+    void setTitle(String title) {
+        this.title = title;
+    }
+
 
     void setRequires(Version requires) {
         this.requires = requires;
