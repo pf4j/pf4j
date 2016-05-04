@@ -50,8 +50,9 @@ public class PluginDescriptor {
 
     public PluginDescriptor(PluginManager pluginManager) {
     	requires = Version.ZERO;
-        dependencies = new ArrayList<PluginDependency>();
+        dependencies = new ArrayList<>();
         this.pluginManager = pluginManager;
+        setAddOnProperties();
     }
 
     /**
@@ -210,37 +211,18 @@ public class PluginDescriptor {
         addSDKDependency();
     }
 
-    private void addSDKDependency() {
-        if (pluginId.equals(SDK_PLUGIN_ID))
-            return;
+    private void setAddOnProperties() {
         String[] split = pluginId.split("\\.");
         File descriptorFile = new File(pluginManager.getPluginDirectory().getPath() + File.separator +
                 split[split.length - 1] + "-" + rawVersion + File.separator + "classes" + File.separator
                 + "addon_config.properties");
+
         if (descriptorFile.exists()) {
-            FileInputStream fileInput = null;
-            Properties properties = null;
-            try {
-                fileInput = new FileInputStream(descriptorFile);
-                properties = new Properties();
+            try(FileInputStream fileInput = new FileInputStream(descriptorFile)) {
+                Properties properties = new Properties();
                 properties.load(fileInput);
                 fileInput.close();
                 addOnProperties = properties;
-                String sdkVersion = properties.getProperty("sdkVersion");
-                if (sdkVersion == null) {
-                    log.error("Error, sdk-version property not found for " + pluginId);
-                    addDefaultSDKDependency();
-                    return;
-                }
-                String mainVersion = sdkVersion.split("\\.")[0];
-                if (!mainVersion.matches("\\d+")) {
-                    log.error("Error, sdk-version is in an illegal format " + pluginId);
-                    addDefaultSDKDependency();
-                    return;
-                }
-                PluginDependency pluginDependency = new PluginDependency(SDK_PLUGIN_ID);
-                pluginDependency.setPluginVersion(new Version(Integer.parseInt(mainVersion), 0, 0));
-                dependencies.add(pluginDependency);
             } catch (IOException e) {
                 log.error("Error while trying to read class_loader_config.properties file for addOn:" + pluginId
                         + ", is it a resource in your addOn? Are all required properties there and filled out?", e);
@@ -248,9 +230,30 @@ public class PluginDescriptor {
         } else {
             if (!pluginId.equals(SDK_PLUGIN_ID)) {
                 log.error("Error, no config file found for plugin: " + pluginId);
-                addDefaultSDKDependency();
             }
         }
+    }
+
+    private void addSDKDependency() {
+        if (pluginId.equals(SDK_PLUGIN_ID)) {
+            return;
+        }
+
+        String sdkVersion = getSdkVersion().toString();
+        if (sdkVersion == null) {
+            log.error("Error, sdk-version not found in manifest for " + pluginId);
+            addDefaultSDKDependency();
+            return;
+        }
+        String mainVersion = sdkVersion.split("\\.")[0];
+        if (!mainVersion.matches("\\d+")) {
+            log.error("Error, sdk-version is in an illegal format " + pluginId);
+            addDefaultSDKDependency();
+            return;
+        }
+        PluginDependency pluginDependency = new PluginDependency(SDK_PLUGIN_ID);
+        pluginDependency.setPluginVersion(new Version(Integer.parseInt(mainVersion), 0, 0));
+        dependencies.add(pluginDependency);
     }
 
     /**
