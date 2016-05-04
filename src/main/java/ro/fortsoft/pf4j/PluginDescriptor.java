@@ -239,20 +239,15 @@ public class PluginDescriptor {
             return;
         }
 
-        String sdkVersion = getSdkVersion().toString();
+        Version sdkVersion = getSdkVersion();
         if (sdkVersion == null) {
             log.error("Error, sdk-version not found in manifest for " + pluginId);
             addDefaultSDKDependency();
             return;
         }
-        String mainVersion = sdkVersion.split("\\.")[0];
-        if (!mainVersion.matches("\\d+")) {
-            log.error("Error, sdk-version is in an illegal format " + pluginId);
-            addDefaultSDKDependency();
-            return;
-        }
+
         PluginDependency pluginDependency = new PluginDependency(SDK_PLUGIN_ID);
-        pluginDependency.setPluginVersion(new Version(Integer.parseInt(mainVersion), 0, 0));
+        pluginDependency.setPluginVersion(new Version(sdkVersion.getMajor(), 0, 0));
         dependencies.add(pluginDependency);
     }
 
