@@ -12,10 +12,10 @@
  */
 package ro.fortsoft.pf4j;
 
+import ro.fortsoft.pf4j.util.StringUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import ro.fortsoft.pf4j.util.StringUtils;
 
 /**
  * Version following semantic defined by <a href="http://semver.org/">Semantic Versioning</a> document.
@@ -62,8 +62,6 @@ public class Version implements Comparable<Version> {
         if (!matcher.matches()) {
             throw new IllegalArgumentException("'" + version + "' does not match format '" + FORMAT + "'");
         }
-
-
 
         int major = Integer.valueOf(matcher.group(1));
         int minor = Integer.valueOf(matcher.group(2));

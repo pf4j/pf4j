@@ -100,7 +100,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         pluginDescriptor.setPluginVersion(Version.createVersion(version), version);
 
         pluginDescriptor.setProvider(attrs.getValue("Plugin-Provider"));
-        pluginDescriptor.setProvider(attrs.getValue("Implementation-Title"));
+        pluginDescriptor.setTitle(attrs.getValue("Implementation-Title"));
         pluginDescriptor.setArtifactID(attrs.getValue("Artifact-ID"));
         pluginDescriptor.setServerID(attrs.getValue("Server-ID"));
         pluginDescriptor.setSDKVersion(attrs.getValue("SDK-Version"));
@@ -111,6 +111,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         	pluginDescriptor.setRequires(Version.createVersion(requires));
         }
 
+        pluginDescriptor.setAddOnProperties();
 		return pluginDescriptor;
 	}
 

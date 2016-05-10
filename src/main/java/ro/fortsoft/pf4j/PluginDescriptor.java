@@ -52,7 +52,6 @@ public class PluginDescriptor {
     	requires = Version.ZERO;
         dependencies = new ArrayList<>();
         this.pluginManager = pluginManager;
-        setAddOnProperties();
     }
 
     /**
@@ -164,7 +163,7 @@ public class PluginDescriptor {
     }
 
     void setServerID(String serverID) {
-        if (serverID != null) {
+        if (serverID != null && !serverID.equals("")) {
             try {
                 this.serverID = Integer.parseInt(serverID);
             } catch (NumberFormatException e) {
@@ -211,7 +210,7 @@ public class PluginDescriptor {
         addSDKDependency();
     }
 
-    private void setAddOnProperties() {
+    void setAddOnProperties() {
         String[] split = pluginId.split("\\.");
         File descriptorFile = new File(pluginManager.getPluginDirectory().getPath() + File.separator +
                 split[split.length - 1] + "-" + rawVersion + File.separator + "classes" + File.separator
