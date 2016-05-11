@@ -15,13 +15,13 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ro.fortsoft.pf4j.util.DirectedGraph;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Decebal Suiu
@@ -33,18 +33,29 @@ public class DependencyResolver {
     private List<PluginWrapper> plugins;
     private DirectedGraph<String> dependenciesGraph;
     private DirectedGraph<String> dependentsGraph;
+    private boolean resolved;
 
-	public DependencyResolver(List<PluginWrapper> plugins) {
+	public void resolve(List<PluginWrapper> plugins) {
 		this.plugins = plugins;
 
         initGraph();
+
+        resolved = true;
 	}
 
     public List<String> getDependecies(String pluginsId) {
+        if (!resolved) {
+            return Collections.emptyList();
+        }
+
         return dependenciesGraph.getNeighbors(pluginsId);
     }
 
     public List<String> getDependents(String pluginsId) {
+        if (!resolved) {
+            return Collections.emptyList();
+        }
+
         return dependentsGraph.getNeighbors(pluginsId);
     }
 
@@ -52,6 +63,10 @@ public class DependencyResolver {
 	 * Get the list of plugins in dependency sorted order.
 	 */
 	public List<PluginWrapper> getSortedPlugins() throws PluginException {
+        if (!resolved) {
+            return Collections.emptyList();
+        }
+
 		log.debug("Graph: {}", dependenciesGraph);
 		List<String> pluginsId = dependenciesGraph.reverseTopologicalSort();
 

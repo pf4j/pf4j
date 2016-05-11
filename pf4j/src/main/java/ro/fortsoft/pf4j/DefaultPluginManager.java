@@ -746,6 +746,8 @@ public class DefaultPluginManager implements PluginManager {
 
         pluginStateListeners = new ArrayList<>();
 
+        dependencyResolver = new DependencyResolver();
+
         log.info("PF4J version {} in '{}' mode", getVersion(), getRuntimeMode());
 
         pluginClasspath = createPluginClasspath();
@@ -853,7 +855,7 @@ public class DefaultPluginManager implements PluginManager {
 	}
 
 	private void resolveDependencies() throws PluginException {
-		dependencyResolver = new DependencyResolver(unresolvedPlugins);
+		dependencyResolver.resolve(unresolvedPlugins);
 		resolvedPlugins = dependencyResolver.getSortedPlugins();
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
         	unresolvedPlugins.remove(pluginWrapper);
