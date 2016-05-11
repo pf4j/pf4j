@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- */
 package ro.fortsoft.pf4j.demo.api;
 
 import ro.fortsoft.pf4j.ExtensionPoint;
