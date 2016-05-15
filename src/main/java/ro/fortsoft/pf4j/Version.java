@@ -146,16 +146,4 @@ public class Version implements Comparable<Version> {
     public boolean exceeds(Version v) {
     	return compareTo(v) > 0;
     }
-
-    // for test only
-    public static void main(String[] args) {
-        Version v = Version.createVersion("1.2.3-SNAPSHOT");
-        System.out.println(v.toString());
-        Version v1 = Version.createVersion("4.1.0");
-        System.out.println(v1.toString());
-        Version v2  = Version.createVersion("4.0.32");
-        System.out.println(v2.toString());
-        System.out.println(v1.compareTo(v2));
-    }
-
 }
