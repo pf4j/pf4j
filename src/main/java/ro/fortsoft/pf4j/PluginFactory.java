@@ -16,7 +16,5 @@ package ro.fortsoft.pf4j;
  * Creates a plugin instance.
  */
 public interface PluginFactory {
-
-    public Plugin create(PluginWrapper pluginWrapper);
-
+    Plugin create(PluginWrapper pluginWrapper);
 }
