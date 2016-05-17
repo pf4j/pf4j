@@ -80,7 +80,8 @@ public class IzouPluginClassLoader extends URLClassLoader {
         if (className.startsWith(PLUGIN_PACKAGE_PREFIX_PF4J)) {
             log.debug("Delegate the loading of class '{}' to parent", className);
             try {
-                return checkAccess(super.getParent().loadClass(className), className);
+//                return checkAccess(super.getParent().loadClass(className), className);
+                return super.getParent().loadClass(className);
             } catch (ClassNotFoundException e) {
                 // try next step
                 // TODO if I uncomment below lines (the correct approach) I received ClassNotFoundException for demo (ro.fortsoft.pf4j.demo)
@@ -88,7 +89,8 @@ public class IzouPluginClassLoader extends URLClassLoader {
                 //  throw e;
             }
         }
-        else if (className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_SL4J) ||
+        else
+        if (className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_SL4J) ||
                 className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU) ||
                 className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_LOG4J)) {
             try {
@@ -152,7 +154,7 @@ public class IzouPluginClassLoader extends URLClassLoader {
         log.debug("Couldn't find class '{}' in plugin classpath. Delegating to parent");
 
         // use the standard URLClassLoader (which follows normal parent delegation)
-        return checkAccess(super.getParent().loadClass(className), className);
+        return super.getParent().loadClass(className);
     }
 
     /**
