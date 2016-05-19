@@ -60,11 +60,38 @@ public class IzouPluginClassLoader extends URLClassLoader {
      * @return the Class or an Exception
      */
     private Class<?> checkAccess(Class<?> parentResult, String classname) throws LinkageError {
-        if (parentResult.isAnnotationPresent(AddonAccessible.class) && parentResult.isInterface()) {
+        if (parentResult.isAnnotationPresent(AddonAccessible.class) && (parentResult.isInterface() || checkInstanceOf(parentResult, Throwable.class))) {
             return parentResult;
         } else {
             throw new LinkageError("Requested class: " + classname + " is not accessible for addons");
         }
+    }
+
+    /**
+     * Checks if a subject class is a sub class of a super class
+     *
+     * @param subject The sub class to check if the superClass is a super class of it.
+     * @param superClass The super class.
+     * @return True if subject is a super class of superClass and otherwise false.
+     */
+    private boolean checkInstanceOf(Class subject, Class superClass) {
+        Class subjectClass = subject;
+
+        // Check for null
+        if (subjectClass == null || superClass == null) {
+            return false;
+        }
+
+        // Check all super classes
+        while (subjectClass != Object.class) {
+            if (subjectClass.getSuperclass() == superClass) {
+                return true;
+            }
+
+            subjectClass = subjectClass.getSuperclass();
+        }
+
+        return false;
     }
 
     /**
@@ -90,9 +117,11 @@ public class IzouPluginClassLoader extends URLClassLoader {
             }
         }
         else
-        if (className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_SL4J) ||
-                className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU) ||
-                className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_LOG4J)) {
+        //TODO resolve: what about the logging things
+        if (//className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_SL4J) ||
+                className.startsWith(PLUGIN_PACKAGE_PREFIX_IZOU) ) {
+                        //||
+                //className.startsWith(PLUGIN_PACKAGE_PREFIX_LOG_LOG4J)) {
             try {
                 //directing to parent
                 return checkAccess(super.getParent().loadClass(className), className);
