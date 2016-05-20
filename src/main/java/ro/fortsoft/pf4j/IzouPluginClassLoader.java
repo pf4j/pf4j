@@ -60,7 +60,8 @@ public class IzouPluginClassLoader extends URLClassLoader {
      * @return the Class or an Exception
      */
     private Class<?> checkAccess(Class<?> parentResult, String classname) throws LinkageError {
-        if (parentResult.isAnnotationPresent(AddonAccessible.class) && (parentResult.isInterface() || checkInstanceOf(parentResult, Throwable.class))) {
+        if (parentResult.isAnnotationPresent(AddonAccessible.class) && (parentResult.isInterface()
+                || checkInstanceOf(parentResult, Throwable.class)) || parentResult.isEnum()) {
             return parentResult;
         } else {
             throw new LinkageError("Requested class: " + classname + " is not accessible for addons");
