@@ -12,10 +12,15 @@ jar {
 task plugin(type: Jar) {
   baseName = 'WelcomePlugin'
   version = '0.1.0'
-  into('classes')
+  into('classes'){
+     with jar
+  }
+  into('lib'){
+    from configurations.compile
+  }
   extension('zip')
-  with jar
 }
+assemble.dependsOn plugin
 
 dependencies {
   compile project(':api')
