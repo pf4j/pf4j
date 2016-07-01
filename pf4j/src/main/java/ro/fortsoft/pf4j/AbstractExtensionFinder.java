@@ -70,20 +70,6 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
             ClassLoader classLoader = (pluginId != null) ? pluginManager.getPluginClassLoader(pluginId) : getClass().getClassLoader();
 
-            // performs some check
-            if (log.isTraceEnabled()) { // an alternative may be the use of a system property
-                ClassLoader typeClassLoader = type.getClassLoader();
-                if (!classLoader.equals(typeClassLoader))
-                {
-                    // in this scenario the method 'isAssignableFrom' returns only FALSE
-                    // see http://www.coderanch.com/t/557846/java/java/FWIW-FYI-isAssignableFrom-isInstance-differing
-                    log.error("Different class loaders: '{}' (E) and '{}' (EP)", classLoader, typeClassLoader);
-
-                    // below line is commented because I wish to see the next log.trace line
-//                    continue;
-                }
-            }
-
             for (String className : entry.getValue()) {
                 try {
                     log.debug("Loading class '{}' using class loader '{}'", className, classLoader);
