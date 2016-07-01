@@ -84,7 +84,7 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
         List<PluginWrapper> plugins = pluginManager.getPlugins();
         for (PluginWrapper plugin : plugins) {
             String pluginId = plugin.getDescriptor().getPluginId();
-            log.debug("Reading extensions storage for plugin '{}'", pluginId);
+            log.debug("Reading extensions storage from plugin '{}'", pluginId);
             Set<String> bucket = new HashSet<>();
 
             try {

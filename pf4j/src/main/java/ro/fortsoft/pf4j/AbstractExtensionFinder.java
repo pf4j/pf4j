@@ -62,6 +62,10 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                 if (PluginState.STARTED != pluginWrapper.getPluginState()) {
                     continue;
                 }
+
+                log.trace("Checking extensions from plugin '{}'", pluginId);
+            } else {
+                log.trace("Checking extensions from classpath");
             }
 
             ClassLoader classLoader = (pluginId != null) ? pluginManager.getPluginClassLoader(pluginId) : getClass().getClassLoader();
@@ -73,7 +77,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                 {
                     // in this scenario the method 'isAssignableFrom' returns only FALSE
                     // see http://www.coderanch.com/t/557846/java/java/FWIW-FYI-isAssignableFrom-isInstance-differing
-                    log.error("Different class loaders: '{}' and '{}'", classLoader, typeClassLoader);
+                    log.error("Different class loaders: '{}' (E) and '{}' (EP)", classLoader, typeClassLoader);
 
                     // below line is commented because I wish to see the next log.trace line
 //                    continue;
