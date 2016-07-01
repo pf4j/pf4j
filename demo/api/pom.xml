@@ -29,6 +29,7 @@
             <groupId>ro.fortsoft.pf4j</groupId>
             <artifactId>pf4j</artifactId>
             <version>${project.version}</version>
+            <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
         </dependency>
     </dependencies>

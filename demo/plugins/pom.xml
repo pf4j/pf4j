@@ -64,9 +64,6 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<!--
-										<execute />
-										-->
 										<execute>
 											<runOnIncremental>true</runOnIncremental>
 											<runOnConfiguration>true</runOnConfiguration>
@@ -91,6 +88,7 @@
             <groupId>ro.fortsoft.pf4j</groupId>
             <artifactId>pf4j</artifactId>
             <version>${project.version}</version>
+            <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
         </dependency>
 
@@ -98,6 +96,7 @@
             <groupId>ro.fortsoft.pf4j.demo</groupId>
             <artifactId>pf4j-demo-api</artifactId>
             <version>${project.version}</version>
+            <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
         </dependency>
     </dependencies>
