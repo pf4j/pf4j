@@ -51,6 +51,10 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
         List<ExtensionWrapper<T>> result = new ArrayList<>();
         for (Map.Entry<String, Set<String>> entry : entries.entrySet()) {
+            if (entry.getValue().isEmpty()) {
+                continue;
+            }
+
             String pluginId = entry.getKey();
 
             if (pluginId != null) {
@@ -61,6 +65,20 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
             }
 
             ClassLoader classLoader = (pluginId != null) ? pluginManager.getPluginClassLoader(pluginId) : getClass().getClassLoader();
+
+            // performs some check
+            if (log.isTraceEnabled()) { // an alternative may be the use of a system property
+                ClassLoader typeClassLoader = type.getClassLoader();
+                if (!classLoader.equals(typeClassLoader))
+                {
+                    // in this scenario the method 'isAssignableFrom' returns only FALSE
+                    // see http://www.coderanch.com/t/557846/java/java/FWIW-FYI-isAssignableFrom-isInstance-differing
+                    log.error("Different class loaders: '{}' and '{}'", classLoader, typeClassLoader);
+
+                    // below line is commented because I wish to see the next log.trace line
+//                    continue;
+                }
+            }
 
             for (String className : entry.getValue()) {
                 try {
@@ -81,13 +99,8 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                         extensionWrapper.setExtensionFactory(pluginManager.getExtensionFactory());
                         result.add(extensionWrapper);
                         log.debug("Added extension '{}' with ordinal {}", className, ordinal);
-                    } else if (log.isTraceEnabled()) { // an alternative may be the use of a system property
+                    } else {
                         log.trace("'{}' is not an extension for extension point '{}'", className, type.getName());
-                        ClassLoader extensionClassLoader = extensionClass.getClassLoader();
-                        ClassLoader typeClassLoader = type.getClassLoader();
-                        if (!extensionClassLoader.equals(typeClassLoader)) {
-                            log.trace("Different class loaders: '{}' and '{}'", extensionClassLoader, typeClassLoader);
-                        }
                     }
                 } catch (ClassNotFoundException e) {
                     log.error(e.getMessage(), e);
