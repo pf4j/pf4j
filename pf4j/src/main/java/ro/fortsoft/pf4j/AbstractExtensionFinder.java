@@ -46,7 +46,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
     @Override
     @SuppressWarnings("unchecked")
 	public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
-		log.debug("Finding extensions for extension point '{}'", type.getName());
+		log.debug("Finding extensions of extension point '{}'", type.getName());
         Map<String, Set<String>> entries = getEntries();
 
         List<ExtensionWrapper<T>> result = new ArrayList<>();
