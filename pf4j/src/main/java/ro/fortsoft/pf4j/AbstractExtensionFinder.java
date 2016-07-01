@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public abstract class AbstractExtensionFinder implements ExtensionFinder, PluginStateListener {
 
-    protected static final Logger log = LoggerFactory.getLogger(AbstractExtensionFinder.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractExtensionFinder.class);
 
     protected PluginManager pluginManager;
     protected volatile Map<String, Set<String>> entries; // cache by pluginId
@@ -60,14 +60,10 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                 }
             }
 
+            ClassLoader classLoader = (pluginId != null) ? pluginManager.getPluginClassLoader(pluginId) : getClass().getClassLoader();
+
             for (String className : entry.getValue()) {
                 try {
-                    ClassLoader classLoader;
-                    if (pluginId != null) {
-                        classLoader = pluginManager.getPluginClassLoader(pluginId);
-                    } else {
-                        classLoader = getClass().getClassLoader();
-                    }
                     log.debug("Loading class '{}' using class loader '{}'", className, classLoader);
                     Class<?> extensionClass = classLoader.loadClass(className);
 
