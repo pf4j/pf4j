@@ -87,10 +87,10 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                         log.debug("Added extension '{}' with ordinal {}", className, ordinal);
                     } else if (log.isTraceEnabled()) { // an alternative may be the use of a system property
                         log.trace("'{}' is not an extension for extension point '{}'", className, type.getName());
-                        ClassLoader typeClassLoader = type.getClassLoader();
                         ClassLoader extensionClassLoader = extensionClass.getClassLoader();
-                        if (!typeClassLoader.equals(extensionClassLoader)) {
-                            log.trace("Different class loaders: '{}' and '{}'", typeClassLoader, extensionClassLoader);
+                        ClassLoader typeClassLoader = type.getClassLoader();
+                        if (!extensionClassLoader.equals(typeClassLoader)) {
+                            log.trace("Different class loaders: '{}' and '{}'", extensionClassLoader, typeClassLoader);
                         }
                     }
                 } catch (ClassNotFoundException e) {
