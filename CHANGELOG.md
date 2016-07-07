@@ -5,12 +5,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#99]: NPE in `DefaultPluginManager.stopPlugin()`
+- [#100]: Gradle build in demo_gradle is broken 
+- [#103]: Gradle demos don't build zip with libs
+- Fix logging issue in demo
 
 #### Changed
+- Rework defense against [#97]
+- Eliminate duplicate log messages from demo
+- Improve debugging for "no extensions found"
 
 #### Added
 
 #### Removed
+
+### [0.13.1] - 2016-04-01
+
+#### Fixed
+- [#98]: WARN ro.fortsoft.pf4j.AbstractExtensionFinder (too many log lines)
 
 ### [0.13.0] - 2016-03-28
 
@@ -89,12 +101,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
  
-[unreleased]: https://github.com/decebals/pf4j/compare/release-0.13.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-0.13.1...HEAD
+[0.13.1]: https://github.com/decebals/pf4j/compare/release-0.13.0...release-0.13.1
 [0.13.0]: https://github.com/decebals/pf4j/compare/release-0.12.0...release-0.13.0
 [0.12.0]: https://github.com/decebals/pf4j/compare/release-0.11.0...release-0.12.0
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#103]: https://github.com/decebals/pf4j/issues/103
+[#100]: https://github.com/decebals/pf4j/issues/100
+[#99]: https://github.com/decebals/pf4j/issues/99
+[#98]: https://github.com/decebals/pf4j/issues/98
 [#97]: https://github.com/decebals/pf4j/issues/97
 [#91]: https://github.com/decebals/pf4j/issues/91
 [#89]: https://github.com/decebals/pf4j/pull/89
