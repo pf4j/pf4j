@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [1.0.0] - 2016-07-07
+
+#### Fixed
 - [#99]: NPE in `DefaultPluginManager.stopPlugin()`
 - [#100]: Gradle build in demo_gradle is broken 
 - [#103]: Gradle demos don't build zip with libs
@@ -100,8 +110,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added test for DefaultPluginRepository
 
 #### Removed
- 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-0.13.1...HEAD
+
+[unreleased]: https://github.com/decebals/pf4j/compare/release-1.0.0...HEAD
+[1.0.0]: https://github.com/decebals/pf4j/compare/release-0.13.1...release-1.0.0
 [0.13.1]: https://github.com/decebals/pf4j/compare/release-0.13.0...release-0.13.1
 [0.13.0]: https://github.com/decebals/pf4j/compare/release-0.12.0...release-0.13.0
 [0.12.0]: https://github.com/decebals/pf4j/compare/release-0.11.0...release-0.12.0
