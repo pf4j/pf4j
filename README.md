@@ -402,6 +402,17 @@ protected ExtensionFinder createExtensionFinder() {
 }
 ```
 
+Troubleshooting
+-------------------
+Below are listed some problems that may occur when attempting to use PF4J, and suggestions for solving them.
+
+- **No Extensions Found**
+
+See if you have a file `extensions.idx` in each plugin.  
+If file `extensions.idx` doesn't exist then probably it's something wrong with the annotation processing step (enable annotation processing in your IDE or in your Maven script).   
+If file `extensions.idx` exists and it's not empty then sure you have a class loader issue (you have the same extension point in two different class loader), in this situation you must remove some libraries (probably the API jar) from plugin.   
+Are some resources on the internet related to this subject: [#82](https://github.com/decebals/pf4j/issues/82), [#64](https://github.com/decebals/pf4j/issues/64) and [No extensions found] (https://groups.google.com/forum/#!topic/pf4j/tEQXY_WpD3A).
+
 Demo
 -------------------
 I have a tiny demo application. The demo application is in demo folder.
