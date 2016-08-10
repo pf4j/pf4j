@@ -89,7 +89,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     }
 
     protected PluginDescriptor createPluginDescriptor(Properties properties) {
-        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        PluginDescriptor pluginDescriptor = createPluginDescriptorInstance();
 
         // TODO validate !!!
         String id = properties.getProperty("plugin.id");
@@ -110,6 +110,10 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         pluginDescriptor.setDependencies(dependencies);
 
         return pluginDescriptor;
+    }
+
+    protected PluginDescriptor createPluginDescriptorInstance() {
+        return new PluginDescriptor();
     }
 
     protected void validatePluginDescriptor(PluginDescriptor pluginDescriptor) throws PluginException {
