@@ -59,14 +59,7 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
                 LegacyExtensionStorage.read(reader, bucket);
             }
 
-            if (bucket.isEmpty()) {
-                log.debug("No extensions found");
-            } else {
-                log.debug("Found possible {} extensions:", bucket.size());
-                for (String entry : bucket) {
-                    log.debug("   " + entry);
-                }
-            }
+            logExtensions(bucket);
 
             result.put(null, bucket);
         } catch (IOException e) {
@@ -97,14 +90,7 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
                     log.debug("Cannot find '{}'", getExtensionsResource());
                 }
 
-                if (bucket.isEmpty()) {
-                    log.debug("No extensions found");
-                } else {
-                    log.debug("Found possible {} extensions:", bucket.size());
-                    for (String entry : bucket) {
-                        log.debug("   " + entry);
-                    }
-                }
+                logExtensions(bucket);
 
                 result.put(pluginId, bucket);
             } catch (IOException e) {

@@ -70,27 +70,11 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
                 } else {
                     extensionPath = Paths.get(url.toURI());
                 }
-                Files.walkFileTree(extensionPath, Collections.<FileVisitOption>emptySet(), 1, new SimpleFileVisitor<Path>() {
 
-                    @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        log.debug("Read '{}'", file);
-                        Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8);
-                        ServiceProviderExtensionStorage.read(reader, bucket);
-                        return FileVisitResult.CONTINUE;
-                    }
-
-                });
+                bucket.addAll(readExtensions(extensionPath));
             }
 
-            if (bucket.isEmpty()) {
-                log.debug("No extensions found");
-            } else {
-                log.debug("Found possible {} extensions:", bucket.size());
-                for (String entry : bucket) {
-                    log.debug("   " + entry);
-                }
-            }
+            logExtensions(bucket);
 
             result.put(null, bucket);
         } catch (IOException | URISyntaxException e) {
@@ -121,29 +105,13 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
                     } else {
                         extensionPath = Paths.get(url.toURI());
                     }
-                    Files.walkFileTree(extensionPath, Collections.<FileVisitOption>emptySet(), 1, new SimpleFileVisitor<Path>() {
 
-                        @Override
-                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                            log.debug("Read '{}'", file);
-                            Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8);
-                            ServiceProviderExtensionStorage.read(reader, bucket);
-                            return FileVisitResult.CONTINUE;
-                        }
-
-                    });
+                    bucket.addAll(readExtensions(extensionPath));
                 } else {
                     log.debug("Cannot find '{}'", getExtensionsResource());
                 }
 
-                if (bucket.isEmpty()) {
-                    log.debug("No extensions found");
-                } else {
-                    log.debug("Found possible {} extensions:", bucket.size());
-                    for (String entry : bucket) {
-                        log.debug("   " + entry);
-                    }
-                }
+                logExtensions(bucket);
 
                 result.put(pluginId, bucket);
             } catch (IOException | URISyntaxException e) {
@@ -156,6 +124,23 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
 
     private static String getExtensionsResource() {
         return ServiceProviderExtensionStorage.EXTENSIONS_RESOURCE;
+    }
+
+    private Set<String> readExtensions(Path extensionPath) throws IOException {
+        final Set<String> result = new HashSet<>();
+        Files.walkFileTree(extensionPath, Collections.<FileVisitOption>emptySet(), 1, new SimpleFileVisitor<Path>() {
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                log.debug("Read '{}'", file);
+                Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8);
+                ServiceProviderExtensionStorage.read(reader, result);
+                return FileVisitResult.CONTINUE;
+            }
+
+        });
+
+        return result;
     }
 
 }

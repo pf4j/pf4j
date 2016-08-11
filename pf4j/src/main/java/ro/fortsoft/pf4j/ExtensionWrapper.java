@@ -30,7 +30,8 @@ public class ExtensionWrapper<T> implements Comparable<ExtensionWrapper<T>> {
         this.descriptor = descriptor;
 	}
 
-	public T getExtension() {
+	@SuppressWarnings("unchecked")
+    public T getExtension() {
         if (extension == null) {
             extension = (T) extensionFactory.create(descriptor.getExtensionClass());
         }
