@@ -29,6 +29,16 @@ public interface ExtensionFinder {
     <T> List<ExtensionWrapper<T>> find(Class<T> type);
 
     /**
+     * Retrieves a list with all extensions found for an extension point and a plugin.
+     */
+    <T> List<ExtensionWrapper<T>> find(Class<T> type, String pluginId);
+
+    /**
+     * Retrieves a list with all extensions found for a plugin
+     */
+    List<ExtensionWrapper> find(String pluginId);
+
+    /**
      * Retrieves a list with all extension class names found for a plugin.
      */
     Set<String> findClassNames(String pluginId);

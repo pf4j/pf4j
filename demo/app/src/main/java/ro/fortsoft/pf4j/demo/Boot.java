@@ -56,19 +56,46 @@ public class Boot {
         }
 
         // print extensions from classpath (non plugin)
-        System.out.println(String.format("Extensions added by classpath:"));
+        System.out.println("Extensions added by classpath:");
         Set<String> extensionClassNames = pluginManager.getExtensionClassNames(null);
         for (String extension : extensionClassNames) {
             System.out.println("   " + extension);
         }
 
-        // print extensions for each started plugin
+        // print extensions ids for each started plugin
         List<PluginWrapper> startedPlugins = pluginManager.getStartedPlugins();
         for (PluginWrapper plugin : startedPlugins) {
             String pluginId = plugin.getDescriptor().getPluginId();
             System.out.println(String.format("Extensions added by plugin '%s':", pluginId));
             extensionClassNames = pluginManager.getExtensionClassNames(pluginId);
             for (String extension : extensionClassNames) {
+                System.out.println("   " + extension);
+            }
+        }
+
+        // print the extensions instances for Greeting extension point for each started plugin
+        for (PluginWrapper plugin : startedPlugins) {
+            String pluginId = plugin.getDescriptor().getPluginId();
+            System.out.println(String.format("Extensions instances added by plugin '%s' for extension point '%s':", pluginId, Greeting.class.getName()));
+            List<Greeting> extensions = pluginManager.getExtensions(Greeting.class, pluginId);
+            for (Object extension : extensions) {
+                System.out.println("   " + extension);
+            }
+        }
+
+        // print extensions instances from classpath (non plugin)
+        System.out.println("Extensions instances added by classpath:");
+        List extensions = pluginManager.getExtensions((String) null);
+        for (Object extension : extensions) {
+            System.out.println("   " + extension);
+        }
+
+        // print extensions instances for each started plugin
+        for (PluginWrapper plugin : startedPlugins) {
+            String pluginId = plugin.getDescriptor().getPluginId();
+            System.out.println(String.format("Extensions instances added by plugin '%s':", pluginId));
+            extensions = pluginManager.getExtensions(pluginId);
+            for (Object extension : extensions) {
                 System.out.println("   " + extension);
             }
         }
