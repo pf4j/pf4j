@@ -7,8 +7,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 #### Fixed
 
 #### Changed
+- [#107]: PluginDescriptor can't be extended
 
 #### Added
+- [#108]: Return a list of all extensions from a plugin and optional for an extension point
 
 #### Removed
 
@@ -119,6 +121,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#108]: https://github.com/decebals/pf4j/pull/108
+[#107]: https://github.com/decebals/pf4j/issues/107
 [#103]: https://github.com/decebals/pf4j/issues/103
 [#100]: https://github.com/decebals/pf4j/issues/100
 [#99]: https://github.com/decebals/pf4j/issues/99
