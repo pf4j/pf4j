@@ -186,13 +186,15 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         entries = null;
     }
 
-    protected void logExtensions(Set<String> extensions) {
-        if (extensions.isEmpty()) {
-            log.debug("No extensions found");
-        } else {
-            log.debug("Found possible {} extensions:", extensions.size());
-            for (String extension : extensions) {
-                log.debug("   " + extension);
+    protected void debugExtensions(Set<String> extensions) {
+        if (log.isDebugEnabled()) {
+            if (extensions.isEmpty()) {
+                log.debug("No extensions found");
+            } else {
+                log.debug("Found possible {} extensions:", extensions.size());
+                for (String extension : extensions) {
+                    log.debug("   " + extension);
+                }
             }
         }
     }

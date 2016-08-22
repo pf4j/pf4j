@@ -59,7 +59,7 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
                 LegacyExtensionStorage.read(reader, bucket);
             }
 
-            logExtensions(bucket);
+            debugExtensions(bucket);
 
             result.put(null, bucket);
         } catch (IOException e) {
@@ -90,7 +90,7 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
                     log.debug("Cannot find '{}'", getExtensionsResource());
                 }
 
-                logExtensions(bucket);
+                debugExtensions(bucket);
 
                 result.put(pluginId, bucket);
             } catch (IOException e) {

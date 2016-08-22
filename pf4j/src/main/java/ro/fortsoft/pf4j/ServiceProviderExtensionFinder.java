@@ -74,7 +74,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
                 bucket.addAll(readExtensions(extensionPath));
             }
 
-            logExtensions(bucket);
+            debugExtensions(bucket);
 
             result.put(null, bucket);
         } catch (IOException | URISyntaxException e) {
@@ -111,7 +111,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
                     log.debug("Cannot find '{}'", getExtensionsResource());
                 }
 
-                logExtensions(bucket);
+                debugExtensions(bucket);
 
                 result.put(pluginId, bucket);
             } catch (IOException | URISyntaxException e) {
