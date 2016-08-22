@@ -7,6 +7,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 #### Fixed
 
 #### Changed
+
+#### Added
+
+#### Removed
+
+### [1.1.0] - 2016-08-22
+
+#### Fixed
+
+#### Changed
 - [#107]: PluginDescriptor can't be extended
 
 #### Added
@@ -113,7 +123,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-1.0.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-1.1.0...HEAD
+[1.1.0]: https://github.com/decebals/pf4j/compare/release-1.0.0...release-1.1.0
 [1.0.0]: https://github.com/decebals/pf4j/compare/release-0.13.1...release-1.0.0
 [0.13.1]: https://github.com/decebals/pf4j/compare/release-0.13.0...release-0.13.1
 [0.13.0]: https://github.com/decebals/pf4j/compare/release-0.12.0...release-0.13.0
