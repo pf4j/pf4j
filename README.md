@@ -1,6 +1,5 @@
 Plugin Framework for Java (PF4J)
 =====================
-
 [![Join the chat at https://gitter.im/decebals/pf4j](https://badges.gitter.im/decebals/pf4j.svg)](https://gitter.im/decebals/pf4j?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Travis CI Build Status](https://travis-ci.org/decebals/pf4j.png)](https://travis-ci.org/decebals/pf4j)
 [![Coverage Status](https://coveralls.io/repos/decebals/pf4j/badge.svg?branch=master&service=github)](https://coveralls.io/github/decebals/pf4j?branch=master)
