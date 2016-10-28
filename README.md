@@ -126,6 +126,8 @@ Plugin-Version: 0.0.1
 In above manifest I described a plugin with id `welcome-plugin`, with class `ro.fortsoft.pf4j.demo.welcome.WelcomePlugin`, with version `0.0.1` and with dependencies 
 to plugins `x, y, z`.
 
+**NOTE:** The plugin version must be compliant with [Semantic Versioning](http://semver.org) (PF4J uses `jsemver` as implementation for SemVer because it comes with support for comparing versions)
+
 You can define an extension point in your application using **ExtensionPoint** interface marker.
 
 ```java
@@ -399,7 +401,10 @@ For example if I want to use `ServiceProviderExtensionStorage` then the value fo
 not added/enabled by default. To do this please override `createExtensionFinder` from `DefaultPluginManager`:
 ```java
 protected ExtensionFinder createExtensionFinder() {
-    return ((DefaultExtensionFinder) super.createExtensionFinder()).addServiceProviderExtensionFinder();
+    DefaultExtensionFinder extensionFinder = super.createExtensionFinder();
+    extensionFinder.addServiceProviderExtensionFinder();
+    
+    return extensionFinder;
 }
 ```
 
