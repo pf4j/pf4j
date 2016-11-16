@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#116]: Default/System extensions are duplicated
 
 #### Changed
 
@@ -132,6 +133,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#116]: https://github.com/decebals/pf4j/issues/116
 [#108]: https://github.com/decebals/pf4j/pull/108
 [#107]: https://github.com/decebals/pf4j/issues/107
 [#103]: https://github.com/decebals/pf4j/issues/103
