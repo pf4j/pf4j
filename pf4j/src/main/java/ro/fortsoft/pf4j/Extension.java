@@ -32,6 +32,6 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Extension {
 
-	 int ordinal() default 0;
+	int ordinal() default 0;
 
 }

@@ -50,12 +50,9 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         Map<String, Set<String>> entries = getEntries();
         List<ExtensionWrapper<T>> result = new ArrayList<>();
 
-        // add extensions found in classpath
-        List<ExtensionWrapper<T>> classpathExtensions = find(type, null);
-        result.addAll(classpathExtensions);
-
-        // add extensions found in each plugin
+        // add extensions found in classpath and plugins
         for (String pluginId : entries.keySet()) {
+            // classpath's extensions <=> pluginId = null
             List<ExtensionWrapper<T>> pluginExtensions = find(type, pluginId);
             result.addAll(pluginExtensions);
         }
@@ -78,6 +75,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         log.debug("Finding extensions of extension point '{}' for plugin '{}'", type.getName(), pluginId);
         List<ExtensionWrapper<T>> result = new ArrayList<>();
 
+        // classpath's extensions <=> pluginId = null
         Set<String> classNames = findClassNames(pluginId);
         if (classNames.isEmpty()) {
             return result;
