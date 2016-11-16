@@ -5,11 +5,22 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [1.1.1] - 2016-11-17
+
+#### Fixed
 - [#116]: Default/System extensions are duplicated
 
 #### Changed
 
 #### Added
+- [#111]: Add inheritance support on Extension annotation
 
 #### Removed
 
@@ -124,7 +135,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-1.1.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-1.1.1...HEAD
+[1.1.1]: https://github.com/decebals/pf4j/compare/release-1.1.0...release-1.1.1
 [1.1.0]: https://github.com/decebals/pf4j/compare/release-1.0.0...release-1.1.0
 [1.0.0]: https://github.com/decebals/pf4j/compare/release-0.13.1...release-1.0.0
 [0.13.1]: https://github.com/decebals/pf4j/compare/release-0.13.0...release-0.13.1
@@ -134,6 +146,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
 [#116]: https://github.com/decebals/pf4j/issues/116
+[#111]: https://github.com/decebals/pf4j/pull/111
 [#108]: https://github.com/decebals/pf4j/pull/108
 [#107]: https://github.com/decebals/pf4j/issues/107
 [#103]: https://github.com/decebals/pf4j/issues/103
