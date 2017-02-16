@@ -4,7 +4,7 @@ jar {
   manifest {
     attributes 'Plugin-Class' : 'ro.fortsoft.pf4j.demo.welcome.WelcomePlugin',
       'Plugin-Id' : 'WelcomePlugin',
-      'Plugin-Version' : '1.0',
+      'Plugin-Version' : '1.0.0',
       'Plugin-Provider' : 'Decebal Suiu'
   }
 }
@@ -24,7 +24,7 @@ assemble.dependsOn plugin
 
 dependencies {
   compile project(':api')
-  compile 'ro.fortsoft.pf4j:pf4j:0.4'
+  compile 'ro.fortsoft.pf4j:pf4j:1.1.1'
   compile 'org.apache.commons:commons-lang3:3.0'
   testCompile group: 'junit', name: 'junit', version: '4.+'
 }
