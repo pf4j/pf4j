@@ -17,6 +17,7 @@ package ro.fortsoft.pf4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ro.fortsoft.pf4j.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,6 +107,9 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                     log.debug("Added extension '{}' with ordinal {}", className, extensionWrapper.getOrdinal());
                 } else {
                     log.trace("'{}' is not an extension for extension point '{}'", className, type.getName());
+                    if (RuntimeMode.DEVELOPMENT.equals(pluginManager.getRuntimeMode())) {
+                        checkDifferentClassLoaders(type, extensionClass);
+                    }
                 }
             } catch (ClassNotFoundException e) {
                 log.error(e.getMessage(), e);
@@ -227,6 +231,17 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         extensionWrapper.setExtensionFactory(pluginManager.getExtensionFactory());
 
         return extensionWrapper;
+    }
+
+    private void checkDifferentClassLoaders(Class<?> type, Class<?> extensionClass) {
+        ClassLoader typeClassLoader = type.getClassLoader(); // class loader of extension point
+        ClassLoader extensionClassLoader = extensionClass.getClassLoader();
+        boolean match = ClassUtils.getAllInterfacesNames(extensionClass).contains(type.getSimpleName());
+        if (match && !extensionClassLoader.equals(typeClassLoader)) {
+            // in this scenario the method 'isAssignableFrom' returns only FALSE
+            // see http://www.coderanch.com/t/557846/java/java/FWIW-FYI-isAssignableFrom-isInstance-differing
+            log.error("Different class loaders: '{}' (E) and '{}' (EP)", extensionClassLoader, typeClassLoader);
+        }
     }
 
 }

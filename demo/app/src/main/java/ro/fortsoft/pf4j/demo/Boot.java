@@ -21,6 +21,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import ro.fortsoft.pf4j.DefaultPluginManager;
+import ro.fortsoft.pf4j.JarPluginManager;
 import ro.fortsoft.pf4j.PluginManager;
 import ro.fortsoft.pf4j.PluginWrapper;
 import ro.fortsoft.pf4j.demo.api.Greeting;
@@ -37,7 +38,8 @@ public class Boot {
         printLogo();
 
         // create the plugin manager
-        final PluginManager pluginManager = new DefaultPluginManager();
+//        final PluginManager pluginManager = new DefaultPluginManager();
+        final PluginManager pluginManager = new JarPluginManager();
 
         // load the plugins
         pluginManager.loadPlugins();
