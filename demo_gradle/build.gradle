@@ -5,9 +5,22 @@ subprojects {
     mavenLocal()
     mavenCentral()
   }
+}
 
+task copyPlugins() {
+    doLast {
+        delete 'app/plugins'
+        mkdir 'app/plugins'
 
-  task wrapper(type: Wrapper) {
-      gradleVersion = '1.11'
-  }
+        subprojects.each { p ->
+            if (p.path.contains(":plugins/")) {
+                System.out.println("Copying plugin from " +  p.path);
+                copy {
+                    from p.projectDir.toString() + '/build/libs'
+                    into 'app/plugins'
+                    include '*.zip'
+                }
+            }
+        }
+    }
 }
