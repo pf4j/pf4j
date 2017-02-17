@@ -78,7 +78,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
         // classpath's extensions <=> pluginId = null
         Set<String> classNames = findClassNames(pluginId);
-        if (classNames.isEmpty()) {
+        if (classNames == null || classNames.isEmpty()) {
             return result;
         }
 
