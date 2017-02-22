@@ -15,17 +15,17 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
- * Find a plugin descriptor in a directory (plugin repository).
- * You can find in manifest file @see DefaultPluginDescriptorFinder,
- * xml file, properties file, java services (with ServiceLoader), etc.
+ * Find a plugin descriptor for a plugin path.
+ * You can find in manifest file {@link DefaultPluginDescriptorFinder},
+ * xml file, properties file, java services (with {@link java.util.ServiceLoader}), etc.
  *
  * @author Decebal Suiu
  */
 public interface PluginDescriptorFinder {
 
-	PluginDescriptor find(File pluginRepository) throws PluginException;
+	PluginDescriptor find(Path pluginPath) throws PluginException;
 
 }

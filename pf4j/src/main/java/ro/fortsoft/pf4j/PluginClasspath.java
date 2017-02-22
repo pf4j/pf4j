@@ -16,50 +16,39 @@
 package ro.fortsoft.pf4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * The classpath of the plugin after it was unpacked.
- * It contains classes directories and lib directories (directories that contains jars).
- * All directories are relative to plugin repository.
- * The default values are "classes" and "lib".
+ * The classpath of the plugin.
+ * It contains {@code classes} directories and {@code lib} directories (directories that contains jars).
  *
  * @author Decebal Suiu
  */
 public class PluginClasspath {
 
-	private static final String DEFAULT_CLASSES_DIRECTORY = "classes";
-	private static final String DEFAULT_LIB_DIRECTORY = "lib";
-
-	protected List<String> classesDirectories;
-	protected List<String> libDirectories;
+	private List<String> classesDirectories;
+	private List<String> libDirectories;
 
 	public PluginClasspath() {
 		classesDirectories = new ArrayList<>();
 		libDirectories = new ArrayList<>();
-
-		addResources();
 	}
 
 	public List<String> getClassesDirectories() {
 		return classesDirectories;
 	}
 
-	public void setClassesDirectories(List<String> classesDirectories) {
-		this.classesDirectories = classesDirectories;
+	public void addClassesDirectories(String... classesDirectories) {
+		this.classesDirectories.addAll(Arrays.asList(classesDirectories));
 	}
 
 	public List<String> getLibDirectories() {
 		return libDirectories;
 	}
 
-	public void setLibDirectories(List<String> libDirectories) {
-		this.libDirectories = libDirectories;
-	}
-
-	protected void addResources() {
-		classesDirectories.add(DEFAULT_CLASSES_DIRECTORY);
-		libDirectories.add(DEFAULT_LIB_DIRECTORY);
+	public void addLibDirectories(String... libDirectories) {
+		this.libDirectories.addAll(Arrays.asList(libDirectories));
 	}
 
 }

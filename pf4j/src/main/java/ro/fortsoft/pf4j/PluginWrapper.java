@@ -15,6 +15,8 @@
  */
 package ro.fortsoft.pf4j;
 
+import java.nio.file.Path;
+
 /**
  * A wrapper over plugin instance.
  *
@@ -22,16 +24,17 @@ package ro.fortsoft.pf4j;
  */
 public class PluginWrapper {
 
-    PluginManager pluginManager;
-	PluginDescriptor descriptor;
-	String pluginPath;
-	PluginClassLoader pluginClassLoader;
-	PluginFactory pluginFactory;
-	PluginState pluginState;
-	RuntimeMode runtimeMode;
+    private PluginManager pluginManager;
+	private PluginDescriptor descriptor;
+	private Path pluginPath;
+	private ClassLoader pluginClassLoader;
+	private PluginFactory pluginFactory;
+	private PluginState pluginState;
+	private RuntimeMode runtimeMode;
+
     Plugin plugin; // cache
 
-	public PluginWrapper(PluginManager pluginManager, PluginDescriptor descriptor, String pluginPath, PluginClassLoader pluginClassLoader) {
+	public PluginWrapper(PluginManager pluginManager, PluginDescriptor descriptor, Path pluginPath, ClassLoader pluginClassLoader) {
         this.pluginManager = pluginManager;
 		this.descriptor = descriptor;
 		this.pluginPath = pluginPath;
@@ -55,9 +58,9 @@ public class PluginWrapper {
     }
 
     /**
-     * Returns the path of this plugin relative to plugins directory.
+     * Returns the path of this plugin.
      */
-    public String getPluginPath() {
+    public Path getPluginPath() {
     	return pluginPath;
     }
 
