@@ -21,6 +21,6 @@ import ro.fortsoft.pf4j.ExtensionPoint;
  *
  * @author Mario Franco
  */
-public interface TestExtensionInterface extends ExtensionPoint {
+public interface TestExtensionPoint extends ExtensionPoint {
 
 }

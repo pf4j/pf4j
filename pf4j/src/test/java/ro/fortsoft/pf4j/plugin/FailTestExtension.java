@@ -22,7 +22,7 @@ import ro.fortsoft.pf4j.Extension;
  * @author Mario Franco
  */
 @Extension
-public class FailTestExtension implements TestExtensionInterface {
+public class FailTestExtension implements TestExtensionPoint {
 
     public FailTestExtension(String name) {
     }
