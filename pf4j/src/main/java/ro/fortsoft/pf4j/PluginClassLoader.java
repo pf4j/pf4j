@@ -18,6 +18,7 @@ package ro.fortsoft.pf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -25,8 +26,8 @@ import java.util.List;
 
 /**
  * One instance of this class should be created by plugin manager for every available plug-in.
- * This class loader is a Parent Last ClassLoader - it loads the classes from the plugin's jars before delegating
- * to the parent class loader.
+ * This class loader is a Parent Last ClassLoader - it loads the classes from the plugin's jars
+ * before delegating to the parent class loader.
  *
  * @author Decebal Suiu
  */
@@ -48,13 +49,23 @@ public class PluginClassLoader extends URLClassLoader {
 
 	@Override
 	public void addURL(URL url) {
+        log.debug("Add '{}'", url);
 		super.addURL(url);
 	}
 
+	public void addFile(File file) {
+        try {
+            addURL(file.getCanonicalFile().toURI().toURL());
+        } catch (IOException e) {
+//            throw new RuntimeException(e);
+            log.error(e.getMessage(), e);
+        }
+    }
+
     /**
-     * This implementation of loadClass uses a child first delegation model rather than the standard parent first.
+     * Uses a child first delegation model rather than the standard parent first.
      * If the requested class cannot be found in this class loader, the parent class loader will be consulted
-     * via the standard ClassLoader.loadClass(String) mechanism.
+     * via the standard {@link ClassLoader#loadClass(String)} mechanism.
      */
 	@Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
@@ -67,9 +78,6 @@ public class PluginClassLoader extends URLClassLoader {
                     return getClass().getClassLoader().loadClass(className);
                 } catch (ClassNotFoundException e) {
                     // try next step
-                    // TODO if I uncomment below lines (the correct approach) I received ClassNotFoundException for demo (ro.fortsoft.pf4j.demo)
-                    //                log.error(e.getMessage(), e);
-                    //                throw e;
                 }
             }
 
@@ -93,7 +101,7 @@ public class PluginClassLoader extends URLClassLoader {
             log.trace("Search in dependencies for class '{}'", className);
             List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
             for (PluginDependency dependency : dependencies) {
-                PluginClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
+                ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
                 try {
                     return classLoader.loadClass(className);
                 } catch (ClassNotFoundException e) {
@@ -103,14 +111,14 @@ public class PluginClassLoader extends URLClassLoader {
 
             log.trace("Couldn't find class '{}' in plugin classpath. Delegating to parent", className);
 
-            // use the standard URLClassLoader (which follows normal parent delegation)
+            // use the standard ClassLoader (which follows normal parent delegation)
             return super.loadClass(className);
         }
     }
 
     /**
-     * Load the named resource from this plugin. This implementation checks the plugin's classpath first
-     * then delegates to the parent.
+     * Load the named resource from this plugin.
+     * This implementation checks the plugin's classpath first then delegates to the parent.
      *
      * @param name the name of the resource.
      * @return the URL to the resource, <code>null</code> if the resource was not found.
@@ -132,20 +140,6 @@ public class PluginClassLoader extends URLClassLoader {
     @Override
     public URL findResource(String name) {
         return super.findResource(name);
-    }
-
-    /**
-     * Release all resources acquired by this class loader.
-     * The current implementation is incomplete.
-     * For now, this instance can no longer be used to load
-     * new classes or resources that are defined by this loader.
-     */
-    public void dispose() {
-        try {
-            close();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
     }
 
 }

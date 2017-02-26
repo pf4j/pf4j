@@ -15,11 +15,11 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Directory whose contents are .zip files used as plugins.
+ * Directory that contains plugins. A plugin could be a zip file.
  *
  * @author Decebal Suiu
  * @author Mário Franco
@@ -27,11 +27,11 @@ import java.util.List;
 public interface PluginRepository {
 
     /**
-     * List all plugin archive filed.
+     * List all plugin paths.
      *
      * @return a list of files
      */
-    List<File> getPluginArchives();
+    List<Path> getPluginPaths();
 
     /**
      * Removes a plugin from the repository.
@@ -39,6 +39,6 @@ public interface PluginRepository {
      * @param pluginPath the plugin path
      * @return true if deleted
      */
-    boolean deletePluginArchive(String pluginPath);
+    boolean deletePluginPath(Path pluginPath);
 
 }

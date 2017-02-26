@@ -15,16 +15,16 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.util.FileUtils;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+
 /**
- * The default implementation for PluginStatusProvider.
+ * The default implementation for {@link PluginStatusProvider}.
  *
  * @author Decebal Suiu
  * @author Mário Franco
@@ -33,24 +33,25 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultPluginStatusProvider.class);
 
-    private final File pluginsDirectory;
+    private final Path pluginsRoot;
 
-    private List<String> enabledPlugins = new ArrayList<>();
-    private List<String> disabledPlugins = new ArrayList<>();
+    private List<String> enabledPlugins;
+    private List<String> disabledPlugins;
 
-    public DefaultPluginStatusProvider(File pluginsDirectory) {
-        this.pluginsDirectory = pluginsDirectory;
+    public DefaultPluginStatusProvider(Path pluginsRoot) {
+        this.pluginsRoot = pluginsRoot;
+
         initialize();
     }
 
     private void initialize() {
         try {
             // create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
-            enabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "enabled.txt"), true);
+            enabledPlugins = FileUtils.readLines(pluginsRoot.resolve("enabled.txt").toFile(), true);
             log.info("Enabled plugins: {}", enabledPlugins);
 
             // create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
-            disabledPlugins = FileUtils.readLines(new File(pluginsDirectory, "disabled.txt"), true);
+            disabledPlugins = FileUtils.readLines(pluginsRoot.resolve("disabled.txt").toFile(), true);
             log.info("Disabled plugins: {}", disabledPlugins);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -70,12 +71,13 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
     public boolean disablePlugin(String pluginId) {
         if (disabledPlugins.add(pluginId)) {
             try {
-                FileUtils.writeLines(disabledPlugins, new File(pluginsDirectory, "disabled.txt"));
+                FileUtils.writeLines(disabledPlugins, pluginsRoot.resolve("disabled.txt").toFile());
             } catch (IOException e) {
                 log.error("Failed to disable plugin {}", pluginId, e);
                 return false;
             }
         }
+
         return true;
     }
 
@@ -83,12 +85,13 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
     public boolean enablePlugin(String pluginId) {
         try {
             if (disabledPlugins.remove(pluginId)) {
-                FileUtils.writeLines(disabledPlugins, new File(pluginsDirectory, "disabled.txt"));
+                FileUtils.writeLines(disabledPlugins, pluginsRoot.resolve("disabled.txt").toFile());
             }
         } catch (IOException e) {
             log.error("Failed to enable plugin {}", pluginId, e);
             return false;
         }
+
         return true;
     }
 

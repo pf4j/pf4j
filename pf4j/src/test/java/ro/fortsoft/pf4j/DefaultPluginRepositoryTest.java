@@ -19,10 +19,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import ro.fortsoft.pf4j.util.ZipFileFilter;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -31,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Mario Franco
+ * @author Decebal Suiu
  */
 public class DefaultPluginRepositoryTest {
 
@@ -39,52 +39,53 @@ public class DefaultPluginRepositoryTest {
 
     @Before
     public void setUp() throws IOException {
-        testFolder.newFile("plugin-1.zip");
-        testFolder.newFile("plugin-2.zip");
-        testFolder.newFile("plugin-3.zi_");
+        testFolder.newFolder("plugin-1");
+        testFolder.newFolder("plugin-2");
+        testFolder.newFolder("plugin-3");
     }
 
     /**
-     * Test of getPluginArchives method, of class DefaultPluginRepository.
+     * Test of {@link DefaultPluginRepository#getPluginPaths()} method.
      */
     @Test
     public void testGetPluginArchives() {
-        DefaultPluginRepository instance = new DefaultPluginRepository(testFolder.getRoot(), new ZipFileFilter());
+        Path pluginsRoot = getPluginsRoot();
 
-        List<File> result = instance.getPluginArchives();
+        PluginRepository instance = new DefaultPluginRepository(pluginsRoot, false);
 
-        assertEquals(2, result.size());
-        assertFileExists(result, "plugin-1.zip");
-        assertFileExists(result, "plugin-2.zip");
+        List<Path> result = instance.getPluginPaths();
+
+        assertEquals(3, result.size());
+        assertPathExists(result, pluginsRoot.resolve("plugin-1"));
+        assertPathExists(result, pluginsRoot.resolve("plugin-2"));
+        assertPathExists(result, pluginsRoot.resolve("plugin-3"));
     }
 
     /**
-     * Test of deletePluginArchive method, of class DefaultPluginRepository.
+     * Test of {@link DefaultPluginRepository#deletePluginPath(Path)} method.
      */
     @Test
-    public void testDeletePluginArchive() {
-        DefaultPluginRepository instance = new DefaultPluginRepository(testFolder.getRoot(), new ZipFileFilter());
+    public void testDeletePluginPath() {
+        Path pluginsRoot = getPluginsRoot();
 
-        assertTrue(instance.deletePluginArchive("/plugin-1"));
-        assertFalse(instance.deletePluginArchive("/plugin-3"));
+        PluginRepository instance = new DefaultPluginRepository(pluginsRoot, false);
 
-        List<File> result = instance.getPluginArchives();
+        assertTrue(instance.deletePluginPath(pluginsRoot.resolve("plugin-1")));
+        assertTrue(instance.deletePluginPath(pluginsRoot.resolve("plugin-3")));
+        assertFalse(instance.deletePluginPath(pluginsRoot.resolve("plugin-4")));
+
+        List<Path> result = instance.getPluginPaths();
 
         assertEquals(1, result.size());
-        assertEquals(result.get(0).getName(), "plugin-2.zip");
+        assertEquals(pluginsRoot.relativize(result.get(0)).toString(), "plugin-2");
     }
 
-    public static void assertFileExists(List<File> files, String file) {
-        boolean found = false;
+    private void assertPathExists(List<Path> paths, Path path) {
+        assertTrue("The directory must contains the file " + path, paths.contains(path));
+    }
 
-        for (File f : files) {
-            if (f.getName().equals(file)) {
-                found = true;
-                break;
-            }
-        }
-
-        assertTrue("The directory must contains the file " + file, found);
+    private Path getPluginsRoot() {
+        return testFolder.getRoot().toPath();
     }
 
 }

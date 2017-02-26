@@ -18,6 +18,7 @@ package ro.fortsoft.pf4j.util;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -94,5 +95,30 @@ public class FileUtils {
 
 		return success;
 	}
+
+	public static List<File> getJars(File folder) {
+	    List<File> bucket = new ArrayList<>();
+	    getJars(bucket, folder);
+
+	    return bucket;
+    }
+
+    private static void getJars(List<File> bucket, File folder) {
+        FileFilter jarFilter = new JarFileFilter();
+        FileFilter directoryFilter = new DirectoryFileFilter();
+
+        if (folder.exists() && folder.isDirectory() && folder.isAbsolute()) {
+            File[] jars = folder.listFiles(jarFilter);
+            for (int i = 0; (jars != null) && (i < jars.length); ++i) {
+                bucket.add(jars[i]);
+            }
+
+            File[] directories = folder.listFiles(directoryFilter);
+            for (int i = 0; (directories != null) && (i < directories.length); ++i) {
+                File directory = directories[i];
+                getJars(bucket, directory);
+            }
+        }
+    }
 
 }

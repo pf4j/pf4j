@@ -21,18 +21,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Mario Franco
+ * @author Decebal Suiu
  */
 public class ManifestPluginDescriptorFinderTest {
 
@@ -43,43 +44,42 @@ public class ManifestPluginDescriptorFinderTest {
     public void setUp() throws IOException {
         Charset charset = Charset.forName("UTF-8");
 
-        File plugin = testFolder.newFolder("test-plugin-1", "classes", "META-INF");
-        Files.write(Paths.get(plugin.getPath(), "extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
-        Files.write(Paths.get(plugin.getPath(), "MANIFEST.MF"), getPlugin1Manifest(), charset);
+        Path pluginPath = testFolder.newFolder("test-plugin-1", "classes", "META-INF").toPath();
+        Files.write(pluginPath.resolve("extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
+        Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin1Manifest(), charset);
 
-        plugin = testFolder.newFolder("test-plugin-2", "classes", "META-INF");
-        Files.write(Paths.get(plugin.getPath(), "extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
-        Files.write(Paths.get(plugin.getPath(), "MANIFEST.MF"), getPlugin2Manifest(), charset);
+        pluginPath = testFolder.newFolder("test-plugin-2", "classes", "META-INF").toPath();
+        Files.write(pluginPath.resolve("extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
+        Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin2Manifest(), charset);
 
-        // Empty Plugin
+        // empty plugin
         testFolder.newFolder("test-plugin-3");
 
-        // No Plugin Class
-        plugin = testFolder.newFolder("test-plugin-4", "classes", "META-INF");
-        Files.write(Paths.get(plugin.getPath(), "extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
-        Files.write(Paths.get(plugin.getPath(), "MANIFEST.MF"), getPlugin4Manifest(), charset);
+        // no plugin class
+        pluginPath = testFolder.newFolder("test-plugin-4", "classes", "META-INF").toPath();
+        Files.write(pluginPath.resolve("extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
+        Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin4Manifest(), charset);
 
-        // No Plugin Version
-        plugin = testFolder.newFolder("test-plugin-5", "classes", "META-INF");
-        Files.write(Paths.get(plugin.getPath(), "extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
-        Files.write(Paths.get(plugin.getPath(), "MANIFEST.MF"), getPlugin5Manifest(), charset);
+        // no plugin version
+        pluginPath = testFolder.newFolder("test-plugin-5", "classes", "META-INF").toPath();
+        Files.write(pluginPath.resolve("extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
+        Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin5Manifest(), charset);
 
-        // No Plugin Id
-        plugin = testFolder.newFolder("test-plugin-6", "classes", "META-INF");
-        Files.write(Paths.get(plugin.getPath(), "extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
-        Files.write(Paths.get(plugin.getPath(), "MANIFEST.MF"), getPlugin6Manifest(), charset);
+        // no plugin id
+        pluginPath = testFolder.newFolder("test-plugin-6", "classes", "META-INF").toPath();
+        Files.write(pluginPath.resolve("extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
+        Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin6Manifest(), charset);
     }
 
     /**
-     * Test of find method, of class ManifestPluginDescriptorFinder.
+     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
      */
     @Test
     public void testFind() throws Exception {
-        DefaultPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
+        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
 
-        PluginDescriptor plugin1 = instance.find(Paths.get(testFolder.getRoot().getPath(),"test-plugin-1").toFile());
-
-        PluginDescriptor plugin2 = instance.find(Paths.get(testFolder.getRoot().getPath(),"test-plugin-2").toFile());
+        PluginDescriptor plugin1 = instance.find(getPluginsRoot().resolve("test-plugin-1"));
+        PluginDescriptor plugin2 = instance.find(getPluginsRoot().resolve("test-plugin-2"));
 
         assertEquals("test-plugin-1", plugin1.getPluginId());
         assertEquals("Test Plugin 1", plugin1.getPluginDescription());
@@ -102,48 +102,44 @@ public class ManifestPluginDescriptorFinderTest {
     }
 
     /**
-     * Test of find method, of class ManifestPluginDescriptorFinder.
+     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
      */
     @Test(expected = PluginException.class)
     public void testFindNotFound() throws Exception {
-
-        ManifestPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
-        PluginDescriptor result = instance.find(Paths.get(testFolder.getRoot().getPath(),"test-plugin-3").toFile());
+        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
+        instance.find(getPluginsRoot().resolve("test-plugin-3"));
     }
 
     /**
-     * Test of find method, of class ManifestPluginDescriptorFinder.
+     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
      */
     @Test(expected = PluginException.class)
     public void testFindMissingPluginClass() throws Exception {
-
-        ManifestPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
-        PluginDescriptor result = instance.find(Paths.get(testFolder.getRoot().getPath(),"test-plugin-4").toFile());
+        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
+        instance.find(getPluginsRoot().resolve("test-plugin-4"));
     }
 
     /**
-     * Test of find method, of class ManifestPluginDescriptorFinder.
+     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
      */
     @Test(expected = PluginException.class)
     public void testFindMissingPluginVersion() throws Exception {
-
-        ManifestPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
-        PluginDescriptor result = instance.find(Paths.get(testFolder.getRoot().getPath(),"test-plugin-5").toFile());
+        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
+        instance.find(getPluginsRoot().resolve("test-plugin-5"));
     }
 
     /**
-     * Test of find method, of class ManifestPluginDescriptorFinder.
+     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
      */
     @Test(expected = PluginException.class)
     public void testFindMissingPluginId() throws Exception {
-
-        ManifestPluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new PluginClasspath());
-        PluginDescriptor result = instance.find(Paths.get(testFolder.getRoot().getPath(),"test-plugin-6").toFile());
+        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
+        instance.find(getPluginsRoot().resolve("test-plugin-6"));
     }
 
     private List<String> getPlugin1Manifest() {
-
-        String[] lines = new String[]{"Manifest-Version: 1.0\n"
+        String[] lines = new String[] {
+            "Manifest-Version: 1.0\n"
             + "Implementation-Title: Test Plugin #1\n"
             + "Implementation-Version: 0.10.0-SNAPSHOT\n"
             + "Archiver-Version: Plexus Archiver\n"
@@ -161,14 +157,15 @@ public class ManifestPluginDescriptorFinderTest {
             + "Build-Jdk: 1.8.0_45\n"
             + "Specification-Version: 0.10.0-SNAPSHOT\n"
             + "\n"
-            + ""};
+            + ""
+        };
 
         return Arrays.asList(lines);
     }
 
     private List<String> getPlugin2Manifest() {
-
-        String[] lines = new String[]{"Manifest-Version: 1.0\n"
+        String[] lines = new String[] {
+            "Manifest-Version: 1.0\n"
             + "Plugin-Dependencies: \n"
             + "Implementation-Title: Test Plugin #2\n"
             + "Implementation-Version: 0.10.0-SNAPSHOT\n"
@@ -184,14 +181,15 @@ public class ManifestPluginDescriptorFinderTest {
             + "Build-Jdk: 1.8.0_45\n"
             + "Specification-Version: 0.10.0-SNAPSHOT\n"
             + "\n"
-            + ""};
+            + ""
+        };
 
         return Arrays.asList(lines);
     }
 
     private List<String> getPlugin4Manifest() {
-
-        String[] lines = new String[]{"Manifest-Version: 1.0\n"
+        String[] lines = new String[] {
+            "Manifest-Version: 1.0\n"
             + "Implementation-Title: Test Plugin #4\n"
             + "Implementation-Version: 0.10.0-SNAPSHOT\n"
             + "Archiver-Version: Plexus Archiver\n"
@@ -205,14 +203,15 @@ public class ManifestPluginDescriptorFinderTest {
             + "Build-Jdk: 1.8.0_45\n"
             + "Specification-Version: 0.10.0-SNAPSHOT\n"
             + "\n"
-            + ""};
+            + ""
+        };
 
         return Arrays.asList(lines);
     }
 
     private List<String> getPlugin5Manifest() {
-
-        String[] lines = new String[]{"Manifest-Version: 1.0\n"
+        String[] lines = new String[] {
+            "Manifest-Version: 1.0\n"
             + "Implementation-Title: Test Plugin #5\n"
             + "Implementation-Version: 0.10.0-SNAPSHOT\n"
             + "Archiver-Version: Plexus Archiver\n"
@@ -226,14 +225,15 @@ public class ManifestPluginDescriptorFinderTest {
             + "Build-Jdk: 1.8.0_45\n"
             + "Specification-Version: 0.10.0-SNAPSHOT\n"
             + "\n"
-            + ""};
+            + ""
+        };
 
         return Arrays.asList(lines);
     }
 
     private List<String> getPlugin6Manifest() {
-
-        String[] lines = new String[]{"Manifest-Version: 1.0\n"
+        String[] lines = new String[] {
+            "Manifest-Version: 1.0\n"
             + "Implementation-Title: Test Plugin #6\n"
             + "Implementation-Version: 0.10.0-SNAPSHOT\n"
             + "Archiver-Version: Plexus Archiver\n"
@@ -246,8 +246,14 @@ public class ManifestPluginDescriptorFinderTest {
             + "Build-Jdk: 1.8.0_45\n"
             + "Specification-Version: 0.10.0-SNAPSHOT\n"
             + "\n"
-            + ""};
+            + ""
+        };
 
         return Arrays.asList(lines);
     }
+
+    private Path getPluginsRoot() {
+        return testFolder.getRoot().toPath();
+    }
+
 }

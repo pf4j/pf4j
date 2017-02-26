@@ -16,7 +16,8 @@
 package ro.fortsoft.pf4j;
 
 import com.github.zafarkhaja.semver.Version;
-import java.io.File;
+
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
@@ -69,10 +70,10 @@ public interface PluginManager {
     /**
      * Load a plugin.
      *
-     * @param pluginArchiveFile
+     * @param pluginPath
      * @return the pluginId of the installed plugin or null
      */
-	String loadPlugin(File pluginArchiveFile);
+	String loadPlugin(Path pluginPath);
 
     /**
      * Start all active plugins.
@@ -130,7 +131,7 @@ public interface PluginManager {
      */
     boolean deletePlugin(String pluginId);
 
-	PluginClassLoader getPluginClassLoader(String pluginId);
+	ClassLoader getPluginClassLoader(String pluginId);
 
 	<T> List<T> getExtensions(Class<T> type);
 

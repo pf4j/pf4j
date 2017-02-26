@@ -22,13 +22,16 @@ import ro.fortsoft.pf4j.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Mario Franco
+ * @author Decebal Suiu
  */
 public class DefaultPluginStatusProviderTest {
 
@@ -42,7 +45,8 @@ public class DefaultPluginStatusProviderTest {
     public void testIsPluginDisabled() throws IOException {
         createEnabledFile();
         createDisabledFile();
-        DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
+
+        PluginStatusProvider instance = new DefaultPluginStatusProvider(getPluginsRoot());
 
         assertFalse(instance.isPluginDisabled("plugin-1"));
         assertTrue(instance.isPluginDisabled("plugin-2"));
@@ -55,7 +59,8 @@ public class DefaultPluginStatusProviderTest {
     @Test
     public void testIsPluginDisabledWithEnableEmpty() throws IOException {
         createDisabledFile();
-        DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
+
+        PluginStatusProvider instance = new DefaultPluginStatusProvider(getPluginsRoot());
 
         assertFalse(instance.isPluginDisabled("plugin-1"));
         assertTrue(instance.isPluginDisabled("plugin-2"));
@@ -69,7 +74,8 @@ public class DefaultPluginStatusProviderTest {
     public void testDisablePlugin() throws IOException {
         createEnabledFile();
         createDisabledFile();
-        DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
+
+        PluginStatusProvider instance = new DefaultPluginStatusProvider(getPluginsRoot());
 
         assertTrue(instance.disablePlugin("plugin-1"));
         assertTrue(instance.isPluginDisabled("plugin-1"));
@@ -83,7 +89,8 @@ public class DefaultPluginStatusProviderTest {
     @Test
     public void testDisablePluginWithEnableEmpty() throws IOException {
         createDisabledFile();
-        DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
+
+        PluginStatusProvider instance = new DefaultPluginStatusProvider(getPluginsRoot());
 
         assertTrue(instance.disablePlugin("plugin-1"));
         assertTrue(instance.isPluginDisabled("plugin-1"));
@@ -97,7 +104,8 @@ public class DefaultPluginStatusProviderTest {
     @Test
     public void testEnablePlugin() throws IOException {
         createEnabledFile();
-        DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
+
+        PluginStatusProvider instance = new DefaultPluginStatusProvider(getPluginsRoot());
 
         assertTrue(instance.enablePlugin("plugin-2"));
         assertFalse(instance.isPluginDisabled("plugin-1"));
@@ -110,7 +118,7 @@ public class DefaultPluginStatusProviderTest {
      */
     @Test
     public void testEnablePluginWithEnableEmpty() {
-        DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
+        PluginStatusProvider instance = new DefaultPluginStatusProvider(getPluginsRoot());
 
         assertTrue(instance.enablePlugin("plugin-2"));
         assertFalse(instance.isPluginDisabled("plugin-1"));
@@ -123,7 +131,7 @@ public class DefaultPluginStatusProviderTest {
      */
     @Test
     public void testDisablePluginWithoutDisabledFile() throws IOException {
-        DefaultPluginStatusProvider instance = new DefaultPluginStatusProvider(testFolder.getRoot());
+        PluginStatusProvider instance = new DefaultPluginStatusProvider(getPluginsRoot());
 
         assertFalse(instance.isPluginDisabled("plugin-1"));
         assertTrue(instance.disablePlugin("plugin-1"));
@@ -148,6 +156,10 @@ public class DefaultPluginStatusProviderTest {
     private void writeLines(List<String> lines, String fileName) throws IOException {
         File file = testFolder.newFile(fileName);
         FileUtils.writeLines(lines, file);
+    }
+
+    private Path getPluginsRoot() {
+        return testFolder.getRoot().toPath();
     }
 
 }

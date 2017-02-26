@@ -22,8 +22,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
 /**
- * The default implementation for PluginFactory.
- * It uses Class.newInstance() method.
+ * The default implementation for {@link PluginFactory}.
+ * It uses {@link Class#newInstance()} method.
  *
  * @author Decebal Suiu
  */

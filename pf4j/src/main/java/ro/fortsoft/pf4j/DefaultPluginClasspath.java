@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Decebal Suiu
+ * Copyright 2016 Decebal Suiu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,17 @@
 package ro.fortsoft.pf4j;
 
 /**
- * CyclicDependencyException will be thrown if a cyclic dependency is detected.
+ * The default values are {@code classes} and {@code lib}.
  *
  * @author Decebal Suiu
  */
-class CyclicDependencyException extends PluginException {
+public class DefaultPluginClasspath extends PluginClasspath {
 
-	private static final long serialVersionUID = 1L;
+    public DefaultPluginClasspath() {
+        super();
 
-	public CyclicDependencyException(String message) {
-		super(message);
-	}
+        addClassesDirectories("classes");
+        addLibDirectories("lib");
+    }
 
 }

@@ -15,16 +15,47 @@
  */
 package ro.fortsoft.pf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.jar.Manifest;
+
 /**
- * The default implementation for PluginDescriptorFinder.
- * Now, this class it's a "link" to {@link ro.fortsoft.pf4j.ManifestPluginDescriptorFinder}.
+ * The default implementation for {@link PluginDescriptorFinder}.
+ * Now, this class it's a "link" to {@link ManifestPluginDescriptorFinder}.
  *
  * @author Decebal Suiu
  */
 public class DefaultPluginDescriptorFinder extends ManifestPluginDescriptorFinder {
 
-	public DefaultPluginDescriptorFinder(PluginClasspath pluginClasspath) {
-		super(pluginClasspath);
-	}
+    private static final Logger log = LoggerFactory.getLogger(ManifestPluginDescriptorFinder.class);
+
+    private PluginClasspath pluginClasspath;
+
+    public DefaultPluginDescriptorFinder(PluginClasspath pluginClasspath) {
+        this.pluginClasspath = pluginClasspath;
+    }
+
+	@Override
+    public Manifest readManifest(Path pluginPath) throws PluginException {
+        // TODO it's ok with first classes root? Another idea is to specify in PluginClasspath the folder.
+        String classes = pluginClasspath.getClassesDirectories().get(0);
+        Path manifestPath = pluginPath.resolve(Paths.get(classes,"/META-INF/MANIFEST.MF"));
+        log.debug("Lookup plugin descriptor in '{}'", manifestPath);
+        if (Files.notExists(manifestPath)) {
+            throw new PluginException("Cannot find '" + manifestPath + "' path");
+        }
+
+        try (InputStream input = Files.newInputStream(manifestPath)) {
+            return new Manifest(input);
+        } catch (IOException e) {
+            throw new PluginException(e.getMessage(), e);
+        }
+    }
 
 }

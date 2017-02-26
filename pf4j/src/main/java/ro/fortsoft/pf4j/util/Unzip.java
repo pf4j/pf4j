@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class extracts the containt of the plugin archive into a directory.
+ * This class extracts the content of the plugin zip into a directory.
  * It's a class for only the internal use.
  *
  * @author Decebal Suiu
@@ -70,8 +70,8 @@ public class Unzip {
         removeDirectory(destination);
 
     	ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(source));
-	    ZipEntry zipEntry = null;
 
+	    ZipEntry zipEntry;
     	while ((zipEntry = zipInputStream.getNextEntry()) != null) {
 	        try {
 		        File file = new File(destination, zipEntry.getName());

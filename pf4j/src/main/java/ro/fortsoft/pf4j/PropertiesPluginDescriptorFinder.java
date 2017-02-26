@@ -20,11 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.util.StringUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -49,8 +49,8 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 	}
 
 	@Override
-	public PluginDescriptor find(File pluginRepository) throws PluginException {
-        Properties properties = readProperties(pluginRepository);
+	public PluginDescriptor find(Path pluginPath) throws PluginException {
+        Properties properties = readProperties(pluginPath);
 
         PluginDescriptor pluginDescriptor = createPluginDescriptor(properties);
         validatePluginDescriptor(pluginDescriptor);
@@ -58,31 +58,18 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         return pluginDescriptor;
 	}
 
-    protected Properties readProperties(File pluginRepository) throws PluginException {
-        File propertiesFile = new File(pluginRepository, propertiesFileName);
-        log.debug("Lookup plugin descriptor in '{}'", propertiesFile);
-        if (!propertiesFile.exists()) {
-            throw new PluginException("Cannot find '" + propertiesFile + "' file");
-        }
-
-        InputStream input = null;
-        try {
-            input = new FileInputStream(propertiesFile);
-        } catch (FileNotFoundException e) {
-            // not happening
+    protected Properties readProperties(Path pluginPath) throws PluginException {
+        Path propertiesPath = pluginPath.resolve(Paths.get(propertiesFileName));
+        log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
+        if (Files.notExists(propertiesPath)) {
+            throw new PluginException("Cannot find '" + pluginPath + "' path");
         }
 
         Properties properties = new Properties();
-        try {
+        try (InputStream input = Files.newInputStream(propertiesPath)) {
             properties.load(input);
         } catch (IOException e) {
             throw new PluginException(e.getMessage(), e);
-        } finally {
-            try {
-                input.close();
-            } catch (IOException e) {
-                throw new PluginException(e.getMessage(), e);
-            }
         }
 
         return properties;

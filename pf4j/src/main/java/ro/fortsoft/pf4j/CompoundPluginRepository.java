@@ -15,7 +15,7 @@
  */
 package ro.fortsoft.pf4j;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,19 +32,19 @@ public class CompoundPluginRepository implements PluginRepository {
     }
 
     @Override
-    public List<File> getPluginArchives() {
-        List<File> file = new ArrayList<>();
+    public List<Path> getPluginPaths() {
+        List<Path> paths = new ArrayList<>();
         for (PluginRepository repository : repositories) {
-            file.addAll(repository.getPluginArchives());
+            paths.addAll(repository.getPluginPaths());
         }
 
-        return file;
+        return paths;
     }
 
     @Override
-    public boolean deletePluginArchive(String pluginPath) {
+    public boolean deletePluginPath(Path pluginPath) {
         for (PluginRepository repository : repositories) {
-            if (repository.deletePluginArchive(pluginPath)) {
+            if (repository.deletePluginPath(pluginPath)) {
                 return true;
             }
         }
