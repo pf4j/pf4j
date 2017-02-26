@@ -22,6 +22,6 @@ import ro.fortsoft.pf4j.Extension;
  * @author Mario Franco
  */
 @Extension
-public class TestExtension implements TestExtensionPoint {
+public class TestExtension implements TestExtensionInterface {
 
 }
