@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [1.2.0] - 2017-03-03
+
+#### Fixed
 - [#125]: Fix possible NPE
 
 #### Changed
@@ -139,7 +149,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-1.1.1...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-1.2.0...HEAD
+[1.2.0]: https://github.com/decebals/pf4j/compare/release-1.1.1...release-1.2.0
 [1.1.1]: https://github.com/decebals/pf4j/compare/release-1.1.0...release-1.1.1
 [1.1.0]: https://github.com/decebals/pf4j/compare/release-1.0.0...release-1.1.0
 [1.0.0]: https://github.com/decebals/pf4j/compare/release-0.13.1...release-1.0.0
