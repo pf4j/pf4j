@@ -5,10 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#125]: Fix possible NPE
 
 #### Changed
+- [#116]: Updated PF4J to newest version in Gradle demo
+- Reactivate protection against the issues similar with [#97]
 
 #### Added
+- [#128]: Add `JarPluginManager`, `PluginLoader`, `AbstractPluginManager`
 
 #### Removed
 
@@ -40,7 +44,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Fixed
 - [#99]: NPE in `DefaultPluginManager.stopPlugin()`
-- [#100]: Gradle build in demo_gradle is broken 
+- [#100]: Gradle build in demo_gradle is broken
 - [#103]: Gradle demos don't build zip with libs
 - Fix logging issue in demo
 
@@ -145,6 +149,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#128]: https://github.com/decebals/pf4j/pull/128
+[#125]: https://github.com/decebals/pf4j/pull/125
+[#122]: https://github.com/decebals/pf4j/pull/122
 [#116]: https://github.com/decebals/pf4j/issues/116
 [#111]: https://github.com/decebals/pf4j/pull/111
 [#108]: https://github.com/decebals/pf4j/pull/108
