@@ -134,7 +134,7 @@ You can define an extension point in your application using **ExtensionPoint** i
 ```java
 public interface Greeting extends ExtensionPoint {
 
-    public String getGreeting();
+    String getGreeting();
 
 }
 ```
