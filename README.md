@@ -265,6 +265,59 @@ __PluginStateListener__ defines the interface for an object that listens to plug
 
 Your application, as a PF4J consumer, has full control over each plugin (state). So, you can load, unload, enable, disable, start, stop and delete a certain plugin using PluginManager (programmatically).
 
+Custom PluginManager
+--------------------------
+To create a custom plugin manager you could:
+* implements `PluginManager` interface (create a plugin manager from scratch)
+* modifies some aspects/behaviors of built-in implementations (`DefaultPluginManager`, `JarPluginManager`)
+* extends `AbstractPluginManager` class
+
+`JarPluginManager` is a `PluginManager` that loads plugin from a jar file. Actually, a plugin is a fat jar, a jar which contains classes from all the libraries,
+on which your project depends and, of course, the classes of current project.
+`AbstractPluginManager` adds some glue that help you to create quickly a plugin manager. All you need to do is to implement some factory methods.
+PF4J uses in many places the factory method pattern to implement the dependency injection (DI) concept in a manually mode.
+See below the abstract methods for `AbstractPluginManager`:
+
+```java
+public abstract class AbstractPluginManager implements PluginManager {
+
+    protected abstract PluginRepository createPluginRepository();
+    protected abstract PluginFactory createPluginFactory();
+    protected abstract ExtensionFactory createExtensionFactory();
+    protected abstract PluginDescriptorFinder createPluginDescriptorFinder();
+    protected abstract ExtensionFinder createExtensionFinder();
+    protected abstract PluginStatusProvider createPluginStatusProvider();
+    protected abstract PluginLoader createPluginLoader();
+
+    // other non abstract methods
+
+}
+```
+
+`DefaultPluginManager` contributes with "default" components (`DefaultExtensionFactory`, `DefaultPluginFactory`, `DefaultPluginLoader`, ...) to `AbstractPluginManager`.  
+Most of the times it's enough to extends `DefaultPluginManager` and to supply your custom components. As example, I will show you the implementation for `JarPluginManager`:
+
+```java
+public class JarPluginManager extends DefaultPluginManager {
+
+    @Override
+    protected PluginRepository createPluginRepository() {
+        return new JarPluginRepository(getPluginsRoot(), isDevelopment());
+    }
+
+    @Override
+    protected PluginDescriptorFinder createPluginDescriptorFinder() {
+        return isDevelopment() ? new PropertiesPluginDescriptorFinder() : new JarPluginDescriptorFinder();
+    }
+
+    @Override
+    protected PluginLoader createPluginLoader() {
+        return new JarPluginLoader(this, pluginClasspath);
+    }
+
+}
+```
+
 Development mode
 --------------------------
 PF4J can run in two modes: **DEVELOPMENT** and **DEPLOYMENT**.  

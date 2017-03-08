@@ -30,7 +30,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 /**
- * It's a {@link PluginManager} that load plugin from a jar file.
+ * It's a {@link PluginManager} that loads plugin from a jar file.
  * Actually, a plugin is a fat jar, a jar which contains classes from all the libraries,
  * on which your project depends and, of course, the classes of current project.
  *
