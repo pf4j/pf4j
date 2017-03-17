@@ -13,7 +13,7 @@ declared by application or other plugins. Also a plugin can define extension poi
 Features/Benefits
 -------------------
 With PF4J you can easily transform a monolithic java application in a modular application.  
-PF4J is an open source (Apache license) lightweight (around 50KB) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see PluginDescriptorFinder and ExtensionFinder).   
+PF4J is an open source (Apache license) lightweight (around __50 KB__) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see PluginDescriptorFinder and ExtensionFinder).   
 
 Practically PF4J is a microframework and the aim is to keep the core simple but extensible. I try to create a little ecosystem (extensions) based on this core with the help of the comunity.  
 For now are available these extensions:
