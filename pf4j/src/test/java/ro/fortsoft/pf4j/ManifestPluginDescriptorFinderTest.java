@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import ro.fortsoft.pf4j.util.PluginDescriptorUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -107,7 +108,7 @@ public class ManifestPluginDescriptorFinderTest {
     @Test(expected = PluginException.class)
     public void testFindNotFound() throws Exception {
         PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        instance.find(getPluginsRoot().resolve("test-plugin-3"));
+        PluginDescriptorUtils.simpleValidation(instance.find(getPluginsRoot().resolve("test-plugin-3")));
     }
 
     /**
@@ -116,7 +117,7 @@ public class ManifestPluginDescriptorFinderTest {
     @Test(expected = PluginException.class)
     public void testFindMissingPluginClass() throws Exception {
         PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        instance.find(getPluginsRoot().resolve("test-plugin-4"));
+        PluginDescriptorUtils.simpleValidation(instance.find(getPluginsRoot().resolve("test-plugin-4")));
     }
 
     /**
@@ -125,7 +126,7 @@ public class ManifestPluginDescriptorFinderTest {
     @Test(expected = PluginException.class)
     public void testFindMissingPluginVersion() throws Exception {
         PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        instance.find(getPluginsRoot().resolve("test-plugin-5"));
+        PluginDescriptorUtils.simpleValidation(instance.find(getPluginsRoot().resolve("test-plugin-5")));
     }
 
     /**
@@ -134,7 +135,7 @@ public class ManifestPluginDescriptorFinderTest {
     @Test(expected = PluginException.class)
     public void testFindMissingPluginId() throws Exception {
         PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        instance.find(getPluginsRoot().resolve("test-plugin-6"));
+        PluginDescriptorUtils.simpleValidation(instance.find(getPluginsRoot().resolve("test-plugin-6")));
     }
 
     private List<String> getPlugin1Manifest() {

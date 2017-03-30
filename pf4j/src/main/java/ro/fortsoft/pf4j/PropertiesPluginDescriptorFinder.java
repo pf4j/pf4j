@@ -32,7 +32,7 @@ import java.util.Properties;
  *
  * @author Decebal Suiu
  */
-public class PropertiesPluginDescriptorFinder extends AbstractPluginDescriptorFinder {
+public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder {
 
 	private static final Logger log = LoggerFactory.getLogger(PropertiesPluginDescriptorFinder.class);
 
@@ -52,10 +52,7 @@ public class PropertiesPluginDescriptorFinder extends AbstractPluginDescriptorFi
 	public PluginDescriptor find(Path pluginPath) throws PluginException {
         Properties properties = readProperties(pluginPath);
 
-        PluginDescriptor pluginDescriptor = createPluginDescriptor(properties);
-        validate(pluginDescriptor);
-
-        return pluginDescriptor;
+        return createPluginDescriptor(properties);
 	}
 
     protected Properties readProperties(Path pluginPath) throws PluginException {

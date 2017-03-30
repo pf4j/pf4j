@@ -27,16 +27,13 @@ import java.util.jar.Manifest;
  *
  * @author Decebal Suiu
  */
-public abstract class ManifestPluginDescriptorFinder extends AbstractPluginDescriptorFinder {
+public abstract class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
 	@Override
 	public PluginDescriptor find(Path pluginPath) throws PluginException {
         Manifest manifest = readManifest(pluginPath);
 
-        PluginDescriptor pluginDescriptor = createPluginDescriptor(manifest);
-        validate(pluginDescriptor);
-
-		return pluginDescriptor;
+        return createPluginDescriptor(manifest);
 	}
 
     public abstract Manifest readManifest(Path pluginPath) throws PluginException;
