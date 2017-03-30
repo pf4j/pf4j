@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Implementation-Title: Demo Plugin #1
+Implementation-Version: 0.9.0-SNAPSHOT
+Plugin-Id: welcome-plugin
+Built-By: decebal.suiu
+Created-By: Apache Maven 3.0.4
+Plugin-Version: 0.0.1
+Plugin-Provider: Decebal Suiu
+Plugin-Class: ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
+Plugin-Dependencies: 
+Implementation-Vendor-Id: ro.fortsoft.pf4j.demo
+Build-Jdk: 1.7.0_25
+Specification-Title: Demo Plugin #1
+Specification-Version: 0.9.0-SNAPSHOT
+Archiver-Version: Plexus Archiver
+
