@@ -32,7 +32,7 @@ import java.util.Properties;
  *
  * @author Decebal Suiu
  */
-public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder {
+public class PropertiesPluginDescriptorFinder extends AbstractPluginDescriptorFinder {
 
 	private static final Logger log = LoggerFactory.getLogger(PropertiesPluginDescriptorFinder.class);
 
@@ -45,7 +45,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 	}
 
 	public PropertiesPluginDescriptorFinder(String propertiesFileName) {
-		this.propertiesFileName = propertiesFileName;
+        this.propertiesFileName = propertiesFileName;
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         Properties properties = readProperties(pluginPath);
 
         PluginDescriptor pluginDescriptor = createPluginDescriptor(properties);
-        validatePluginDescriptor(pluginDescriptor);
+        validate(pluginDescriptor);
 
         return pluginDescriptor;
 	}
@@ -102,17 +102,4 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     protected PluginDescriptor createPluginDescriptorInstance() {
         return new PluginDescriptor();
     }
-
-    protected void validatePluginDescriptor(PluginDescriptor pluginDescriptor) throws PluginException {
-        if (StringUtils.isEmpty(pluginDescriptor.getPluginId())) {
-            throw new PluginException("plugin.id cannot be empty");
-        }
-        if (StringUtils.isEmpty(pluginDescriptor.getPluginClass())) {
-            throw new PluginException("plugin.class cannot be empty");
-        }
-        if (pluginDescriptor.getVersion() == null) {
-            throw new PluginException("plugin.version cannot be empty");
-        }
-    }
-
 }
