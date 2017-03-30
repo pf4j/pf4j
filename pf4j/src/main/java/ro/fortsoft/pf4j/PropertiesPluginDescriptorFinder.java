@@ -82,6 +82,13 @@ public class PropertiesPluginDescriptorFinder extends AbstractPluginDescriptorFi
         String id = properties.getProperty("plugin.id");
         pluginDescriptor.setPluginId(id);
 
+        String description = properties.getProperty("plugin.description");
+        if (StringUtils.isEmpty(description)) {
+            pluginDescriptor.setPluginDescription("");
+        } else {
+            pluginDescriptor.setPluginDescription(description);
+        }
+
         String clazz = properties.getProperty("plugin.class");
         pluginDescriptor.setPluginClass(clazz);
 
@@ -95,6 +102,11 @@ public class PropertiesPluginDescriptorFinder extends AbstractPluginDescriptorFi
 
         String dependencies = properties.getProperty("plugin.dependencies");
         pluginDescriptor.setDependencies(dependencies);
+
+        String requires = properties.getProperty("plugin.requires");
+        if (StringUtils.isNotEmpty(requires)) {
+            pluginDescriptor.setRequires(requires);
+        }
 
         return pluginDescriptor;
     }
