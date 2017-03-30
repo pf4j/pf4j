@@ -78,6 +78,7 @@ public class PropertiesPluginDescriptorFinderTest {
         assertEquals("test-plugin-2", plugin1.getDependencies().get(0).getPluginId());
         assertEquals("test-plugin-3", plugin1.getDependencies().get(1).getPluginId());
         assertEquals("~1.0", plugin1.getDependencies().get(1).getPluginVersionSupport());
+        assertEquals("Apache-2.0", plugin1.getLicense());
         assertTrue(plugin1.getRequires().interpret(Version.valueOf("1.0.0")));
 
         assertEquals("test-plugin-2", plugin2.getPluginId());
@@ -122,6 +123,7 @@ public class PropertiesPluginDescriptorFinderTest {
             + "plugin.class=ro.fortsoft.pf4j.plugin.TestPlugin\n"
             + "plugin.dependencies=test-plugin-2,test-plugin-3@~1.0\n"
             + "plugin.requires=*\n"
+            + "plugin.license=Apache-2.0\n"
             + "\n"
             + ""
         };

@@ -39,6 +39,7 @@ public class PluginDescriptor {
     private Expression requires;
     private String provider;
     private List<PluginDependency> dependencies;
+    private String license;
 
     public PluginDescriptor() {
     	requires = gte("0.0.0"); // Any
@@ -88,6 +89,13 @@ public class PluginDescriptor {
     }
 
     /**
+     * Returns the legal license of this plugin, e.g. "Apache-2.0", "MIT" etc
+     */
+    public String getLicense() {
+        return license;
+    }
+
+    /**
      * Returns all dependencies declared by this plugin.
      * Returns an empty array if this plugin does not declare any require.
      */
@@ -99,8 +107,9 @@ public class PluginDescriptor {
 	public String toString() {
 		return "PluginDescriptor [pluginId=" + pluginId + ", pluginClass="
 				+ pluginClass + ", version=" + version + ", provider="
-				+ provider + ", dependencies=" + dependencies
-				+ "]";
+				+ provider + ", dependencies=" + dependencies + ", description="
+                + pluginDescription + ", requires=" + requires + ", license="
+				+ license + "]";
 	}
 
 	void setPluginId(String pluginId) {
@@ -125,7 +134,7 @@ public class PluginDescriptor {
 
     void setRequires(String requires) {
         Parser<Expression> parser = ExpressionParser.newInstance();
-        this.requires = parser.parse(requires);
+        setRequires(parser.parse(requires));
     }
 
     void setRequires(Expression requires) {
@@ -153,6 +162,10 @@ public class PluginDescriptor {
     	} else {
     		this.dependencies = Collections.emptyList();
     	}
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
     }
 
 }
