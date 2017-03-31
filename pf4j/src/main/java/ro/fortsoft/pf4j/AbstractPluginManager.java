@@ -19,7 +19,7 @@ import com.github.zafarkhaja.semver.Version;
 import com.github.zafarkhaja.semver.expr.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ro.fortsoft.pf4j.util.PluginDescriptorUtils;
+import ro.fortsoft.pf4j.util.StringUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -794,7 +794,15 @@ public abstract class AbstractPluginManager implements PluginManager {
      * @throws PluginException if validation fails
      */
     protected void validatePluginDescriptor(PluginDescriptor descriptor) throws PluginException {
-        PluginDescriptorUtils.simpleValidation(descriptor);
+        if (StringUtils.isEmpty(descriptor.getPluginId())) {
+            throw new PluginException("id cannot be empty");
+        }
+        if (StringUtils.isEmpty(descriptor.getPluginClass())) {
+            throw new PluginException("class cannot be empty");
+        }
+        if (descriptor.getVersion() == null) {
+            throw new PluginException("version cannot be empty");
+        }
     }
 
     // TODO add this method in PluginManager as default method for Java 8.

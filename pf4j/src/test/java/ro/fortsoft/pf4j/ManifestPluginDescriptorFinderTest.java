@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import ro.fortsoft.pf4j.util.PluginDescriptorUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -108,34 +107,7 @@ public class ManifestPluginDescriptorFinderTest {
     @Test(expected = PluginException.class)
     public void testFindNotFound() throws Exception {
         PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        PluginDescriptorUtils.simpleValidation(instance.find(getPluginsRoot().resolve("test-plugin-3")));
-    }
-
-    /**
-     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
-     */
-    @Test(expected = PluginException.class)
-    public void testFindMissingPluginClass() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        PluginDescriptorUtils.simpleValidation(instance.find(getPluginsRoot().resolve("test-plugin-4")));
-    }
-
-    /**
-     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
-     */
-    @Test(expected = PluginException.class)
-    public void testFindMissingPluginVersion() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        PluginDescriptorUtils.simpleValidation(instance.find(getPluginsRoot().resolve("test-plugin-5")));
-    }
-
-    /**
-     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
-     */
-    @Test(expected = PluginException.class)
-    public void testFindMissingPluginId() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        PluginDescriptorUtils.simpleValidation(instance.find(getPluginsRoot().resolve("test-plugin-6")));
+        instance.find(getPluginsRoot().resolve("test-plugin-3"));
     }
 
     private List<String> getPlugin1Manifest() {
