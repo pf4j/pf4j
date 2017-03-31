@@ -90,6 +90,7 @@ public class ManifestPluginDescriptorFinderTest {
         assertEquals("test-plugin-2", plugin1.getDependencies().get(0).getPluginId());
         assertEquals("test-plugin-3", plugin1.getDependencies().get(1).getPluginId());
         assertEquals("~1.0", plugin1.getDependencies().get(1).getPluginVersionSupport());
+        assertEquals("Apache-2.0", plugin1.getLicense());
         assertTrue(plugin1.getRequires().interpret(Version.valueOf("1.0.0")));
 
         assertEquals("test-plugin-2", plugin2.getPluginId());
@@ -153,6 +154,7 @@ public class ManifestPluginDescriptorFinderTest {
             + "Plugin-Class: ro.fortsoft.pf4j.plugin.TestPlugin\n"
             + "Plugin-Dependencies: test-plugin-2,test-plugin-3@~1.0\n"
             + "Plugin-Requires: *\n"
+            + "Plugin-License: Apache-2.0\n"
             + "Created-By: Apache Maven 3.0.5\n"
             + "Build-Jdk: 1.8.0_45\n"
             + "Specification-Version: 0.10.0-SNAPSHOT\n"

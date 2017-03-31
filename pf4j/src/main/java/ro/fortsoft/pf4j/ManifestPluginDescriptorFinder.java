@@ -74,6 +74,8 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
             pluginDescriptor.setRequires(requires);
         }
 
+        pluginDescriptor.setLicense(attributes.getValue("Plugin-License"));
+
         return pluginDescriptor;
     }
 

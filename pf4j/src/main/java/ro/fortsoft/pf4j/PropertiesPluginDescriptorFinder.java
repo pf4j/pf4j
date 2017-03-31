@@ -108,6 +108,8 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
             pluginDescriptor.setRequires(requires);
         }
 
+        pluginDescriptor.setLicense(properties.getProperty("plugin.license"));
+
         return pluginDescriptor;
     }
 
