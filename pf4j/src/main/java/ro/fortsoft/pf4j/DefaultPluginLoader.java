@@ -69,7 +69,7 @@ public class DefaultPluginLoader implements PluginLoader {
      */
     protected void loadJars(Path pluginPath, PluginClassLoader pluginClassLoader) {
         for (String libDirectory : pluginClasspath.getLibDirectories()) {
-            File file = pluginPath.resolve(libDirectory).toFile();
+            Path file = pluginPath.resolve(libDirectory);
             List<File> jars = FileUtils.getJars(file);
             for (File jar : jars) {
                 pluginClassLoader.addFile(jar);

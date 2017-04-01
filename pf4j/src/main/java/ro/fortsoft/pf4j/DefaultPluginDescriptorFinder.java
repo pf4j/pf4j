@@ -44,6 +44,9 @@ public class DefaultPluginDescriptorFinder extends ManifestPluginDescriptorFinde
 	@Override
     public Manifest readManifest(Path pluginPath) throws PluginException {
         // TODO it's ok with first classes root? Another idea is to specify in PluginClasspath the folder.
+        if (pluginClasspath.getClassesDirectories().size() == 0) {
+            throw new PluginException("Failed to read manifest, no classes folder in classpath");
+        }
         String classes = pluginClasspath.getClassesDirectories().get(0);
         Path manifestPath = pluginPath.resolve(Paths.get(classes,"/META-INF/MANIFEST.MF"));
         log.debug("Lookup plugin descriptor in '{}'", manifestPath);

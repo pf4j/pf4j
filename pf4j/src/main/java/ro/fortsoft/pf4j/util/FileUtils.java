@@ -15,13 +15,9 @@
  */
 package ro.fortsoft.pf4j.util;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -96,27 +92,27 @@ public class FileUtils {
 		return success;
 	}
 
-	public static List<File> getJars(File folder) {
+	public static List<File> getJars(Path folder) {
 	    List<File> bucket = new ArrayList<>();
 	    getJars(bucket, folder);
 
 	    return bucket;
     }
 
-    private static void getJars(List<File> bucket, File folder) {
+    private static void getJars(final List<File> bucket, Path folder) {
         FileFilter jarFilter = new JarFileFilter();
         FileFilter directoryFilter = new DirectoryFileFilter();
 
-        if (folder.exists() && folder.isDirectory() && folder.isAbsolute()) {
-            File[] jars = folder.listFiles(jarFilter);
+        if (Files.exists(folder) && Files.isDirectory(folder)) {
+            File[] jars = folder.toFile().listFiles(jarFilter);
             for (int i = 0; (jars != null) && (i < jars.length); ++i) {
                 bucket.add(jars[i]);
             }
 
-            File[] directories = folder.listFiles(directoryFilter);
+            File[] directories = folder.toFile().listFiles(directoryFilter);
             for (int i = 0; (directories != null) && (i < directories.length); ++i) {
                 File directory = directories[i];
-                getJars(bucket, directory);
+                getJars(bucket, directory.toPath());
             }
         }
     }
