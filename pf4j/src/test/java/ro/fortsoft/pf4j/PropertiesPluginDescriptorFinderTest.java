@@ -96,24 +96,6 @@ public class PropertiesPluginDescriptorFinderTest {
         instance.find(getPluginsRoot().resolve("test-plugin-3"));
     }
 
-    @Test(expected = PluginException.class)
-    public void testFindMissingPluginClass() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        instance.find(getPluginsRoot().resolve("test-plugin-4"));
-    }
-
-    @Test(expected = PluginException.class)
-    public void testFindMissingPluginVersion() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        instance.find(getPluginsRoot().resolve("test-plugin-5"));
-    }
-
-    @Test(expected = PluginException.class)
-    public void testFindMissingPluginId() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        instance.find(getPluginsRoot().resolve("test-plugin-6"));
-    }
-
     private List<String> getPlugin1Properties() {
         String[] lines = new String[] {
             "plugin.id=test-plugin-1\n"

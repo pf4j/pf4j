@@ -111,33 +111,6 @@ public class ManifestPluginDescriptorFinderTest {
         instance.find(getPluginsRoot().resolve("test-plugin-3"));
     }
 
-    /**
-     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
-     */
-    @Test(expected = PluginException.class)
-    public void testFindMissingPluginClass() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        instance.find(getPluginsRoot().resolve("test-plugin-4"));
-    }
-
-    /**
-     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
-     */
-    @Test(expected = PluginException.class)
-    public void testFindMissingPluginVersion() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        instance.find(getPluginsRoot().resolve("test-plugin-5"));
-    }
-
-    /**
-     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
-     */
-    @Test(expected = PluginException.class)
-    public void testFindMissingPluginId() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
-        instance.find(getPluginsRoot().resolve("test-plugin-6"));
-    }
-
     private List<String> getPlugin1Manifest() {
         String[] lines = new String[] {
             "Manifest-Version: 1.0\n"

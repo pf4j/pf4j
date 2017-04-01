@@ -45,17 +45,14 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 	}
 
 	public PropertiesPluginDescriptorFinder(String propertiesFileName) {
-		this.propertiesFileName = propertiesFileName;
+        this.propertiesFileName = propertiesFileName;
 	}
 
 	@Override
 	public PluginDescriptor find(Path pluginPath) throws PluginException {
         Properties properties = readProperties(pluginPath);
 
-        PluginDescriptor pluginDescriptor = createPluginDescriptor(properties);
-        validatePluginDescriptor(pluginDescriptor);
-
-        return pluginDescriptor;
+        return createPluginDescriptor(properties);
 	}
 
     protected Properties readProperties(Path pluginPath) throws PluginException {
@@ -116,17 +113,4 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     protected PluginDescriptor createPluginDescriptorInstance() {
         return new PluginDescriptor();
     }
-
-    protected void validatePluginDescriptor(PluginDescriptor pluginDescriptor) throws PluginException {
-        if (StringUtils.isEmpty(pluginDescriptor.getPluginId())) {
-            throw new PluginException("plugin.id cannot be empty");
-        }
-        if (StringUtils.isEmpty(pluginDescriptor.getPluginClass())) {
-            throw new PluginException("plugin.class cannot be empty");
-        }
-        if (pluginDescriptor.getVersion() == null) {
-            throw new PluginException("plugin.version cannot be empty");
-        }
-    }
-
 }

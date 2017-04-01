@@ -33,10 +33,7 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
 	public PluginDescriptor find(Path pluginPath) throws PluginException {
         Manifest manifest = readManifest(pluginPath);
 
-        PluginDescriptor pluginDescriptor = createPluginDescriptor(manifest);
-        validatePluginDescriptor(pluginDescriptor);
-
-		return pluginDescriptor;
+        return createPluginDescriptor(manifest);
 	}
 
     public abstract Manifest readManifest(Path pluginPath) throws PluginException;
@@ -82,17 +79,4 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
     protected PluginDescriptor createPluginDescriptorInstance() {
         return new PluginDescriptor();
     }
-
-    protected void validatePluginDescriptor(PluginDescriptor pluginDescriptor) throws PluginException {
-        if (StringUtils.isEmpty(pluginDescriptor.getPluginId())) {
-            throw new PluginException("Plugin-Id cannot be empty");
-        }
-        if (StringUtils.isEmpty(pluginDescriptor.getPluginClass())) {
-            throw new PluginException("Plugin-Class cannot be empty");
-        }
-        if (pluginDescriptor.getVersion() == null) {
-            throw new PluginException("Plugin-Version cannot be empty");
-        }
-    }
-
 }

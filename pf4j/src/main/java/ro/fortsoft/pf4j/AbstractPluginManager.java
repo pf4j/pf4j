@@ -19,19 +19,14 @@ import com.github.zafarkhaja.semver.Version;
 import com.github.zafarkhaja.semver.expr.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ro.fortsoft.pf4j.util.StringUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class implements the boilerplate plugin code that any {@link PluginManager}
@@ -751,6 +746,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         // retrieves the plugin descriptor
         log.debug("Find plugin descriptor '{}'", pluginPath);
         PluginDescriptor pluginDescriptor = getPluginDescriptorFinder().find(pluginPath);
+        validatePluginDescriptor(pluginDescriptor);
         log.debug("Descriptor {}", pluginDescriptor);
         String pluginClassName = pluginDescriptor.getPluginClass();
         log.debug("Class '{}' for plugin '{}'",  pluginClassName, pluginPath);
@@ -790,6 +786,23 @@ public abstract class AbstractPluginManager implements PluginManager {
         getPluginClassLoaders().put(pluginId, pluginClassLoader);
 
         return pluginWrapper;
+    }
+
+    /**
+     * Override this to change the validation criteria
+     * @param descriptor the plugin descriptor to validate
+     * @throws PluginException if validation fails
+     */
+    protected void validatePluginDescriptor(PluginDescriptor descriptor) throws PluginException {
+        if (StringUtils.isEmpty(descriptor.getPluginId())) {
+            throw new PluginException("id cannot be empty");
+        }
+        if (StringUtils.isEmpty(descriptor.getPluginClass())) {
+            throw new PluginException("class cannot be empty");
+        }
+        if (descriptor.getVersion() == null) {
+            throw new PluginException("version cannot be empty");
+        }
     }
 
     // TODO add this method in PluginManager as default method for Java 8.
