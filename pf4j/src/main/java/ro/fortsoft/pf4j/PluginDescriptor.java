@@ -37,6 +37,7 @@ public class PluginDescriptor {
     private String pluginClass;
     private Version version;
     private Expression requires;
+    private String requiresString;
     private String provider;
     private List<PluginDependency> dependencies;
     private String license;
@@ -82,6 +83,13 @@ public class PluginDescriptor {
     }
 
     /**
+     * Returns the requires of this plugin as a string.
+     */
+    public String getRequiresString() {
+        return requiresString;
+    }
+
+    /**
      * Returns the provider name of this plugin.
      */
     public String getProvider() {
@@ -108,7 +116,7 @@ public class PluginDescriptor {
 		return "PluginDescriptor [pluginId=" + pluginId + ", pluginClass="
 				+ pluginClass + ", version=" + version + ", provider="
 				+ provider + ", dependencies=" + dependencies + ", description="
-                + pluginDescription + ", requires=" + requires + ", license="
+                + pluginDescription + ", requires=" + requiresString + ", license="
 				+ license + "]";
 	}
 
@@ -133,6 +141,7 @@ public class PluginDescriptor {
     }
 
     void setRequires(String requires) {
+        requiresString = requires;
         Parser<Expression> parser = ExpressionParser.newInstance();
         setRequires(parser.parse(requires));
     }
