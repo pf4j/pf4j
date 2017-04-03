@@ -703,10 +703,11 @@ public abstract class AbstractPluginManager implements PluginManager {
             return true;
         }
 
-        log.warn("Plugin '{}:{}' requires a minimum system version of {}",
+        log.warn("Plugin '{}:{}' requires a minimum system version of {}, and you have {}",
             pluginWrapper.getPluginId(),
             pluginWrapper.getDescriptor().getVersion(),
-            requires);
+            pluginWrapper.getDescriptor().getRequiresString(),
+            system);
 
         return false;
     }

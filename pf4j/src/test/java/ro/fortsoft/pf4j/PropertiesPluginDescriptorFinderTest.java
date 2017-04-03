@@ -79,6 +79,7 @@ public class PropertiesPluginDescriptorFinderTest {
         assertEquals("test-plugin-3", plugin1.getDependencies().get(1).getPluginId());
         assertEquals("~1.0", plugin1.getDependencies().get(1).getPluginVersionSupport());
         assertEquals("Apache-2.0", plugin1.getLicense());
+        assertEquals("*", plugin1.getRequiresString());
         assertTrue(plugin1.getRequires().interpret(Version.valueOf("1.0.0")));
 
         assertEquals("test-plugin-2", plugin2.getPluginId());
