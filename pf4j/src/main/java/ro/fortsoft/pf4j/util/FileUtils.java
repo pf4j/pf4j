@@ -118,4 +118,33 @@ public class FileUtils {
             }
         }
     }
+
+    /**
+     * Finds a path with various endings or null if not found
+     * @param basePath the base name
+     * @param endings a list of endings to search for
+     * @return new path or null if not found
+     */
+    public static Path findWithEnding(Path basePath, String... endings) {
+        for (String ending : endings) {
+            Path newPath = basePath.resolveSibling(basePath.getFileName() + ending);
+            if (Files.exists(newPath)) {
+                return newPath;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Delete a file (not recursively) and ignore any errors
+     * @param path the path to delete
+     */
+    public static void optimisticDelete(Path path) {
+        if (path == null) {
+            return;
+        }
+        try {
+            Files.delete(path);
+        } catch (IOException ignored) { }
+    }
 }
