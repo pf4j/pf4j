@@ -21,7 +21,9 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -40,6 +42,8 @@ public class DefaultPluginRepositoryTest {
     @Before
     public void setUp() throws IOException {
         testFolder.newFolder("plugin-1");
+        // Prove that we can delete a folder with a file inside
+        Files.createFile(Paths.get(testFolder.getRoot().getAbsolutePath()).resolve("plugin-1").resolve("myfile"));
         testFolder.newFolder("plugin-2");
         testFolder.newFolder("plugin-3");
     }
@@ -81,7 +85,7 @@ public class DefaultPluginRepositoryTest {
     }
 
     private void assertPathExists(List<Path> paths, Path path) {
-        assertTrue("The directory must contains the file " + path, paths.contains(path));
+        assertTrue("The directory must contain the file " + path, paths.contains(path));
     }
 
     private Path getPluginsRoot() {

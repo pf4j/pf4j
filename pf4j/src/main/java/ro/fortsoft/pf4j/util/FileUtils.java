@@ -16,8 +16,11 @@
 package ro.fortsoft.pf4j.util;
 
 import java.io.*;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -67,29 +70,28 @@ public class FileUtils {
         }
     }
 
-	/**
-	 * Delete a file or recursively delete a folder.
-	 *
-	 * @param fileOrFolder
-	 * @return true, if successful
-	 */
-	public static boolean delete(File fileOrFolder) {
-		boolean success = false;
-		if (fileOrFolder.isDirectory()) {
-			File [] files = fileOrFolder.listFiles();
-			if (files != null) {
-				for (File file : files) {
-					if (file.isDirectory()) {
-						success |= delete(file);
-					} else {
-						success |= file.delete();
-					}
-				}
-			}
-		}
-		success |= fileOrFolder.delete();
+    /**
+   	 * Delete a file or recursively delete a folder, do not follow symlinks.
+   	 *
+   	 * @param path the file or folder to delete
+   	 * @throws IOException if something goes wrong
+   	 */
+    public static void delete(Path path) throws IOException {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+           @Override
+           public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+               if (!attrs.isSymbolicLink()) {
+                   Files.delete(path);
+               }
+               return FileVisitResult.CONTINUE;
+           }
 
-		return success;
+           @Override
+           public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+               Files.delete(dir);
+               return FileVisitResult.CONTINUE;
+           }
+        });
 	}
 
 	public static List<File> getJars(Path folder) {
@@ -116,5 +118,4 @@ public class FileUtils {
             }
         }
     }
-
 }

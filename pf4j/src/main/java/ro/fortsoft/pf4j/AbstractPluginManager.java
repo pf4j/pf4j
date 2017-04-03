@@ -304,9 +304,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         Path pluginPath = pluginWrapper.getPluginPath();
 
-        pluginRepository.deletePluginPath(pluginPath);
-
-        return true;
+        return pluginRepository.deletePluginPath(pluginPath);
     }
 
     /**
