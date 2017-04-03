@@ -139,7 +139,7 @@ public class FileUtils {
      * Delete a file (not recursively) and ignore any errors
      * @param path the path to delete
      */
-    public static void optimisiticDelete(Path path) {
+    public static void optimisticDelete(Path path) {
         if (path == null) {
             return;
         }
