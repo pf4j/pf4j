@@ -612,7 +612,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     public Version getVersion() {
         String version = null;
 
-        Package pf4jPackage = getClass().getPackage();
+        Package pf4jPackage = PluginManager.class.getPackage();
         if (pf4jPackage != null) {
             version = pf4jPackage.getImplementationVersion();
             if (version == null) {
