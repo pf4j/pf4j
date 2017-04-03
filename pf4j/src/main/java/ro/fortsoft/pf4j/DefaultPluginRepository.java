@@ -103,7 +103,7 @@ public class DefaultPluginRepository extends BasePluginRepository {
 
             // do not overwrite an old version, remove it
             if (pluginDirectory.exists()) {
-                FileUtils.delete(pluginDirectory);
+                FileUtils.delete(pluginDirectory.toPath());
             }
 
             // create root for plugin

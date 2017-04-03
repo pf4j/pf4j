@@ -15,10 +15,12 @@
  */
 package ro.fortsoft.pf4j;
 
+import ro.fortsoft.pf4j.util.FileUtils;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +67,10 @@ public class BasePluginRepository implements PluginRepository {
     @Override
     public boolean deletePluginPath(Path pluginPath) {
         try {
-            return Files.deleteIfExists(pluginPath);
+            FileUtils.delete(pluginPath);
+            return true;
+        } catch (NoSuchFileException nsf) {
+            return false; // Return false on not found to be compatible with previous API
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
