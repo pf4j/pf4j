@@ -44,6 +44,8 @@ public class DefaultPluginRepositoryTest {
         testFolder.newFolder("plugin-1");
         // Prove that we can delete a folder with a file inside
         Files.createFile(Paths.get(testFolder.getRoot().getAbsolutePath()).resolve("plugin-1").resolve("myfile"));
+        // Create a zip file for plugin-1 to test that it is deleted when plugin is deleted
+        Files.createFile(Paths.get(testFolder.getRoot().getAbsolutePath()).resolve("plugin-1.zip"));
         testFolder.newFolder("plugin-2");
         testFolder.newFolder("plugin-3");
     }
@@ -74,7 +76,9 @@ public class DefaultPluginRepositoryTest {
 
         PluginRepository instance = new DefaultPluginRepository(pluginsRoot, false);
 
+        assertTrue(Files.exists(pluginsRoot.resolve("plugin-1.zip")));
         assertTrue(instance.deletePluginPath(pluginsRoot.resolve("plugin-1")));
+        assertFalse(Files.exists(pluginsRoot.resolve("plugin-1.zip")));
         assertTrue(instance.deletePluginPath(pluginsRoot.resolve("plugin-3")));
         assertFalse(instance.deletePluginPath(pluginsRoot.resolve("plugin-4")));
 
