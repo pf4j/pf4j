@@ -15,11 +15,10 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Parser;
 import com.github.zafarkhaja.semver.Version;
-import static com.github.zafarkhaja.semver.expr.CompositeExpression.Helper.gte;
 import com.github.zafarkhaja.semver.expr.Expression;
 import com.github.zafarkhaja.semver.expr.ExpressionParser;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
