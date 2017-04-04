@@ -28,8 +28,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class PropertiesPluginDescriptorFinderTest {
 
@@ -79,8 +78,9 @@ public class PropertiesPluginDescriptorFinderTest {
         assertEquals("test-plugin-3", plugin1.getDependencies().get(1).getPluginId());
         assertEquals("~1.0", plugin1.getDependencies().get(1).getPluginVersionSupport());
         assertEquals("Apache-2.0", plugin1.getLicense());
-        assertEquals("*", plugin1.getRequiresString());
-        assertTrue(plugin1.getRequires().interpret(Version.valueOf("1.0.0")));
+        assertEquals(">=1", plugin1.getRequires());
+        assertTrue(plugin1.validFor(Version.valueOf("1.0.0")));
+        assertFalse(plugin1.validFor(Version.valueOf("0.1.0")));
 
         assertEquals("test-plugin-2", plugin2.getPluginId());
         assertEquals("", plugin2.getPluginDescription());
@@ -88,7 +88,8 @@ public class PropertiesPluginDescriptorFinderTest {
         assertEquals(Version.valueOf("0.0.1"), plugin2.getVersion());
         assertEquals("Decebal Suiu", plugin2.getProvider());
         assertEquals(0, plugin2.getDependencies().size());
-        assertTrue(plugin2.getRequires().interpret(Version.valueOf("1.0.0")));
+        assertEquals("*", plugin2.getRequires()); // Default is *
+        assertTrue(plugin2.validFor(Version.valueOf("1.0.0")));
     }
 
     @Test(expected = PluginException.class)
@@ -105,7 +106,7 @@ public class PropertiesPluginDescriptorFinderTest {
             + "plugin.provider=Decebal Suiu\n"
             + "plugin.class=ro.fortsoft.pf4j.plugin.TestPlugin\n"
             + "plugin.dependencies=test-plugin-2,test-plugin-3@~1.0\n"
-            + "plugin.requires=*\n"
+            + "plugin.requires=>=1\n"
             + "plugin.license=Apache-2.0\n"
             + "\n"
             + ""
@@ -121,7 +122,6 @@ public class PropertiesPluginDescriptorFinderTest {
             + "plugin.provider=Decebal Suiu\n"
             + "plugin.class=ro.fortsoft.pf4j.plugin.TestPlugin\n"
             + "plugin.dependencies=\n"
-            + "plugin.requires=*\n"
             + "\n"
             + ""
         };

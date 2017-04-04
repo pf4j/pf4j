@@ -91,7 +91,7 @@ public class ManifestPluginDescriptorFinderTest {
         assertEquals("test-plugin-3", plugin1.getDependencies().get(1).getPluginId());
         assertEquals("~1.0", plugin1.getDependencies().get(1).getPluginVersionSupport());
         assertEquals("Apache-2.0", plugin1.getLicense());
-        assertTrue(plugin1.getRequires().interpret(Version.valueOf("1.0.0")));
+        assertTrue(plugin1.validFor(Version.valueOf("1.0.0")));
 
         assertEquals("test-plugin-2", plugin2.getPluginId());
         assertEquals("", plugin2.getPluginDescription());
@@ -99,7 +99,7 @@ public class ManifestPluginDescriptorFinderTest {
         assertEquals(Version.valueOf("0.0.1"), plugin2.getVersion());
         assertEquals("Decebal Suiu", plugin2.getProvider());
         assertEquals(0, plugin2.getDependencies().size());
-        assertTrue(plugin2.getRequires().interpret(Version.valueOf("1.0.0")));
+        assertTrue(plugin2.validFor(Version.valueOf("1.0.0")));
     }
 
     /**

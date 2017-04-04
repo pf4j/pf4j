@@ -697,17 +697,15 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     protected boolean isPluginValid(PluginWrapper pluginWrapper) {
-        Expression requires = pluginWrapper.getDescriptor().getRequires();
-        Version system = getSystemVersion();
-        if (requires.interpret(system)) {
+        if (pluginWrapper.getDescriptor().validFor(getSystemVersion())) {
             return true;
         }
 
         log.warn("Plugin '{}:{}' requires a minimum system version of {}, and you have {}",
             pluginWrapper.getPluginId(),
             pluginWrapper.getDescriptor().getVersion(),
-            pluginWrapper.getDescriptor().getRequiresString(),
-            system);
+            pluginWrapper.getDescriptor().getRequires(),
+            getSystemVersion());
 
         return false;
     }

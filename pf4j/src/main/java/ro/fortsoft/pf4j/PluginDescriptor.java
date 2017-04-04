@@ -36,14 +36,12 @@ public class PluginDescriptor {
 	private String pluginDescription;
     private String pluginClass;
     private Version version;
-    private Expression requires;
-    private String requiresString;
+    private String requires = "*";
     private String provider;
     private List<PluginDependency> dependencies;
     private String license;
 
     public PluginDescriptor() {
-    	requires = gte("0.0.0"); // Any
         dependencies = new ArrayList<>();
     }
 
@@ -76,17 +74,18 @@ public class PluginDescriptor {
     }
 
     /**
-     * Returns the requires of this plugin.
+     * Returns string version of requires
+     * @return String with requires expression
      */
-    public Expression getRequires() {
+    public String getRequires() {
         return requires;
     }
 
     /**
-     * Returns the requires of this plugin as a string.
+     * Returns the requires expression of this plugin.
      */
-    public String getRequiresString() {
-        return requiresString;
+    public Expression getRequiresExpression() {
+        return ExpressionParser.newInstance().parse(requires);
     }
 
     /**
@@ -116,9 +115,18 @@ public class PluginDescriptor {
 		return "PluginDescriptor [pluginId=" + pluginId + ", pluginClass="
 				+ pluginClass + ", version=" + version + ", provider="
 				+ provider + ", dependencies=" + dependencies + ", description="
-                + pluginDescription + ", requires=" + requiresString + ", license="
+                + pluginDescription + ", requires=" + requires + ", license="
 				+ license + "]";
 	}
+
+    /**
+     * Check if this plugin is valid (satisfies "requires" param) for a given system version
+     * @param systemVersion the system (host) version to test
+     * @return true if plugin satisfies the "requires" or if requires is left blank
+     */
+	public boolean validFor(Version systemVersion) {
+        return systemVersion.satisfies(getRequiresExpression());
+    }
 
 	void setPluginId(String pluginId) {
         this.pluginId = pluginId;
@@ -141,12 +149,6 @@ public class PluginDescriptor {
     }
 
     void setRequires(String requires) {
-        requiresString = requires;
-        Parser<Expression> parser = ExpressionParser.newInstance();
-        setRequires(parser.parse(requires));
-    }
-
-    void setRequires(Expression requires) {
         this.requires = requires;
     }
 

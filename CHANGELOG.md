@@ -5,10 +5,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#129]: Properties Descriptor finder bug fixes and a test
+- [#131]: Fix bug in loadJars(), did not add `/lib` to classloader
+- [#134]: getVersion() use wrong class for calculating PF4J version 
+- [#135]: deletePlugin() failed to delete plugin folder with contents 
+- [#137]: The requires Expression does not print well
 
 #### Changed
+- [#130]: Refactor validation of PluginDescriptors
+- [#138]: Refactor of requires in PluginDescriptor (breaking change) 
 
 #### Added
+- [#133]: Support for adding license information to the plugins 
+- [#136]: Delete plugin zip on uninstall 
 
 #### Removed
 
