@@ -174,4 +174,9 @@ public interface PluginManager {
      */
     Version getSystemVersion();
 
+    /**
+     * Gets the path of the folder where plugins are installed
+     * @return Path of plugins root
+     */
+    public Path getPluginsRoot();
 }
