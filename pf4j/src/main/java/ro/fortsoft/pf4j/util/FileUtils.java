@@ -15,13 +15,18 @@
  */
 package ro.fortsoft.pf4j.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,8 +34,11 @@ import java.util.List;
  * @author Decebal Suiu
  */
 public class FileUtils {
+    private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
-	public static List<String> readLines(File file, boolean ignoreComments) throws IOException {
+    private static final List<String> ZIP_EXTENSIONS = Arrays.asList(".zip", ".ZIP", ".Zip");
+
+    public static List<String> readLines(File file, boolean ignoreComments) throws IOException {
 		if (!file.exists() || !file.isFile()) {
 			return new ArrayList<>();
 		}
@@ -146,5 +154,45 @@ public class FileUtils {
         try {
             Files.delete(path);
         } catch (IOException ignored) { }
+    }
+
+    /**
+     * Unzip a zip file in a directory that has the same name as the zip file.
+     * For example if the zip file is {@code my-plugin.zip} then the resulted directory
+     * is {@code my-plugin}.
+     *
+     * @param filePath the file to evaluate
+     * @return Path of unzipped folder or original path if this was not a zip file
+     * @throws IOException on error
+     */
+    public static Path expandIfZip(Path filePath) throws IOException {
+        String fileName = filePath.getFileName().toString();
+        if (!ZIP_EXTENSIONS.contains(fileName.substring(fileName.lastIndexOf(".")))) {
+            return filePath;
+        }
+        FileTime pluginZipDate = Files.getLastModifiedTime(filePath);
+        Path pluginDirectory = filePath.resolveSibling(fileName.substring(0, fileName.lastIndexOf(".")));
+
+        // check if exists root or the '.zip' file is "newer" than root
+        if (!Files.exists(pluginDirectory) || pluginZipDate.compareTo(Files.getLastModifiedTime(pluginDirectory)) > 0) {
+            log.debug("Expand plugin zip '{}' in '{}'", filePath, pluginDirectory);
+
+            // do not overwrite an old version, remove it
+            if (Files.exists(pluginDirectory)) {
+                FileUtils.delete(pluginDirectory);
+            }
+
+            // create root for plugin
+            Files.createDirectories(pluginDirectory);
+
+            // expand '.zip' file
+            Unzip unzip = new Unzip();
+            unzip.setSource(filePath.toFile());
+            unzip.setDestination(pluginDirectory.toFile());
+            unzip.extract();
+        }
+        log.debug("Expanded {} to {}", filePath, pluginDirectory);
+
+        return pluginDirectory;
     }
 }
