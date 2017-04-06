@@ -166,11 +166,12 @@ public class FileUtils {
      * @throws IOException on error
      */
     public static Path expandIfZip(Path filePath) throws IOException {
-        String fileName = filePath.getFileName().toString();
-        if (!fileName.contains(".") || !ZIP_EXTENSIONS.contains(fileName.substring(fileName.lastIndexOf(".")))) {
+        if (!isZipFile(filePath)) {
             return filePath;
         }
+
         FileTime pluginZipDate = Files.getLastModifiedTime(filePath);
+        String fileName = filePath.getFileName().toString();
         Path pluginDirectory = filePath.resolveSibling(fileName.substring(0, fileName.lastIndexOf(".")));
 
         if (!Files.exists(pluginDirectory) || pluginZipDate.compareTo(Files.getLastModifiedTime(pluginDirectory)) > 0) {
@@ -191,5 +192,14 @@ public class FileUtils {
         }
 
         return pluginDirectory;
+    }
+
+    /**
+     * Return true only if path is a zip file
+     * @param path to a file/dir
+     * @return true if file with .zip ending
+     */
+    public static boolean isZipFile(Path path) {
+        return Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".zip");
     }
 }

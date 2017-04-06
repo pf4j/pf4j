@@ -60,6 +60,12 @@ public class FileUtilsTest {
 
         // Non-zip file remains unchanged
         assertEquals(propsFile, FileUtils.expandIfZip(propsFile));
+        // File without .suffix
+        Path extra = Files.createFile(tmpDir.resolve("extra"));
+        assertEquals(extra, FileUtils.expandIfZip(extra));
+        // Folder
+        Path folder = Files.createFile(tmpDir.resolve("folder"));
+        assertEquals(folder, FileUtils.expandIfZip(folder));
     }
 
 }
