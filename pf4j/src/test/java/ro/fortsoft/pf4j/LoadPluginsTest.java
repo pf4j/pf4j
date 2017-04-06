@@ -35,6 +35,7 @@ public class LoadPluginsTest {
     private MockPluginManager pluginManager;
     private MockZipPlugin p1;
     private MockZipPlugin p2;
+    private MockZipPlugin p3;
 
     @Before
     public void setup() throws IOException {
@@ -42,6 +43,7 @@ public class LoadPluginsTest {
         tmpDir.toFile().deleteOnExit();
         p1 = new MockZipPlugin("myPlugin", "1.2.3", "my-plugin-1.2.3", "my-plugin-1.2.3.zip");
         p2 = new MockZipPlugin("myPlugin", "2.0.0", "my-plugin-2.0.0", "my-plugin-2.0.0.ZIP");
+        p3 = new MockZipPlugin("other", "3.0.0", "other-3.0.0", "other-3.0.0.Zip");
         pluginManager = new MockPluginManager(
             tmpDir,
             new PropertiesPluginDescriptorFinder("my.properties"));
@@ -94,7 +96,7 @@ public class LoadPluginsTest {
         assertEquals(1, pluginManager.getStartedPlugins().size());
         p2.create();
         pluginManager.loadPlugins();
-        pluginManager.startPlugins();
+        pluginManager.startPlugin(p2.id);
         assertEquals(1, pluginManager.getPlugins().size());
         assertEquals(Version.valueOf("2.0.0"), pluginManager.getPlugin(p2.id).getDescriptor().getVersion());
         assertEquals(Version.valueOf("2.0.0"), pluginManager.getStartedPlugins().get(1).getDescriptor().getVersion());
@@ -111,6 +113,21 @@ public class LoadPluginsTest {
         Files.createFile(notAPlugin);
         pluginManager.loadPlugins();
         assertEquals(0, pluginManager.getPlugins().size());
+    }
+
+    @Test
+    public void deletePlugin() throws Exception {
+        p1.create();
+        p3.create();
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+        assertEquals(2, pluginManager.getPlugins().size());
+        pluginManager.deletePlugin(p1.id);
+        assertEquals(1, pluginManager.getPlugins().size());
+        assertFalse(Files.exists(p1.zipFile));
+        assertFalse(Files.exists(p1.unzipped));
+        assertTrue(Files.exists(p3.zipFile));
+        assertTrue(Files.exists(p3.unzipped));
     }
 
     private class MockZipPlugin {
