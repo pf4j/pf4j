@@ -167,7 +167,7 @@ public class FileUtils {
      */
     public static Path expandIfZip(Path filePath) throws IOException {
         String fileName = filePath.getFileName().toString();
-        if (!ZIP_EXTENSIONS.contains(fileName.substring(fileName.lastIndexOf(".")))) {
+        if (!fileName.contains(".") || !ZIP_EXTENSIONS.contains(fileName.substring(fileName.lastIndexOf(".")))) {
             return filePath;
         }
         FileTime pluginZipDate = Files.getLastModifiedTime(filePath);
