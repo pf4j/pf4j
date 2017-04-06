@@ -17,6 +17,7 @@ package ro.fortsoft.pf4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ro.fortsoft.pf4j.util.FileUtils;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -106,4 +107,22 @@ public class DefaultPluginManager extends AbstractPluginManager {
         log.info("PF4J version {} in '{}' mode", getVersion(), getRuntimeMode());
 	}
 
+    /**
+     * Load a plugin from disk. If the path is a zip file, first unpack
+     * @param pluginPath plugin location on disk
+     * @return PluginWrapper for the loaded plugin or null if not loaded
+     * @throws PluginException if problems during load
+     */
+    @Override
+    protected PluginWrapper loadPluginFromPath(Path pluginPath) throws PluginException {
+        // First unzip any ZIP files
+        try {
+            pluginPath = FileUtils.expandIfZip(pluginPath);
+        } catch (Exception e) {
+            log.warn("Failed to unzip " + pluginPath, e);
+            return null;
+        }
+
+        return super.loadPluginFromPath(pluginPath);
+    }
 }

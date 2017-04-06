@@ -18,7 +18,6 @@ package ro.fortsoft.pf4j;
 import com.github.zafarkhaja.semver.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ro.fortsoft.pf4j.util.FileUtils;
 import ro.fortsoft.pf4j.util.StringUtils;
 
 import java.io.Closeable;
@@ -737,14 +736,6 @@ public abstract class AbstractPluginManager implements PluginManager {
     protected PluginWrapper loadPluginFromPath(Path pluginPath) throws PluginException {
         // test for plugin duplication
         if (plugins.get(pathToIdMap.get(pluginPath)) != null) {
-            return null;
-        }
-
-        // First unzip any ZIP files
-        try {
-            pluginPath = FileUtils.expandIfZip(pluginPath);
-        } catch (Exception e) {
-            log.warn("Failed to unzip " + pluginPath, e);
             return null;
         }
 

@@ -173,10 +173,7 @@ public class FileUtils {
         FileTime pluginZipDate = Files.getLastModifiedTime(filePath);
         Path pluginDirectory = filePath.resolveSibling(fileName.substring(0, fileName.lastIndexOf(".")));
 
-        // check if exists root or the '.zip' file is "newer" than root
         if (!Files.exists(pluginDirectory) || pluginZipDate.compareTo(Files.getLastModifiedTime(pluginDirectory)) > 0) {
-            log.debug("Expand plugin zip '{}' in '{}'", filePath, pluginDirectory);
-
             // do not overwrite an old version, remove it
             if (Files.exists(pluginDirectory)) {
                 FileUtils.delete(pluginDirectory);
@@ -190,8 +187,8 @@ public class FileUtils {
             unzip.setSource(filePath.toFile());
             unzip.setDestination(pluginDirectory.toFile());
             unzip.extract();
+            log.info("Expanded plugin zip '{}' in '{}'", filePath.getFileName(), pluginDirectory.getFileName());
         }
-        log.debug("Expanded {} to {}", filePath, pluginDirectory);
 
         return pluginDirectory;
     }
