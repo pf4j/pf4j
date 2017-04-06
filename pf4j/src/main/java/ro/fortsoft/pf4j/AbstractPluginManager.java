@@ -16,7 +16,6 @@
 package ro.fortsoft.pf4j;
 
 import com.github.zafarkhaja.semver.Version;
-import com.github.zafarkhaja.semver.expr.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.util.StringUtils;
