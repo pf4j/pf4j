@@ -85,11 +85,6 @@ public abstract class AbstractPluginManager implements PluginManager {
      */
     private Version systemVersion = Version.forIntegers(0, 0, 0);
 
-    /**
-     * A relation between 'pluginPath' and 'pluginId'
-     */
-    private Map<Path, String> pathToIdMap;
-
     private PluginRepository pluginRepository;
     private PluginFactory pluginFactory;
     private ExtensionFactory extensionFactory;
@@ -258,7 +253,6 @@ public abstract class AbstractPluginManager implements PluginManager {
             // remove the plugin
             plugins.remove(pluginId);
             getResolvedPlugins().remove(pluginWrapper);
-            pathToIdMap.remove(pluginWrapper.getPluginPath());
 
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
 
@@ -654,7 +648,6 @@ public abstract class AbstractPluginManager implements PluginManager {
         startedPlugins = new ArrayList<>();
 
         pluginStateListeners = new ArrayList<>();
-        pathToIdMap = new HashMap<>();
 
         if (pluginsRoot == null) {
             pluginsRoot = createPluginsRoot();
@@ -735,7 +728,8 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     protected PluginWrapper loadPluginFromPath(Path pluginPath) throws PluginException {
         // test for plugin duplication
-        if (plugins.get(pathToIdMap.get(pluginPath)) != null) {
+        if (idForPath(pluginPath) != null) {
+            log.warn("Plugin {} already loaded", idForPath(pluginPath));
             return null;
         }
 
@@ -782,6 +776,20 @@ public abstract class AbstractPluginManager implements PluginManager {
         getPluginClassLoaders().put(pluginId, pluginClassLoader);
 
         return pluginWrapper;
+    }
+
+    /**
+     * Tests for already loaded plugins on given path
+     * @param pluginPath the path to investigate
+     * @return id of plugin or null if not loaded
+     */
+    protected String idForPath(Path pluginPath) {
+        for (PluginWrapper plugin : plugins.values()) {
+            if (plugin.getPluginPath().equals(pluginPath)) {
+                return plugin.getPluginId();
+            }
+        }
+        return null;
     }
 
     /**
