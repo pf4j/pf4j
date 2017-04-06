@@ -15,12 +15,11 @@
  */
 package ro.fortsoft.pf4j.plugin;
 
-import ro.fortsoft.pf4j.Extension;
+import ro.fortsoft.pf4j.ExtensionPoint;
 
 /**
  * @author Mario Franco
  */
-@Extension
-public class TestExtension implements TestExtensionPoint {
+public interface TestExtensionPoint extends ExtensionPoint {
 
 }
