@@ -1,0 +1,51 @@
+<div class="unit one-fifth hide-on-mobiles">
+  <aside>
+
+    <h4>Getting Started</h4>
+    <ul>
+      <li class="{% if page.title == "Welcome" %}current{% endif %}">
+        <a href="{{ site.url }}/docs/welcome">Welcome</a>
+      </li>
+      <li class="{% if page.title == "Installation" %}current{% endif %}">
+        <a href="{{ site.url }}/docs/installation">Installation</a>
+      </li>
+      <li class="{% if page.title == "Basic usage" %}current{% endif %}">
+        <a href="{{ site.url }}/docs/usage">Basic usage</a>
+      </li>
+    </ul>
+
+    <h4>Miscellaneous</h4>
+    <ul>
+        <li class="{% if page.title == "Frequently Asked Questions" %}current{% endif %}">
+            <a href="{{ site.url }}/docs/faq/">FAQ</a>
+        </li>
+
+        <li class="{% if page.title == "Getting support" %}current{% endif %}">
+            <a href="{{ site.url }}/docs/support/">Getting support</a>
+        </li>
+    </ul>
+
+    <h4>Meta</h4>
+    <ul>
+      <li class="{% if page.title == "Building from sources" %}current{% endif %}">
+        <a href="{{ site.url }}/docs/building">Building from sources</a>
+      </li>
+      <li class="{% if page.title == "Contributing" %}current{% endif %}">
+        <a href="{{ site.url }}/docs/contributing">Contributing</a>
+      </li>
+      <li class="{% if page.title == "License" %}current{% endif %}">
+        <a href="{{ site.url }}/docs/license">License</a>
+      </li>
+    </ul>
+
+    <h4>Other stuff</h4>
+    <ul>
+      <li><a href="{{ site.url }}/news/releases/">History</a></li>
+      <li><a href="http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22ro.fortsoft.pf4j%22%20AND%20a%3A%22pf4j%22">Downloads</a></li>
+      <li><a href="https://github.com/decebals/pf4j/releases">Releases</a></li>
+      <li><a href="https://travis-ci.org/decebals/pf4j">Travis CI reports</a></li>
+      <li><a href="https://coveralls.io/github/decebals/pf4j">Coveralls reports</a></li>
+    </ul>
+
+  </aside>
+</div>

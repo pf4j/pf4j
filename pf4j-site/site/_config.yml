@@ -1,0 +1,22 @@
+highlighter: pygments
+relative_permalinks: false
+url: https://decebals.github.io/pf4j/
+title: PF4J • Plugin Framework for Java™.
+description: A microframework to transform a monolithic java application in a modular application.
+google_analytics_id:
+exclude: ["README", "bin", "build.xml"]
+permalink: /news/:year/:month/:day/:title
+
+author :
+  name : Decebal Suiu
+  email : decebal.suiu@gmail.com
+  github : decebals
+  twitter : decebals
+
+project:
+  name: PF4J
+  github: pf4j
+
+markdown: redcarpet
+redcarpet:
+  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "strikethrough", "superscript", "with_toc_data"]

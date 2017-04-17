@@ -1,0 +1,32 @@
+<div class="docs-nav-mobile unit whole show-on-mobiles">
+    <select onchange="if (this.value) window.location.href=this.value">
+
+        <option value="">Navigate the docs…</option>
+
+        <optgroup label="Getting started">
+            <option value="{{ site.url }}/docs/welcome/">Welcome</option>
+            <option value="{{ site.url }}/docs/installation/">Installation</option>
+            <option value="{{ site.url }}/docs/usage/">Basic usage</option>
+        </optgroup>
+
+        <optgroup label="Miscellaneous">
+            <option value="{{ site.url }}/docs/faq/">FAQ</option>
+            <option value="{{ site.url }}/docs/support/">Getting support</option>
+        </optgroup>
+
+        <optgroup label="Meta">
+            <option value="{{ site.url }}/docs/building/">Building from sources</option>
+            <option value="{{ site.url }}/docs/contributing/">Contributing</option>
+            <option value="{{ site.url }}/docs/license/">License</option>
+        </optgroup>
+
+        <optgroup label="Other stuff">
+            <option value="{{ site.url }}/news/releases/">History</option>
+            <option value="http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22ro.fortsoft.pf4j%22%20AND%20a%3A%22pf4j%22">Downloads</option>
+            <option value="https://github.com/decebals/pf4j/releases">Releases</option>
+            <option value="https://travis-ci.org/decebals/pf4j">Travis CI reports</option>
+            <option value="https://coveralls.io/github/decebals/pf4j">Coveralls reports</option>
+        </optgroup>
+
+    </select>
+</div>
