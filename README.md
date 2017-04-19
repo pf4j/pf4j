@@ -256,10 +256,14 @@ a requirement to specify a minimum system version for loading plugins.
 Loading & starting a newer plugin on an older system could result in
 runtime failures due to method signature changes or other class
 differences.  
+
 For this reason was added a manifest attribute (in PluginDescriptor) to specify a 'requires' version
-which is a minimum system version. Also DefaultPluginManager contains a method to
+which is a minimum system version on x.y.z format, or a 
+[SemVer Expression](https://github.com/zafarkhaja/jsemver#semver-expressions-api-ranges). 
+Also DefaultPluginManager contains a method to
 specify the system version of the plugin manager and the logic to disable
-plugins on load if the system version is too old (if you want total control, please override `isPluginValid()`). This works for both `loadPlugins()` and `loadPlugin()`.  
+plugins on load if the system version is too old (if you want total control, 
+please override `isPluginValid()`). This works for both `loadPlugins()` and `loadPlugin()`.  
 
 __PluginStateListener__ defines the interface for an object that listens to plugin state changes. You can use `addPluginStateListener()` and `removePluginStateListener()` from PluginManager if you want to add or remove a plugin state listener.  
 
