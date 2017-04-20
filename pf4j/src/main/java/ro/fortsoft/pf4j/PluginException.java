@@ -15,6 +15,8 @@
  */
 package ro.fortsoft.pf4j;
 
+import ro.fortsoft.pf4j.util.StringUtils;
+
 /**
  * An exception used to indicate that a plugin problem occurred.
  *
@@ -38,6 +40,14 @@ public class PluginException extends Exception {
 
     public PluginException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public PluginException(Throwable cause, String message, Object... args) {
+        super(StringUtils.format(message, args), cause);
+    }
+
+    public PluginException(String message, Object... args) {
+        super(StringUtils.format(message, args));
     }
 
 }

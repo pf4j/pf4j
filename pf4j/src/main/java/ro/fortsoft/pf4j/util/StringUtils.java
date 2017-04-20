@@ -28,4 +28,13 @@ public class StringUtils {
         return !isEmpty(str);
     }
 
+    /**
+     * Format the string. Replace "{}" with %s and format the string using {@link String#format(String, Object...)}.
+     */
+    public static String format(String str, Object... args) {
+        str = str.replaceAll("\\{}", "%s");
+
+        return String.format(str, args);
+    }
+
 }
