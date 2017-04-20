@@ -51,7 +51,7 @@ public class DefaultPluginDescriptorFinder extends ManifestPluginDescriptorFinde
         Path manifestPath = pluginPath.resolve(Paths.get(classes,"/META-INF/MANIFEST.MF"));
         log.debug("Lookup plugin descriptor in '{}'", manifestPath);
         if (Files.notExists(manifestPath)) {
-            throw new PluginException("Cannot find '" + manifestPath + "' path");
+            throw new PluginException("Cannot find '{}' path", manifestPath);
         }
 
         try (InputStream input = Files.newInputStream(manifestPath)) {

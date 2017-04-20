@@ -71,7 +71,7 @@ public class DependencyResolver {
 		List<String> pluginsId = dependenciesGraph.reverseTopologicalSort();
 
 		if (pluginsId == null) {
-			throw new PluginException("Cyclic dependencies !!!" + dependenciesGraph.toString());
+			throw new PluginException("Cyclic dependencies !!! {}", dependenciesGraph.toString());
 		}
 
 		log.debug("Plugins order: {}", pluginsId);

@@ -178,5 +178,6 @@ public interface PluginManager {
      * Gets the path of the folder where plugins are installed
      * @return Path of plugins root
      */
-    public Path getPluginsRoot();
+    Path getPluginsRoot();
+
 }

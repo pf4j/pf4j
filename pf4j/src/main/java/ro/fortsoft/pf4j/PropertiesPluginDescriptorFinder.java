@@ -59,7 +59,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         Path propertiesPath = pluginPath.resolve(Paths.get(propertiesFileName));
         log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
         if (Files.notExists(propertiesPath)) {
-            throw new PluginException("Cannot find '" + pluginPath + "' path");
+            throw new PluginException("Cannot find '{}' path", pluginPath);
         }
 
         Properties properties = new Properties();
