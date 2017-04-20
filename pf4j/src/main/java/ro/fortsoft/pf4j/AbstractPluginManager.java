@@ -91,6 +91,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     private PluginStatusProvider pluginStatusProvider;
     private DependencyResolver dependencyResolver;
     private PluginLoader pluginLoader;
+    private boolean exactVersionAllowed = false;
 
     /**
      * The plugins root is supplied by {@code System.getProperty("pf4j.pluginsDir", "plugins")}.
@@ -688,8 +689,18 @@ public abstract class AbstractPluginManager implements PluginManager {
         return Paths.get(pluginsDir);
     }
 
+    /**
+     * Check if this plugin is valid (satisfies "requires" param) for a given system version
+     * @param pluginWrapper the plugin to check
+     * @return true if plugin satisfies the "requires" or if requires was left blank
+     */
     protected boolean isPluginValid(PluginWrapper pluginWrapper) {
-        if (pluginWrapper.getDescriptor().validFor(getSystemVersion())) {
+        String requires = pluginWrapper.getDescriptor().getRequires().trim();
+        if (!isExactVersionAllowed() && requires.matches("^\\d+\\.\\d+\\.\\d+$")) {
+            // If exact versions are not allowed in requires, rewrite to >= expression
+            requires = ">=" + requires;
+        }
+        if (systemVersion.equals(Version.forIntegers(0,0,0)) || systemVersion.satisfies(requires)) {
             return true;
         }
 
@@ -814,4 +825,20 @@ public abstract class AbstractPluginManager implements PluginManager {
         return RuntimeMode.DEVELOPMENT.equals(getRuntimeMode());
     }
 
+    /**
+     * @return true if exact versions in requires is allowed
+     */
+    public boolean isExactVersionAllowed() {
+        return exactVersionAllowed;
+    }
+
+    /**
+     * Set to true to allow requires expression to be exactly x.y.z.
+     * The default is false, meaning that using an exact version x.y.z will
+     * implicitly mean the same as >=x.y.z
+     * @param exactVersionAllowed set to true or false
+     */
+    public void setExactVersionAllowed(boolean exactVersionAllowed) {
+        this.exactVersionAllowed = exactVersionAllowed;
+    }
 }

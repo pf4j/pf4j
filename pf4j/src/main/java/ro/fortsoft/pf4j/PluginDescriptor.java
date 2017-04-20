@@ -16,8 +16,6 @@
 package ro.fortsoft.pf4j;
 
 import com.github.zafarkhaja.semver.Version;
-import com.github.zafarkhaja.semver.expr.Expression;
-import com.github.zafarkhaja.semver.expr.ExpressionParser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +33,7 @@ public class PluginDescriptor {
 	private String pluginDescription;
     private String pluginClass;
     private Version version;
-    private String requires = "*";
+    private String requires = "*"; // SemVer format
     private String provider;
     private List<PluginDependency> dependencies;
     private String license;
@@ -74,17 +72,10 @@ public class PluginDescriptor {
 
     /**
      * Returns string version of requires
-     * @return String with requires expression
+     * @return String with requires expression on SemVer format
      */
     public String getRequires() {
         return requires;
-    }
-
-    /**
-     * Returns the requires expression of this plugin.
-     */
-    public Expression getRequiresExpression() {
-        return ExpressionParser.newInstance().parse(requires);
     }
 
     /**
@@ -117,15 +108,6 @@ public class PluginDescriptor {
                 + pluginDescription + ", requires=" + requires + ", license="
 				+ license + "]";
 	}
-
-    /**
-     * Check if this plugin is valid (satisfies "requires" param) for a given system version
-     * @param systemVersion the system (host) version to test
-     * @return true if plugin satisfies the "requires" or if requires is left blank
-     */
-	public boolean validFor(Version systemVersion) {
-        return systemVersion.satisfies(getRequiresExpression());
-    }
 
 	void setPluginId(String pluginId) {
         this.pluginId = pluginId;

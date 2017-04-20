@@ -19,12 +19,20 @@ import com.github.zafarkhaja.semver.Version;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class DefaultPluginManagerTest {
     private PluginDescriptor pd1 = null;
     private DefaultPluginManager pluginManager = new DefaultPluginManager();
+    private PluginWrapper pw1;
 
     @Before
-    public void init() {
+    public void init() throws IOException {
         pd1 = new PluginDescriptor();
         pd1.setPluginId("myPlugin");
         pd1.setPluginVersion(Version.valueOf("1.2.3"));
@@ -33,6 +41,8 @@ public class DefaultPluginManagerTest {
         pd1.setDependencies("bar, baz");
         pd1.setProvider("Me");
         pd1.setRequires("5.0.0");
+
+        pw1 = new PluginWrapper(pluginManager, pd1, Files.createTempDirectory("test"), getClass().getClassLoader());
     }
 
     @Test
@@ -56,5 +66,42 @@ public class DefaultPluginManagerTest {
     public void validateFailsOnClass() throws PluginException {
         pd1.setPluginClass(null);
         pluginManager.validatePluginDescriptor(pd1);
+    }
+
+    @Test
+    public void isPluginValid() throws Exception {
+        // By default accept all since system version not given
+        assertTrue(pluginManager.isPluginValid(pw1));
+
+        pluginManager.setSystemVersion(Version.valueOf("1.0.0"));
+        assertFalse(pluginManager.isPluginValid(pw1));
+
+        pluginManager.setSystemVersion(Version.valueOf("5.0.0"));
+        assertTrue(pluginManager.isPluginValid(pw1));
+
+        pluginManager.setSystemVersion(Version.valueOf("6.0.0"));
+        assertTrue(pluginManager.isPluginValid(pw1));
+    }
+
+    @Test
+    public void isPluginValidAllowExact() throws Exception {
+        pluginManager.setExactVersionAllowed(true);
+
+        // By default accept all since system version not given
+        assertTrue(pluginManager.isPluginValid(pw1));
+
+        pluginManager.setSystemVersion(Version.valueOf("1.0.0"));
+        assertFalse(pluginManager.isPluginValid(pw1));
+
+        pluginManager.setSystemVersion(Version.valueOf("5.0.0"));
+        assertTrue(pluginManager.isPluginValid(pw1));
+
+        pluginManager.setSystemVersion(Version.valueOf("6.0.0"));
+        assertFalse(pluginManager.isPluginValid(pw1));
+    }
+
+    @Test
+    public void testDefaultExactVersionAllowed() throws Exception {
+        assertEquals(false, pluginManager.isExactVersionAllowed());
     }
 }

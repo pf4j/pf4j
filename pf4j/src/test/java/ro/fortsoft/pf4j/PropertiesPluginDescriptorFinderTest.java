@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static ro.fortsoft.pf4j.util.SemVerUtils.versionMatches;
 
 public class PropertiesPluginDescriptorFinderTest {
 
@@ -79,8 +80,8 @@ public class PropertiesPluginDescriptorFinderTest {
         assertEquals("~1.0", plugin1.getDependencies().get(1).getPluginVersionSupport());
         assertEquals("Apache-2.0", plugin1.getLicense());
         assertEquals(">=1", plugin1.getRequires());
-        assertTrue(plugin1.validFor(Version.valueOf("1.0.0")));
-        assertFalse(plugin1.validFor(Version.valueOf("0.1.0")));
+        assertTrue(versionMatches(plugin1.getRequires(),"1.0.0"));
+        assertFalse(versionMatches(plugin1.getRequires(), "0.1.0"));
 
         assertEquals("test-plugin-2", plugin2.getPluginId());
         assertEquals("", plugin2.getPluginDescription());
@@ -89,7 +90,7 @@ public class PropertiesPluginDescriptorFinderTest {
         assertEquals("Decebal Suiu", plugin2.getProvider());
         assertEquals(0, plugin2.getDependencies().size());
         assertEquals("*", plugin2.getRequires()); // Default is *
-        assertTrue(plugin2.validFor(Version.valueOf("1.0.0")));
+        assertTrue(versionMatches(plugin2.getRequires(),"1.0.0"));
     }
 
     @Test(expected = PluginException.class)
