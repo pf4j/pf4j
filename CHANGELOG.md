@@ -6,10 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Fixed
 - [#129]: Properties Descriptor finder bug fixes and a test
-- [#131]: Fix bug in loadJars(), did not add `/lib` to classloader
-- [#134]: getVersion() use wrong class for calculating PF4J version 
-- [#135]: deletePlugin() failed to delete plugin folder with contents 
+- [#131]: Fix bug in `loadJars()`, did not add `/lib` to classloader
+- [#134]: `getVersion()` use wrong class for calculating PF4J version 
+- [#135]: `deletePlugin()` failed to delete plugin folder with contents 
 - [#137]: The requires Expression does not print well
+- [#140]: Unzip plugin zip file in `loadPluginFromPath()`
 
 #### Changed
 - [#130]: Refactor validation of PluginDescriptors
@@ -17,7 +18,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Added
 - [#133]: Support for adding license information to the plugins 
-- [#136]: Delete plugin zip on uninstall 
+- [#136]: Delete plugin zip on uninstall
+- [#139]: Ability to get `pluginsRoot` from PluginManager
+- Add constructors with varargs in PippoException
 
 #### Removed
 
@@ -169,6 +172,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#140]: https://github.com/decebals/pf4j/pull/140
+[#139]: https://github.com/decebals/pf4j/pull/139
+[#138]: https://github.com/decebals/pf4j/pull/138
+[#137]: https://github.com/decebals/pf4j/pull/137
+[#136]: https://github.com/decebals/pf4j/pull/136
+[#135]: https://github.com/decebals/pf4j/pull/135
+[#134]: https://github.com/decebals/pf4j/pull/134
+[#133]: https://github.com/decebals/pf4j/pull/133
+[#131]: https://github.com/decebals/pf4j/pull/131
+[#130]: https://github.com/decebals/pf4j/pull/130
+[#129]: https://github.com/decebals/pf4j/pull/129
 [#128]: https://github.com/decebals/pf4j/pull/128
 [#125]: https://github.com/decebals/pf4j/pull/125
 [#122]: https://github.com/decebals/pf4j/pull/122
