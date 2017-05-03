@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [1.3.0] - 2017-05-03
+
+#### Fixed
 - [#129]: Properties Descriptor finder bug fixes and a test
 - [#131]: Fix bug in `loadJars()`, did not add `/lib` to classloader
 - [#134]: `getVersion()` use wrong class for calculating PF4J version 
@@ -161,7 +171,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-1.2.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-1.3.0...HEAD
+[1.3.0]: https://github.com/decebals/pf4j/compare/release-1.2.0...release-1.3.0
 [1.2.0]: https://github.com/decebals/pf4j/compare/release-1.1.1...release-1.2.0
 [1.1.1]: https://github.com/decebals/pf4j/compare/release-1.1.0...release-1.1.1
 [1.1.0]: https://github.com/decebals/pf4j/compare/release-1.0.0...release-1.1.0
