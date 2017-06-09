@@ -223,6 +223,13 @@ The `maven-compiler-plugin` can be configured to do this like so:
 </plugin>
 ```
 
+### Kotlin
+
+PF4J can be used in Kotlin project as well. One has to use the Kotlin annotation processing tool 
+[**kapt**](https://kotlinlang.org/docs/reference/kapt.html) for the plugin project written in Kotlin.
+The demo_gradle project contains one plugin project _plugin3_ written in Kotlin for demonstration.
+
+
 Plugin assembly
 ------------------------------
 After you developed a plugin the next step is to deploy it in your application. For this task, one option is to create a zip file with a structure described in section [How to use](https://github.com/decebals/pf4j/blob/master/README.md#how-to-use) from the beginning of the document.  
