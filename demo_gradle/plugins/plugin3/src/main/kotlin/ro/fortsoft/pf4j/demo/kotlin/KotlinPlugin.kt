@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Anindya Chatterjee
+ * Copyright (C) 2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import ro.fortsoft.pf4j.demo.api.Greeting
 /**
  * A sample plugin written in Kotlin
  *
- * @author Anindya Chatterjee (anidotnet)
+ * @author Anindya Chatterjee
  */
 class KotlinPlugin(wrapper: PluginWrapper) : Plugin(wrapper) {
 
