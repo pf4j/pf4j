@@ -394,7 +394,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * Stop the specified plugin and it's dependencies.
+     * Stop the specified plugin and it's dependents.
      */
     @Override
     public PluginState stopPlugin(String pluginId) {
@@ -841,4 +841,5 @@ public abstract class AbstractPluginManager implements PluginManager {
     public void setExactVersionAllowed(boolean exactVersionAllowed) {
         this.exactVersionAllowed = exactVersionAllowed;
     }
+
 }

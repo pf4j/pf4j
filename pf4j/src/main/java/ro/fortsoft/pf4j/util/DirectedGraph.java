@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Stack;
 
 /**
+ * See <a href="https://en.wikipedia.org/wiki/Directed_graph">Wikipedia</a> for more information.
+ *
  * @author Decebal Suiu
  */
 public class DirectedGraph<V> {
@@ -76,14 +78,14 @@ public class DirectedGraph<V> {
 
     public List<V> getNeighbors(V vertex) {
         if (!neighbors.containsKey(vertex)) {
-        	return new ArrayList<V>();
+        	return new ArrayList<>();
         }
 
         return neighbors.get(vertex);
     }
 
     /**
-     * Report (as a Map) the out-degree of each vertex.
+     * Report (as a Map) the out-degree (the number of tail ends adjacent to a vertex) of each vertex.
      */
     public Map<V, Integer> outDegree() {
         Map<V, Integer> result = new HashMap<>();
@@ -95,9 +97,9 @@ public class DirectedGraph<V> {
     }
 
     /**
-     * Report (as a Map) the in-degree of each vertex.
+     * Report (as a Map) the in-degree (the number of head ends adjacent to a vertex) of each vertex.
      */
-    public Map<V,Integer> inDegree() {
+    public Map<V, Integer> inDegree() {
         Map<V, Integer> result = new HashMap<>();
         for (V vertex : neighbors.keySet()) {
         	result.put(vertex, 0); // all in-degrees are 0
@@ -113,6 +115,7 @@ public class DirectedGraph<V> {
 
     /**
      * Report (as a List) the topological sort of the vertices; null for no such sort.
+     * See <a href="https://en.wikipedia.org/wiki/Topological_sorting">this</a> for more information.
      */
     public List<V> topologicalSort() {
         Map<V, Integer> degree = inDegree();

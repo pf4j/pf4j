@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.util.DirectedGraph;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,8 +30,8 @@ public class DependencyResolver {
 	private static final Logger log = LoggerFactory.getLogger(DependencyResolver.class);
 
     private List<PluginWrapper> plugins;
-    private DirectedGraph<String> dependenciesGraph;
-    private DirectedGraph<String> dependentsGraph;
+    private DirectedGraph<String> dependenciesGraph; // the value is 'pluginId'
+    private DirectedGraph<String> dependentsGraph; // the value is 'pluginId'
     private boolean resolved;
 
 	public void resolve(List<PluginWrapper> plugins) {
@@ -43,40 +42,46 @@ public class DependencyResolver {
         resolved = true;
 	}
 
-    public List<String> getDependecies(String pluginsId) {
-        if (!resolved) {
-            return Collections.emptyList();
-        }
+    /**
+     * Retrieves the plugins ids that the given plugin id directly depends on.
+     *
+     * @param pluginId
+     * @return
+     */
+    public List<String> getDependecies(String pluginId) {
+	    checkResolved();
 
-        return dependenciesGraph.getNeighbors(pluginsId);
+        return dependenciesGraph.getNeighbors(pluginId);
     }
 
-    public List<String> getDependents(String pluginsId) {
-        if (!resolved) {
-            return Collections.emptyList();
-        }
+    /**
+     * Retrieves the plugins ids that the given content is a direct dependency of.
+     *
+     * @param pluginId
+     * @return
+     */
+    public List<String> getDependents(String pluginId) {
+	    checkResolved();
 
-        return dependentsGraph.getNeighbors(pluginsId);
+        return dependentsGraph.getNeighbors(pluginId);
     }
 
 	/**
 	 * Get the list of plugins in dependency sorted order.
 	 */
 	public List<PluginWrapper> getSortedPlugins() throws PluginException {
-        if (!resolved) {
-            return Collections.emptyList();
-        }
+	    checkResolved();
 
 		log.debug("Graph: {}", dependenciesGraph);
-		List<String> pluginsId = dependenciesGraph.reverseTopologicalSort();
+		List<String> pluginsIds = dependenciesGraph.reverseTopologicalSort();
 
-		if (pluginsId == null) {
+		if (pluginsIds == null) {
 			throw new PluginException("Cyclic dependencies !!! {}", dependenciesGraph.toString());
 		}
 
-		log.debug("Plugins order: {}", pluginsId);
+		log.debug("Plugins order: {}", pluginsIds);
 		List<PluginWrapper> sortedPlugins = new ArrayList<>();
-		for (String pluginId : pluginsId) {
+		for (String pluginId : pluginsIds) {
 			sortedPlugins.add(getPlugin(pluginId));
 		}
 
@@ -84,23 +89,23 @@ public class DependencyResolver {
 	}
 
     private void initGraph() {
-        // create graph
+        // create graphs
         dependenciesGraph = new DirectedGraph<>();
         dependentsGraph = new DirectedGraph<>();
 
-        // populate graph
+        // populate graphs
         for (PluginWrapper pluginWrapper : plugins) {
             PluginDescriptor descriptor = pluginWrapper.getDescriptor();
             String pluginId = descriptor.getPluginId();
             List<PluginDependency> dependencies = descriptor.getDependencies();
-            if (!dependencies.isEmpty()) {
+            if (dependencies.isEmpty()) {
+                dependenciesGraph.addVertex(pluginId);
+                dependentsGraph.addVertex(pluginId);
+            } else {
                 for (PluginDependency dependency : dependencies) {
                     dependenciesGraph.addEdge(pluginId, dependency.getPluginId());
                     dependentsGraph.addEdge(dependency.getPluginId(), pluginId);
                 }
-            } else {
-                dependenciesGraph.addVertex(pluginId);
-                dependentsGraph.addVertex(pluginId);
             }
         }
     }
@@ -114,5 +119,11 @@ public class DependencyResolver {
 
 		throw new PluginNotFoundException(pluginId);
 	}
+
+	private void checkResolved() {
+	    if (!resolved) {
+	        throw new IllegalStateException("Call 'resolve' method first");
+        }
+    }
 
 }
