@@ -16,6 +16,7 @@
 package ro.fortsoft.pf4j.demo.kotlin
 
 import org.apache.commons.lang3.StringUtils
+import org.slf4j.LoggerFactory
 import ro.fortsoft.pf4j.Extension
 import ro.fortsoft.pf4j.Plugin
 import ro.fortsoft.pf4j.PluginWrapper
@@ -27,14 +28,15 @@ import ro.fortsoft.pf4j.demo.api.Greeting
  * @author Anindya Chatterjee
  */
 class KotlinPlugin(wrapper: PluginWrapper) : Plugin(wrapper) {
+    private val logger = LoggerFactory.getLogger(KotlinPlugin::class.java)
 
     override fun start() {
-        println("KotlinPlugin.start()")
-        println(StringUtils.upperCase("KotlinPlugin"))
+        logger.info("KotlinPlugin.start()")
+        logger.info(StringUtils.upperCase("KotlinPlugin"))
     }
 
     override fun stop() {
-        println("KotlinPlugin.stop()")
+        logger.info("KotlinPlugin.stop()")
     }
 }
 

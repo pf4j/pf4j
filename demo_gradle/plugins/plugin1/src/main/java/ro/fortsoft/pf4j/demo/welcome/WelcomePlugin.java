@@ -17,6 +17,8 @@ package ro.fortsoft.pf4j.demo.welcome;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.Extension;
 import ro.fortsoft.pf4j.Plugin;
 import ro.fortsoft.pf4j.PluginWrapper;
@@ -26,6 +28,7 @@ import ro.fortsoft.pf4j.demo.api.Greeting;
  * @author Decebal Suiu
  */
 public class WelcomePlugin extends Plugin {
+    private static final Logger logger = LoggerFactory.getLogger(WelcomePlugin.class);
 
     public WelcomePlugin(PluginWrapper wrapper) {
         super(wrapper);
@@ -33,13 +36,13 @@ public class WelcomePlugin extends Plugin {
 
     @Override
     public void start() {
-        System.out.println("WelcomePlugin.start()");
-        	System.out.println(StringUtils.upperCase("WelcomePlugin"));
+        logger.info("WelcomePlugin.start()");
+        	logger.info(StringUtils.upperCase("WelcomePlugin"));
     }
 
     @Override
     public void stop() {
-        System.out.println("WelcomePlugin.stop()");
+        logger.info("WelcomePlugin.stop()");
     }
 
     @Extension

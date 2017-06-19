@@ -15,15 +15,15 @@
  */
 package ro.fortsoft.pf4j.demo;
 
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.DefaultPluginManager;
 import ro.fortsoft.pf4j.PluginManager;
 import ro.fortsoft.pf4j.PluginWrapper;
 import ro.fortsoft.pf4j.demo.api.Greeting;
+
+import java.util.List;
 
 /**
  * A boot class that start the demo.
@@ -31,6 +31,7 @@ import ro.fortsoft.pf4j.demo.api.Greeting;
  * @author Decebal Suiu
  */
 public class Boot {
+    private static final Logger logger = LoggerFactory.getLogger(Boot.class);
 
     public static void main(String[] args) {
         // print logo
@@ -48,31 +49,31 @@ public class Boot {
         // start (active/resolved) the plugins
         pluginManager.startPlugins();
 
-        System.out.println("Plugindirectory: ");
-        System.out.println("\t" + System.getProperty("pf4j.pluginsDir", "plugins") + "\n");
+        logger.info("Plugindirectory: ");
+        logger.info("\t" + System.getProperty("pf4j.pluginsDir", "plugins") + "\n");
 
         // retrieves the extensions for Greeting extension point
         List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);
-        System.out.println(String.format("Found %d extensions for extension point '%s'", greetings.size(), Greeting.class.getName()));
+        logger.info(String.format("Found %d extensions for extension point '%s'", greetings.size(), Greeting.class.getName()));
         for (Greeting greeting : greetings) {
-            System.out.println(">>> " + greeting.getGreeting());
+            logger.info(">>> " + greeting.getGreeting());
         }
 
         // // print extensions from classpath (non plugin)
-        // System.out.println(String.format("Extensions added by classpath:"));
+        // logger.info(String.format("Extensions added by classpath:"));
         // Set<String> extensionClassNames = pluginManager.getExtensionClassNames(null);
         // for (String extension : extensionClassNames) {
-        //     System.out.println("   " + extension);
+        //     logger.info("   " + extension);
         // }
 
         // print extensions for each started plugin
         List<PluginWrapper> startedPlugins = pluginManager.getStartedPlugins();
         for (PluginWrapper plugin : startedPlugins) {
             String pluginId = plugin.getDescriptor().getPluginId();
-            System.out.println(String.format("Extensions added by plugin '%s':", pluginId));
+            logger.info(String.format("Extensions added by plugin '%s':", pluginId));
             // extensionClassNames = pluginManager.getExtensionClassNames(pluginId);
             // for (String extension : extensionClassNames) {
-            //     System.out.println("   " + extension);
+            //     logger.info("   " + extension);
             // }
         }
 
@@ -91,9 +92,9 @@ public class Boot {
     }
 
 	private static void printLogo() {
-    	System.out.println(StringUtils.repeat("#", 40));
-    	System.out.println(StringUtils.center("PF4J-DEMO", 40));
-    	System.out.println(StringUtils.repeat("#", 40));
+    	logger.info(StringUtils.repeat("#", 40));
+    	logger.info(StringUtils.center("PF4J-DEMO", 40));
+    	logger.info(StringUtils.repeat("#", 40));
 	}
 
 }
