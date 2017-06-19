@@ -15,6 +15,8 @@
  */
 package ro.fortsoft.pf4j.demo.hello;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.Extension;
 import ro.fortsoft.pf4j.Plugin;
 import ro.fortsoft.pf4j.PluginWrapper;
@@ -26,6 +28,7 @@ import ro.fortsoft.pf4j.demo.api.Greeting;
  * @author Decebal Suiu
  */
 public class HelloPlugin extends Plugin {
+    private static final Logger logger = LoggerFactory.getLogger(HelloPlugin.class);
 
     public HelloPlugin(PluginWrapper wrapper) {
         super(wrapper);
@@ -33,12 +36,12 @@ public class HelloPlugin extends Plugin {
 
     @Override
     public void start() {
-        System.out.println("HelloPlugin.start()");
+        logger.info("HelloPlugin.start()");
     }
 
     @Override
     public void stop() {
-        System.out.println("HelloPlugin.stop()");
+        logger.info("HelloPlugin.stop()");
     }
 
     @Extension(ordinal=1)
