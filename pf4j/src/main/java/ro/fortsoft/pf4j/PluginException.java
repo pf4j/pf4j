@@ -24,8 +24,6 @@ import ro.fortsoft.pf4j.util.StringUtils;
  */
 public class PluginException extends Exception {
 
-	private static final long serialVersionUID = 1L;
-
 	public PluginException() {
         super();
     }
