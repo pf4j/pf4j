@@ -36,7 +36,7 @@ public class DependencyResolverTest {
     private DefaultPluginManager pluginManager = new DefaultPluginManager();
 
     @Test
-     public void sortedPlugins() {
+    public void sortedPlugins() {
         // create incomplete plugin descriptor (ignore some attributes)
         PluginDescriptor pd1 = new PluginDescriptor()
             .setPluginId("p1")
