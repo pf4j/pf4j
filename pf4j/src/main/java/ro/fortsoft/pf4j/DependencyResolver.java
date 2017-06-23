@@ -58,14 +58,16 @@ public class DependencyResolver {
         // create the result object
         Result result = new Result(sortedPlugins);
 
-        // detect not found dependencies
-        for (String pluginId : sortedPlugins) {
-            if (!pluginByIds.containsKey(pluginId)) {
-                result.addNotFoundDependency(pluginId);
+        resolved = true;
+
+        if (sortedPlugins != null) { // no cyclic dependency
+            // detect not found dependencies
+            for (String pluginId : sortedPlugins) {
+                if (!pluginByIds.containsKey(pluginId)) {
+                    result.addNotFoundDependency(pluginId);
+                }
             }
         }
-
-        resolved = true;
 
         // check dependencies versions
         for (PluginWrapper plugin : plugins) {
@@ -212,8 +214,8 @@ public class DependencyResolver {
 
     public static class WrongDependencyVersion {
 
-        private String dependencyId;
-        private String dependentId;
+        private String dependencyId; // value is "pluginId"
+        private String dependentId; // value is "pluginId"
         private Version existingVersion;
         private String requiredVersion;
 
