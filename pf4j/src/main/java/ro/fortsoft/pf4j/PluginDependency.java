@@ -28,7 +28,6 @@ public class PluginDependency {
         if (index == -1) {
             this.pluginId = dependency;
         } else {
-
             this.pluginId = dependency.substring(0, index);
             if (dependency.length() > index + 1) {
                 this.pluginVersionSupport = dependency.substring(index + 1);

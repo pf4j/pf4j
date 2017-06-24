@@ -109,31 +109,43 @@ public class PluginDescriptor {
 				+ license + "]";
 	}
 
-	void setPluginId(String pluginId) {
+	PluginDescriptor setPluginId(String pluginId) {
         this.pluginId = pluginId;
+
+        return this;
     }
 
-	void setPluginDescription(String pluginDescription) {
+    PluginDescriptor setPluginDescription(String pluginDescription) {
         this.pluginDescription = pluginDescription;
+
+        return this;
     }
 
-    void setPluginClass(String pluginClassName) {
+    PluginDescriptor setPluginClass(String pluginClassName) {
         this.pluginClass = pluginClassName;
+
+        return this;
     }
 
-    void setPluginVersion(Version version) {
+    PluginDescriptor setPluginVersion(Version version) {
         this.version = version;
+
+        return this;
     }
 
-    void setProvider(String provider) {
+    PluginDescriptor setProvider(String provider) {
         this.provider = provider;
+
+        return this;
     }
 
-    void setRequires(String requires) {
+    PluginDescriptor setRequires(String requires) {
         this.requires = requires;
+
+        return this;
     }
 
-    void setDependencies(String dependencies) {
+    PluginDescriptor setDependencies(String dependencies) {
     	if (dependencies != null) {
     		dependencies = dependencies.trim();
     		if (dependencies.isEmpty()) {
@@ -154,10 +166,14 @@ public class PluginDescriptor {
     	} else {
     		this.dependencies = Collections.emptyList();
     	}
+
+    	return this;
     }
 
-    public void setLicense(String license) {
+    public PluginDescriptor setLicense(String license) {
         this.license = license;
+
+        return this;
     }
 
 }

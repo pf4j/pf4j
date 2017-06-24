@@ -18,7 +18,13 @@ package ro.fortsoft.pf4j.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +32,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,9 +39,8 @@ import java.util.List;
  * @author Decebal Suiu
  */
 public class FileUtils {
-    private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
-    private static final List<String> ZIP_EXTENSIONS = Arrays.asList(".zip", ".ZIP", ".Zip");
+    private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
     public static List<String> readLines(File file, boolean ignoreComments) throws IOException {
 		if (!file.exists() || !file.isFile()) {
@@ -86,19 +90,23 @@ public class FileUtils {
    	 */
     public static void delete(Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+
            @Override
            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
                if (!attrs.isSymbolicLink()) {
                    Files.delete(path);
                }
+
                return FileVisitResult.CONTINUE;
            }
 
            @Override
            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                Files.delete(dir);
+
                return FileVisitResult.CONTINUE;
            }
+
         });
 	}
 
@@ -140,6 +148,7 @@ public class FileUtils {
                 return newPath;
             }
         }
+
         return null;
     }
 
@@ -151,6 +160,7 @@ public class FileUtils {
         if (path == null) {
             return;
         }
+
         try {
             Files.delete(path);
         } catch (IOException ignored) { }
@@ -202,4 +212,5 @@ public class FileUtils {
     public static boolean isZipFile(Path path) {
         return Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".zip");
     }
+
 }

@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Stack;
 
 /**
+ * See <a href="https://en.wikipedia.org/wiki/Directed_graph">Wikipedia</a> for more information.
+ *
  * @author Decebal Suiu
  */
 public class DirectedGraph<V> {
@@ -38,7 +40,7 @@ public class DirectedGraph<V> {
      * Add a vertex to the graph. Nothing happens if vertex is already in graph.
      */
     public void addVertex(V vertex) {
-        if (neighbors.containsKey(vertex)) {
+        if (containsVertex(vertex)) {
         	return;
         }
 
@@ -52,38 +54,42 @@ public class DirectedGraph<V> {
         return neighbors.containsKey(vertex);
     }
 
+    public void removeVertex(V vertex) {
+        neighbors.remove(vertex);
+    }
+
     /**
      * Add an edge to the graph; if either vertex does not exist, it's added.
      * This implementation allows the creation of multi-edges and self-loops.
      */
     public void addEdge(V from, V to) {
-        this.addVertex(from);
-        this.addVertex(to);
+        addVertex(from);
+        addVertex(to);
         neighbors.get(from).add(to);
     }
 
     /**
      * Remove an edge from the graph. Nothing happens if no such edge.
-     * @throws IllegalArgumentException if either vertex doesn't exist.
+     * @throws {@link IllegalArgumentException} if either vertex doesn't exist.
      */
-    public void remove(V from, V to) {
-        if (!(this.containsVertex(from) && this.containsVertex(to))) {
-            throw new IllegalArgumentException("Nonexistent vertex");
+    public void removeEdge(V from, V to) {
+        if (!containsVertex(from)) {
+            throw new IllegalArgumentException("Nonexistent vertex " + from);
+        }
+
+        if (!containsVertex(to)) {
+            throw new IllegalArgumentException("Nonexistent vertex " + to);
         }
 
         neighbors.get(from).remove(to);
     }
 
     public List<V> getNeighbors(V vertex) {
-        if (!neighbors.containsKey(vertex)) {
-        	return new ArrayList<V>();
-        }
-
-        return neighbors.get(vertex);
+        return containsVertex(vertex) ? neighbors.get(vertex) : new ArrayList<V>();
     }
 
     /**
-     * Report (as a Map) the out-degree of each vertex.
+     * Report (as a Map) the out-degree (the number of tail ends adjacent to a vertex) of each vertex.
      */
     public Map<V, Integer> outDegree() {
         Map<V, Integer> result = new HashMap<>();
@@ -95,9 +101,9 @@ public class DirectedGraph<V> {
     }
 
     /**
-     * Report (as a Map) the in-degree of each vertex.
+     * Report (as a Map) the in-degree (the number of head ends adjacent to a vertex) of each vertex.
      */
-    public Map<V,Integer> inDegree() {
+    public Map<V, Integer> inDegree() {
         Map<V, Integer> result = new HashMap<>();
         for (V vertex : neighbors.keySet()) {
         	result.put(vertex, 0); // all in-degrees are 0
@@ -113,6 +119,7 @@ public class DirectedGraph<V> {
 
     /**
      * Report (as a List) the topological sort of the vertices; null for no such sort.
+     * See <a href="https://en.wikipedia.org/wiki/Topological_sorting">this</a> for more information.
      */
     public List<V> topologicalSort() {
         Map<V, Integer> degree = inDegree();
@@ -156,6 +163,7 @@ public class DirectedGraph<V> {
     	if (list == null) {
     		return null;
     	}
+
     	Collections.reverse(list);
 
     	return list;

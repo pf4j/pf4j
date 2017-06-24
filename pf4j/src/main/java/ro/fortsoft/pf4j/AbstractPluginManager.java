@@ -50,7 +50,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     protected Map<String, PluginWrapper> plugins;
 
     /*
-     * A map of plugin class loaders (he key is the 'pluginId').
+     * A map of plugin class loaders (the key is the 'pluginId').
      */
     private Map<String, ClassLoader> pluginClassLoaders;
 
@@ -60,7 +60,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     private List<PluginWrapper> unresolvedPlugins;
 
     /**
-     * A list with resolved plugins (resolved dependency).
+     * A list with all resolved plugins (resolved dependency).
      */
     private List<PluginWrapper> resolvedPlugins;
 
@@ -83,7 +83,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     /*
      * The system version used for comparisons to the plugin requires attribute.
      */
-    private Version systemVersion = Version.forIntegers(0, 0, 0);
+    private Version systemVersion = Version.forIntegers(0);
 
     private PluginRepository pluginRepository;
     private PluginFactory pluginFactory;
@@ -394,7 +394,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * Stop the specified plugin and it's dependencies.
+     * Stop the specified plugin and it's dependents.
      */
     @Override
     public PluginState stopPlugin(String pluginId) {
@@ -612,7 +612,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
-        return (version != null) ? Version.valueOf(version) : Version.forIntegers(0, 0, 0);
+        return (version != null) ? Version.valueOf(version) : Version.forIntegers(0);
     }
 
     protected abstract PluginRepository createPluginRepository();
@@ -700,7 +700,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             // If exact versions are not allowed in requires, rewrite to >= expression
             requires = ">=" + requires;
         }
-        if (systemVersion.equals(Version.forIntegers(0,0,0)) || systemVersion.satisfies(requires)) {
+        if (systemVersion.equals(Version.forIntegers(0)) || systemVersion.satisfies(requires)) {
             return true;
         }
 
@@ -718,15 +718,36 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     protected void resolvePlugins() throws PluginException {
-        resolveDependencies();
-    }
+        // extract plugins descriptors from "unresolvedPlugins" list
+        List<PluginDescriptor> descriptors = new ArrayList<>();
+        for (PluginWrapper plugin : unresolvedPlugins) {
+            descriptors.add(plugin.getDescriptor());
+        }
 
-    protected void resolveDependencies() throws PluginException {
-        dependencyResolver.resolve(unresolvedPlugins);
-        resolvedPlugins = dependencyResolver.getSortedPlugins();
-        for (PluginWrapper pluginWrapper : resolvedPlugins) {
+        DependencyResolver.Result result = dependencyResolver.resolve(descriptors);
+
+        if (result.hasCyclicDependency()) {
+            throw new DependencyResolver.CyclicDependencyException();
+        }
+
+        List<String> notFoundDependencies = result.getNotFoundDependencies();
+        if (!notFoundDependencies.isEmpty()) {
+            throw new DependencyResolver.DependenciesNotFoundException(notFoundDependencies);
+        }
+
+        List<DependencyResolver.WrongDependencyVersion> wrongVersionDependencies = result.getWrongVersionDependencies();
+        if (!wrongVersionDependencies.isEmpty()) {
+            throw new DependencyResolver.DependenciesWrongVersionException(wrongVersionDependencies);
+        }
+
+        List<String> sortedPlugins = result.getSortedPlugins();
+
+        // move plugins from "unresolved" to "resolved"
+        for (String pluginId : sortedPlugins) {
+            PluginWrapper pluginWrapper = plugins.get(pluginId);
             unresolvedPlugins.remove(pluginWrapper);
-            log.info("Plugin '{}' resolved", pluginWrapper.getDescriptor().getPluginId());
+            resolvedPlugins.add(pluginWrapper);
+            log.info("Plugin '{}' resolved", pluginId);
         }
     }
 
@@ -800,6 +821,7 @@ public abstract class AbstractPluginManager implements PluginManager {
                 return plugin.getPluginId();
             }
         }
+
         return null;
     }
 
@@ -841,4 +863,5 @@ public abstract class AbstractPluginManager implements PluginManager {
     public void setExactVersionAllowed(boolean exactVersionAllowed) {
         this.exactVersionAllowed = exactVersionAllowed;
     }
+
 }
