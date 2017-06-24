@@ -37,14 +37,14 @@ public class DependencyResolver {
     private DirectedGraph<String> dependentsGraph; // the value is 'pluginId'
     private boolean resolved;
 
-    public Result resolve(List<PluginWrapper> plugins) {
+    public Result resolve(List<PluginDescriptor> plugins) {
         // create graphs
         dependenciesGraph = new DirectedGraph<>();
         dependentsGraph = new DirectedGraph<>();
 
         // populate graphs
-        Map<String, PluginWrapper> pluginByIds = new HashMap<>();
-        for (PluginWrapper plugin : plugins) {
+        Map<String, PluginDescriptor> pluginByIds = new HashMap<>();
+        for (PluginDescriptor plugin : plugins) {
             addPlugin(plugin);
             pluginByIds.put(plugin.getPluginId(), plugin);
         }
@@ -70,14 +70,14 @@ public class DependencyResolver {
         }
 
         // check dependencies versions
-        for (PluginWrapper plugin : plugins) {
+        for (PluginDescriptor plugin : plugins) {
             String pluginId = plugin.getPluginId();
-            Version existingVersion = plugin.getDescriptor().getVersion();
+            Version existingVersion = plugin.getVersion();
 
             List<String> dependents = getDependents(pluginId);
             while (!dependents.isEmpty()) {
                 String dependentId = dependents.remove(0);
-                PluginWrapper dependent = pluginByIds.get(dependentId);
+                PluginDescriptor dependent = pluginByIds.get(dependentId);
                 String requiredVersion = getDependencyVersionSupport(dependent, pluginId);
                 boolean ok = checkDependencyVersion(requiredVersion, existingVersion);
                 if (!ok) {
@@ -122,8 +122,7 @@ public class DependencyResolver {
         return existingVersion.satisfies(requiredVersion);
     }
 
-    private void addPlugin(PluginWrapper plugin) {
-        PluginDescriptor descriptor = plugin.getDescriptor();
+    private void addPlugin(PluginDescriptor descriptor) {
         String pluginId = descriptor.getPluginId();
         List<PluginDependency> dependencies = descriptor.getDependencies();
         if (dependencies.isEmpty()) {
@@ -143,8 +142,8 @@ public class DependencyResolver {
         }
     }
 
-    private String getDependencyVersionSupport(PluginWrapper dependent, String dependencyId) {
-        List<PluginDependency> dependencies = dependent.getDescriptor().getDependencies();
+    private String getDependencyVersionSupport(PluginDescriptor dependent, String dependencyId) {
+        List<PluginDependency> dependencies = dependent.getDependencies();
         for (PluginDependency dependency : dependencies) {
             if (dependencyId.equals(dependency.getPluginId())) {
                 return dependency.getPluginVersionSupport();

@@ -18,8 +18,6 @@ package ro.fortsoft.pf4j;
 import com.github.zafarkhaja.semver.Version;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,8 +31,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class DependencyResolverTest {
 
-    private DefaultPluginManager pluginManager = new DefaultPluginManager();
-
     @Test
     public void sortedPlugins() {
         // create incomplete plugin descriptor (ignore some attributes)
@@ -46,9 +42,9 @@ public class DependencyResolverTest {
             .setPluginId("p2")
             .setPluginVersion(Version.forIntegers(0)); // needed in "checkDependencyVersion" method
 
-        List<PluginWrapper> plugins = new ArrayList<>();
-        plugins.add(createPluginWrapper(pd1, "p1"));
-        plugins.add(createPluginWrapper(pd2, "p2"));
+        List<PluginDescriptor> plugins = new ArrayList<>();
+        plugins.add(pd1);
+        plugins.add(pd2);
 
         DependencyResolver resolver = new DependencyResolver();
         DependencyResolver.Result result = resolver.resolve(plugins);
@@ -63,8 +59,8 @@ public class DependencyResolverTest {
             .setPluginId("p1")
             .setDependencies("p2, p3");
 
-        List<PluginWrapper> plugins = new ArrayList<>();
-        plugins.add(createPluginWrapper(pd1, "p1"));
+        List<PluginDescriptor> plugins = new ArrayList<>();
+        plugins.add(pd1);
 
         DependencyResolver resolver = new DependencyResolver();
         DependencyResolver.Result result = resolver.resolve(plugins);
@@ -90,10 +86,10 @@ public class DependencyResolverTest {
             .setPluginVersion(Version.forIntegers(0))
             .setDependencies("p1");
 
-        List<PluginWrapper> plugins = new ArrayList<>();
-        plugins.add(createPluginWrapper(pd1, "p1"));
-        plugins.add(createPluginWrapper(pd2, "p2"));
-        plugins.add(createPluginWrapper(pd3, "p3"));
+        List<PluginDescriptor> plugins = new ArrayList<>();
+        plugins.add(pd1);
+        plugins.add(pd2);
+        plugins.add(pd3);
 
         DependencyResolver resolver = new DependencyResolver();
         DependencyResolver.Result result = resolver.resolve(plugins);
@@ -112,9 +108,9 @@ public class DependencyResolverTest {
             .setPluginId("p2")
             .setPluginVersion(Version.forIntegers(1, 4));
 
-        List<PluginWrapper> plugins = new ArrayList<>();
-        plugins.add(createPluginWrapper(pd1, "p1"));
-        plugins.add(createPluginWrapper(pd2, "p2"));
+        List<PluginDescriptor> plugins = new ArrayList<>();
+        plugins.add(pd1);
+        plugins.add(pd2);
 
         DependencyResolver resolver = new DependencyResolver();
         DependencyResolver.Result result = resolver.resolve(plugins);
@@ -132,22 +128,14 @@ public class DependencyResolverTest {
             .setPluginId("p2")
             .setPluginVersion(Version.forIntegers(2));
 
-        List<PluginWrapper> plugins = new ArrayList<>();
-        plugins.add(createPluginWrapper(pd1, "p1"));
-        plugins.add(createPluginWrapper(pd2, "p2"));
+        List<PluginDescriptor> plugins = new ArrayList<>();
+        plugins.add(pd1);
+        plugins.add(pd2);
 
         DependencyResolver resolver = new DependencyResolver();
         DependencyResolver.Result result = resolver.resolve(plugins);
 
         assertTrue(result.getWrongVersionDependencies().isEmpty());
-    }
-
-    private PluginWrapper createPluginWrapper(PluginDescriptor descriptor, String pluginPath) {
-        try {
-            return new PluginWrapper(pluginManager, descriptor, Files.createTempDirectory(pluginPath), getClass().getClassLoader());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

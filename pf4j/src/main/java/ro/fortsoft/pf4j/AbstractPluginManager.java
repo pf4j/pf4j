@@ -718,7 +718,13 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     protected void resolvePlugins() throws PluginException {
-        DependencyResolver.Result result = dependencyResolver.resolve(unresolvedPlugins);
+        // extract plugins descriptors from "unresolvedPlugins" list
+        List<PluginDescriptor> descriptors = new ArrayList<>();
+        for (PluginWrapper plugin : unresolvedPlugins) {
+            descriptors.add(plugin.getDescriptor());
+        }
+
+        DependencyResolver.Result result = dependencyResolver.resolve(descriptors);
 
         if (result.hasCyclicDependency()) {
             throw new DependencyResolver.CyclicDependencyException();
