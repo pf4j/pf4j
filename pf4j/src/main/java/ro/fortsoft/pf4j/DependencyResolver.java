@@ -27,6 +27,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * This class builds a dependency graph for a list of plugins (descriptors).
+ * The entry point is the {@link #resolve(List)} method, method that returns a {@link Result} object.
+ * The {@code Result} class contains nice information about the result of resolve operation (if it's a cyclic dependency,
+ * they are not found dependencies, they are dependencies with wrong version).
+ * This class is very useful for if-else scenarios.
+ *
+ * Only some attributes (pluginId, dependencies and pluginVersion) from {@link PluginDescriptor} are used in
+ * the process of {@code resolve} operation.
+ *
  * @author Decebal Suiu
  */
 public class DependencyResolver {
