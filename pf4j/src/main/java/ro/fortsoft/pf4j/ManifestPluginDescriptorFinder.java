@@ -58,7 +58,7 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
 
         String version = attributes.getValue("Plugin-Version");
         if (StringUtils.isNotEmpty(version)) {
-            pluginDescriptor.setPluginVersion(Version.valueOf(version));
+            pluginDescriptor.setPluginVersion(createPluginVersion(version));
         }
 
         String provider = attributes.getValue("Plugin-Provider");
@@ -74,6 +74,10 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
         pluginDescriptor.setLicense(attributes.getValue("Plugin-License"));
 
         return pluginDescriptor;
+    }
+
+    protected Version createPluginVersion(String version) {
+      return Version.valueOf(version);
     }
 
     protected PluginDescriptor createPluginDescriptorInstance() {
