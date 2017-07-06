@@ -58,7 +58,7 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
 
         String version = attributes.getValue("Plugin-Version");
         if (StringUtils.isNotEmpty(version)) {
-            pluginDescriptor.setPluginVersion(Version.valueOf(version));
+            pluginDescriptor.setPluginVersion(createPluginVersion(version));
         }
 
         String provider = attributes.getValue("Plugin-Provider");
@@ -74,6 +74,17 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
         pluginDescriptor.setLicense(attributes.getValue("Plugin-License"));
 
         return pluginDescriptor;
+    }
+
+    /**
+     * Parse version to semver {@link Version} object.
+     * Example : 1.1.1.RC1 -> 1.1.1-RC1.
+     * This may be override to use a custom parsing to semver Version.
+     * @param version given string to be the plugin version
+     * @return a semver version
+     */
+    protected Version createPluginVersion(String version) {
+        return Version.valueOf(version);
     }
 
     protected PluginDescriptor createPluginDescriptorInstance() {
