@@ -76,8 +76,15 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
         return pluginDescriptor;
     }
 
+    /**
+     * Parse version to semver {@link Version} object.
+     * Example : 1.1.1.RC1 -> 1.1.1-RC1.
+     * This may be override to use a custom parsing to semver Version.
+     * @param version given string to be the plugin version
+     * @return a semver version
+     */
     protected Version createPluginVersion(String version) {
-      return Version.valueOf(version);
+        return Version.valueOf(version);
     }
 
     protected PluginDescriptor createPluginDescriptorInstance() {
