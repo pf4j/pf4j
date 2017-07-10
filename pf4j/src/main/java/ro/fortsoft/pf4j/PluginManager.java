@@ -15,8 +15,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
-
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -162,22 +160,24 @@ public interface PluginManager {
      * requires attribute.  The default system version is 0.0.0 which
      * disables all version checking.
      *
-     * @default 0.0.0
+     * @default {@code null}
      * @param version
      */
-    void setSystemVersion(Version version);
+    void setSystemVersion(String version);
 
     /**
      * Returns the system version.
      *
-     * * @return the system version
+     * @return the system version
      */
-    Version getSystemVersion();
+    String getSystemVersion();
 
     /**
      * Gets the path of the folder where plugins are installed
      * @return Path of plugins root
      */
     Path getPluginsRoot();
+
+    VersionManager getVersionManager();
 
 }

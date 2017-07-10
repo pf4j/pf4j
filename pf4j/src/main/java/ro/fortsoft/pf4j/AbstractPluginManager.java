@@ -15,7 +15,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.util.StringUtils;
@@ -25,7 +24,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class implements the boilerplate plugin code that any {@link PluginManager}
@@ -83,7 +88,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     /*
      * The system version used for comparisons to the plugin requires attribute.
      */
-    private Version systemVersion = Version.forIntegers(0);
+    private String systemVersion = "0.0.0";
 
     private PluginRepository pluginRepository;
     private PluginFactory pluginFactory;
@@ -92,6 +97,8 @@ public abstract class AbstractPluginManager implements PluginManager {
     private DependencyResolver dependencyResolver;
     private PluginLoader pluginLoader;
     private boolean exactVersionAllowed = false;
+
+    private VersionManager versionManager;
 
     /**
      * The plugins root is supplied by {@code System.getProperty("pf4j.pluginsDir", "plugins")}.
@@ -112,12 +119,12 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     @Override
-    public void setSystemVersion(Version version) {
+    public void setSystemVersion(String version) {
         systemVersion = version;
     }
 
     @Override
-    public Version getSystemVersion() {
+    public String getSystemVersion() {
         return systemVersion;
     }
 
@@ -601,7 +608,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         pluginStateListeners.remove(listener);
     }
 
-    public Version getVersion() {
+    public String getVersion() {
         String version = null;
 
         Package pf4jPackage = PluginManager.class.getPackage();
@@ -612,7 +619,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
-        return (version != null) ? Version.valueOf(version) : Version.forIntegers(0);
+        return (version != null) ? version : "0.0.0";
     }
 
     protected abstract PluginRepository createPluginRepository();
@@ -628,6 +635,8 @@ public abstract class AbstractPluginManager implements PluginManager {
     protected abstract PluginStatusProvider createPluginStatusProvider();
 
     protected abstract PluginLoader createPluginLoader();
+
+    protected abstract VersionManager createVersionManager();
 
     protected PluginDescriptorFinder getPluginDescriptorFinder() {
         return pluginDescriptorFinder;
@@ -656,8 +665,6 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         System.setProperty("pf4j.pluginsDir", pluginsRoot.toString());
 
-        dependencyResolver = new DependencyResolver();
-
         pluginRepository = createPluginRepository();
         pluginFactory = createPluginFactory();
         extensionFactory = createExtensionFactory();
@@ -665,6 +672,9 @@ public abstract class AbstractPluginManager implements PluginManager {
         extensionFinder = createExtensionFinder();
         pluginStatusProvider = createPluginStatusProvider();
         pluginLoader = createPluginLoader();
+
+        versionManager = createVersionManager();
+        dependencyResolver = new DependencyResolver(versionManager);
     }
 
     /**
@@ -700,7 +710,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             // If exact versions are not allowed in requires, rewrite to >= expression
             requires = ">=" + requires;
         }
-        if (systemVersion.equals(Version.forIntegers(0)) || systemVersion.satisfies(requires)) {
+        if (systemVersion.equals("0.0.0") || versionManager.satisfies(requires, systemVersion)) {
             return true;
         }
 
@@ -862,6 +872,11 @@ public abstract class AbstractPluginManager implements PluginManager {
      */
     public void setExactVersionAllowed(boolean exactVersionAllowed) {
         this.exactVersionAllowed = exactVersionAllowed;
+    }
+
+    @Override
+    public VersionManager getVersionManager() {
+        return versionManager;
     }
 
 }

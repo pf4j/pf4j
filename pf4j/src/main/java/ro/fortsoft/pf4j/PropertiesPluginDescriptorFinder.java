@@ -15,7 +15,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.util.StringUtils;
@@ -38,7 +37,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 
 	private static final String DEFAULT_PROPERTIES_FILE_NAME = "plugin.properties";
 
-	private String propertiesFileName;
+	protected String propertiesFileName;
 
 	public PropertiesPluginDescriptorFinder() {
 		this(DEFAULT_PROPERTIES_FILE_NAME);
@@ -91,7 +90,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 
         String version = properties.getProperty("plugin.version");
         if (StringUtils.isNotEmpty(version)) {
-            pluginDescriptor.setPluginVersion(Version.valueOf(version));
+            pluginDescriptor.setPluginVersion(version);
         }
 
         String provider = properties.getProperty("plugin.provider");
@@ -113,4 +112,5 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     protected PluginDescriptor createPluginDescriptorInstance() {
         return new PluginDescriptor();
     }
+
 }

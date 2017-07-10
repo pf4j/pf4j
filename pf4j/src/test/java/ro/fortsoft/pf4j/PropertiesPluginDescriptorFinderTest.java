@@ -15,7 +15,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,9 +28,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static ro.fortsoft.pf4j.util.SemVerUtils.versionMatches;
 
 public class PropertiesPluginDescriptorFinderTest {
+
+    private VersionManager versionManager;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -60,6 +60,8 @@ public class PropertiesPluginDescriptorFinderTest {
         // no plugin id
         pluginPath = testFolder.newFolder("test-plugin-6").toPath();
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin6Properties(), charset);
+
+        versionManager = new DefaultVersionManager();
     }
 
     @Test
@@ -72,7 +74,7 @@ public class PropertiesPluginDescriptorFinderTest {
         assertEquals("test-plugin-1", plugin1.getPluginId());
         assertEquals("Test Plugin 1", plugin1.getPluginDescription());
         assertEquals("ro.fortsoft.pf4j.plugin.TestPlugin", plugin1.getPluginClass());
-        assertEquals(Version.valueOf("0.0.1"), plugin1.getVersion());
+        assertEquals("0.0.1", plugin1.getVersion());
         assertEquals("Decebal Suiu", plugin1.getProvider());
         assertEquals(2, plugin1.getDependencies().size());
         assertEquals("test-plugin-2", plugin1.getDependencies().get(0).getPluginId());
@@ -80,17 +82,17 @@ public class PropertiesPluginDescriptorFinderTest {
         assertEquals("~1.0", plugin1.getDependencies().get(1).getPluginVersionSupport());
         assertEquals("Apache-2.0", plugin1.getLicense());
         assertEquals(">=1", plugin1.getRequires());
-        assertTrue(versionMatches(plugin1.getRequires(),"1.0.0"));
-        assertFalse(versionMatches(plugin1.getRequires(), "0.1.0"));
+        assertTrue(versionManager.satisfies(plugin1.getRequires(), "1.0.0"));
+        assertFalse(versionManager.satisfies(plugin1.getRequires(), "0.1.0"));
 
         assertEquals("test-plugin-2", plugin2.getPluginId());
         assertEquals("", plugin2.getPluginDescription());
         assertEquals("ro.fortsoft.pf4j.plugin.TestPlugin", plugin2.getPluginClass());
-        assertEquals(Version.valueOf("0.0.1"), plugin2.getVersion());
+        assertEquals("0.0.1", plugin2.getVersion());
         assertEquals("Decebal Suiu", plugin2.getProvider());
         assertEquals(0, plugin2.getDependencies().size());
         assertEquals("*", plugin2.getRequires()); // Default is *
-        assertTrue(versionMatches(plugin2.getRequires(),"1.0.0"));
+        assertTrue(versionManager.satisfies(plugin2.getRequires(), "1.0.0"));
     }
 
     @Test(expected = PluginException.class)
@@ -171,6 +173,7 @@ public class PropertiesPluginDescriptorFinderTest {
 
         return Arrays.asList(lines);
     }
+
     private Path getPluginsRoot() {
         return testFolder.getRoot().toPath();
     }

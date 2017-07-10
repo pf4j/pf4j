@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ro.fortsoft.pf4j.util;
+package ro.fortsoft.pf4j;
 
 import com.github.zafarkhaja.semver.Version;
-import com.github.zafarkhaja.semver.expr.ExpressionParser;
 
 /**
- * Utility for semantic version testing
+ * Default implementation for {@link VersionManager}.
+ * This implementation uses jSemVer (a Java implementation of the SemVer Specification).
+ *
+ * @author Decebal Suiu
  */
-public class SemVerUtils {
-    public static boolean versionMatches(String expression, String systemVersion) {
-        return ExpressionParser.newInstance().parse(expression).interpret(Version.valueOf(systemVersion));
+public class DefaultVersionManager implements VersionManager {
+
+    @Override
+    public boolean satisfies(String constraint, String version) {
+        return Version.valueOf(version).satisfies(constraint);
     }
+
 }

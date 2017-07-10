@@ -15,7 +15,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,15 +27,15 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static ro.fortsoft.pf4j.util.SemVerUtils.versionMatches;
+import static org.junit.Assert.*;
 
 /**
  * @author Mario Franco
  * @author Decebal Suiu
  */
 public class ManifestPluginDescriptorFinderTest {
+
+    private VersionManager versionManager;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -70,6 +69,8 @@ public class ManifestPluginDescriptorFinderTest {
         pluginPath = testFolder.newFolder("test-plugin-6", "classes", "META-INF").toPath();
         Files.write(pluginPath.resolve("extensions.idx"), "ro.fortsoft.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin6Manifest(), charset);
+
+        versionManager = new DefaultVersionManager();
     }
 
     /**
@@ -85,22 +86,22 @@ public class ManifestPluginDescriptorFinderTest {
         assertEquals("test-plugin-1", plugin1.getPluginId());
         assertEquals("Test Plugin 1", plugin1.getPluginDescription());
         assertEquals("ro.fortsoft.pf4j.plugin.TestPlugin", plugin1.getPluginClass());
-        assertEquals(Version.valueOf("0.0.1"), plugin1.getVersion());
+        assertEquals("0.0.1", plugin1.getVersion());
         assertEquals("Decebal Suiu", plugin1.getProvider());
         assertEquals(2, plugin1.getDependencies().size());
         assertEquals("test-plugin-2", plugin1.getDependencies().get(0).getPluginId());
         assertEquals("test-plugin-3", plugin1.getDependencies().get(1).getPluginId());
         assertEquals("~1.0", plugin1.getDependencies().get(1).getPluginVersionSupport());
         assertEquals("Apache-2.0", plugin1.getLicense());
-        assertTrue(versionMatches(plugin1.getRequires(), "1.0.0"));
+        assertTrue(versionManager.satisfies(plugin1.getRequires(), "1.0.0"));
 
         assertEquals("test-plugin-2", plugin2.getPluginId());
         assertEquals("", plugin2.getPluginDescription());
         assertEquals("ro.fortsoft.pf4j.plugin.TestPlugin", plugin2.getPluginClass());
-        assertEquals(Version.valueOf("0.0.1"), plugin2.getVersion());
+        assertEquals("0.0.1", plugin2.getVersion());
         assertEquals("Decebal Suiu", plugin2.getProvider());
         assertEquals(0, plugin2.getDependencies().size());
-        assertTrue(versionMatches(plugin2.getRequires(),"1.0.0"));
+        assertTrue(versionManager.satisfies(plugin2.getRequires(), "1.0.0"));
     }
 
     /**

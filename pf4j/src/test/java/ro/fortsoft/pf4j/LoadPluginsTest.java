@@ -15,7 +15,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
 import org.junit.Before;
 import org.junit.Test;
 import ro.fortsoft.pf4j.plugin.MockPluginManager;
@@ -31,6 +30,7 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.*;
 
 public class LoadPluginsTest {
+
     private Path tmpDir;
     private MockPluginManager pluginManager;
     private MockZipPlugin p1;
@@ -92,14 +92,14 @@ public class LoadPluginsTest {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
         assertEquals(1, pluginManager.getPlugins().size());
-        assertEquals(Version.valueOf("1.2.3"), pluginManager.getPlugin(p2.id).getDescriptor().getVersion());
+        assertEquals("1.2.3", pluginManager.getPlugin(p2.id).getDescriptor().getVersion());
         assertEquals(1, pluginManager.getStartedPlugins().size());
         p2.create();
         pluginManager.loadPlugins();
         pluginManager.startPlugin(p2.id);
         assertEquals(1, pluginManager.getPlugins().size());
-        assertEquals(Version.valueOf("2.0.0"), pluginManager.getPlugin(p2.id).getDescriptor().getVersion());
-        assertEquals(Version.valueOf("2.0.0"), pluginManager.getStartedPlugins().get(1).getDescriptor().getVersion());
+        assertEquals("2.0.0", pluginManager.getPlugin(p2.id).getDescriptor().getVersion());
+        assertEquals("2.0.0", pluginManager.getStartedPlugins().get(1).getDescriptor().getVersion());
     }
 
     @Test
@@ -131,6 +131,7 @@ public class LoadPluginsTest {
     }
 
     private class MockZipPlugin {
+
         public final String id;
         public final String version;
         public final String filename;
@@ -165,5 +166,7 @@ public class LoadPluginsTest {
                 Files.move(propsFile, propsInZip);
             }
         }
+
     }
+
 }

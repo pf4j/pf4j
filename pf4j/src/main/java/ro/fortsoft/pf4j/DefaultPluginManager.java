@@ -89,6 +89,11 @@ public class DefaultPluginManager extends AbstractPluginManager {
         return new DefaultPluginLoader(this, pluginClasspath);
     }
 
+    @Override
+    protected VersionManager createVersionManager() {
+        return new DefaultVersionManager();
+    }
+
     /**
      * By default if {@link DefaultPluginManager#isDevelopment()} returns true
      * than a {@link DevelopmentPluginClasspath} is returned
@@ -125,4 +130,5 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
         return super.loadPluginFromPath(pluginPath);
     }
+
 }
