@@ -22,12 +22,16 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.*;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import static org.junit.Assert.*;
 
 public class FileUtilsTest {
+
     private Path zipFile;
     private Path tmpDir;
     private Path propsFile;

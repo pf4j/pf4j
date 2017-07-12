@@ -15,7 +15,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.fortsoft.pf4j.util.DirectedGraph;
@@ -42,9 +41,15 @@ public class DependencyResolver {
 
 	private static final Logger log = LoggerFactory.getLogger(DependencyResolver.class);
 
+	private VersionManager versionManager;
+
     private DirectedGraph<String> dependenciesGraph; // the value is 'pluginId'
     private DirectedGraph<String> dependentsGraph; // the value is 'pluginId'
     private boolean resolved;
+
+    public DependencyResolver(VersionManager versionManager) {
+        this.versionManager = versionManager;
+    }
 
     public Result resolve(List<PluginDescriptor> plugins) {
         // create graphs
@@ -81,7 +86,7 @@ public class DependencyResolver {
         // check dependencies versions
         for (PluginDescriptor plugin : plugins) {
             String pluginId = plugin.getPluginId();
-            Version existingVersion = plugin.getVersion();
+            String existingVersion = plugin.getVersion();
 
             List<String> dependents = getDependents(pluginId);
             while (!dependents.isEmpty()) {
@@ -127,8 +132,8 @@ public class DependencyResolver {
      * @param existingVersion
      * @return
      */
-    protected boolean checkDependencyVersion(String requiredVersion, Version existingVersion) {
-        return existingVersion.satisfies(requiredVersion);
+    protected boolean checkDependencyVersion(String requiredVersion, String existingVersion) {
+        return versionManager.satisfies(requiredVersion, existingVersion);
     }
 
     private void addPlugin(PluginDescriptor descriptor) {
@@ -224,10 +229,10 @@ public class DependencyResolver {
 
         private String dependencyId; // value is "pluginId"
         private String dependentId; // value is "pluginId"
-        private Version existingVersion;
+        private String existingVersion;
         private String requiredVersion;
 
-        WrongDependencyVersion(String dependencyId, String dependentId, Version existingVersion, String requiredVersion) {
+        WrongDependencyVersion(String dependencyId, String dependentId, String existingVersion, String requiredVersion) {
             this.dependencyId = dependencyId;
             this.dependentId = dependentId;
             this.existingVersion = existingVersion;
@@ -242,7 +247,7 @@ public class DependencyResolver {
             return dependentId;
         }
 
-        public Version getExistingVersion() {
+        public String getExistingVersion() {
             return existingVersion;
         }
 

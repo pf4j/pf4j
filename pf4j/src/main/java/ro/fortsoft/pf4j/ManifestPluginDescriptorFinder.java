@@ -15,7 +15,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
 import ro.fortsoft.pf4j.util.StringUtils;
 
 import java.nio.file.Path;
@@ -29,7 +28,7 @@ import java.util.jar.Manifest;
  */
 public abstract class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
-	@Override
+    @Override
 	public PluginDescriptor find(Path pluginPath) throws PluginException {
         Manifest manifest = readManifest(pluginPath);
 
@@ -58,7 +57,7 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
 
         String version = attributes.getValue("Plugin-Version");
         if (StringUtils.isNotEmpty(version)) {
-            pluginDescriptor.setPluginVersion(createPluginVersion(version));
+            pluginDescriptor.setPluginVersion(version);
         }
 
         String provider = attributes.getValue("Plugin-Provider");
@@ -76,18 +75,8 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
         return pluginDescriptor;
     }
 
-    /**
-     * Parse version to semver {@link Version} object.
-     * Example : 1.1.1.RC1 -> 1.1.1-RC1.
-     * This may be override to use a custom parsing to semver Version.
-     * @param version given string to be the plugin version
-     * @return a semver version
-     */
-    protected Version createPluginVersion(String version) {
-        return Version.valueOf(version);
-    }
-
     protected PluginDescriptor createPluginDescriptorInstance() {
         return new PluginDescriptor();
     }
+
 }

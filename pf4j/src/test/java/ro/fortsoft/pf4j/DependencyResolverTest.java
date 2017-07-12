@@ -15,21 +15,27 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Decebal Suiu
  */
 public class DependencyResolverTest {
+
+    private DependencyResolver resolver;
+
+    @Before
+    public void init() {
+        VersionManager versionManager = new DefaultVersionManager();
+        resolver = new DependencyResolver(versionManager);
+    }
 
     @Test
     public void sortedPlugins() {
@@ -40,13 +46,12 @@ public class DependencyResolverTest {
 
         PluginDescriptor pd2 = new PluginDescriptor()
             .setPluginId("p2")
-            .setPluginVersion(Version.forIntegers(0)); // needed in "checkDependencyVersion" method
+            .setPluginVersion("0.0.0"); // needed in "checkDependencyVersion" method
 
         List<PluginDescriptor> plugins = new ArrayList<>();
         plugins.add(pd1);
         plugins.add(pd2);
 
-        DependencyResolver resolver = new DependencyResolver();
         DependencyResolver.Result result = resolver.resolve(plugins);
 
         assertTrue(result.getNotFoundDependencies().isEmpty());
@@ -62,7 +67,6 @@ public class DependencyResolverTest {
         List<PluginDescriptor> plugins = new ArrayList<>();
         plugins.add(pd1);
 
-        DependencyResolver resolver = new DependencyResolver();
         DependencyResolver.Result result = resolver.resolve(plugins);
 
         assertFalse(result.getNotFoundDependencies().isEmpty());
@@ -73,17 +77,17 @@ public class DependencyResolverTest {
     public void cyclicDependencies() {
         PluginDescriptor pd1 = new PluginDescriptor()
             .setPluginId("p1")
-            .setPluginVersion(Version.forIntegers(0))
+            .setPluginVersion("0.0.0")
             .setDependencies("p2");
 
         PluginDescriptor pd2 = new PluginDescriptor()
             .setPluginId("p2")
-            .setPluginVersion(Version.forIntegers(0))
+            .setPluginVersion("0.0.0")
             .setDependencies("p3");
 
         PluginDescriptor pd3 = new PluginDescriptor()
             .setPluginId("p3")
-            .setPluginVersion(Version.forIntegers(0))
+            .setPluginVersion("0.0.0")
             .setDependencies("p1");
 
         List<PluginDescriptor> plugins = new ArrayList<>();
@@ -91,7 +95,6 @@ public class DependencyResolverTest {
         plugins.add(pd2);
         plugins.add(pd3);
 
-        DependencyResolver resolver = new DependencyResolver();
         DependencyResolver.Result result = resolver.resolve(plugins);
 
         assertTrue(result.hasCyclicDependency());
@@ -106,13 +109,12 @@ public class DependencyResolverTest {
 
         PluginDescriptor pd2 = new PluginDescriptor()
             .setPluginId("p2")
-            .setPluginVersion(Version.forIntegers(1, 4));
+            .setPluginVersion("1.4.0");
 
         List<PluginDescriptor> plugins = new ArrayList<>();
         plugins.add(pd1);
         plugins.add(pd2);
 
-        DependencyResolver resolver = new DependencyResolver();
         DependencyResolver.Result result = resolver.resolve(plugins);
 
         assertFalse(result.getWrongVersionDependencies().isEmpty());
@@ -126,13 +128,12 @@ public class DependencyResolverTest {
 
         PluginDescriptor pd2 = new PluginDescriptor()
             .setPluginId("p2")
-            .setPluginVersion(Version.forIntegers(2));
+            .setPluginVersion("2.0.0");
 
         List<PluginDescriptor> plugins = new ArrayList<>();
         plugins.add(pd1);
         plugins.add(pd2);
 
-        DependencyResolver resolver = new DependencyResolver();
         DependencyResolver.Result result = resolver.resolve(plugins);
 
         assertTrue(result.getWrongVersionDependencies().isEmpty());

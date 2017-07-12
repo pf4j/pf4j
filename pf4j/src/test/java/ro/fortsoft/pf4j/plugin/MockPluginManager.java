@@ -26,6 +26,7 @@ import java.nio.file.Path;
  * Manager for testing
  */
 public class MockPluginManager extends DefaultPluginManager {
+
     private PluginDescriptorFinder finder = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
 
     public MockPluginManager() {
@@ -46,4 +47,5 @@ public class MockPluginManager extends DefaultPluginManager {
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
         return finder;
     }
+
 }

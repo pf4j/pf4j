@@ -15,8 +15,6 @@
  */
 package ro.fortsoft.pf4j;
 
-import com.github.zafarkhaja.semver.Version;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +30,7 @@ public class PluginDescriptor {
 	private String pluginId;
 	private String pluginDescription;
     private String pluginClass;
-    private Version version;
+    private String version;
     private String requires = "*"; // SemVer format
     private String provider;
     private List<PluginDependency> dependencies;
@@ -66,7 +64,7 @@ public class PluginDescriptor {
     /**
      * Returns the version of this plugin.
      */
-    public Version getVersion() {
+    public String getVersion() {
         return version;
     }
 
@@ -127,7 +125,7 @@ public class PluginDescriptor {
         return this;
     }
 
-    PluginDescriptor setPluginVersion(Version version) {
+    PluginDescriptor setPluginVersion(String version) {
         this.version = version;
 
         return this;
