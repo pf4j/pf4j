@@ -160,7 +160,7 @@ public interface PluginManager {
      * requires attribute.  The default system version is 0.0.0 which
      * disables all version checking.
      *
-     * @default {@code null}
+     * @default 0.0.0
      * @param version
      */
     void setSystemVersion(String version);
