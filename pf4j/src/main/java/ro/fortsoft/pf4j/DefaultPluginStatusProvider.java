@@ -47,11 +47,11 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
     private void initialize() {
         try {
             // create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
-            enabledPlugins = FileUtils.readLines(pluginsRoot.resolve("enabled.txt").toFile(), true);
+            enabledPlugins = FileUtils.readLines(pluginsRoot.resolve("enabled.txt"), true);
             log.info("Enabled plugins: {}", enabledPlugins);
 
             // create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
-            disabledPlugins = FileUtils.readLines(pluginsRoot.resolve("disabled.txt").toFile(), true);
+            disabledPlugins = FileUtils.readLines(pluginsRoot.resolve("disabled.txt"), true);
             log.info("Disabled plugins: {}", disabledPlugins);
         } catch (IOException e) {
             log.error(e.getMessage(), e);

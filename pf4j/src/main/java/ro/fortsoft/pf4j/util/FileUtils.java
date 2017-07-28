@@ -19,12 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,25 +41,20 @@ public class FileUtils {
 
     private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
-    public static List<String> readLines(File file, boolean ignoreComments) throws IOException {
+    public static List<String> readLines(Path path, boolean ignoreComments) throws IOException {
+        File file = path.toFile();
 		if (!file.exists() || !file.isFile()) {
 			return new ArrayList<>();
 		}
 
 		List<String> lines = new ArrayList<>();
 
-		BufferedReader reader = null;
-		try {
-	        reader = new BufferedReader(new FileReader(file));
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				if (ignoreComments && !line.startsWith("#") && !lines.contains(line)) {
 					lines.add(line);
 				}
-			}
-		} finally {
-			if (reader != null) {
-				reader.close();
 			}
 		}
 
@@ -68,18 +62,7 @@ public class FileUtils {
 	}
 
     public static void writeLines(Collection<String> lines, File file) throws IOException {
-        BufferedWriter writer = null;
-        try {
-            writer = new BufferedWriter(new FileWriter(file));
-            for (String line : lines) {
-                writer.write(line);
-                writer.newLine();
-            }
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
-        }
+        Files.write(file.toPath(), lines, StandardCharsets.UTF_8);
     }
 
     /**
@@ -136,7 +119,8 @@ public class FileUtils {
     }
 
     /**
-     * Finds a path with various endings or null if not found
+     * Finds a path with various endings or null if not found.
+     *
      * @param basePath the base name
      * @param endings a list of endings to search for
      * @return new path or null if not found
@@ -153,7 +137,8 @@ public class FileUtils {
     }
 
     /**
-     * Delete a file (not recursively) and ignore any errors
+     * Delete a file (not recursively) and ignore any errors.
+     *
      * @param path the path to delete
      */
     public static void optimisticDelete(Path path) {
@@ -205,9 +190,10 @@ public class FileUtils {
     }
 
     /**
-     * Return true only if path is a zip file
+     * Return true only if path is a zip file.
+     *
      * @param path to a file/dir
-     * @return true if file with .zip ending
+     * @return true if file with {@code .zip} ending
      */
     public static boolean isZipFile(Path path) {
         return Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".zip");
