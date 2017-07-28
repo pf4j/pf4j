@@ -41,8 +41,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The ServiceLoader base implementation for ExtensionFinder.
- * This class lookup extensions in all extensions index files "META-INF/services".
+ * The {@link java.util.ServiceLoader} base implementation for {@link ExtensionFinder}.
+ * This class lookup extensions in all extensions index files {@code META-INF/services}.
  *
  * @author Decebal Suiu
  */
@@ -133,8 +133,10 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 log.debug("Read '{}'", file);
-                Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8);
-                ServiceProviderExtensionStorage.read(reader, result);
+                try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+                    ServiceProviderExtensionStorage.read(reader, result);
+                }
+
                 return FileVisitResult.CONTINUE;
             }
 

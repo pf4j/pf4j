@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -31,8 +32,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * All extensions declared in a plugin are indexed in a file "META-INF/extensions.idx".
- * This class lookup extensions in all extensions index files "META-INF/extensions.idx".
+ * All extensions declared in a plugin are indexed in a file {@code META-INF/extensions.idx}.
+ * This class lookup extensions in all extensions index files {@code META-INF/extensions.idx}.
  *
  * @author Decebal Suiu
  */
@@ -55,8 +56,9 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 log.debug("Read '{}'", url.getFile());
-                Reader reader = new InputStreamReader(url.openStream(), "UTF-8");
-                LegacyExtensionStorage.read(reader, bucket);
+                try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
+                    LegacyExtensionStorage.read(reader, bucket);
+                }
             }
 
             debugExtensions(bucket);
@@ -84,8 +86,9 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
                 URL url = ((PluginClassLoader) plugin.getPluginClassLoader()).findResource(getExtensionsResource());
                 if (url != null) {
                     log.debug("Read '{}'", url.getFile());
-                    Reader reader = new InputStreamReader(url.openStream(), "UTF-8");
-                    LegacyExtensionStorage.read(reader, bucket);
+                    try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
+                        LegacyExtensionStorage.read(reader, bucket);
+                    }
                 } else {
                     log.debug("Cannot find '{}'", getExtensionsResource());
                 }

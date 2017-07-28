@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The default implementation for ExtensionFinder.
- * It's a compound ExtensionFinder.
+ * The default implementation for {@link ExtensionFinder}.
+ * It's a compound {@code ExtensionFinder}.
  *
  * @author Decebal Suiu
  */
