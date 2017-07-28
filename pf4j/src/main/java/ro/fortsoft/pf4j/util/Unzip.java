@@ -67,59 +67,36 @@ public class Unzip {
         log.debug("Extract content of '{}' to '{}'", source, destination);
 
         // delete destination file if exists
-        removeDirectory(destination);
+        if (destination.exists() && destination.isDirectory()) {
+            FileUtils.delete(destination.toPath());
+        }
 
-    	ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(source));
+    	try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(source))) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                try {
+                    File file = new File(destination, zipEntry.getName());
 
-	    ZipEntry zipEntry;
-    	while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-	        try {
-		        File file = new File(destination, zipEntry.getName());
+                    // create intermediary directories - sometimes zip don't add them
+                    File dir = new File(file.getParent());
+                    dir.mkdirs();
 
-        		// create intermediary directories - sometimes zip don't add them
-        		File dir = new File(file.getParent());
-        		dir.mkdirs();
-
-        		if (zipEntry.isDirectory()) {
-		            file.mkdirs();
-        		} else {
-		            byte[] buffer = new byte[1024];
-        		    int length = 0;
-		            FileOutputStream fos = new FileOutputStream(file);
-
-        		    while ((length = zipInputStream.read(buffer)) >= 0) {
-		            	fos.write(buffer, 0, length);
-        		    }
-
-		            fos.close();
+                    if (zipEntry.isDirectory()) {
+                        file.mkdirs();
+                    } else {
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                            while ((length = zipInputStream.read(buffer)) >= 0) {
+                                fos.write(buffer, 0, length);
+                            }
+                        }
+                    }
+                } catch (FileNotFoundException e) {
+                    log.error("File '{}' not found", zipEntry.getName());
                 }
-    	    } catch (FileNotFoundException e) {
-    	    	log.error("File '{}' not found", zipEntry.getName());
-    	    }
-	    }
-
-    	zipInputStream.close();
-    }
-
-    private boolean removeDirectory(File directory) {
-        if (!directory.exists()) {
-            return true;
-        }
-
-        if (!directory.isDirectory()) {
-            return false;
-        }
-
-        File[] files = directory.listFiles();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                removeDirectory(file);
-            } else {
-                file.delete();
             }
         }
-
-        return directory.delete();
     }
 
 }
