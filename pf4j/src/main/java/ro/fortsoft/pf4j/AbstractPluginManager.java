@@ -108,7 +108,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * Constructs {@code DefaultPluginManager} which the given plugins root.
+     * Constructs {@code AbstractPluginManager} with the given plugins root.
      *
      * @param pluginsRoot the root to search for plugins
      */
@@ -515,7 +515,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * Get plugin class loader for this path.
+     * Get the {@link ClassLoader} for plugin.
      */
     @Override
     public ClassLoader getPluginClassLoader(String pluginId) {
@@ -679,12 +679,11 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     /**
      * Add the possibility to override the plugins root.
-     * If a "pf4j.pluginsDir" system property is defined than this method returns
-     * that root.
-     * If getRuntimeMode() returns RuntimeMode.DEVELOPMENT than a
-     * DEVELOPMENT_PLUGINS_DIRECTORY ("../plugins") is returned else this method returns
-     * DEFAULT_PLUGINS_DIRECTORY ("plugins").
-     * @return
+     * If a {@code pf4j.pluginsDir} system property is defined than this method returns that root.
+     * If {@link #getRuntimeMode()} returns {@link RuntimeMode#DEVELOPMENT} than {@code ../plugins}
+     * is returned else this method returns {@code plugins}.
+     *
+     * @return the plugins root
      */
     protected Path createPluginsRoot() {
         String pluginsDir = System.getProperty("pf4j.pluginsDir");
@@ -700,7 +699,8 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * Check if this plugin is valid (satisfies "requires" param) for a given system version
+     * Check if this plugin is valid (satisfies "requires" param) for a given system version.
+     *
      * @param pluginWrapper the plugin to check
      * @return true if plugin satisfies the "requires" or if requires was left blank
      */
@@ -821,7 +821,8 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * Tests for already loaded plugins on given path
+     * Tests for already loaded plugins on given path.
+     *
      * @param pluginPath the path to investigate
      * @return id of plugin or null if not loaded
      */
@@ -836,7 +837,8 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * Override this to change the validation criteria
+     * Override this to change the validation criteria.
+     *
      * @param descriptor the plugin descriptor to validate
      * @throws PluginException if validation fails
      */
@@ -868,6 +870,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Set to true to allow requires expression to be exactly x.y.z.
      * The default is false, meaning that using an exact version x.y.z will
      * implicitly mean the same as >=x.y.z
+     *
      * @param exactVersionAllowed set to true or false
      */
     public void setExactVersionAllowed(boolean exactVersionAllowed) {
