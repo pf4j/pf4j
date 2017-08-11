@@ -53,10 +53,10 @@ public interface PluginManager {
     List<PluginWrapper> getStartedPlugins();
 
     /**
-     * Retrieves the plugin with this id.
+     * Retrieves the plugin with this id, or null if the plugin does not exist.
      *
-     * @param pluginId
-     * @return the plugin
+     * @param pluginId The pluginId for the plugin you are trying to get.
+     * @return A PluginWrapper object for this plugin, or null if it does not exist.
      */
     PluginWrapper getPlugin(String pluginId);
 
