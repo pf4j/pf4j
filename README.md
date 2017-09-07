@@ -96,7 +96,7 @@ In above code, I created a **DefaultPluginManager** (it's the default implementa
 Each available plugin is loaded using a different java class loader, **PluginClassLoader**.   
 The **PluginClassLoader** contains only classes found in **PluginClasspath** (default _classes_ and _lib_ folders) of plugin and runtime classes and libraries of the required/dependent plugins. This class loader is a _Parent Last ClassLoader_ - it loads the classes from the plugin's jars before delegating to the parent class loader.   
 The plugins are stored in a folder. You can specify the plugins folder in the constructor of DefaultPluginManager. If the plugins folder is not specified
-than the location is returned by `System.getProperty("pf4j.pluginsDir", "plugins")`.
+then the location is returned by `System.getProperty("pf4j.pluginsDir", "plugins")`.
 
 The structure of plugins folder is:
 * plugin1.zip (or plugin1 folder)
@@ -233,7 +233,7 @@ The demo_gradle project contains one plugin project _plugin3_ written in Kotlin 
 Plugin assembly
 ------------------------------
 After you developed a plugin the next step is to deploy it in your application. For this task, one option is to create a zip file with a structure described in section [How to use](https://github.com/decebals/pf4j/blob/master/README.md#how-to-use) from the beginning of the document.  
-If you use `apache maven` as build manger than your pom.xml file must looks like [this](https://github.com/decebals/pf4j/blob/master/demo/plugins/plugin1/pom.xml). This file it's very simple and it's self explanatory.  
+If you use `apache maven` as build manger then your pom.xml file must looks like [this](https://github.com/decebals/pf4j/blob/master/demo/plugins/plugin1/pom.xml). This file it's very simple and it's self explanatory.  
 If you use `apache ant` then your build.xml file must looks like [this](https://github.com/gitblit/gitblit-powertools-plugin/blob/master/build.xml). In this case please look at the "build" target.  
 
 Plugin lifecycle
@@ -344,7 +344,7 @@ You can retrieve the current runtime mode using `PluginManager.getRuntimeMode()`
 The DefaultPluginManager determines automatically the correct runtime mode and for DEVELOPMENT mode overrides some components(pluginsDirectory is __"../plugins"__, __PropertiesPluginDescriptorFinder__ as PluginDescriptorFinder, __DevelopmentPluginClasspath__ as PluginClassPath).  
 Another advantage of DEVELOPMENT runtime mode is that you can execute some code lines only in this mode (for example more debug messages).
 
-**NOTE:** If you use Eclipse than make sure annotation processing is enabled at least for any projects registering objects using annotations. In the properties for your new project go to __Java Compiler > Annotation Processing__
+**NOTE:** If you use Eclipse then make sure annotation processing is enabled at least for any projects registering objects using annotations. In the properties for your new project go to __Java Compiler > Annotation Processing__
 Check the __“Enable Project Specific Settings”__ and make sure __“Enable annotation processing”__ is checked.  
 If you use Maven as build manger, after each dependency modification in your plugin (Maven module) you must run __Maven > Update Project...__   
 
@@ -386,7 +386,7 @@ welcome-plugin
 ```
 
 All comment lines (line that start with # character) are ignored.   
-If a file with enabled.txt exists than disabled.txt is ignored. See enabled.txt and disabled.txt from the demo folder.
+If a file with enabled.txt exists then disabled.txt is ignored. See enabled.txt and disabled.txt from the demo folder.
 
 Default/System extension
 -------------------
@@ -480,7 +480,7 @@ Below are listed some problems that may occur when attempting to use PF4J, and s
 - **No Extensions Found**
 
 See if you have a file `extensions.idx` in each plugin.  
-If file `extensions.idx` doesn't exist then probably it's something wrong with the annotation processing step (enable annotation processing in your IDE or in your Maven script).   
+If file `extensions.idx` doesn't exist then probably there is something wrong with the annotation processing step (enable annotation processing in your IDE or in your Maven script).   
 If file `extensions.idx` exists and it's not empty then sure you have a class loader issue (you have the same extension point in two different class loader), in this situation you must remove some libraries (probably the API jar) from plugin.   
 
 If the problem persist or you want to find more info related to the extensions discovery process (e.g what interfaces/classes are loaded by each plugin, what classes are not recognized as extensions for an extension point) then you must put on `TRACE` level the logger for `PluginClassLoader` and `AbstractExtensionFinder` (see the [log4j.properties](https://github.com/decebals/pf4j/blob/master/demo/app/src/main/resources/log4j.properties) file for demo).   
