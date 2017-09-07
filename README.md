@@ -1,4 +1,4 @@
-![pf4j-logo](pf4j-logo.png)
+![pf4j-logo](pf4j-logo.svg)
 
 Plugin Framework for Java (PF4J)
 =====================
