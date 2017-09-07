@@ -47,7 +47,7 @@ public class DefaultPluginManager extends AbstractPluginManager {
     }
 
     /**
-	 * By default if {@link DefaultPluginManager#isDevelopment()} returns true
+	 * By default if {@link DefaultPluginManager#isDevelopment()} returns {@code true}
      * than a {@link PropertiesPluginDescriptorFinder} is returned
      * else this method returns {@link DefaultPluginDescriptorFinder}.
 	 */

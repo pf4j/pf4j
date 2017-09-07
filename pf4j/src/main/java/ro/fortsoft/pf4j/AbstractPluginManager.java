@@ -287,9 +287,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     @Override
     public boolean deletePlugin(String pluginId) {
-        if (!plugins.containsKey(pluginId)) {
-            throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
-        }
+        checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         PluginState pluginState = stopPlugin(pluginId);
@@ -317,8 +315,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             PluginState pluginState = pluginWrapper.getPluginState();
             if ((PluginState.DISABLED != pluginState) && (PluginState.STARTED != pluginState)) {
                 try {
-                    PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
-                    log.info("Start plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+                    log.info("Start plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
                     pluginWrapper.getPlugin().start();
                     pluginWrapper.setPluginState(PluginState.STARTED);
                     startedPlugins.add(pluginWrapper);
@@ -336,15 +333,13 @@ public abstract class AbstractPluginManager implements PluginManager {
      */
     @Override
     public PluginState startPlugin(String pluginId) {
-        if (!plugins.containsKey(pluginId)) {
-            throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
-        }
+        checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
         if (PluginState.STARTED == pluginState) {
-            log.debug("Already started plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            log.debug("Already started plugin '{}'", getPluginLabel(pluginDescriptor));
             return PluginState.STARTED;
         }
 
@@ -360,7 +355,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         try {
-            log.info("Start plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            log.info("Start plugin '{}'", getPluginLabel(pluginDescriptor));
             pluginWrapper.getPlugin().start();
             pluginWrapper.setPluginState(PluginState.STARTED);
             startedPlugins.add(pluginWrapper);
@@ -386,8 +381,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             PluginState pluginState = pluginWrapper.getPluginState();
             if (PluginState.STARTED == pluginState) {
                 try {
-                    PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
-                    log.info("Stop plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+                    log.info("Stop plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
                     pluginWrapper.getPlugin().stop();
                     pluginWrapper.setPluginState(PluginState.STOPPED);
                     itr.remove();
@@ -409,9 +403,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     private PluginState stopPlugin(String pluginId, boolean stopDependents) {
-        if (!plugins.containsKey(pluginId)) {
-            throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
-        }
+        checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
@@ -450,17 +442,21 @@ public abstract class AbstractPluginManager implements PluginManager {
         return pluginWrapper.getPluginState();
     }
 
-    @Override
-    public boolean disablePlugin(String pluginId) {
+    private void checkPluginId(String pluginId) {
         if (!plugins.containsKey(pluginId)) {
             throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
         }
+    }
+
+    @Override
+    public boolean disablePlugin(String pluginId) {
+        checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
         if (PluginState.DISABLED == pluginState) {
-            log.debug("Already disabled plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            log.debug("Already disabled plugin '{}'", getPluginLabel(pluginDescriptor));
             return true;
         }
 
@@ -473,7 +469,7 @@ public abstract class AbstractPluginManager implements PluginManager {
                 return false;
             }
 
-            log.info("Disabled plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            log.info("Disabled plugin '{}'", getPluginLabel(pluginDescriptor));
 
             return true;
         }
@@ -483,21 +479,18 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     @Override
     public boolean enablePlugin(String pluginId) {
-        if (!plugins.containsKey(pluginId)) {
-            throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
-        }
+        checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         if (!isPluginValid(pluginWrapper)) {
-            log.warn("Plugin '{}:{}' can not be enabled", pluginWrapper.getPluginId(),
-                pluginWrapper.getDescriptor().getVersion());
+            log.warn("Plugin '{}' can not be enabled", getPluginLabel(pluginWrapper.getDescriptor()));
             return false;
         }
 
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
         if (PluginState.DISABLED != pluginState) {
-            log.debug("Plugin '{}:{}' is not disabled", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+            log.debug("Plugin '{}' is not disabled", getPluginLabel(pluginDescriptor));
             return true;
         }
 
@@ -509,7 +502,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
 
-        log.info("Enabled plugin '{}:{}'", pluginDescriptor.getPluginId(), pluginDescriptor.getVersion());
+        log.info("Enabled plugin '{}'", getPluginLabel(pluginDescriptor));
 
         return true;
     }
@@ -714,9 +707,9 @@ public abstract class AbstractPluginManager implements PluginManager {
             return true;
         }
 
-        log.warn("Plugin '{}:{}' requires a minimum system version of {}, and you have {}",
-            pluginWrapper.getPluginId(),
-            pluginWrapper.getDescriptor().getVersion(),
+        PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
+        log.warn("Plugin '{}' requires a minimum system version of {}, and you have {}",
+            getPluginLabel(pluginDescriptor),
             pluginWrapper.getDescriptor().getRequires(),
             getSystemVersion());
 
@@ -728,7 +721,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     protected void resolvePlugins() throws PluginException {
-        // extract plugins descriptors from "unresolvedPlugins" list
+        // retrieves the  plugins descriptors from "unresolvedPlugins" list
         List<PluginDescriptor> descriptors = new ArrayList<>();
         for (PluginWrapper plugin : unresolvedPlugins) {
             descriptors.add(plugin.getDescriptor());
@@ -757,7 +750,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             PluginWrapper pluginWrapper = plugins.get(pluginId);
             unresolvedPlugins.remove(pluginWrapper);
             resolvedPlugins.add(pluginWrapper);
-            log.info("Plugin '{}' resolved", pluginId);
+            log.info("Plugin '{}' resolved", getPluginLabel(pluginWrapper.getDescriptor()));
         }
     }
 
@@ -770,16 +763,17 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     protected PluginWrapper loadPluginFromPath(Path pluginPath) throws PluginException {
         // test for plugin duplication
-        if (idForPath(pluginPath) != null) {
-            log.warn("Plugin {} already loaded", idForPath(pluginPath));
+        String pluginId = idForPath(pluginPath);
+        if (pluginId != null) {
+            log.warn("Plugin '{}' already loaded with id '{}'", pluginPath, pluginId);
             return null;
         }
 
         // retrieves the plugin descriptor
-        log.debug("Find plugin descriptor '{}'", pluginPath);
+        log.debug("Finding plugin descriptor for plugin '{}'", pluginPath);
         PluginDescriptor pluginDescriptor = getPluginDescriptorFinder().find(pluginPath);
         validatePluginDescriptor(pluginDescriptor);
-        log.debug("Descriptor {}", pluginDescriptor);
+        log.debug("Found descriptor {}", pluginDescriptor);
         String pluginClassName = pluginDescriptor.getPluginClass();
         log.debug("Class '{}' for plugin '{}'",  pluginClassName, pluginPath);
 
@@ -808,7 +802,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         log.debug("Created wrapper '{}' for plugin '{}'", pluginWrapper, pluginPath);
 
-        String pluginId = pluginDescriptor.getPluginId();
+        pluginId = pluginDescriptor.getPluginId();
 
         // add plugin to the list with plugins
         plugins.put(pluginId, pluginWrapper);
@@ -844,13 +838,15 @@ public abstract class AbstractPluginManager implements PluginManager {
      */
     protected void validatePluginDescriptor(PluginDescriptor descriptor) throws PluginException {
         if (StringUtils.isEmpty(descriptor.getPluginId())) {
-            throw new PluginException("id cannot be empty");
+            throw new PluginException("Field 'id' cannot be empty");
         }
+
         if (StringUtils.isEmpty(descriptor.getPluginClass())) {
-            throw new PluginException("class cannot be empty");
+            throw new PluginException("Field 'class' cannot be empty");
         }
+
         if (descriptor.getVersion() == null) {
-            throw new PluginException("version cannot be empty");
+            throw new PluginException("Field 'version' cannot be empty");
         }
     }
 
@@ -880,6 +876,15 @@ public abstract class AbstractPluginManager implements PluginManager {
     @Override
     public VersionManager getVersionManager() {
         return versionManager;
+    }
+
+    /**
+     * The plugin label is used in logging and it's a string in format {@code pluginId@pluginVersion}.
+     * @param pluginDescriptor
+     * @return
+     */
+    protected String getPluginLabel(PluginDescriptor pluginDescriptor) {
+        return pluginDescriptor.getPluginId() + "@" + pluginDescriptor.getVersion();
     }
 
 }
