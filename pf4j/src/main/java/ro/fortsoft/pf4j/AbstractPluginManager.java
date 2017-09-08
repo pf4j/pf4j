@@ -737,6 +737,11 @@ public abstract class AbstractPluginManager implements PluginManager {
             descriptors.add(plugin.getDescriptor());
         }
 
+        // retrieves the plugins descriptors from the resolvedPlugins list. This allows to load plugins that have already loaded dependencies.
+        for (PluginWrapper plugin: resolvedPlugins) {
+            descriptors.add(plugin.getDescriptor());
+        }
+
         DependencyResolver.Result result = dependencyResolver.resolve(descriptors);
 
         if (result.hasCyclicDependency()) {
@@ -758,6 +763,12 @@ public abstract class AbstractPluginManager implements PluginManager {
         // move plugins from "unresolved" to "resolved"
         for (String pluginId : sortedPlugins) {
             PluginWrapper pluginWrapper = plugins.get(pluginId);
+
+            //The plugin is already resolved. Don't put a copy in the resolvedPlugins.
+            if (resolvedPlugins.contains(pluginWrapper)) {
+                continue;
+            }
+
             unresolvedPlugins.remove(pluginWrapper);
             resolvedPlugins.add(pluginWrapper);
             log.info("Plugin '{}' resolved", getPluginLabel(pluginWrapper.getDescriptor()));
