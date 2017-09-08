@@ -1,3 +1,5 @@
+<img src="pf4j-logo.svg" width="250"/>
+
 Plugin Framework for Java (PF4J)
 =====================
 [![Join the chat at https://gitter.im/decebals/pf4j](https://badges.gitter.im/decebals/pf4j.svg)](https://gitter.im/decebals/pf4j?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
