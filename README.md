@@ -234,7 +234,8 @@ Plugin assembly
 ------------------------------
 After you developed a plugin the next step is to deploy it in your application. For this task, one option is to create a zip file with a structure described in section [How to use](https://github.com/decebals/pf4j/blob/master/README.md#how-to-use) from the beginning of the document.  
 If you use `apache maven` as build manger than your pom.xml file must looks like [this](https://github.com/decebals/pf4j/blob/master/demo/plugins/plugin1/pom.xml). This file it's very simple and it's self explanatory.  
-If you use `apache ant` then your build.xml file must looks like [this](https://github.com/gitblit/gitblit-powertools-plugin/blob/master/build.xml). In this case please look at the "build" target.  
+If you use `apache ant` then your build.xml file must looks like [this](https://github.com/gitblit/gitblit-powertools-plugin/blob/master/build.xml). In this case please look at the "build" target.
+If you use `gradle` then your build.gradle file can look something like [this](https://github.com/decebals/pf4j/blob/master/demo_gradle/plugins/plugin1/build.gradle).
 
 Plugin lifecycle
 --------------------------
