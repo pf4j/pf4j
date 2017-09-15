@@ -13,20 +13,20 @@ jar {
     baseName = 'KotlinPlugin'
     version = '0.1.0'
     manifest {
-        attributes 'Plugin-Class' : 'org.pf4j.demo.kotlin.KotlinPlugin',
-                'Plugin-Id' : 'KotlinPlugin',
-                'Plugin-Version' : '1.0.0',
-                'Plugin-Provider' : 'Anindya Chatterjee'
+        attributes 'Plugin-Class': 'org.pf4j.demo.kotlin.KotlinPlugin',
+            'Plugin-Id': 'KotlinPlugin',
+            'Plugin-Version': '1.0.0',
+            'Plugin-Provider': 'Anindya Chatterjee'
     }
 }
 
 task plugin(type: Jar) {
     baseName = 'KotlinPlugin'
     version = '0.1.0'
-    into('classes'){
+    into('classes') {
         with jar
     }
-    into('lib'){
+    into('lib') {
         from configurations.compile
     }
     extension('zip')
@@ -42,7 +42,7 @@ repositories {
 
 dependencies {
     compileOnly project(':api')
-    kapt ('org.pf4j:pf4j:1.4.0-SNAPSHOT') {
+    kapt('org.pf4j:pf4j:1.4.0-SNAPSHOT') {
         exclude group: "org.slf4j"
     }
     compile 'org.apache.commons:commons-lang3:3.5'
