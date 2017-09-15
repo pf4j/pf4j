@@ -1,10 +1,10 @@
 subprojects {
-  apply plugin: 'java'
+    apply plugin: 'java'
 
-  repositories {
-    mavenLocal()
-    mavenCentral()
-  }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
 }
 
 task copyPlugins() {
@@ -14,7 +14,7 @@ task copyPlugins() {
 
         subprojects.each { p ->
             if (p.path.contains(":plugins/")) {
-                System.out.println("Copying plugin from " +  p.path);
+                System.out.println("Copying plugin from " + p.path);
                 copy {
                     from p.projectDir.toString() + '/build/libs'
                     into 'app/plugins'

@@ -5,12 +5,12 @@ Plugin Framework for Java (PF4J)
 [![Join the chat at https://gitter.im/decebals/pf4j](https://badges.gitter.im/decebals/pf4j.svg)](https://gitter.im/decebals/pf4j?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Travis CI Build Status](https://travis-ci.org/decebals/pf4j.png)](https://travis-ci.org/decebals/pf4j)
 [![Coverage Status](https://coveralls.io/repos/decebals/pf4j/badge.svg?branch=master&service=github)](https://coveralls.io/github/decebals/pf4j?branch=master)
-[![Maven Central](http://img.shields.io/maven-central/v/ro.fortsoft.pf4j/pf4j.svg)](http://search.maven.org/#search|ga|1|pf4j)
+[![Maven Central](http://img.shields.io/maven-central/v/org.pf4j/pf4j.svg)](http://search.maven.org/#search|ga|1|pf4j)
 
 A plugin is a way for a third party to extend the functionality of an application. A plugin implements extension points
 declared by application or other plugins. Also a plugin can define extension points.  
 
-**NOTE:** Starting with version 0.9 you can define an extension directly in the application jar (you're not obligated to put the extension in a plugin - you can see this extension as a default/system extension). See [WhazzupGreeting](https://github.com/decebals/pf4j/blob/master/demo/app/src/main/java/ro/fortsoft/pf4j/demo/WhazzupGreeting.java) for a real example.  
+**NOTE:** Starting with version 0.9 you can define an extension directly in the application jar (you're not obligated to put the extension in a plugin - you can see this extension as a default/system extension). See [WhazzupGreeting](https://github.com/decebals/pf4j/blob/master/demo/app/src/main/java/org/pf4j/demo/WhazzupGreeting.java) for a real example.  
 
 Features/Benefits
 -------------------
@@ -50,7 +50,7 @@ In your pom.xml you must define the dependencies to PF4J artifacts with:
 
 ```xml
 <dependency>
-    <groupId>ro.fortsoft.pf4j</groupId>
+    <groupId>org.pf4j</groupId>
     <artifactId>pf4j</artifactId>
     <version>${pf4j.version}</version>
 </dependency>    
@@ -119,14 +119,14 @@ Archiver-Version: Plexus Archiver
 Created-By: Apache Maven
 Built-By: decebal
 Build-Jdk: 1.6.0_17
-Plugin-Class: ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
+Plugin-Class: org.pf4j.demo.welcome.WelcomePlugin
 Plugin-Dependencies: x, y, z
 Plugin-Id: welcome-plugin
 Plugin-Provider: Decebal Suiu
 Plugin-Version: 0.0.1
 ```
 
-In above manifest I described a plugin with id `welcome-plugin`, with class `ro.fortsoft.pf4j.demo.welcome.WelcomePlugin`, with version `0.0.1` and with dependencies
+In above manifest I described a plugin with id `welcome-plugin`, with class `org.pf4j.demo.welcome.WelcomePlugin`, with version `0.0.1` and with dependencies
 to plugins `x, y, z`.
 
 **NOTE:** The plugin version must be compliant with [Semantic Versioning](http://semver.org) (PF4J uses `jsemver` as implementation for SemVer because it comes with support for comparing versions)
@@ -195,7 +195,7 @@ protected PluginDescriptorFinder createPluginDescriptorFinder() {
 and in plugin repository you must have a plugin.properties file with the below content:
 
 ```
-plugin.class=ro.fortsoft.pf4j.demo.welcome.WelcomePlugin
+plugin.class=org.pf4j.demo.welcome.WelcomePlugin
 plugin.dependencies=x, y, z
 plugin.id=welcome-plugin
 plugin.provider=Decebal Suiu
@@ -219,7 +219,7 @@ The `maven-compiler-plugin` can be configured to do this like so:
     <version>2.5.1</version>
     <configuration>
         <annotationProcessors>
-            <annotationProcessor>ro.fortsoft.pf4j.processor.ExtensionAnnotationProcessor</annotationProcessor>
+            <annotationProcessor>org.pf4j.processor.ExtensionAnnotationProcessor</annotationProcessor>
         </annotationProcessors>
     </configuration>
 </plugin>
@@ -240,7 +240,7 @@ If you use `apache ant` then your build.xml file must looks like [this](https://
 
 Plugin lifecycle
 --------------------------
-Each plugin passes through a pre-defined set of states. [PluginState](https://github.com/decebals/pf4j/blob/master/pf4j/src/main/java/ro/fortsoft/pf4j/PluginState.java) defines all possible states.   
+Each plugin passes through a pre-defined set of states. [PluginState](https://github.com/decebals/pf4j/blob/master/pf4j/src/main/java/org/pf4j/PluginState.java) defines all possible states.   
 The primary plugin states are:
 * CREATED
 * DISABLED
@@ -342,7 +342,7 @@ Lets describe how DEVELOPMENT runtime mode works.
 
 First, you can change the runtime mode using the "pf4j.mode" system property or overriding `DefaultPluginManager.getRuntimeMode()`.  
 For example I run the pf4j demo in eclipse in DEVELOPMENT mode adding only `"-Dpf4j.mode=development"` to the pf4j demo launcher.  
-You can retrieve the current runtime mode using `PluginManager.getRuntimeMode()` or in your Plugin implementation with `getWrapper().getRuntimeMode()`(see [WelcomePlugin](https://github.com/decebals/pf4j/blob/master/demo/plugins/plugin1/src/main/java/ro/fortsoft/pf4j/demo/welcome/WelcomePlugin.java)).   
+You can retrieve the current runtime mode using `PluginManager.getRuntimeMode()` or in your Plugin implementation with `getWrapper().getRuntimeMode()`(see [WelcomePlugin](https://github.com/decebals/pf4j/blob/master/demo/plugins/plugin1/src/main/java/org/pf4j/demo/welcome/WelcomePlugin.java)).   
 The DefaultPluginManager determines automatically the correct runtime mode and for DEVELOPMENT mode overrides some components(pluginsDirectory is __"../plugins"__, __PropertiesPluginDescriptorFinder__ as PluginDescriptorFinder, __DevelopmentPluginClasspath__ as PluginClassPath).  
 Another advantage of DEVELOPMENT runtime mode is that you can execute some code lines only in this mode (for example more debug messages).
 
@@ -394,7 +394,7 @@ Default/System extension
 -------------------
 Starting with version 0.9 you can define an extension directly in the application jar (you're not obligated
 to put the extension in a plugin - you can see this extension as a default/system extension).
-See [WhazzupGreeting](https://github.com/decebals/pf4j/blob/master/demo/app/src/main/java/ro/fortsoft/pf4j/demo/WhazzupGreeting.java)
+See [WhazzupGreeting](https://github.com/decebals/pf4j/blob/master/demo/app/src/main/java/org/pf4j/demo/WhazzupGreeting.java)
 for a real example.
 
 This is great for starting application phase. In this scenario you have a minimalist plugin framework with one class loader
@@ -441,20 +441,20 @@ calls from your application with `PluginManager.getExtensions()` and migrate smo
 Also you have the possibility to change the `ExtensionStorage` used in `ExtensionAnnotationProcessor`.
 By default we use the format with `META-INF/extensions.idx`
 ```
-ro.fortsoft.pf4j.demo.HowdyGreeting
-ro.fortsoft.pf4j.demo.WhazzupGreeting
+org.pf4j.demo.HowdyGreeting
+org.pf4j.demo.WhazzupGreeting
 ```
 
 but you can use a more standard location and format, `META-INF/services/<extension-point>`, used by Java Service Provider
 (see `java.util.ServiceLoader`) via `ServiceProviderExtensionStorage` implementation.
-In this case the format of `META-INF/services/ro.fortsoft.pf4j.demo.api.Greeting` is
+In this case the format of `META-INF/services/org.pf4j.demo.api.Greeting` is
 ```
 # Generated by PF4J
-ro.fortsoft.pf4j.demo.HowdyGreeting
-ro.fortsoft.pf4j.demo.WhazzupGreeting # pf4j extension
+org.pf4j.demo.HowdyGreeting
+org.pf4j.demo.WhazzupGreeting # pf4j extension
 ```
 
-where the `ro.fortsoft.pf4j.demo.HowdyGreeting` entry is legacy (it's not generated by PF4J) but it's seen as
+where the `org.pf4j.demo.HowdyGreeting` entry is legacy (it's not generated by PF4J) but it's seen as
 an extension of `Greeting` by PF4J (at runtime).
 
 You can plug your custom `ExtensionStorage` implementation in `ExtensionAnnotationProcessor` in two possible modes:
@@ -462,7 +462,7 @@ You can plug your custom `ExtensionStorage` implementation in `ExtensionAnnotati
 - set the system property with key `pf4j.storageClassName`
 
 For example if I want to use `ServiceProviderExtensionStorage` then the value for the `pf4j.storageClassName` key must be
-`ro.fortsoft.pf4j.processor.ServiceProviderExtensionStorage`
+`org.pf4j.processor.ServiceProviderExtensionStorage`
 
 **NOTE:** `ServiceLoaderExtensionFinder`, the class that lookups for extensions stored in `META-INF/services` folder, is
 not added/enabled by default. To do this please override `createExtensionFinder` from `DefaultPluginManager`:

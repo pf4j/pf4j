@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>ro.fortsoft.pf4j.demo</groupId>
+        <groupId>org.pf4j.demo</groupId>
         <artifactId>pf4j-demo-parent</artifactId>
         <version>1.4.0-SNAPSHOT</version>
     </parent>
@@ -14,7 +14,7 @@
     <name>Demo App</name>
 
     <properties>
-        <main.class>ro.fortsoft.pf4j.demo.Boot</main.class>
+        <main.class>org.pf4j.demo.Boot</main.class>
         <slf4j.version>1.7.5</slf4j.version>
     </properties>
 
@@ -68,13 +68,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>ro.fortsoft.pf4j</groupId>
+            <groupId>org.pf4j</groupId>
             <artifactId>pf4j</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>ro.fortsoft.pf4j.demo</groupId>
+            <groupId>org.pf4j.demo</groupId>
             <artifactId>pf4j-demo-api</artifactId>
             <version>${project.version}</version>
         </dependency>
