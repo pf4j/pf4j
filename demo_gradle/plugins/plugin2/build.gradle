@@ -25,7 +25,7 @@ assemble.dependsOn plugin
 dependencies {
     compileOnly project(':api')
     // compileOnly important!!! We do not want to put the api into the zip file since the main program has it already!
-    compile('org.pf4j:pf4j:1.4.0-SNAPSHOT') {
+    compile('org.pf4j:pf4j:2.0.0-SNAPSHOT') {
         exclude group: "org.slf4j"
     }
     compile 'org.apache.commons:commons-lang3:3.5'

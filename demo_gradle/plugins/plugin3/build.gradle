@@ -42,7 +42,7 @@ repositories {
 
 dependencies {
     compileOnly project(':api')
-    kapt('org.pf4j:pf4j:1.4.0-SNAPSHOT') {
+    kapt('org.pf4j:pf4j:2.0.0-SNAPSHOT') {
         exclude group: "org.slf4j"
     }
     compile 'org.apache.commons:commons-lang3:3.5'
