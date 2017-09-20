@@ -54,7 +54,7 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <unzip src="target/${artifactId}-${version}.${packaging}" dest="target/plugin-classes" />
+                                <unzip src="target/${project.artifactId}-${project.version}.${project.packaging}" dest="target/plugin-classes" />
                             </target>
                         </configuration>
                         <goals>
