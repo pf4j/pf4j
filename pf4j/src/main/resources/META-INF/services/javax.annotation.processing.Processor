@@ -1,1 +1,1 @@
-ro.fortsoft.pf4j.processor.ExtensionAnnotationProcessor
+org.pf4j.processor.ExtensionAnnotationProcessor
