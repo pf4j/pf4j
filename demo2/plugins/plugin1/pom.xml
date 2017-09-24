@@ -23,7 +23,7 @@
         </dependency>
         <dependency>
             <!--
-            A trouble (or p*** in the a**) for java systems is coping with multiple transitive dependency versions.
+            A trouble for java systems is - dealing with multiple transitive dependency versions.
             This plugin uses version 6.0.0 of lucene ; other one will use 7.0.0
             to test whether the class loaders are setup correctly.
             -->

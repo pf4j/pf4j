@@ -15,14 +15,7 @@
  */
 package org.pf4j.demo;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -44,12 +37,7 @@ public class Boot {
 
         // create the plugin manager
 //        final PluginManager pluginManager = new DefaultPluginManager();
-        final PluginManager pluginManager = new JarPluginManager(){
-            @Override
-            protected PluginDescriptorFinder createPluginDescriptorFinder() {
-                return new JarPropsPluginDescriptorFinder();
-            }
-        };
+        final PluginManager pluginManager = new JarPluginManager();
 
         // load the plugins
         pluginManager.loadPlugins();
@@ -126,23 +114,4 @@ public class Boot {
     	System.out.println(StringUtils.center("PF4J-DEMO 2", 40));
     	System.out.println(StringUtils.repeat("#", 40));
 	}
-
-    private static class JarPropsPluginDescriptorFinder extends PropertiesPluginDescriptorFinder {
-        static final String DEFAULT_PROPERTIES_FILE_NAME = "plugin.properties";
-
-        @Override
-        protected Properties readProperties(Path pluginPath) throws PluginException {
-            //TODO: submit this patch to main code base
-            try (FileSystem fileSystem = FileSystems.newFileSystem(pluginPath, this.getClass().getClassLoader());) {
-                // this way we can access files from .zip or .jar without extracting them
-                try (InputStream stream = Files.newInputStream(fileSystem.getPath(DEFAULT_PROPERTIES_FILE_NAME))) {
-                   Properties props = new Properties();
-                   props.load(stream);
-                   return props;
-                }
-            } catch (IOException e) {
-                throw new PluginException(e);
-            }
-        }
-    }
 }
