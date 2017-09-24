@@ -62,9 +62,11 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
             // For files inside .zip: Files.notExists() thinks the file exists, but Files.newInputStream() doesn't agree with it
             // So, to circumvent this, we open a FileSystem and close it at the end
             if (!Files.exists(propertiesPath)) {
-                fileSystem = FileSystems.newFileSystem(pluginPath, this.getClass().getClassLoader());
-                propertiesPath = fileSystem.getPath(propertiesFileName);
-                if (Files.notExists(propertiesPath)) {
+                if (pluginPath.endsWith(".zip") || pluginPath.endsWith(".jar")) {
+                    fileSystem = FileSystems.newFileSystem(pluginPath, this.getClass().getClassLoader());
+                    propertiesPath = fileSystem.getPath(propertiesFileName);
+                }
+                if (!Files.exists(propertiesPath)) {
                     throw new PluginException("Cannot find '{}' path", pluginPath);
                 }
             }
