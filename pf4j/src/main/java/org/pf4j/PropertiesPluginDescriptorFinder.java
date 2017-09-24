@@ -15,15 +15,14 @@
  */
 package org.pf4j;
 
+import org.pf4j.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.pf4j.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Properties;
 
 /**
@@ -55,20 +54,30 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 	}
 
     protected Properties readProperties(Path pluginPath) throws PluginException {
+        FileSystem fileSystem = null;
         Path propertiesPath = pluginPath.resolve(Paths.get(propertiesFileName));
         log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
-        if (Files.notExists(propertiesPath)) {
-            throw new PluginException("Cannot find '{}' path", pluginPath);
-        }
-
-        Properties properties = new Properties();
-        try (InputStream input = Files.newInputStream(propertiesPath)) {
-            properties.load(input);
+        try {
+            // NOTE: as of JDK 8, Files.notExists() doesn't work here if properties file is inside .zip or .jar
+            // For files inside .zip: Files.notExists() thinks the file exists, but Files.newInputStream() doesn't agree with it
+            // So, to circumvent this, we open a FileSystem and close it at the end
+            if (!Files.exists(propertiesPath)) {
+                fileSystem = FileSystems.newFileSystem(pluginPath, this.getClass().getClassLoader());
+                propertiesPath = fileSystem.getPath(propertiesFileName);
+                if (Files.notExists(propertiesPath)) {
+                    throw new PluginException("Cannot find '{}' path", pluginPath);
+                }
+            }
+            Properties properties = new Properties();
+            try (InputStream input = Files.newInputStream(propertiesPath)) {
+                properties.load(input);
+            }
+            return properties;
         } catch (IOException e) {
             throw new PluginException(e.getMessage(), e);
+        } finally {
+            FileUtils.closeQuietly(fileSystem);
         }
-
-        return properties;
     }
 
     protected PluginDescriptor createPluginDescriptor(Properties properties) {
