@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
@@ -197,6 +198,21 @@ public class FileUtils {
      */
     public static boolean isZipFile(Path path) {
         return Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".zip");
+    }
+
+    /**
+     * Closes an instance of closeable quietly.
+     * It is null safe and ignores IOExceptions that may atrise during close
+     * @param closeable object to be closed
+     */
+    public static void closeQuietly(Closeable closeable){
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                //Ignore
+            }
+        }
     }
 
 }
