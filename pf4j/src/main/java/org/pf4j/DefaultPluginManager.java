@@ -52,8 +52,17 @@ public class DefaultPluginManager extends AbstractPluginManager {
      * else this method returns {@link DefaultPluginDescriptorFinder}.
 	 */
     @Override
-    protected PluginDescriptorFinder createPluginDescriptorFinder() {
-    	return isDevelopment() ? new PropertiesPluginDescriptorFinder() : new DefaultPluginDescriptorFinder(pluginClasspath);
+    protected CompoundPluginDescriptorFinder createPluginDescriptorFinder() {
+        return new CompoundPluginDescriptorFinder()
+            .add(new PropertiesPluginDescriptorFinder() {
+
+                @Override
+                public boolean isApplicable(Path pluginPath) {
+                    return isDevelopment() && super.isApplicable(pluginPath);
+                }
+
+            })
+            .add(new DefaultPluginDescriptorFinder(pluginClasspath));
     }
 
     @Override

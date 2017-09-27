@@ -15,25 +15,16 @@
  */
 package org.pf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.jar.Manifest;
 
 /**
  * The default implementation for {@link PluginDescriptorFinder}.
- * Now, this class it's a "link" to {@link ManifestPluginDescriptorFinder}.
  *
  * @author Decebal Suiu
  */
 public class DefaultPluginDescriptorFinder extends ManifestPluginDescriptorFinder {
-
-    private static final Logger log = LoggerFactory.getLogger(ManifestPluginDescriptorFinder.class);
 
     private PluginClasspath pluginClasspath;
 
@@ -41,24 +32,20 @@ public class DefaultPluginDescriptorFinder extends ManifestPluginDescriptorFinde
         this.pluginClasspath = pluginClasspath;
     }
 
-	@Override
-    public Manifest readManifest(Path pluginPath) throws PluginException {
+    @Override
+    public boolean isApplicable(Path pluginPath) {
+        return Files.exists(pluginPath) && Files.isDirectory(pluginPath);
+    }
+
+    @Override
+    protected Path getManifestPath(Path pluginPath) throws PluginException {
         // TODO it's ok with first classes root? Another idea is to specify in PluginClasspath the folder.
         if (pluginClasspath.getClassesDirectories().size() == 0) {
             throw new PluginException("Failed to read manifest, no classes folder in classpath");
         }
         String classes = pluginClasspath.getClassesDirectories().get(0);
-        Path manifestPath = pluginPath.resolve(Paths.get(classes,"/META-INF/MANIFEST.MF"));
-        log.debug("Lookup plugin descriptor in '{}'", manifestPath);
-        if (Files.notExists(manifestPath)) {
-            throw new PluginException("Cannot find '{}' path", manifestPath);
-        }
 
-        try (InputStream input = Files.newInputStream(manifestPath)) {
-            return new Manifest(input);
-        } catch (IOException e) {
-            throw new PluginException(e.getMessage(), e);
-        }
+        return pluginPath.resolve(Paths.get(classes,"/META-INF/MANIFEST.MF"));
     }
 
 }

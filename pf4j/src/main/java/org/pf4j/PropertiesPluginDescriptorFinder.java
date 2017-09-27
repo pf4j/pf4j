@@ -15,9 +15,9 @@
  */
 package org.pf4j;
 
+import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.pf4j.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +47,12 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         this.propertiesFileName = propertiesFileName;
 	}
 
-	@Override
+    @Override
+    public boolean isApplicable(Path pluginPath) {
+        return Files.exists(pluginPath) && Files.isDirectory(pluginPath);
+    }
+
+    @Override
 	public PluginDescriptor find(Path pluginPath) throws PluginException {
         Properties properties = readProperties(pluginPath);
 
@@ -65,7 +70,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         try (InputStream input = Files.newInputStream(propertiesPath)) {
             properties.load(input);
         } catch (IOException e) {
-            throw new PluginException(e.getMessage(), e);
+            throw new PluginException(e);
         }
 
         return properties;

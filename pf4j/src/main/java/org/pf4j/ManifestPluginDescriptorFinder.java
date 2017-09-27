@@ -16,7 +16,12 @@
 package org.pf4j;
 
 import org.pf4j.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -28,6 +33,8 @@ import java.util.jar.Manifest;
  */
 public abstract class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
+    private static final Logger log = LoggerFactory.getLogger(ManifestPluginDescriptorFinder.class);
+
     @Override
 	public PluginDescriptor find(Path pluginPath) throws PluginException {
         Manifest manifest = readManifest(pluginPath);
@@ -35,7 +42,21 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
         return createPluginDescriptor(manifest);
 	}
 
-    public abstract Manifest readManifest(Path pluginPath) throws PluginException;
+    protected Manifest readManifest(Path pluginPath) throws PluginException {
+        Path manifestPath = getManifestPath(pluginPath);
+        log.debug("Lookup plugin descriptor in '{}'", manifestPath);
+        if (Files.notExists(manifestPath)) {
+            throw new PluginException("Cannot find '{}' path", manifestPath);
+        }
+
+        try (InputStream input = Files.newInputStream(manifestPath)) {
+            return new Manifest(input);
+        } catch (IOException e) {
+            throw new PluginException(e);
+        }
+    }
+
+    protected abstract Path getManifestPath(Path pluginPath) throws PluginException;
 
     protected PluginDescriptor createPluginDescriptor(Manifest manifest) {
         PluginDescriptor pluginDescriptor = createPluginDescriptorInstance();

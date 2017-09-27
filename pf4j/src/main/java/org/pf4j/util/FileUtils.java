@@ -199,4 +199,14 @@ public class FileUtils {
         return Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".zip");
     }
 
+    /**
+     * Return true only if path is a jar file.
+     *
+     * @param path to a file/dir
+     * @return true if file with {@code .jar} ending
+     */
+    public static boolean isJarFile(Path path) {
+        return Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".jar");
+    }
+
 }

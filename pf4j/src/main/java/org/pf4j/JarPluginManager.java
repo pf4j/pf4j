@@ -17,14 +17,16 @@ package org.pf4j;
 
 import org.pf4j.util.AndFileFilter;
 import org.pf4j.util.DirectoryFileFilter;
+import org.pf4j.util.FileUtils;
 import org.pf4j.util.HiddenFilter;
 import org.pf4j.util.JarFileFilter;
+import org.pf4j.util.NameFileFilter;
 import org.pf4j.util.NotFileFilter;
 import org.pf4j.util.OrFileFilter;
-import org.pf4j.util.NameFileFilter;
 
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -44,8 +46,8 @@ public class JarPluginManager extends DefaultPluginManager {
     }
 
     @Override
-    protected PluginDescriptorFinder createPluginDescriptorFinder() {
-        return isDevelopment() ? new PropertiesPluginDescriptorFinder() : new JarPluginDescriptorFinder();
+    protected CompoundPluginDescriptorFinder createPluginDescriptorFinder() {
+        return super.createPluginDescriptorFinder().add(new JarPluginDescriptorFinder());
     }
 
     @Override
@@ -82,12 +84,23 @@ public class JarPluginManager extends DefaultPluginManager {
     class JarPluginDescriptorFinder extends ManifestPluginDescriptorFinder {
 
         @Override
+        public boolean isApplicable(Path pluginPath) {
+            return Files.exists(pluginPath) && FileUtils.isJarFile(pluginPath);
+        }
+
+        @Override
         public Manifest readManifest(Path pluginPath) throws PluginException {
             try {
                 return new JarFile(pluginPath.toFile()).getManifest();
             } catch (IOException e) {
                 throw new PluginException(e);
             }
+        }
+
+        @Override
+        protected Path getManifestPath(Path pluginPath) throws PluginException {
+            // make no sense for a jar file
+            return null;
         }
 
     }

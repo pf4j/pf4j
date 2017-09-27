@@ -26,6 +26,14 @@ import java.nio.file.Path;
  */
 public interface PluginDescriptorFinder {
 
+    /**
+     * Returns true if this finder is applicable to the given {@link Path}.
+     *
+     * @param pluginPath
+     * @return
+     */
+    boolean isApplicable(Path pluginPath);
+
 	PluginDescriptor find(Path pluginPath) throws PluginException;
 
 }

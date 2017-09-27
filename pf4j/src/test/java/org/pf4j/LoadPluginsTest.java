@@ -17,22 +17,24 @@ package org.pf4j;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pf4j.plugin.MockPluginManager;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.*;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 
-import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.*;
 
 public class LoadPluginsTest {
 
     private Path tmpDir;
-    private MockPluginManager pluginManager;
+    private DefaultPluginManager pluginManager;
     private MockZipPlugin p1;
     private MockZipPlugin p2;
     private MockZipPlugin p3;
@@ -44,9 +46,15 @@ public class LoadPluginsTest {
         p1 = new MockZipPlugin("myPlugin", "1.2.3", "my-plugin-1.2.3", "my-plugin-1.2.3.zip");
         p2 = new MockZipPlugin("myPlugin", "2.0.0", "my-plugin-2.0.0", "my-plugin-2.0.0.ZIP");
         p3 = new MockZipPlugin("other", "3.0.0", "other-3.0.0", "other-3.0.0.Zip");
-        pluginManager = new MockPluginManager(
-            tmpDir,
-            new PropertiesPluginDescriptorFinder("my.properties"));
+        pluginManager = new DefaultPluginManager(tmpDir) {
+
+            @Override
+            protected CompoundPluginDescriptorFinder createPluginDescriptorFinder() {
+                return new CompoundPluginDescriptorFinder()
+                    .add(new PropertiesPluginDescriptorFinder("my.properties"));
+            }
+
+        };
     }
 
     @Test

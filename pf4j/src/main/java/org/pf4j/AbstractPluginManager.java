@@ -780,8 +780,10 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         // retrieves the plugin descriptor
+        PluginDescriptorFinder pluginDescriptorFinder = getPluginDescriptorFinder();
+        log.debug("Use '{}' to find plugins descriptors", pluginDescriptorFinder);
         log.debug("Finding plugin descriptor for plugin '{}'", pluginPath);
-        PluginDescriptor pluginDescriptor = getPluginDescriptorFinder().find(pluginPath);
+        PluginDescriptor pluginDescriptor = pluginDescriptorFinder.find(pluginPath);
         validatePluginDescriptor(pluginDescriptor);
         log.debug("Found descriptor {}", pluginDescriptor);
         String pluginClassName = pluginDescriptor.getPluginClass();
