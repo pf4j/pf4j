@@ -55,10 +55,10 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 	}
 
     protected Properties readProperties(Path pluginPath) throws PluginException {
-        Path propertiesPath = pluginPath.resolve(Paths.get(propertiesFileName));
+        Path propertiesPath = getPropertiesPath(pluginPath, propertiesFileName);
         log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
         if (Files.notExists(propertiesPath)) {
-            throw new PluginException("Cannot find '{}' path", pluginPath);
+            throw new PluginException("Cannot find '{}' path", propertiesPath);
         }
 
         Properties properties = new Properties();
@@ -69,6 +69,10 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         }
 
         return properties;
+    }
+
+    protected Path getPropertiesPath(Path pluginPath, String propertiesFileName) throws PluginException {
+	    return pluginPath.resolve(Paths.get(propertiesFileName));
     }
 
     protected PluginDescriptor createPluginDescriptor(Properties properties) {
