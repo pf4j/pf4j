@@ -46,11 +46,6 @@ public class DefaultPluginManager extends AbstractPluginManager {
         super(pluginsRoot);
     }
 
-    /**
-	 * By default if {@link DefaultPluginManager#isDevelopment()} returns {@code true}
-     * than a {@link PropertiesPluginDescriptorFinder} is returned
-     * else this method returns {@link DefaultPluginDescriptorFinder}.
-	 */
     @Override
     protected CompoundPluginDescriptorFinder createPluginDescriptorFinder() {
         return new CompoundPluginDescriptorFinder()
@@ -62,7 +57,7 @@ public class DefaultPluginManager extends AbstractPluginManager {
                 }
 
             })
-            .add(new DefaultPluginDescriptorFinder(pluginClasspath));
+            .add(new ManifestPluginDescriptorFinder());
     }
 
     @Override

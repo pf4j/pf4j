@@ -15,6 +15,7 @@
  */
 package org.pf4j;
 
+import org.pf4j.util.FileUtils;
 import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 /**
@@ -31,9 +33,14 @@ import java.util.jar.Manifest;
  *
  * @author Decebal Suiu
  */
-public abstract class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
+public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
     private static final Logger log = LoggerFactory.getLogger(ManifestPluginDescriptorFinder.class);
+
+    @Override
+    public boolean isApplicable(Path pluginPath) {
+        return Files.exists(pluginPath) && (Files.isDirectory(pluginPath) || FileUtils.isJarFile(pluginPath));
+    }
 
     @Override
 	public PluginDescriptor find(Path pluginPath) throws PluginException {
@@ -43,7 +50,22 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
 	}
 
     protected Manifest readManifest(Path pluginPath) throws PluginException {
+        if (FileUtils.isJarFile(pluginPath)) {
+            try {
+                Manifest manifest = new JarFile(pluginPath.toFile()).getManifest();
+                if (manifest != null) {
+                    return manifest;
+                }
+            } catch (IOException e) {
+                throw new PluginException(e);
+            }
+        }
+
         Path manifestPath = getManifestPath(pluginPath);
+        if (manifestPath == null) {
+            throw new PluginException("Cannot find the manifest path");
+        }
+
         log.debug("Lookup plugin descriptor in '{}'", manifestPath);
         if (Files.notExists(manifestPath)) {
             throw new PluginException("Cannot find '{}' path", manifestPath);
@@ -56,7 +78,14 @@ public abstract class ManifestPluginDescriptorFinder implements PluginDescriptor
         }
     }
 
-    protected abstract Path getManifestPath(Path pluginPath) throws PluginException;
+    protected Path getManifestPath(Path pluginPath) throws PluginException {
+        if (Files.isDirectory(pluginPath)) {
+            // legacy (the path is something like "classes/META-INF/MANIFEST.MF")
+            return FileUtils.findFile(pluginPath,"MANIFEST.MF");
+        }
+
+        return null;
+    }
 
     protected PluginDescriptor createPluginDescriptor(Manifest manifest) {
         PluginDescriptor pluginDescriptor = createPluginDescriptorInstance();

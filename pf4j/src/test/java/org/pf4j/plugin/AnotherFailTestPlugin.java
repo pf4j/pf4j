@@ -18,7 +18,6 @@ package org.pf4j.plugin;
 import org.pf4j.Plugin;
 
 /**
- *
  * @author Mario Franco
  */
 public class AnotherFailTestPlugin extends Plugin {

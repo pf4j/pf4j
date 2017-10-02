@@ -23,7 +23,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,6 +35,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -207,6 +211,41 @@ public class FileUtils {
      */
     public static boolean isJarFile(Path path) {
         return Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".jar");
+    }
+
+    public static Path getPath(Path path, String first, String... more) throws IOException {
+        URI uri = path.toUri();
+        if (isJarFile(path)) {
+            uri = URI.create("jar:file:" + path.toString());
+        }
+
+        return getPath(uri, first, more);
+    }
+
+    public static Path getPath(URI uri, String first, String... more) throws IOException {
+        FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
+
+        return fileSystem.getPath(first, more);
+    }
+
+    public static Path findFile(Path directoryPath, String fileName) {
+        File[] files = directoryPath.toFile().listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    if (file.getName().equals(fileName)) {
+                        return file.toPath();
+                    }
+                } else if (file.isDirectory()) {
+                    Path foundFile = findFile(file.toPath(), fileName);
+                    if (foundFile != null) {
+                        return foundFile;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
 }

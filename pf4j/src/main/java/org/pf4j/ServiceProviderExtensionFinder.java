@@ -16,6 +16,7 @@
 package org.pf4j;
 
 import org.pf4j.processor.ServiceProviderExtensionStorage;
+import org.pf4j.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +25,6 @@ import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -65,8 +64,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
             if (url != null) {
                 Path extensionPath;
                 if (url.toURI().getScheme().equals("jar")) {
-                    FileSystem fileSystem = FileSystems.newFileSystem(url.toURI(), Collections.<String, Object>emptyMap());
-                    extensionPath = fileSystem.getPath(getExtensionsResource());
+                    extensionPath = FileUtils.getPath(url.toURI(), getExtensionsResource());
                 } else {
                     extensionPath = Paths.get(url.toURI());
                 }
@@ -100,8 +98,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
                 if (url != null) {
                     Path extensionPath;
                     if (url.toURI().getScheme().equals("jar")) {
-                        FileSystem fileSystem = FileSystems.newFileSystem(url.toURI(), Collections.<String, Object>emptyMap());
-                        extensionPath = fileSystem.getPath(getExtensionsResource());
+                        extensionPath = FileUtils.getPath(url.toURI(), getExtensionsResource());
                     } else {
                         extensionPath = Paths.get(url.toURI());
                     }

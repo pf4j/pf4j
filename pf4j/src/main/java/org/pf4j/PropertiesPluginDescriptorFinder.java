@@ -15,6 +15,7 @@
  */
 package org.pf4j;
 
+import org.pf4j.util.FileUtils;
 import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 
     @Override
     public boolean isApplicable(Path pluginPath) {
-        return Files.exists(pluginPath) && Files.isDirectory(pluginPath);
+        return Files.exists(pluginPath) && (Files.isDirectory(pluginPath) || FileUtils.isJarFile(pluginPath));
     }
 
     @Override
@@ -61,6 +62,10 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 
     protected Properties readProperties(Path pluginPath) throws PluginException {
         Path propertiesPath = getPropertiesPath(pluginPath, propertiesFileName);
+        if (propertiesPath == null) {
+            throw new PluginException("Cannot find the properties path");
+        }
+
         log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
         if (Files.notExists(propertiesPath)) {
             throw new PluginException("Cannot find '{}' path", propertiesPath);
@@ -77,7 +82,16 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     }
 
     protected Path getPropertiesPath(Path pluginPath, String propertiesFileName) throws PluginException {
-	    return pluginPath.resolve(Paths.get(propertiesFileName));
+	    if (Files.isDirectory(pluginPath)) {
+            return pluginPath.resolve(Paths.get(propertiesFileName));
+        } else {
+	        // it's a jar file
+            try {
+                return FileUtils.getPath(pluginPath, propertiesFileName);
+            } catch (IOException e) {
+                throw new PluginException(e);
+            }
+        }
     }
 
     protected PluginDescriptor createPluginDescriptor(Properties properties) {

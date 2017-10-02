@@ -16,7 +16,6 @@
 package org.pf4j.plugin;
 
 /**
- *
  * @author Mario Franco
  */
 public class FailTestPlugin {

@@ -42,9 +42,9 @@ public class FileUtilsTest {
         tmpDir.toFile().deleteOnExit();
         zipFile = tmpDir.resolve("my.zip").toAbsolutePath();
         propsFile = tmpDir.resolve("plugin.properties");
-        URI file = URI.create("jar:file:"+zipFile.toString());
+        URI file = URI.create("jar:file:" + zipFile.toString());
         try (FileSystem zipfs = FileSystems.newFileSystem(file, Collections.singletonMap("create", "true"))) {
-            Path propsInZip = zipfs.getPath("/plugin.properties");
+            // plugin descriptor content
             BufferedWriter br = new BufferedWriter(new FileWriter(propsFile.toString()));
             br.write("plugin.id=test");
             br.newLine();
@@ -52,6 +52,8 @@ public class FileUtilsTest {
             br.newLine();
             br.write("plugin.class=foo.bar");
             br.close();
+
+            Path propsInZip = zipfs.getPath("/plugin.properties");
             Files.move(propsFile, propsInZip);
         }
     }

@@ -140,14 +140,14 @@ public class LoadPluginsTest {
 
     private class MockZipPlugin {
 
-        public final String id;
-        public final String version;
-        public final String filename;
-        public final Path zipFile;
-        public final Path unzipped;
-        public final Path propsFile;
-        public final URI fileURI;
-        public String zipname;
+        final String id;
+        final String version;
+        final String filename;
+        final Path zipFile;
+        final Path unzipped;
+        final Path propsFile;
+        final URI fileURI;
+        String zipname;
 
         public MockZipPlugin(String id, String version, String filename, String zipname) throws IOException {
             this.id = id;
@@ -158,12 +158,12 @@ public class LoadPluginsTest {
             zipFile = tmpDir.resolve(zipname).toAbsolutePath();
             unzipped = tmpDir.resolve(filename);
             propsFile = tmpDir.resolve("my.properties");
-            fileURI = URI.create("jar:file:"+zipFile.toString());
+            fileURI = URI.create("jar:file:" + zipFile.toString());
         }
 
         public void create() throws IOException {
             try (FileSystem zipfs = FileSystems.newFileSystem(fileURI, Collections.singletonMap("create", "true"))) {
-                Path propsInZip = zipfs.getPath("/" + propsFile.getFileName().toString());
+                // plugin descriptor content
                 BufferedWriter br = new BufferedWriter(new FileWriter(propsFile.toString()));
                 br.write("plugin.id=" + id);
                 br.newLine();
@@ -171,6 +171,8 @@ public class LoadPluginsTest {
                 br.newLine();
                 br.write("plugin.class=org.pf4j.plugin.TestPlugin");
                 br.close();
+
+                Path propsInZip = zipfs.getPath("/" + propsFile.getFileName().toString());
                 Files.move(propsFile, propsInZip);
             }
         }
