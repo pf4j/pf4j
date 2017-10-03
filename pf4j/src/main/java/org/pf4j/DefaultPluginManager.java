@@ -49,14 +49,7 @@ public class DefaultPluginManager extends AbstractPluginManager {
     @Override
     protected CompoundPluginDescriptorFinder createPluginDescriptorFinder() {
         return new CompoundPluginDescriptorFinder()
-            .add(new PropertiesPluginDescriptorFinder() {
-
-                @Override
-                public boolean isApplicable(Path pluginPath) {
-                    return isDevelopment() && super.isApplicable(pluginPath);
-                }
-
-            })
+            .add(new PropertiesPluginDescriptorFinder())
             .add(new ManifestPluginDescriptorFinder());
     }
 
