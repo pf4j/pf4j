@@ -15,62 +15,36 @@
  */
 package org.pf4j.util;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.pf4j.plugin.PluginZip;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 
 import static org.junit.Assert.*;
 
 public class FileUtilsTest {
 
-    private Path zipFile;
-    private Path tmpDir;
-    private Path propsFile;
-
-    @Before
-    public void setup() throws IOException {
-        tmpDir = Files.createTempDirectory("pf4j-test");
-        tmpDir.toFile().deleteOnExit();
-        zipFile = tmpDir.resolve("my.zip").toAbsolutePath();
-        propsFile = tmpDir.resolve("plugin.properties");
-        URI file = URI.create("jar:file:" + zipFile.toString());
-        try (FileSystem zipfs = FileSystems.newFileSystem(file, Collections.singletonMap("create", "true"))) {
-            // plugin descriptor content
-            BufferedWriter br = new BufferedWriter(new FileWriter(propsFile.toString()));
-            br.write("plugin.id=test");
-            br.newLine();
-            br.write("plugin.version=1.2.3");
-            br.newLine();
-            br.write("plugin.class=foo.bar");
-            br.close();
-
-            Path propsInZip = zipfs.getPath("/plugin.properties");
-            Files.move(propsFile, propsInZip);
-        }
-    }
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
     public void expandIfZip() throws Exception {
-        Path unzipped = FileUtils.expandIfZip(zipFile);
-        assertEquals(tmpDir.resolve("my"), unzipped);
-        assertTrue(Files.exists(tmpDir.resolve("my/plugin.properties")));
+        PluginZip pluginZip = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
 
-        // Non-zip file remains unchanged
-        assertEquals(propsFile, FileUtils.expandIfZip(propsFile));
+        Path unzipped = FileUtils.expandIfZip(pluginZip.path());
+        assertEquals(pluginZip.unzippedPath(), unzipped);
+        assertTrue(Files.exists(unzipped.resolve("plugin.properties")));
+
         // File without .suffix
-        Path extra = Files.createFile(tmpDir.resolve("extra"));
+        Path extra = testFolder.newFile("extra").toPath();
         assertEquals(extra, FileUtils.expandIfZip(extra));
         // Folder
-        Path folder = Files.createFile(tmpDir.resolve("folder"));
+        Path folder = testFolder.newFile("folder").toPath();
         assertEquals(folder, FileUtils.expandIfZip(folder));
     }
 
