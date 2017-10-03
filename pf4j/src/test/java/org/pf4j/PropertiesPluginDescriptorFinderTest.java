@@ -97,7 +97,7 @@ public class PropertiesPluginDescriptorFinderTest {
     }
 
     @Test(expected = PluginException.class)
-    public void testFindNotFound() throws Exception {
+    public void testNotFound() throws Exception {
         PluginDescriptorFinder instance = new PropertiesPluginDescriptorFinder();
         instance.find(getPluginsRoot().resolve("test-plugin-3"));
     }
