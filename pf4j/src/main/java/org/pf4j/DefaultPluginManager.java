@@ -37,6 +37,11 @@ public class DefaultPluginManager extends AbstractPluginManager {
         super();
     }
 
+    /**
+     * Use {@link DefaultPluginManager#DefaultPluginManager(Path)}.
+     *
+     * @param pluginsDir
+     */
     @Deprecated
     public DefaultPluginManager(File pluginsDir) {
         this(pluginsDir.toPath());

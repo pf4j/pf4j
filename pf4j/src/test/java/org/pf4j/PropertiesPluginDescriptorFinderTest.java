@@ -19,18 +19,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.pf4j.plugin.PluginZip;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.Charset;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -109,13 +104,17 @@ public class PropertiesPluginDescriptorFinderTest {
 
     @Test
     public void findInJar() throws Exception {
-        MockJarPlugin p1 = new MockJarPlugin();
-        p1.create();
-        assertTrue(Files.exists(p1.jarFile));
-//        assertTrue(Files.exists(p1.propsFile));
+        PluginZip pluginJar = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.jar"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        assertTrue(Files.exists(pluginJar.path()));
 
         PluginDescriptorFinder instance = new PropertiesPluginDescriptorFinder();
-        PluginDescriptor pd = instance.find(p1.jarFile);
+        PluginDescriptor pluginDescriptor = instance.find(pluginJar.path());
+        assertNotNull(pluginDescriptor);
+        assertEquals("myPlugin", pluginJar.pluginId());
+        assertEquals("1.2.3", pluginJar.pluginVersion());
     }
 
     private List<String> getPlugin1Properties() {
@@ -193,34 +192,6 @@ public class PropertiesPluginDescriptorFinderTest {
 
     private Path getPluginsRoot() {
         return testFolder.getRoot().toPath();
-    }
-
-    private class MockJarPlugin {
-
-        Path jarFile;
-        Path propsFile;
-
-        public void create() throws IOException {
-            Path tmpDir = Files.createTempDirectory("pf4j-test");
-            tmpDir.toFile().deleteOnExit();
-            jarFile = tmpDir.resolve("my.jar").toAbsolutePath();
-            propsFile = tmpDir.resolve("plugin.properties");
-            URI file = URI.create("jar:file:" + jarFile.toString());
-            try (FileSystem jarfs = FileSystems.newFileSystem(file, Collections.singletonMap("create", "true"))) {
-                // plugin descriptor content
-                BufferedWriter br = new BufferedWriter(new FileWriter(propsFile.toString()));
-                br.write("plugin.id=test");
-                br.newLine();
-                br.write("plugin.version=1.2.3");
-                br.newLine();
-                br.write("plugin.class=org.pf4j.plugin.TestPlugin");
-                br.close();
-
-                Path propsInJar = jarfs.getPath("/plugin.properties");
-                Files.move(propsFile, propsInJar);
-            }
-        }
-
     }
 
 }
