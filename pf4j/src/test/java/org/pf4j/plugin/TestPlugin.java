@@ -19,7 +19,6 @@ import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
 
 /**
- *
  * @author Mario Franco
  */
 public class TestPlugin extends Plugin {

@@ -34,10 +34,8 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
 	public DefaultExtensionFinder(PluginManager pluginManager) {
         this.pluginManager = pluginManager;
 
-        finders = new ArrayList<>();
-
-        addExtensionFinder(new LegacyExtensionFinder(pluginManager));
-//        addExtensionFinder(new ServiceProviderExtensionFinder(pluginManager));
+        add(new LegacyExtensionFinder(pluginManager));
+//        add(new ServiceProviderExtensionFinder(pluginManager));
     }
 
     @Override
@@ -70,7 +68,6 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
         return extensions;
     }
 
-
     @Override
     public Set<String> findClassNames(String pluginId) {
         Set<String> classNames = new HashSet<>();
@@ -91,10 +88,10 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
     }
 
     public DefaultExtensionFinder addServiceProviderExtensionFinder() {
-        return addExtensionFinder(new ServiceProviderExtensionFinder(pluginManager));
+        return add(new ServiceProviderExtensionFinder(pluginManager));
     }
 
-    public DefaultExtensionFinder addExtensionFinder(ExtensionFinder finder) {
+    public DefaultExtensionFinder add(ExtensionFinder finder) {
         finders.add(finder);
 
         return this;

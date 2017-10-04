@@ -16,49 +16,42 @@
 package org.pf4j;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.pf4j.plugin.MockPluginManager;
+import org.junit.rules.TemporaryFolder;
+import org.pf4j.plugin.PluginZip;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.*;
-import java.util.Collections;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.*;
 
 public class LoadPluginsTest {
 
-    private Path tmpDir;
-    private MockPluginManager pluginManager;
-    private MockZipPlugin p1;
-    private MockZipPlugin p2;
-    private MockZipPlugin p3;
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
+    private DefaultPluginManager pluginManager;
 
     @Before
     public void setup() throws IOException {
-        tmpDir = Files.createTempDirectory("pf4j-test");
-        tmpDir.toFile().deleteOnExit();
-        p1 = new MockZipPlugin("myPlugin", "1.2.3", "my-plugin-1.2.3", "my-plugin-1.2.3.zip");
-        p2 = new MockZipPlugin("myPlugin", "2.0.0", "my-plugin-2.0.0", "my-plugin-2.0.0.ZIP");
-        p3 = new MockZipPlugin("other", "3.0.0", "other-3.0.0", "other-3.0.0.Zip");
-        pluginManager = new MockPluginManager(
-            tmpDir,
-            new PropertiesPluginDescriptorFinder("my.properties"));
+        pluginManager = new DefaultPluginManager(testFolder.getRoot().toPath());
     }
 
     @Test
     public void load() throws Exception {
-        p1.create();
-        assertTrue(Files.exists(p1.zipFile));
+        PluginZip pluginZip = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        assertTrue(Files.exists(pluginZip.path()));
         assertEquals(0, pluginManager.getPlugins().size());
         pluginManager.loadPlugins();
-        assertTrue(Files.exists(p1.zipFile));
-        assertTrue(Files.exists(p1.unzipped));
+        assertTrue(Files.exists(pluginZip.path()));
+        assertTrue(Files.exists(pluginZip.unzippedPath()));
         assertEquals(1, pluginManager.getPlugins().size());
-        assertEquals(p1.id, pluginManager.idForPath(p1.unzipped));
+        assertEquals(pluginZip.pluginId(), pluginManager.idForPath(pluginZip.unzippedPath()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -68,105 +61,93 @@ public class LoadPluginsTest {
 
     @Test
     public void loadTwiceFails() throws Exception {
-        p1.create();
-        assertNotNull(pluginManager.loadPluginFromPath(p1.zipFile));
-        assertNull(pluginManager.loadPluginFromPath(p1.zipFile));
+        PluginZip pluginZip = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        assertNotNull(pluginManager.loadPluginFromPath(pluginZip.path()));
+        assertNull(pluginManager.loadPluginFromPath(pluginZip.path()));
     }
 
     @Test
     public void loadUnloadLoad() throws Exception {
-        p1.create();
+        PluginZip pluginZip = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
         pluginManager.loadPlugins();
+
         assertEquals(1, pluginManager.getPlugins().size());
-        assertTrue(pluginManager.unloadPlugin(pluginManager.idForPath(p1.unzipped)));
+        assertTrue(pluginManager.unloadPlugin(pluginManager.idForPath(pluginZip.unzippedPath())));
         // duplicate check
-        assertNull(pluginManager.idForPath(p1.unzipped));
+        assertNull(pluginManager.idForPath(pluginZip.unzippedPath()));
         // Double unload ok
-        assertFalse(pluginManager.unloadPlugin(pluginManager.idForPath(p1.unzipped)));
-        assertNotNull(pluginManager.loadPlugin(p1.unzipped));
+        assertFalse(pluginManager.unloadPlugin(pluginManager.idForPath(pluginZip.unzippedPath())));
+        assertNotNull(pluginManager.loadPlugin(pluginZip.unzippedPath()));
     }
 
     @Test
     public void upgrade() throws Exception {
-        p1.create();
+        new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
+
         assertEquals(1, pluginManager.getPlugins().size());
-        assertEquals("1.2.3", pluginManager.getPlugin(p2.id).getDescriptor().getVersion());
         assertEquals(1, pluginManager.getStartedPlugins().size());
-        p2.create();
+
+        PluginZip pluginZip2 = new PluginZip.Builder(testFolder.newFile("my-plugin-2.0.0.ZIP"), "myPlugin")
+            .pluginVersion("2.0.0")
+            .build();
+
+        assertEquals("1.2.3", pluginManager.getPlugin(pluginZip2.pluginId()).getDescriptor().getVersion());
+
         pluginManager.loadPlugins();
-        pluginManager.startPlugin(p2.id);
+        pluginManager.startPlugin(pluginZip2.pluginId());
+
         assertEquals(1, pluginManager.getPlugins().size());
-        assertEquals("2.0.0", pluginManager.getPlugin(p2.id).getDescriptor().getVersion());
+        assertEquals("2.0.0", pluginManager.getPlugin(pluginZip2.pluginId()).getDescriptor().getVersion());
         assertEquals("2.0.0", pluginManager.getStartedPlugins().get(1).getDescriptor().getVersion());
     }
 
     @Test
     public void getRoot() throws Exception {
-        assertEquals(tmpDir, pluginManager.getPluginsRoot());
+        assertEquals(testFolder.getRoot().toPath(), pluginManager.getPluginsRoot());
     }
 
     @Test
     public void notAPlugin() throws Exception {
-        Path notAPlugin = tmpDir.resolve("not-a-zip");
-        Files.createFile(notAPlugin);
+        testFolder.newFile("not-a-zip");
+
         pluginManager.loadPlugins();
+
         assertEquals(0, pluginManager.getPlugins().size());
     }
 
     @Test
     public void deletePlugin() throws Exception {
-        p1.create();
-        p3.create();
+        PluginZip pluginZip1 = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        PluginZip pluginZip3 = new PluginZip.Builder(testFolder.newFile("other-3.0.0.Zip"), "other")
+            .pluginVersion("3.0.0")
+            .build();
+
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
+
         assertEquals(2, pluginManager.getPlugins().size());
-        pluginManager.deletePlugin(p1.id);
+
+        pluginManager.deletePlugin(pluginZip1.pluginId());
+
         assertEquals(1, pluginManager.getPlugins().size());
-        assertFalse(Files.exists(p1.zipFile));
-        assertFalse(Files.exists(p1.unzipped));
-        assertTrue(Files.exists(p3.zipFile));
-        assertTrue(Files.exists(p3.unzipped));
-    }
-
-    private class MockZipPlugin {
-
-        public final String id;
-        public final String version;
-        public final String filename;
-        public final Path zipFile;
-        public final Path unzipped;
-        public final Path propsFile;
-        public final URI fileURI;
-        public String zipname;
-
-        public MockZipPlugin(String id, String version, String filename, String zipname) throws IOException {
-            this.id = id;
-            this.version = version;
-            this.filename = filename;
-            this.zipname = zipname;
-
-            zipFile = tmpDir.resolve(zipname).toAbsolutePath();
-            unzipped = tmpDir.resolve(filename);
-            propsFile = tmpDir.resolve("my.properties");
-            fileURI = URI.create("jar:file:"+zipFile.toString());
-        }
-
-        public void create() throws IOException {
-            try (FileSystem zipfs = FileSystems.newFileSystem(fileURI, Collections.singletonMap("create", "true"))) {
-                Path propsInZip = zipfs.getPath("/" + propsFile.getFileName().toString());
-                BufferedWriter br = new BufferedWriter(new FileWriter(propsFile.toString()));
-                br.write("plugin.id=" + id);
-                br.newLine();
-                br.write("plugin.version=" + version);
-                br.newLine();
-                br.write("plugin.class=org.pf4j.plugin.TestPlugin");
-                br.close();
-                Files.move(propsFile, propsInZip);
-            }
-        }
-
+        assertFalse(Files.exists(pluginZip1.path()));
+        assertFalse(Files.exists(pluginZip1.unzippedPath()));
+        assertTrue(Files.exists(pluginZip3.path()));
+        assertTrue(Files.exists(pluginZip3.unzippedPath()));
     }
 
 }

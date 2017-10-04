@@ -37,6 +37,11 @@ public class DefaultPluginManager extends AbstractPluginManager {
         super();
     }
 
+    /**
+     * Use {@link DefaultPluginManager#DefaultPluginManager(Path)}.
+     *
+     * @param pluginsDir
+     */
     @Deprecated
     public DefaultPluginManager(File pluginsDir) {
         this(pluginsDir.toPath());
@@ -46,14 +51,11 @@ public class DefaultPluginManager extends AbstractPluginManager {
         super(pluginsRoot);
     }
 
-    /**
-	 * By default if {@link DefaultPluginManager#isDevelopment()} returns {@code true}
-     * than a {@link PropertiesPluginDescriptorFinder} is returned
-     * else this method returns {@link DefaultPluginDescriptorFinder}.
-	 */
     @Override
-    protected PluginDescriptorFinder createPluginDescriptorFinder() {
-    	return isDevelopment() ? new PropertiesPluginDescriptorFinder() : new DefaultPluginDescriptorFinder(pluginClasspath);
+    protected CompoundPluginDescriptorFinder createPluginDescriptorFinder() {
+        return new CompoundPluginDescriptorFinder()
+            .add(new PropertiesPluginDescriptorFinder())
+            .add(new ManifestPluginDescriptorFinder());
     }
 
     @Override

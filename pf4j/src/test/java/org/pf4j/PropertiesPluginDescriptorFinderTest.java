@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.pf4j.plugin.PluginZip;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -96,9 +97,24 @@ public class PropertiesPluginDescriptorFinderTest {
     }
 
     @Test(expected = PluginException.class)
-    public void testFindNotFound() throws Exception {
+    public void testNotFound() throws Exception {
         PluginDescriptorFinder instance = new PropertiesPluginDescriptorFinder();
         instance.find(getPluginsRoot().resolve("test-plugin-3"));
+    }
+
+    @Test
+    public void findInJar() throws Exception {
+        PluginZip pluginJar = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.jar"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        assertTrue(Files.exists(pluginJar.path()));
+
+        PluginDescriptorFinder instance = new PropertiesPluginDescriptorFinder();
+        PluginDescriptor pluginDescriptor = instance.find(pluginJar.path());
+        assertNotNull(pluginDescriptor);
+        assertEquals("myPlugin", pluginJar.pluginId());
+        assertEquals("1.2.3", pluginJar.pluginVersion());
     }
 
     private List<String> getPlugin1Properties() {

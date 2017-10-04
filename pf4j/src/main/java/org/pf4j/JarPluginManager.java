@@ -19,15 +19,12 @@ import org.pf4j.util.AndFileFilter;
 import org.pf4j.util.DirectoryFileFilter;
 import org.pf4j.util.HiddenFilter;
 import org.pf4j.util.JarFileFilter;
+import org.pf4j.util.NameFileFilter;
 import org.pf4j.util.NotFileFilter;
 import org.pf4j.util.OrFileFilter;
-import org.pf4j.util.NameFileFilter;
 
 import java.io.FileFilter;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 /**
  * It's a {@link PluginManager} that loads plugin from a jar file.
@@ -41,11 +38,6 @@ public class JarPluginManager extends DefaultPluginManager {
     @Override
     protected PluginRepository createPluginRepository() {
         return new JarPluginRepository(getPluginsRoot(), isDevelopment());
-    }
-
-    @Override
-    protected PluginDescriptorFinder createPluginDescriptorFinder() {
-        return isDevelopment() ? new PropertiesPluginDescriptorFinder() : new JarPluginDescriptorFinder();
     }
 
     @Override
@@ -75,19 +67,6 @@ public class JarPluginManager extends DefaultPluginManager {
             }
 
             return hiddenPluginFilter;
-        }
-
-    }
-
-    class JarPluginDescriptorFinder extends ManifestPluginDescriptorFinder {
-
-        @Override
-        public Manifest readManifest(Path pluginPath) throws PluginException {
-            try {
-                return new JarFile(pluginPath.toFile()).getManifest();
-            } catch (IOException e) {
-                throw new PluginException(e);
-            }
         }
 
     }

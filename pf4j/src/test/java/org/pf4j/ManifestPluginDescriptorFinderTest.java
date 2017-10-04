@@ -74,11 +74,11 @@ public class ManifestPluginDescriptorFinderTest {
     }
 
     /**
-     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
+     * Test of {@link ManifestPluginDescriptorFinder#find(Path)} method.
      */
     @Test
     public void testFind() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
+        PluginDescriptorFinder instance = new ManifestPluginDescriptorFinder();
 
         PluginDescriptor plugin1 = instance.find(getPluginsRoot().resolve("test-plugin-1"));
         PluginDescriptor plugin2 = instance.find(getPluginsRoot().resolve("test-plugin-2"));
@@ -105,11 +105,11 @@ public class ManifestPluginDescriptorFinderTest {
     }
 
     /**
-     * Test of {@link DefaultPluginDescriptorFinder#find(Path)} method.
+     * Test of {@link ManifestPluginDescriptorFinder#find(Path)} method.
      */
     @Test(expected = PluginException.class)
     public void testFindNotFound() throws Exception {
-        PluginDescriptorFinder instance = new DefaultPluginDescriptorFinder(new DefaultPluginClasspath());
+        PluginDescriptorFinder instance = new ManifestPluginDescriptorFinder();
         instance.find(getPluginsRoot().resolve("test-plugin-3"));
     }
 
