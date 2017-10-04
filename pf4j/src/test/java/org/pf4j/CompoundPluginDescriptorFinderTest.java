@@ -37,6 +37,15 @@ public class CompoundPluginDescriptorFinderTest {
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
+    public void add() {
+        CompoundPluginDescriptorFinder instance = new CompoundPluginDescriptorFinder();
+        assertEquals(0, instance.size());
+
+        instance.add(new PropertiesPluginDescriptorFinder());
+        assertEquals(1, instance.size());
+    }
+
+    @Test
     public void find() throws Exception {
         Path pluginPath = testFolder.newFolder("test-plugin-1").toPath();
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin1Properties(), StandardCharsets.UTF_8);

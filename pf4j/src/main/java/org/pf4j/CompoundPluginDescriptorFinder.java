@@ -41,26 +41,8 @@ public class CompoundPluginDescriptorFinder implements PluginDescriptorFinder {
         return this;
     }
 
-    public CompoundPluginDescriptorFinder addAll(List<PluginDescriptorFinder> finders) {
-        if (finders.contains(null)) {
-            throw new IllegalArgumentException("null not allowed");
-        }
-
-        this.finders.addAll(finders);
-
-        return this;
-    }
-
-    public CompoundPluginDescriptorFinder remove(PluginDescriptorFinder finder) {
-        finders.remove(finder);
-
-        return this;
-    }
-
-    public CompoundPluginDescriptorFinder removeAll() {
-        finders.clear();
-
-        return this;
+    public int size() {
+        return finders.size();
     }
 
     @Override
