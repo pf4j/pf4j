@@ -40,11 +40,6 @@ public class JarPluginManager extends DefaultPluginManager {
         return new JarPluginRepository(getPluginsRoot(), isDevelopment());
     }
 
-    @Override
-    protected PluginLoader createPluginLoader() {
-        return new JarPluginLoader(this, pluginClasspath);
-    }
-
     class JarPluginRepository extends BasePluginRepository {
 
         public JarPluginRepository(Path pluginsRoot, boolean development) {
@@ -67,26 +62,6 @@ public class JarPluginManager extends DefaultPluginManager {
             }
 
             return hiddenPluginFilter;
-        }
-
-    }
-
-    class JarPluginLoader extends DefaultPluginLoader {
-
-        public JarPluginLoader(PluginManager pluginManager, PluginClasspath pluginClasspath) {
-            super(pluginManager, pluginClasspath);
-        }
-
-        @Override
-        public ClassLoader loadPlugin(Path pluginPath, PluginDescriptor pluginDescriptor) {
-            if (isDevelopment()) {
-                return super.loadPlugin(pluginPath, pluginDescriptor);
-            }
-
-            PluginClassLoader pluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, getClass().getClassLoader());
-            pluginClassLoader.addFile(pluginPath.toFile());
-
-            return pluginClassLoader;
         }
 
     }

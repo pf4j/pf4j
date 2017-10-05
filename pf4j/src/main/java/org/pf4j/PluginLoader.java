@@ -24,6 +24,14 @@ import java.nio.file.Path;
  */
 public interface PluginLoader {
 
+    /**
+     * Returns true if this loader is applicable to the given {@link Path}.
+     *
+     * @param pluginPath
+     * @return
+     */
+    boolean isApplicable(Path pluginPath);
+
     ClassLoader loadPlugin(Path pluginPath, PluginDescriptor pluginDescriptor);
 
 }

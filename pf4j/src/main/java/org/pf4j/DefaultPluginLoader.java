@@ -18,6 +18,7 @@ package org.pf4j;
 import org.pf4j.util.FileUtils;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -36,6 +37,11 @@ public class DefaultPluginLoader implements PluginLoader {
     public DefaultPluginLoader(PluginManager pluginManager, PluginClasspath pluginClasspath) {
         this.pluginManager = pluginManager;
         this.pluginClasspath = pluginClasspath;
+    }
+
+    @Override
+    public boolean isApplicable(Path pluginPath) {
+        return Files.exists(pluginPath) && Files.isDirectory(pluginPath);
     }
 
     @Override
