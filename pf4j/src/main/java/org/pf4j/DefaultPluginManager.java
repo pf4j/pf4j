@@ -83,7 +83,9 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
     @Override
     protected PluginRepository createPluginRepository() {
-        return new DefaultPluginRepository(getPluginsRoot(), isDevelopment());
+        return new CompoundPluginRepository()
+            .add(new DefaultPluginRepository(getPluginsRoot(), isDevelopment()))
+            .add(new JarPluginRepository(getPluginsRoot()));
     }
 
     @Override

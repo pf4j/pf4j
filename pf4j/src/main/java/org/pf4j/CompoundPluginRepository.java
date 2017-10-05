@@ -25,10 +25,16 @@ import java.util.List;
  */
 public class CompoundPluginRepository implements PluginRepository {
 
-    private final PluginRepository[] repositories;
+    private List<PluginRepository> repositories = new ArrayList<>();
 
-    public CompoundPluginRepository(PluginRepository... repositories) {
-        this.repositories = repositories;
+    public CompoundPluginRepository add(PluginRepository repository) {
+        if (repository == null) {
+            throw new IllegalArgumentException("null not allowed");
+        }
+
+        repositories.add(repository);
+
+        return this;
     }
 
     @Override

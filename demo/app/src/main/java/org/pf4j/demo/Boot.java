@@ -15,16 +15,14 @@
  */
 package org.pf4j.demo;
 
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
-
+import org.pf4j.DefaultPluginManager;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.pf4j.demo.api.Greeting;
-import org.pf4j.DefaultPluginManager;
-import org.pf4j.JarPluginManager;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * A boot class that start the demo.
@@ -39,7 +37,6 @@ public class Boot {
 
         // create the plugin manager
         final PluginManager pluginManager = new DefaultPluginManager();
-//        final PluginManager pluginManager = new JarPluginManager();
 
         // load the plugins
         pluginManager.loadPlugins();
