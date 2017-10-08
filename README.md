@@ -308,28 +308,44 @@ public abstract class AbstractPluginManager implements PluginManager {
 ```
 
 `DefaultPluginManager` contributes with "default" components (`DefaultExtensionFactory`, `DefaultPluginFactory`, `DefaultPluginLoader`, ...) to `AbstractPluginManager`.  
-Most of the times it's enough to extends `DefaultPluginManager` and to supply your custom components. As example, I will show you the implementation for `JarPluginManager`:
+Most of the times it's enough to extends `DefaultPluginManager` and to supply your custom components.
+ 
+Starting with version 2.0 it's possible to coexist multiple plugins types (jar, zip, directory) in the same `PluginManager`.
+For example, `DefaultPluginManager` works out of the box with zip and jar plugins. The idea is that `DefaultPluginManager` uses a compound version for:
+- `PluginDescriptorFinder` (`CompoundPluginDescriptorFinder`)
+- `PluginLoader` (`CompoundPluginLoader`)
+- `PluginRepository` (`CompoundPluginRepository`)
 
 ```java
-public class JarPluginManager extends DefaultPluginManager {
-
-    @Override
-    protected PluginRepository createPluginRepository() {
-        return new JarPluginRepository(getPluginsRoot(), isDevelopment());
-    }
-
+public class DefaultPluginManager extends AbstractPluginManager {
+   
+    ...
+    
     @Override
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
-        return isDevelopment() ? new PropertiesPluginDescriptorFinder() : new JarPluginDescriptorFinder();
+        return new CompoundPluginDescriptorFinder()
+            .add(new PropertiesPluginDescriptorFinder())
+            .add(new ManifestPluginDescriptorFinder());
     }
-
+    
+    @Override
+    protected PluginRepository createPluginRepository() {
+        return new CompoundPluginRepository()
+            .add(new DefaultPluginRepository(getPluginsRoot(), isDevelopment()))
+            .add(new JarPluginRepository(getPluginsRoot()));
+    }
+    
     @Override
     protected PluginLoader createPluginLoader() {
-        return new JarPluginLoader(this, pluginClasspath);
+        return new CompoundPluginLoader()
+            .add(new DefaultPluginLoader(this, pluginClasspath))
+            .add(new JarPluginLoader(this));
     }
 
 }
 ```
+
+So, it's very easy to add new strategies for plugin descriptor finder, plugin loader and plugin repository.
 
 Development mode
 --------------------------
