@@ -5,12 +5,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#156]: `FileSystemException` when I call `deletePlugin` after `getExtensions`
+- Fix Maven warnings
 
 #### Changed
+- [#149]: Updated gradle demo dependencies and switched from System.out.println to slf4j log
+- Update some code to Java 7
+- [#168]: Change root package from `ro.fortsoft.pf4j` to `org.pf4j`
+- Open a new extension (protected method) point in `PropertiesPluginDescriptorFinder`
 
 #### Added
+- [#146]: Kotlin plugin example added and README updated for Kotlin
+- [#150]: Enforce dependencies versions
+- [#155]: Add VersionManager abstractization (breaking change)
+- [#172]: Add `CompoundPluginDescriptorFinder`
+- Add `CompoundPluginLoader`
 
 #### Removed
+- Remove `JarPluginManager` (the logic is included in `DefaultPluginManager` via `CompoundXYZ` concept)
 
 ### [1.3.0] - 2017-05-03
 
@@ -183,6 +195,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#172]: https://github.com/decebals/pf4j/pull/172
+[#168]: https://github.com/decebals/pf4j/pull/168
+[#156]: https://github.com/decebals/pf4j/issues/156
+[#155]: https://github.com/decebals/pf4j/pull/155
+[#150]: https://github.com/decebals/pf4j/pull/150
+[#149]: https://github.com/decebals/pf4j/pull/149
+[#146]: https://github.com/decebals/pf4j/pull/146
 [#140]: https://github.com/decebals/pf4j/pull/140
 [#139]: https://github.com/decebals/pf4j/pull/139
 [#138]: https://github.com/decebals/pf4j/pull/138
