@@ -22,18 +22,19 @@ package org.pf4j;
  */
 public class ExtensionWrapper<T> implements Comparable<ExtensionWrapper<T>> {
 
-    ExtensionDescriptor descriptor;
-    ExtensionFactory extensionFactory;
-    T extension; // cache
+    private final ExtensionDescriptor descriptor;
+    private final ExtensionFactory extensionFactory;
+    private T extension; // cache
 
-	public ExtensionWrapper(ExtensionDescriptor descriptor) {
+	public ExtensionWrapper(ExtensionDescriptor descriptor, ExtensionFactory extensionFactory) {
         this.descriptor = descriptor;
-	}
+        this.extensionFactory = extensionFactory;
+    }
 
 	@SuppressWarnings("unchecked")
     public T getExtension() {
         if (extension == null) {
-            extension = (T) extensionFactory.create(descriptor.getExtensionClass());
+            extension = (T) extensionFactory.create(descriptor.extensionClass);
         }
 
         return extension;
@@ -44,16 +45,12 @@ public class ExtensionWrapper<T> implements Comparable<ExtensionWrapper<T>> {
     }
 
     public int getOrdinal() {
-		return descriptor.getOrdinal();
+		return descriptor.ordinal;
 	}
 
 	@Override
 	public int compareTo(ExtensionWrapper<T> o) {
 		return (getOrdinal() - o.getOrdinal());
 	}
-
-    void setExtensionFactory(ExtensionFactory extensionFactory) {
-        this.extensionFactory = extensionFactory;
-    }
 
 }
