@@ -20,23 +20,12 @@ package org.pf4j;
  */
 public class ExtensionDescriptor {
 
-    private int ordinal;
-    private Class<?> extensionClass;
+    public final int ordinal;
+    public final Class<?> extensionClass;
 
-    public Class<?> getExtensionClass() {
-        return extensionClass;
-    }
-
-    public int getOrdinal() {
-        return ordinal;
-    }
-
-    void setExtensionClass(Class<?> extensionClass) {
-        this.extensionClass = extensionClass;
-    }
-
-    void setOrdinal(int ordinal) {
+    public ExtensionDescriptor(int ordinal, Class<?> extensionClass) {
         this.ordinal = ordinal;
+        this.extensionClass = extensionClass;
     }
 
 }

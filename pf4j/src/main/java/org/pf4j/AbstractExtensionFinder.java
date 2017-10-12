@@ -219,18 +219,13 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
     }
 
     private ExtensionWrapper createExtensionWrapper(Class<?> extensionClass) {
-        ExtensionDescriptor descriptor = new ExtensionDescriptor();
         int ordinal = 0;
         if (extensionClass.isAnnotationPresent(Extension.class)) {
             ordinal = extensionClass.getAnnotation(Extension.class).ordinal();
         }
-        descriptor.setOrdinal(ordinal);
-        descriptor.setExtensionClass(extensionClass);
+        ExtensionDescriptor descriptor = new ExtensionDescriptor(ordinal, extensionClass);
 
-        ExtensionWrapper extensionWrapper = new ExtensionWrapper<>(descriptor);
-        extensionWrapper.setExtensionFactory(pluginManager.getExtensionFactory());
-
-        return extensionWrapper;
+        return new ExtensionWrapper<>(descriptor, pluginManager.getExtensionFactory());
     }
 
     private void checkDifferentClassLoaders(Class<?> type, Class<?> extensionClass) {
