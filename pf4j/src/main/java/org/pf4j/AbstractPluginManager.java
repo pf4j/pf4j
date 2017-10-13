@@ -208,7 +208,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         log.debug("Lookup plugins in '{}'", pluginsRoot);
         // check for plugins root
         if (Files.notExists(pluginsRoot) || !Files.isDirectory(pluginsRoot)) {
-            log.error("No '{}' root", pluginsRoot);
+            log.warn("No '{}' root", pluginsRoot);
             return;
         }
 
