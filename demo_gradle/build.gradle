@@ -1,26 +1,14 @@
 subprojects {
-    apply plugin: 'java'
+  apply plugin: 'java'
 
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
 }
+// plugin location
+ext.pluginsDir = rootProject.buildDir.path + '/plugins'
 
-task copyPlugins() {
-    doLast {
-        delete 'app/plugins'
-        mkdir 'app/plugins'
+task build(dependsOn: [':app:uberjar'])
 
-        subprojects.each { p ->
-            if (p.path.contains(":plugins/")) {
-                System.out.println("Copying plugin from " + p.path);
-                copy {
-                    from p.projectDir.toString() + '/build/libs'
-                    into 'app/plugins'
-                    include '*.zip'
-                }
-            }
-        }
-    }
-}
+

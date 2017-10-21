@@ -16,6 +16,9 @@
 package org.pf4j.demo;
 
 import org.apache.commons.lang3.StringUtils;
+import org.pf4j.CompoundPluginDescriptorFinder;
+import org.pf4j.ManifestPluginDescriptorFinder;
+import org.pf4j.PropertiesPluginDescriptorFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.pf4j.DefaultPluginManager;
@@ -38,7 +41,16 @@ public class Boot {
         printLogo();
 
         // create the plugin manager
-        final PluginManager pluginManager = new DefaultPluginManager();
+        final PluginManager pluginManager = new DefaultPluginManager() {
+          @Override
+          protected CompoundPluginDescriptorFinder createPluginDescriptorFinder() {
+            return new CompoundPluginDescriptorFinder()
+                // Demo is using the Manifest file
+                // PropertiesPluginDescriptorFinder is commented out just to avoid error log
+                //.add(new PropertiesPluginDescriptorFinder())
+                .add(new ManifestPluginDescriptorFinder());
+          }
+        };
 
         // load the plugins
         pluginManager.loadPlugins();

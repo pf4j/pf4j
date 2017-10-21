@@ -3,14 +3,29 @@ apply plugin: 'application'
 mainClassName = 'org.pf4j.demo.Boot'
 
 dependencies {
-    compile project(':api')
-    compile 'org.pf4j:pf4j:2.0.0-SNAPSHOT'
-    compile 'org.apache.commons:commons-lang3:3.5'
-    testCompile group: 'junit', name: 'junit', version: '4.+'
-    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+  compile project(':api')
+  compile group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}"
+  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+  compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+
+  testCompile group: 'junit', name: 'junit', version: '4.+'
 }
 
-jar {
-    baseName = 'Plugin Demo'
-    version = '0.1.0'
+task uberjar(type: Jar, dependsOn: ['compileJava']) {
+  zip64 true
+  from configurations.runtime.asFileTree.files.collect {
+    exclude "META-INF/*.SF"
+    exclude "META-INF/*.DSA"
+    exclude "META-INF/*.RSA"
+    zipTree(it)
+  }
+  from files(sourceSets.main.output.classesDir)
+  from files(sourceSets.main.resources)
+  manifest {
+    attributes 'Main-Class': mainClassName
+  }
+
+  baseName = "${project.name}-plugin-demo"
+  classifier = "uberjar"
 }
+
