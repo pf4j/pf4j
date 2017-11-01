@@ -38,7 +38,7 @@ public class DefaultPluginFactoryTest {
      */
     @Test
     public void testCreate() {
-        PluginDescriptor pluginDescriptor = mock(DefaultPluginDescriptor.class);
+        PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         when(pluginDescriptor.getPluginClass()).thenReturn(TestPlugin.class.getName());
 
         PluginWrapper pluginWrapper = mock(PluginWrapper.class);
@@ -57,7 +57,7 @@ public class DefaultPluginFactoryTest {
      */
     @Test
     public void testCreateFail() {
-        PluginDescriptor pluginDescriptor = mock(DefaultPluginDescriptor.class);
+        PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         when(pluginDescriptor.getPluginClass()).thenReturn(FailTestPlugin.class.getName());
 
         PluginWrapper pluginWrapper = mock(PluginWrapper.class);
@@ -75,7 +75,7 @@ public class DefaultPluginFactoryTest {
      */
     @Test
     public void testCreateFailNotFound() {
-        PluginDescriptor pluginDescriptor = mock(DefaultPluginDescriptor.class);
+        PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         when(pluginDescriptor.getPluginClass()).thenReturn("org.pf4j.plugin.NotFoundTestPlugin");
 
         PluginWrapper pluginWrapper = mock(PluginWrapper.class);
@@ -93,7 +93,7 @@ public class DefaultPluginFactoryTest {
      */
     @Test
     public void testCreateFailConstructor() {
-        PluginDescriptor pluginDescriptor = mock(DefaultPluginDescriptor.class);
+        PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         when(pluginDescriptor.getPluginClass()).thenReturn(AnotherFailTestPlugin.class.getName());
 
         PluginWrapper pluginWrapper = mock(PluginWrapper.class);
