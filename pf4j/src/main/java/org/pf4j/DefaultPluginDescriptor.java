@@ -41,6 +41,38 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
     }
 
     /**
+     * @param pluginId
+     * @param pluginDescription
+     * @param pluginClass
+     * @param version
+     * @param requires
+     * @param provider
+     * @param license
+     */
+    public DefaultPluginDescriptor(
+        String pluginId,
+        String pluginDescription,
+        String pluginClass,
+        String version,
+        String requires,
+        String provider,
+        String license
+    ) {
+        this();
+        this.pluginId = pluginId;
+        this.pluginDescription = pluginDescription;
+        this.pluginClass = pluginClass;
+        this.version = version;
+        this.requires = requires;
+        this.provider = provider;
+        this.license = license;
+    }
+
+    public void addDependency(PluginDependency dependency) {
+        this.dependencies.add(dependency);
+    }
+
+    /**
      * Returns the unique identifier of this plugin.
      */
     @Override
@@ -115,43 +147,44 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
 				+ license + "]";
 	}
 
-	DefaultPluginDescriptor setPluginId(String pluginId) {
+	protected DefaultPluginDescriptor setPluginId(String pluginId) {
         this.pluginId = pluginId;
 
         return this;
     }
 
-    PluginDescriptor setPluginDescription(String pluginDescription) {
+    protected PluginDescriptor setPluginDescription(String pluginDescription) {
         this.pluginDescription = pluginDescription;
 
         return this;
     }
 
-    PluginDescriptor setPluginClass(String pluginClassName) {
+    protected PluginDescriptor setPluginClass(String pluginClassName) {
         this.pluginClass = pluginClassName;
 
         return this;
     }
 
-    DefaultPluginDescriptor setPluginVersion(String version) {
+
+    protected DefaultPluginDescriptor setPluginVersion(String version) {
         this.version = version;
 
         return this;
     }
 
-    PluginDescriptor setProvider(String provider) {
+    protected PluginDescriptor setProvider(String provider) {
         this.provider = provider;
 
         return this;
     }
 
-    PluginDescriptor setRequires(String requires) {
+    protected PluginDescriptor setRequires(String requires) {
         this.requires = requires;
 
         return this;
     }
 
-    PluginDescriptor setDependencies(String dependencies) {
+    protected PluginDescriptor setDependencies(String dependencies) {
     	if (dependencies != null) {
     		dependencies = dependencies.trim();
     		if (dependencies.isEmpty()) {
