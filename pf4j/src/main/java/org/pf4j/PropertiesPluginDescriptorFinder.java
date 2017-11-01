@@ -95,7 +95,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     }
 
     protected PluginDescriptor createPluginDescriptor(Properties properties) {
-        PluginDescriptor pluginDescriptor = createPluginDescriptorInstance();
+        DefaultPluginDescriptor pluginDescriptor = createPluginDescriptorInstance();
 
         // TODO validate !!!
         String id = properties.getProperty("plugin.id");
@@ -132,8 +132,8 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         return pluginDescriptor;
     }
 
-    protected PluginDescriptor createPluginDescriptorInstance() {
-        return new PluginDescriptor();
+    protected DefaultPluginDescriptor createPluginDescriptorInstance() {
+        return new DefaultPluginDescriptor();
     }
 
 }

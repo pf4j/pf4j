@@ -27,13 +27,13 @@ import static org.junit.Assert.assertTrue;
 
 public class DefaultPluginManagerTest {
 
-    private PluginDescriptor pd1 = null;
+    private DefaultPluginDescriptor pd1 = null;
     private DefaultPluginManager pluginManager = new DefaultPluginManager();
     private PluginWrapper pw1;
 
     @Before
     public void init() throws IOException {
-        pd1 = new PluginDescriptor();
+        pd1 = new DefaultPluginDescriptor();
         pd1.setPluginId("myPlugin");
         pd1.setPluginVersion("1.2.3");
         pd1.setPluginClass("foo");
