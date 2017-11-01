@@ -2,6 +2,12 @@ package org.pf4j;
 
 import java.util.List;
 
+/**
+ * A plugin descriptor contains information about a plug-in obtained
+ * from the manifest (META-INF) file.
+ *
+ * @author Decebal Suiu
+ */
 public interface PluginDescriptor {
 
     String getPluginId();
@@ -19,7 +25,4 @@ public interface PluginDescriptor {
     String getLicense();
 
     List<PluginDependency> getDependencies();
-
-    @Override
-    String toString();
 }

@@ -32,7 +32,7 @@ import java.util.Map;
  * they are not found dependencies, they are dependencies with wrong version).
  * This class is very useful for if-else scenarios.
  *
- * Only some attributes (pluginId, dependencies and pluginVersion) from {@link DefaultPluginDescriptor} are used in
+ * Only some attributes (pluginId, dependencies and pluginVersion) from {@link PluginDescriptor} are used in
  * the process of {@code resolve} operation.
  *
  * @author Decebal Suiu

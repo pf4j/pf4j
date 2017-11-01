@@ -27,8 +27,8 @@ import java.util.List;
  */
 public class DefaultPluginDescriptor implements PluginDescriptor {
 
-	private String pluginId;
-	private String pluginDescription;
+    private String pluginId;
+    private String pluginDescription;
     private String pluginClass;
     private String version;
     private String requires = "*"; // SemVer format
@@ -49,15 +49,7 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
      * @param provider
      * @param license
      */
-    public DefaultPluginDescriptor(
-        String pluginId,
-        String pluginDescription,
-        String pluginClass,
-        String version,
-        String requires,
-        String provider,
-        String license
-    ) {
+    public DefaultPluginDescriptor(String pluginId, String pluginDescription, String pluginClass, String version, String requires, String provider, String license) {
         this();
         this.pluginId = pluginId;
         this.pluginDescription = pluginDescription;
@@ -106,6 +98,7 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
 
     /**
      * Returns string version of requires
+     *
      * @return String with requires expression on SemVer format
      */
     @Override
@@ -139,15 +132,15 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
     }
 
     @Override
-	public String toString() {
-		return "PluginDescriptor [pluginId=" + pluginId + ", pluginClass="
-				+ pluginClass + ", version=" + version + ", provider="
-				+ provider + ", dependencies=" + dependencies + ", description="
-                + pluginDescription + ", requires=" + requires + ", license="
-				+ license + "]";
-	}
+    public String toString() {
+        return "PluginDescriptor [pluginId=" + pluginId + ", pluginClass="
+            + pluginClass + ", version=" + version + ", provider="
+            + provider + ", dependencies=" + dependencies + ", description="
+            + pluginDescription + ", requires=" + requires + ", license="
+            + license + "]";
+    }
 
-	protected DefaultPluginDescriptor setPluginId(String pluginId) {
+    protected DefaultPluginDescriptor setPluginId(String pluginId) {
         this.pluginId = pluginId;
 
         return this;
@@ -185,28 +178,28 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
     }
 
     protected PluginDescriptor setDependencies(String dependencies) {
-    	if (dependencies != null) {
-    		dependencies = dependencies.trim();
-    		if (dependencies.isEmpty()) {
-    			this.dependencies = Collections.emptyList();
-    		} else {
-	    		this.dependencies = new ArrayList<>();
-	    		String[] tokens = dependencies.split(",");
-	    		for (String dependency : tokens) {
-	    			dependency = dependency.trim();
-	    			if (!dependency.isEmpty()) {
-	    				this.dependencies.add(new PluginDependency(dependency));
-	    			}
-	    		}
-	    		if (this.dependencies.isEmpty()) {
-	    			this.dependencies = Collections.emptyList();
-	    		}
-    		}
-    	} else {
-    		this.dependencies = Collections.emptyList();
-    	}
+        if (dependencies != null) {
+            dependencies = dependencies.trim();
+            if (dependencies.isEmpty()) {
+                this.dependencies = Collections.emptyList();
+            } else {
+                this.dependencies = new ArrayList<>();
+                String[] tokens = dependencies.split(",");
+                for (String dependency : tokens) {
+                    dependency = dependency.trim();
+                    if (!dependency.isEmpty()) {
+                        this.dependencies.add(new PluginDependency(dependency));
+                    }
+                }
+                if (this.dependencies.isEmpty()) {
+                    this.dependencies = Collections.emptyList();
+                }
+            }
+        } else {
+            this.dependencies = Collections.emptyList();
+        }
 
-    	return this;
+        return this;
     }
 
     public PluginDescriptor setLicense(String license) {
