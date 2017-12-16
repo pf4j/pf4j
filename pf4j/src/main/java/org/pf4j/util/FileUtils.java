@@ -216,7 +216,7 @@ public class FileUtils {
     public static Path getPath(Path path, String first, String... more) throws IOException {
         URI uri = path.toUri();
         if (isJarFile(path)) {
-            uri = URI.create("jar:file:" + path.toString());
+            uri = URI.create("jar:file:" + path.toString().replace("\\", "/"));
         }
 
         return getPath(uri, first, more);
