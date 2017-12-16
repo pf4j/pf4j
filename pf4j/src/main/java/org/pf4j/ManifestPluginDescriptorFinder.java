@@ -88,7 +88,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
     }
 
     protected PluginDescriptor createPluginDescriptor(Manifest manifest) {
-        PluginDescriptor pluginDescriptor = createPluginDescriptorInstance();
+        DefaultPluginDescriptor pluginDescriptor = createPluginDescriptorInstance();
 
         // TODO validate !!!
         Attributes attributes = manifest.getMainAttributes();
@@ -125,8 +125,8 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         return pluginDescriptor;
     }
 
-    protected PluginDescriptor createPluginDescriptorInstance() {
-        return new PluginDescriptor();
+    protected DefaultPluginDescriptor createPluginDescriptorInstance() {
+        return new DefaultPluginDescriptor();
     }
 
 }

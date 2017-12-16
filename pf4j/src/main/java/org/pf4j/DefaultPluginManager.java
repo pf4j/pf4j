@@ -52,7 +52,7 @@ public class DefaultPluginManager extends AbstractPluginManager {
     }
 
     @Override
-    protected CompoundPluginDescriptorFinder createPluginDescriptorFinder() {
+    protected PluginDescriptorFinder createPluginDescriptorFinder() {
         return new CompoundPluginDescriptorFinder()
             .add(new PropertiesPluginDescriptorFinder())
             .add(new ManifestPluginDescriptorFinder());

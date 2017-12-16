@@ -40,11 +40,11 @@ public class DependencyResolverTest {
     @Test
     public void sortedPlugins() {
         // create incomplete plugin descriptor (ignore some attributes)
-        PluginDescriptor pd1 = new PluginDescriptor()
+        PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setDependencies("p2");
 
-        PluginDescriptor pd2 = new PluginDescriptor()
+        PluginDescriptor pd2 = new DefaultPluginDescriptor()
             .setPluginId("p2")
             .setPluginVersion("0.0.0"); // needed in "checkDependencyVersion" method
 
@@ -60,7 +60,7 @@ public class DependencyResolverTest {
 
     @Test
     public void notFoundDependencies() throws Exception {
-        PluginDescriptor pd1 = new PluginDescriptor()
+        PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setDependencies("p2, p3");
 
@@ -75,17 +75,17 @@ public class DependencyResolverTest {
 
     @Test
     public void cyclicDependencies() {
-        PluginDescriptor pd1 = new PluginDescriptor()
+        PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setPluginVersion("0.0.0")
             .setDependencies("p2");
 
-        PluginDescriptor pd2 = new PluginDescriptor()
+        PluginDescriptor pd2 = new DefaultPluginDescriptor()
             .setPluginId("p2")
             .setPluginVersion("0.0.0")
             .setDependencies("p3");
 
-        PluginDescriptor pd3 = new PluginDescriptor()
+        PluginDescriptor pd3 = new DefaultPluginDescriptor()
             .setPluginId("p3")
             .setPluginVersion("0.0.0")
             .setDependencies("p1");
@@ -102,12 +102,12 @@ public class DependencyResolverTest {
 
     @Test
     public void wrongDependencyVersion() {
-        PluginDescriptor pd1 = new PluginDescriptor()
+        PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
 //            .setDependencies("p2@2.0.0"); // simple version
             .setDependencies("p2@>=1.5.0 & <1.6.0"); // range version
 
-        PluginDescriptor pd2 = new PluginDescriptor()
+        PluginDescriptor pd2 = new DefaultPluginDescriptor()
             .setPluginId("p2")
             .setPluginVersion("1.4.0");
 
@@ -122,11 +122,11 @@ public class DependencyResolverTest {
 
     @Test
     public void goodDependencyVersion() {
-        PluginDescriptor pd1 = new PluginDescriptor()
+        PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setDependencies("p2@2.0.0");
 
-        PluginDescriptor pd2 = new PluginDescriptor()
+        PluginDescriptor pd2 = new DefaultPluginDescriptor()
             .setPluginId("p2")
             .setPluginVersion("2.0.0");
 
