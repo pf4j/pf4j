@@ -43,6 +43,7 @@ import java.util.List;
  */
 public class FileUtils {
 
+    private static final String SLASH = "/";
     private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
     public static List<String> readLines(Path path, boolean ignoreComments) throws IOException {
@@ -216,7 +217,11 @@ public class FileUtils {
     public static Path getPath(Path path, String first, String... more) throws IOException {
         URI uri = path.toUri();
         if (isJarFile(path)) {
-            uri = URI.create("jar:file:" + path.toString().replace("\\", "/"));
+            String pathString = path.toString().replace("\\", SLASH);
+            if(!pathString.startsWith(SLASH)){
+                pathString = SLASH + pathString;
+            }
+            uri = URI.create("jar:file:" + pathString);
         }
 
         return getPath(uri, first, more);
