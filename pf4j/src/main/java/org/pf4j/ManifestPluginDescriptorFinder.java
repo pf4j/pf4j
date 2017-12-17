@@ -96,7 +96,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         pluginDescriptor.setPluginId(id);
 
         String description = attributes.getValue("Plugin-Description");
-        if (StringUtils.isEmpty(description)) {
+        if (StringUtils.isNullOrEmpty(description)) {
             pluginDescriptor.setPluginDescription("");
         } else {
             pluginDescriptor.setPluginDescription(description);
@@ -106,7 +106,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         pluginDescriptor.setPluginClass(clazz);
 
         String version = attributes.getValue("Plugin-Version");
-        if (StringUtils.isNotEmpty(version)) {
+        if (StringUtils.isNotNullOrEmpty(version)) {
             pluginDescriptor.setPluginVersion(version);
         }
 
@@ -116,7 +116,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         pluginDescriptor.setDependencies(dependencies);
 
         String requires = attributes.getValue("Plugin-Requires");
-        if (StringUtils.isNotEmpty(requires)) {
+        if (StringUtils.isNotNullOrEmpty(requires)) {
             pluginDescriptor.setRequires(requires);
         }
 

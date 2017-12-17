@@ -102,7 +102,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         pluginDescriptor.setPluginId(id);
 
         String description = properties.getProperty("plugin.description");
-        if (StringUtils.isEmpty(description)) {
+        if (StringUtils.isNullOrEmpty(description)) {
             pluginDescriptor.setPluginDescription("");
         } else {
             pluginDescriptor.setPluginDescription(description);
@@ -112,7 +112,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         pluginDescriptor.setPluginClass(clazz);
 
         String version = properties.getProperty("plugin.version");
-        if (StringUtils.isNotEmpty(version)) {
+        if (StringUtils.isNotNullOrEmpty(version)) {
             pluginDescriptor.setPluginVersion(version);
         }
 
@@ -123,7 +123,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         pluginDescriptor.setDependencies(dependencies);
 
         String requires = properties.getProperty("plugin.requires");
-        if (StringUtils.isNotEmpty(requires)) {
+        if (StringUtils.isNotNullOrEmpty(requires)) {
             pluginDescriptor.setRequires(requires);
         }
 

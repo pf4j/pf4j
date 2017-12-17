@@ -20,12 +20,12 @@ package org.pf4j.util;
  */
 public class StringUtils {
 
-	public static boolean isEmpty(String str) {
+	public static boolean isNullOrEmpty(String str) {
 		return (str == null) || str.isEmpty();
 	}
 
-    public static boolean isNotEmpty(String str) {
-        return !isEmpty(str);
+    public static boolean isNotNullOrEmpty(String str) {
+        return !isNullOrEmpty(str);
     }
 
     /**
@@ -35,6 +35,42 @@ public class StringUtils {
         str = str.replaceAll("\\{}", "%s");
 
         return String.format(str, args);
+    }
+
+    /**
+     * <p>Adds a substring only if the source string does not already start with the substring,
+     * otherwise returns the source string.</p>
+     * <p/>
+     * <p>A {@code null} source string will return {@code null}.
+     * An empty ("") source string will return the empty string.
+     * A {@code null} search string will return the source string.</p>
+     * <p/>
+     * <pre>
+     * StringUtils.addStart(null, *)      = *
+     * StringUtils.addStart("", *)        = *
+     * StringUtils.addStart(*, null)      = *
+     * StringUtils.addStart("domain.com", "www.")  = "www.domain.com"
+     * StringUtils.addStart("abc123", "abc")    = "abc123"
+     * </pre>
+     *
+     * @param str the source String to search, may be null
+     * @param add the String to search for and add, may be null
+     * @return the substring with the string added if required
+     */
+    public static String addStart(String str, String add) {
+        if (isNullOrEmpty(add)) {
+            return str;
+        }
+
+        if (isNullOrEmpty(str)) {
+            return add;
+        }
+
+        if (!str.startsWith(add)) {
+            return add + str;
+        }
+
+        return str;
     }
 
 }

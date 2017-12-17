@@ -849,11 +849,11 @@ public abstract class AbstractPluginManager implements PluginManager {
      * @throws PluginException if validation fails
      */
     protected void validatePluginDescriptor(PluginDescriptor descriptor) throws PluginException {
-        if (StringUtils.isEmpty(descriptor.getPluginId())) {
+        if (StringUtils.isNullOrEmpty(descriptor.getPluginId())) {
             throw new PluginException("Field 'id' cannot be empty");
         }
 
-        if (StringUtils.isEmpty(descriptor.getPluginClass())) {
+        if (StringUtils.isNullOrEmpty(descriptor.getPluginClass())) {
             throw new PluginException("Field 'class' cannot be empty");
         }
 
