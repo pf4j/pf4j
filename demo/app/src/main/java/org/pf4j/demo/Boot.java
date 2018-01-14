@@ -61,6 +61,12 @@ public class Boot {
             System.out.println("   " + extension);
         }
 
+        System.out.println("Extension classes by classpath:");
+        List<Class<Greeting>> greetingsClasses = pluginManager.getExtensionClasses(Greeting.class);
+        for (Class<Greeting> greeting : greetingsClasses) {
+            System.out.println("   Class: " + greeting.getCanonicalName());
+        }
+
         // print extensions ids for each started plugin
         List<PluginWrapper> startedPlugins = pluginManager.getStartedPlugins();
         for (PluginWrapper plugin : startedPlugins) {
