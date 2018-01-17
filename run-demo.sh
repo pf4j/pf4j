@@ -5,17 +5,15 @@
 #
 
 # create artifacts using maven
-mvn clean package
+mvn clean package -DskipTests
 
 # create demo-dist folder
 rm -fr demo-dist
-mkdir demo-dist
-mkdir demo-dist/plugins
+mkdir -p demo-dist/plugins
 
 # copy artifacts to demo-dist folder
 cp -r demo/app/target/pf4j-demo-*/* demo-dist/
-cp demo/plugins/plugin1/target/pf4j-demo-plugin1-*.zip demo-dist/plugins/
-cp demo/plugins/plugin2/target/pf4j-demo-plugin2-*.zip demo-dist/plugins/
+cp demo/plugins/*/target/*plugin.jar demo-dist/plugins/
 
 # run demo
 cd demo-dist
