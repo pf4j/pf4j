@@ -17,11 +17,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.7</java.version>
-        <plugin.id />
-        <plugin.class />
-        <plugin.version />
-        <plugin.provider />
-        <plugin.dependencies />
+
+        <!-- Override below properties in each plugin's pom.xml -->
+        <plugin.id/>
+        <plugin.class/>
+        <plugin.version/>
+        <plugin.provider/>
+        <plugin.dependencies/>
     </properties>
 
     <build>

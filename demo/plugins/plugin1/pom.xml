@@ -18,7 +18,7 @@
         <plugin.class>org.pf4j.demo.welcome.WelcomePlugin</plugin.class>
         <plugin.version>0.0.1</plugin.version>
         <plugin.provider>Decebal Suiu</plugin.provider>
-        <plugin.dependencies />
+        <plugin.dependencies/>
     </properties>
 
     <dependencies>

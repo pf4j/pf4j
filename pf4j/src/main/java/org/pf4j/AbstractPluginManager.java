@@ -525,27 +525,29 @@ public abstract class AbstractPluginManager implements PluginManager {
         return pluginClassLoaders.get(pluginId);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> List<Class<T>> getExtensionClasses(Class<T> type) {
         List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
         List<Class<T>> extensionClasses = new ArrayList<>(extensionsWrapper.size());
         for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            @SuppressWarnings("unchecked")
-            Class<T> c = (Class<T>)extensionWrapper.getDescriptor().extensionClass;
+            Class<T> c = (Class<T>) extensionWrapper.getDescriptor().extensionClass;
             extensionClasses.add(c);
         }
+
         return extensionClasses;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> List<Class<T>> getExtensionClasses(Class<T> type, String pluginId) {
         List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type, pluginId);
         List<Class<T>> extensionClasses = new ArrayList<>(extensionsWrapper.size());
         for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            @SuppressWarnings("unchecked")
-            Class<T> c = (Class<T>)extensionWrapper.getDescriptor().extensionClass;
+            Class<T> c = (Class<T>) extensionWrapper.getDescriptor().extensionClass;
             extensionClasses.add(c);
         }
+
         return extensionClasses;
     }
 
