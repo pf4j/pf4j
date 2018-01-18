@@ -12,6 +12,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
+### [2.1.0] - 2018-01-10
+
+#### Fixed
+- [#177]: Fix Gradle demo
+- [#178]: `@Override` should not change method signature
+- [#184]: Bug in FileUtils while creating URI on Windows
+
+#### Changed
+- [#180]: Refactoring to make `PluginDescriptor` more usable
+
+#### Added
+
+#### Removed
+
 ### [2.0.0] - 2017-10-17
 
 #### Fixed
@@ -193,7 +207,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-2.0.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-2.1.0...HEAD
+[2.1.0]: https://github.com/decebals/pf4j/compare/release-2.0.0...release-2.1.0
 [2.0.0]: https://github.com/decebals/pf4j/compare/release-1.3.0...release-2.0.0
 [1.3.0]: https://github.com/decebals/pf4j/compare/release-1.2.0...release-1.3.0
 [1.2.0]: https://github.com/decebals/pf4j/compare/release-1.1.1...release-1.2.0
@@ -206,6 +221,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#184]: https://github.com/decebals/pf4j/issues/184
+[#180]: https://github.com/decebals/pf4j/pull/180
+[#178]: https://github.com/decebals/pf4j/pull/178
+[#177]: https://github.com/decebals/pf4j/pull/177
 [#172]: https://github.com/decebals/pf4j/pull/172
 [#168]: https://github.com/decebals/pf4j/pull/168
 [#156]: https://github.com/decebals/pf4j/issues/156
