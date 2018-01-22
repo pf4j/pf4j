@@ -424,6 +424,13 @@ public abstract class AbstractPluginManager implements PluginManager {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
+        try {
+            URLClassLoader loader = (URLClassLoader) pluginWrapper.getPluginClassLoader();
+            System.out.println(loader.getURLs().length);
+            loader.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
         if (PluginState.STOPPED == pluginState) {
