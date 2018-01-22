@@ -21,6 +21,7 @@ import org.pf4j.util.StringUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -389,6 +390,13 @@ public abstract class AbstractPluginManager implements PluginManager {
         while (itr.hasNext()) {
             PluginWrapper pluginWrapper = itr.next();
             PluginState pluginState = pluginWrapper.getPluginState();
+            try {
+                URLClassLoader loader = (URLClassLoader) pluginWrapper.getPluginClassLoader();
+                System.out.println(loader.getURLs().length);
+                loader.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
             if (PluginState.STARTED == pluginState) {
                 try {
                     log.info("Stop plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
