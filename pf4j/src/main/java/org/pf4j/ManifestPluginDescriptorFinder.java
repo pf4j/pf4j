@@ -51,7 +51,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
     protected Manifest readManifest(Path pluginPath) throws PluginException {
         if (FileUtils.isJarFile(pluginPath)) {
-            try(JarFile jar = new JarFile(pluginPath.toFile())) {
+            try (JarFile jar = new JarFile(pluginPath.toFile())) {
                 Manifest manifest = jar.getManifest();
                 if (manifest != null) {
                     return manifest;
