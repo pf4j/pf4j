@@ -350,6 +350,11 @@ public abstract class AbstractPluginManager implements PluginManager {
             return PluginState.STARTED;
         }
 
+        if (!resolvedPlugins.contains(pluginWrapper)) {
+            log.warn("Cannot start an unresolved plugin '{}'", getPluginLabel(pluginDescriptor));
+            return pluginState;
+        }
+        
         if (PluginState.DISABLED == pluginState) {
             // automatically enable plugin on manual plugin start
             if (!enablePlugin(pluginId)) {
