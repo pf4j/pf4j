@@ -354,7 +354,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             log.warn("Cannot start an unresolved plugin '{}'", getPluginLabel(pluginDescriptor));
             return pluginState;
         }
-        
+
         if (PluginState.DISABLED == pluginState) {
             // automatically enable plugin on manual plugin start
             if (!enablePlugin(pluginId)) {
@@ -795,7 +795,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     protected synchronized void firePluginStateEvent(PluginStateEvent event) {
         for (PluginStateListener listener : pluginStateListeners) {
-            log.debug("Fire '{}' to '{}'", event, listener);
+            log.trace("Fire '{}' to '{}'", event, listener);
             listener.pluginStateChanged(event);
         }
     }
