@@ -20,10 +20,31 @@ package org.pf4j;
  */
 public class PluginState {
 
+    /**
+     * The runtime knows the plugin is there. It knows about the plugin path, the plugin descriptor.
+     */
 	public static final PluginState CREATED = new PluginState("CREATED");
+
+    /**
+     * The plugin cannot be used.
+     */
     public static final PluginState DISABLED = new PluginState("DISABLED");
+
+    /**
+     * The plugin is created. All the dependencies are created and resolved.
+     * The plugin is ready to be started.
+     */
+    public static final PluginState RESOLVED = new PluginState("RESOLVED");
+
+    /**
+     * The {@link Plugin#start()} has executed. A started plugin may contribute extensions.
+     */
 	public static final PluginState STARTED = new PluginState("STARTED");
-	public static final PluginState STOPPED = new PluginState("STOPPED");
+
+    /**
+     * The {@link Plugin#stop()} has executed.
+     */
+    public static final PluginState STOPPED = new PluginState("STOPPED");
 
 	private String status;
 
@@ -38,9 +59,7 @@ public class PluginState {
 
         PluginState that = (PluginState) o;
 
-        if (!status.equals(that.status)) return false;
-
-        return true;
+        return status.equals(that.status);
     }
 
     @Override

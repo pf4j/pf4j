@@ -787,8 +787,13 @@ public abstract class AbstractPluginManager implements PluginManager {
         for (String pluginId : sortedPlugins) {
             PluginWrapper pluginWrapper = plugins.get(pluginId);
             if (unresolvedPlugins.remove(pluginWrapper)) {
+                PluginState pluginState = pluginWrapper.getPluginState();
+                pluginWrapper.setPluginState(PluginState.RESOLVED);
+
                 resolvedPlugins.add(pluginWrapper);
                 log.info("Plugin '{}' resolved", getPluginLabel(pluginWrapper.getDescriptor()));
+
+                firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
             }
         }
     }
