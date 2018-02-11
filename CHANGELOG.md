@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [2.2.0] - 2018-02-11
+
+#### Fixed
 - [#197]: Close `JarFile` stream after `getManifest` in `ManifestPluginDescriptorFinder.find(Path pluginPath)`
 - Before start a plugin check if the plugin is resolved
 - [#200]: Compiling with Maven under Java9 breaks project
@@ -217,7 +227,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-2.1.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-2.2.0...HEAD
+[2.2.0]: https://github.com/decebals/pf4j/compare/release-2.1.0...release-2.2.0
 [2.1.0]: https://github.com/decebals/pf4j/compare/release-2.0.0...release-2.1.0
 [2.0.0]: https://github.com/decebals/pf4j/compare/release-1.3.0...release-2.0.0
 [1.3.0]: https://github.com/decebals/pf4j/compare/release-1.2.0...release-1.3.0
