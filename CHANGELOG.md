@@ -5,10 +5,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#197]: Close `JarFile` stream after `getManifest` in `ManifestPluginDescriptorFinder.find(Path pluginPath)`
+- Before start a plugin check if the plugin is resolved
+- [#200]: Compiling with Maven under Java9 breaks project
 
 #### Changed
+- [#194]: Changing packaging from ZIP to JAR for demo
+- Improve `VersionManager` (prepare a new `pf4j-update` release)
 
 #### Added
+- [#166]: Simplify main `README` (move the content to http://www.pf4j.org)
+- [#190]: Add methods to just get extension classes
+- Add `LoggingPluginStateListener` as listener in `DefaultPluginManager` (only for `development` mode)
+- Add new `RESOLVED` as plugin state
+- Add support for PARENT FIRST loading strategy
 
 #### Removed
 
@@ -221,12 +231,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#200]: https://github.com/decebals/pf4j/issues/200
+[#197]: https://github.com/decebals/pf4j/pull/197
+[#194]: https://github.com/decebals/pf4j/pull/194
+[#190]: https://github.com/decebals/pf4j/issues/190
 [#184]: https://github.com/decebals/pf4j/issues/184
 [#180]: https://github.com/decebals/pf4j/pull/180
 [#178]: https://github.com/decebals/pf4j/pull/178
 [#177]: https://github.com/decebals/pf4j/pull/177
 [#172]: https://github.com/decebals/pf4j/pull/172
 [#168]: https://github.com/decebals/pf4j/pull/168
+[#166]: https://github.com/decebals/pf4j/issues/166
 [#156]: https://github.com/decebals/pf4j/issues/156
 [#155]: https://github.com/decebals/pf4j/pull/155
 [#150]: https://github.com/decebals/pf4j/pull/150
