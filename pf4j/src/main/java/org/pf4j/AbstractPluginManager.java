@@ -186,11 +186,9 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         try {
             PluginWrapper pluginWrapper = loadPluginFromPath(pluginPath);
-            // TODO uninstalled plugin dependencies?
-            getUnresolvedPlugins().remove(pluginWrapper);
-            getResolvedPlugins().add(pluginWrapper);
 
-            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, null));
+            // try to resolve  the loaded plugin together with other possible plugins that depend on this plugin
+            resolvePlugins();
 
             return pluginWrapper.getDescriptor().getPluginId();
         } catch (PluginException e) {
@@ -224,7 +222,6 @@ public abstract class AbstractPluginManager implements PluginManager {
         log.debug("Found {} possible plugins: {}", pluginPaths.size(), pluginPaths);
 
         // load plugins from plugin paths
-        // TODO
         for (Path pluginPath : pluginPaths) {
             try {
                 loadPluginFromPath(pluginPath);
@@ -233,7 +230,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
-        // resolve 'unresolvedPlugins'
+        // resolve plugins
         try {
             resolvePlugins();
         } catch (PluginException e) {
@@ -351,6 +348,11 @@ public abstract class AbstractPluginManager implements PluginManager {
         if (PluginState.STARTED == pluginState) {
             log.debug("Already started plugin '{}'", getPluginLabel(pluginDescriptor));
             return PluginState.STARTED;
+        }
+
+        if (!resolvedPlugins.contains(pluginWrapper)) {
+            log.warn("Cannot start an unresolved plugin '{}'", getPluginLabel(pluginDescriptor));
+            return pluginState;
         }
 
         if (PluginState.DISABLED == pluginState) {
@@ -739,7 +741,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             // If exact versions are not allowed in requires, rewrite to >= expression
             requires = ">=" + requires;
         }
-        if (systemVersion.equals("0.0.0") || versionManager.satisfies(requires, systemVersion)) {
+        if (systemVersion.equals("0.0.0") || versionManager.checkVersionConstraint(systemVersion, requires)) {
             return true;
         }
 
@@ -757,9 +759,9 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     protected void resolvePlugins() throws PluginException {
-        // retrieves the  plugins descriptors from "unresolvedPlugins" list
+        // retrieves the  plugins descriptors
         List<PluginDescriptor> descriptors = new ArrayList<>();
-        for (PluginWrapper plugin : unresolvedPlugins) {
+        for (PluginWrapper plugin : plugins.values()) {
             descriptors.add(plugin.getDescriptor());
         }
 
@@ -784,15 +786,21 @@ public abstract class AbstractPluginManager implements PluginManager {
         // move plugins from "unresolved" to "resolved"
         for (String pluginId : sortedPlugins) {
             PluginWrapper pluginWrapper = plugins.get(pluginId);
-            unresolvedPlugins.remove(pluginWrapper);
-            resolvedPlugins.add(pluginWrapper);
-            log.info("Plugin '{}' resolved", getPluginLabel(pluginWrapper.getDescriptor()));
+            if (unresolvedPlugins.remove(pluginWrapper)) {
+                PluginState pluginState = pluginWrapper.getPluginState();
+                pluginWrapper.setPluginState(PluginState.RESOLVED);
+
+                resolvedPlugins.add(pluginWrapper);
+                log.info("Plugin '{}' resolved", getPluginLabel(pluginWrapper.getDescriptor()));
+
+                firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
+            }
         }
     }
 
     protected synchronized void firePluginStateEvent(PluginStateEvent event) {
         for (PluginStateListener listener : pluginStateListeners) {
-            log.debug("Fire '{}' to '{}'", event, listener);
+            log.trace("Fire '{}' to '{}'", event, listener);
             listener.pluginStateChanged(event);
         }
     }
@@ -918,6 +926,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     /**
      * The plugin label is used in logging and it's a string in format {@code pluginId@pluginVersion}.
+     *
      * @param pluginDescriptor
      * @return
      */

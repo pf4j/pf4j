@@ -115,6 +115,10 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
         super.initialize();
 
+        if (isDevelopment()) {
+            addPluginStateListener(new LoggingPluginStateListener());
+        }
+
         log.info("PF4J version {} in '{}' mode", getVersion(), getRuntimeMode());
 	}
 

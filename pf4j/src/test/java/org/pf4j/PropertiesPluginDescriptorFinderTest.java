@@ -83,8 +83,8 @@ public class PropertiesPluginDescriptorFinderTest {
         assertEquals("~1.0", plugin1.getDependencies().get(1).getPluginVersionSupport());
         assertEquals("Apache-2.0", plugin1.getLicense());
         assertEquals(">=1", plugin1.getRequires());
-        assertTrue(versionManager.satisfies(plugin1.getRequires(), "1.0.0"));
-        assertFalse(versionManager.satisfies(plugin1.getRequires(), "0.1.0"));
+        assertTrue(versionManager.checkVersionConstraint("1.0.0", plugin1.getRequires()));
+        assertFalse(versionManager.checkVersionConstraint("0.1.0", plugin1.getRequires()));
 
         assertEquals("test-plugin-2", plugin2.getPluginId());
         assertEquals("", plugin2.getPluginDescription());
@@ -93,7 +93,7 @@ public class PropertiesPluginDescriptorFinderTest {
         assertEquals("Decebal Suiu", plugin2.getProvider());
         assertEquals(0, plugin2.getDependencies().size());
         assertEquals("*", plugin2.getRequires()); // Default is *
-        assertTrue(versionManager.satisfies(plugin2.getRequires(), "1.0.0"));
+        assertTrue(versionManager.checkVersionConstraint("1.0.0", plugin2.getRequires()));
     }
 
     @Test(expected = PluginException.class)

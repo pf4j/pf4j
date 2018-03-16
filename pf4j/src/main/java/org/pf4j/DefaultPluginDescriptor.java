@@ -20,9 +20,6 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A plugin descriptor contains information about a plug-in obtained
- * from the manifest (META-INF) file.
- *
  * @author Decebal Suiu
  */
 public class DefaultPluginDescriptor implements PluginDescriptor {

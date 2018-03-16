@@ -34,19 +34,24 @@ public class DefaultVersionManagerTest {
     }
 
     @Test
-    public void satisfies() {
-        assertFalse(versionManager.satisfies(">2.0.0", "1.4.3")); // simple
-        assertTrue(versionManager.satisfies(">=1.4.0 & <1.6.0", "1.4.3")); // range
+    public void checkVersionConstraint() {
+        assertFalse(versionManager.checkVersionConstraint("1.4.3", ">2.0.0")); // simple
+        assertTrue(versionManager.checkVersionConstraint("1.4.3", ">=1.4.0 & <1.6.0")); // range
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullOrEmptyVersion() {
-        assertFalse(versionManager.satisfies(">2.0.0", null));
+        assertFalse(versionManager.checkVersionConstraint(null, ">2.0.0"));
     }
 
     @Test(expected = ParseException.class)
     public void invalidVersion() {
-        assertFalse(versionManager.satisfies(">2.0.0", "1.0"));
+        assertFalse(versionManager.checkVersionConstraint("1.0", ">2.0.0"));
+    }
+
+    @Test
+    public void compareVersions() {
+        assertTrue(versionManager.compareVersions("1.1.0", "1.0.0") > 0);
     }
 
 }

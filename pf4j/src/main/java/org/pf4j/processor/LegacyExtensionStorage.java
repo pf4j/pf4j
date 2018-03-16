@@ -23,6 +23,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.NoSuchFileException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -68,8 +69,8 @@ public class LegacyExtensionStorage extends ExtensionStorage {
             Set<String> entries = new HashSet<>();
             read(file.openReader(true), entries);
             extensions.put(null, entries);
-        } catch (FileNotFoundException e) {
-            // ignore
+        } catch (FileNotFoundException | NoSuchFileException e) {
+            // doesn't exist, ignore
         } catch (FilerException e) {
             // re-opening the file for reading or after writing is ignorable
         } catch (IOException e) {

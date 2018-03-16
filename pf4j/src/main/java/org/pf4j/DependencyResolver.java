@@ -133,7 +133,7 @@ public class DependencyResolver {
      * @return
      */
     protected boolean checkDependencyVersion(String requiredVersion, String existingVersion) {
-        return versionManager.satisfies(requiredVersion, existingVersion);
+        return versionManager.checkVersionConstraint(existingVersion, requiredVersion);
     }
 
     private void addPlugin(PluginDescriptor descriptor) {
