@@ -744,13 +744,14 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         if (systemVersion.equals("0.0.0") || versionManager.checkVersionConstraint(systemVersion, requires)) {
-            PluginClassLoader pluginClassLoaderLoader = (PluginClassLoader)pluginWrapper.getPluginClassLoader();
             try{
+                PluginClassLoader pluginClassLoaderLoader = (PluginClassLoader)pluginWrapper.getPluginClassLoader();
                 pluginClassLoaderLoader.loadClass(pluginDescriptor.getPluginClass());
-            } catch (ClassNotFoundException e){
+            } catch (ClassNotFoundException e) {
                 log.warn("Plugin '{}' main class '{}' not found",
-                    getPluginLabel(pluginDescriptor),pluginDescriptor.getPluginClass());
+                    getPluginLabel(pluginDescriptor), pluginDescriptor.getPluginClass());
                 return false;
+            } catch (ClassCastException e){
             }
             return true;
         }
