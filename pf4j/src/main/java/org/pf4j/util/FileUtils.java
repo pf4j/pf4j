@@ -219,6 +219,8 @@ public class FileUtils {
             String pathString = path.toString();
             // transformation for Windows OS
             pathString = StringUtils.addStart(pathString.replace("\\", "/"), "/");
+            // space is replaced with %20
+            pathString = pathString.replaceAll(" ","%20");
             uri = URI.create("jar:file:" + pathString);
         }
 

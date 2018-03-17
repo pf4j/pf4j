@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.pf4j.plugin.PluginZip;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -78,6 +79,19 @@ public class CompoundPluginDescriptorFinderTest {
     public void testNotFound() throws Exception {
         PluginDescriptorFinder instance = new CompoundPluginDescriptorFinder();
         instance.find(getPluginsRoot().resolve("test-plugin-3"));
+    }
+
+    @Test
+    public void testSpaceCharacterInFileName() throws Exception {
+        PluginDescriptorFinder instance = new PropertiesPluginDescriptorFinder();
+        File jar = testFolder.newFile("my plugin-1.2.3.jar");
+
+        PluginZip pluginJar = new PluginZip.Builder(jar, "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        PluginDescriptor pluginDescriptor = instance.find(pluginJar.path());
+        assertNotNull(pluginDescriptor);
     }
 
     private List<String> getPlugin1Properties() {
