@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Decebal Suiu
  */
-public abstract class Plugin {
+public class Plugin {
 
     /**
      * Makes logging service available for descending classes.

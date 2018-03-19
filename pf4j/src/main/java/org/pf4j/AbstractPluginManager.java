@@ -887,10 +887,6 @@ public abstract class AbstractPluginManager implements PluginManager {
             throw new PluginException("Field 'id' cannot be empty");
         }
 
-        if (StringUtils.isNullOrEmpty(descriptor.getPluginClass())) {
-            throw new PluginException("Field 'class' cannot be empty");
-        }
-
         if (descriptor.getVersion() == null) {
             throw new PluginException("Field 'version' cannot be empty");
         }

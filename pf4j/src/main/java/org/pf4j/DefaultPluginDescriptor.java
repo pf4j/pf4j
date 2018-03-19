@@ -26,7 +26,7 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
 
     private String pluginId;
     private String pluginDescription;
-    private String pluginClass;
+    private String pluginClass = Plugin.class.getName();
     private String version;
     private String requires = "*"; // SemVer format
     private String provider;
@@ -37,15 +37,6 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
         dependencies = new ArrayList<>();
     }
 
-    /**
-     * @param pluginId
-     * @param pluginDescription
-     * @param pluginClass
-     * @param version
-     * @param requires
-     * @param provider
-     * @param license
-     */
     public DefaultPluginDescriptor(String pluginId, String pluginDescription, String pluginClass, String version, String requires, String provider, String license) {
         this();
         this.pluginId = pluginId;

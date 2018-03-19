@@ -109,7 +109,9 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         }
 
         String clazz = properties.getProperty("plugin.class");
-        pluginDescriptor.setPluginClass(clazz);
+        if (StringUtils.isNotNullOrEmpty(clazz)) {
+            pluginDescriptor.setPluginClass(clazz);
+        }
 
         String version = properties.getProperty("plugin.version");
         if (StringUtils.isNotNullOrEmpty(version)) {
