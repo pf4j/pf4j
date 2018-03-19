@@ -36,7 +36,6 @@ public class DefaultPluginManagerTest {
         pd1 = new DefaultPluginDescriptor();
         pd1.setPluginId("myPlugin");
         pd1.setPluginVersion("1.2.3");
-        pd1.setPluginClass("foo");
         pd1.setPluginDescription("My plugin");
         pd1.setDependencies("bar, baz");
         pd1.setProvider("Me");
@@ -62,14 +61,14 @@ public class DefaultPluginManagerTest {
         pluginManager.validatePluginDescriptor(pd1);
     }
 
-    @Test(expected = PluginException.class)
-    public void validateFailsOnClass() throws PluginException {
-        pd1.setPluginClass(null);
+    @Test
+    public void validateNoPluginClass() throws PluginException {
         pluginManager.validatePluginDescriptor(pd1);
+        assertEquals(Plugin.class.getName(), pd1.getPluginClass());
     }
 
     @Test
-    public void isPluginValid() throws Exception {
+    public void isPluginValid() {
         // By default accept all since system version not given
         assertTrue(pluginManager.isPluginValid(pw1));
 
@@ -84,7 +83,7 @@ public class DefaultPluginManagerTest {
     }
 
     @Test
-    public void isPluginValidAllowExact() throws Exception {
+    public void isPluginValidAllowExact() {
         pluginManager.setExactVersionAllowed(true);
 
         // By default accept all since system version not given
@@ -101,7 +100,7 @@ public class DefaultPluginManagerTest {
     }
 
     @Test
-    public void testDefaultExactVersionAllowed() throws Exception {
+    public void testDefaultExactVersionAllowed() {
         assertEquals(false, pluginManager.isExactVersionAllowed());
     }
 
