@@ -4,13 +4,13 @@ Plugin Framework for Java (PF4J)
 =====================
 [![Join the chat at https://gitter.im/decebals/pf4j](https://badges.gitter.im/decebals/pf4j.svg)](https://gitter.im/decebals/pf4j?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Travis CI Build Status](https://travis-ci.org/pf4j/pf4j.png)](https://travis-ci.org/pf4j/pf4j)
-[![Coverage Status](https://coveralls.io/repos/decebals/pf4j/badge.svg?branch=master&service=github)](https://coveralls.io/github/decebals/pf4j?branch=master)
+[![Coverage Status](https://coveralls.io/repos/pf4j/pf4j/badge.svg?branch=master&service=github)](https://coveralls.io/github/pf4j/pf4j?branch=master)
 [![Maven Central](http://img.shields.io/maven-central/v/org.pf4j/pf4j.svg)](http://search.maven.org/#search|ga|1|pf4j)
 
 A plugin is a way for a third party to extend the functionality of an application. A plugin implements extension points
 declared by application or other plugins. Also a plugin can define extension points.  
 
-**NOTE:** Starting with version 0.9 you can define an extension directly in the application jar (you're not obligated to put the extension in a plugin - you can see this extension as a default/system extension). See [WhazzupGreeting](https://github.com/decebals/pf4j/blob/master/demo/app/src/main/java/org/pf4j/demo/WhazzupGreeting.java) for a real example.  
+**NOTE:** Starting with version 0.9 you can define an extension directly in the application jar (you're not obligated to put the extension in a plugin - you can see this extension as a default/system extension). See [WhazzupGreeting](https://github.com/pf4j/pf4j/blob/master/demo/app/src/main/java/org/pf4j/demo/WhazzupGreeting.java) for a real example.  
 
 Features/Benefits
 -------------------
@@ -19,16 +19,16 @@ PF4J is an open source (Apache license) lightweight (around __50 KB__) plugin fr
 
 Practically PF4J is a microframework and the aim is to keep the core simple but extensible. I try to create a little ecosystem (extensions) based on this core with the help of the comunity.  
 For now are available these extensions:
-- [pf4j-update](https://github.com/decebals/pf4j-update) (update mechanism for PF4J)
-- [pf4j-spring](https://github.com/decebals/pf4j-spring) (PF4J - Spring Framework integration)
-- [pf4j-web](https://github.com/rmrodrigues/pf4j-web) (PF4J in web applications)
-- [wicket-plugin](https://github.com/decebals/wicket-plugin) (Wicket Plugin Framework based on PF4J)
+- [pf4j-update](https://github.com/pf4j/pf4j-update) (update mechanism for PF4J)
+- [pf4j-spring](https://github.com/pf4j/pf4j-spring) (PF4J - Spring Framework integration)
+- [pf4j-wicket](https://github.com/pf4j/pf4j-wicket) (PF4J - Wicket integration)
+- [pf4j-web](https://github.com/pf4j/pf4j-web) (PF4J in web applications)
 
 No XML, only Java.
 
 You can mark any interface or abstract class as an extension point (with marker interface ExtensionPoint) and you specified that an class is an extension with @Extension annotation.
 
-Also, PF4J can be used in web applications. For my web applications when I want modularity I use [Wicket Plugin](https://github.com/decebals/wicket-plugin).
+Also, PF4J can be used in web applications. For my web applications when I want modularity I use [pf4j-wicket](https://github.com/pf4j/pf4j-wicket).
 
 Components
 -------------------
@@ -135,4 +135,4 @@ Documentation is available on [pf4j.org](http://www.pf4j.org)
 
 Demo
 ---------------
-Demo applications are available in [demo](https://github.com/decebals/pf4j/tree/master/demo) folder
+Demo applications are available in [demo](https://github.com/pf4j/pf4j/tree/master/demo) folder
