@@ -24,9 +24,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/decebals/pf4j.git</connection>
-        <developerConnection>scm:git:https://github.com/decebals/pf4j.git</developerConnection>
-        <url>git@github.com/decebals/pf4j.git</url>
+        <connection>scm:git:https://github.com/pf4j/pf4j.git</connection>
+        <developerConnection>scm:git:https://github.com/pf4j/pf4j.git</developerConnection>
+        <url>git@github.com/pf4j/pf4j.git</url>
         <tag>HEAD</tag>
     </scm>
 
