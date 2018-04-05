@@ -694,8 +694,6 @@ public abstract class AbstractPluginManager implements PluginManager {
             pluginsRoot = createPluginsRoot();
         }
 
-        System.setProperty("pf4j.pluginsDir", pluginsRoot.toString());
-
         pluginRepository = createPluginRepository();
         pluginFactory = createPluginFactory();
         extensionFactory = createExtensionFactory();
