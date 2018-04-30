@@ -46,8 +46,8 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
     @Override
     @SuppressWarnings("unchecked")
-	public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
-		log.debug("Finding extensions of extension point '{}'", type.getName());
+    public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
+        log.debug("Finding extensions of extension point '{}'", type.getName());
         Map<String, Set<String>> entries = getEntries();
         List<ExtensionWrapper<T>> result = new ArrayList<>();
 
@@ -59,16 +59,16 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         }
 
         if (entries.isEmpty()) {
-        	log.debug("No extensions found for extension point '{}'", type.getName());
+            log.debug("No extensions found for extension point '{}'", type.getName());
         } else {
-        	log.debug("Found {} extensions for extension point '{}'", result.size(), type.getName());
+            log.debug("Found {} extensions for extension point '{}'", result.size(), type.getName());
         }
 
         // sort by "ordinal" property
         Collections.sort(result);
 
-		return result;
-	}
+        return result;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -129,11 +129,11 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
     }
 
     @Override
-	public List<ExtensionWrapper> find(String pluginId) {
+    public List<ExtensionWrapper> find(String pluginId) {
         log.debug("Finding extensions from plugin '{}'", pluginId);
         List<ExtensionWrapper> result = new ArrayList<>();
 
-	    Set<String> classNames = findClassNames(pluginId);
+        Set<String> classNames = findClassNames(pluginId);
         if (classNames.isEmpty()) {
             return result;
         }
@@ -182,7 +182,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
     }
 
     @Override
-	public void pluginStateChanged(PluginStateEvent event) {
+    public void pluginStateChanged(PluginStateEvent event) {
         // TODO optimize (do only for some transitions)
         // clear cache
         entries = null;

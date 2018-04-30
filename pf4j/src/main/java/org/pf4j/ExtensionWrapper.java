@@ -26,31 +26,31 @@ public class ExtensionWrapper<T> implements Comparable<ExtensionWrapper<T>> {
     private final ExtensionFactory extensionFactory;
     private T extension; // cache
 
-	public ExtensionWrapper(ExtensionDescriptor descriptor, ExtensionFactory extensionFactory) {
+    public ExtensionWrapper(ExtensionDescriptor descriptor, ExtensionFactory extensionFactory) {
         this.descriptor = descriptor;
         this.extensionFactory = extensionFactory;
     }
 
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     public T getExtension() {
         if (extension == null) {
             extension = (T) extensionFactory.create(descriptor.extensionClass);
         }
 
         return extension;
-	}
+    }
 
     public ExtensionDescriptor getDescriptor() {
         return descriptor;
     }
 
     public int getOrdinal() {
-		return descriptor.ordinal;
-	}
+        return descriptor.ordinal;
+    }
 
-	@Override
-	public int compareTo(ExtensionWrapper<T> o) {
-		return (getOrdinal() - o.getOrdinal());
-	}
+    @Override
+    public int compareTo(ExtensionWrapper<T> o) {
+        return (getOrdinal() - o.getOrdinal());
+    }
 
 }
