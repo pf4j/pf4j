@@ -807,8 +807,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         // test for plugin duplication
         String pluginId = idForPath(pluginPath);
         if (pluginId != null) {
-            log.warn("Plugin '{}' already loaded with id '{}'", pluginPath, pluginId);
-            return null;
+            throw new PluginAlreadyLoadedException(pluginId, pluginPath);
         }
 
         // retrieves the plugin descriptor
