@@ -35,7 +35,7 @@ public class LoadPluginsTest {
     private DefaultPluginManager pluginManager;
 
     @Before
-    public void setup() throws IOException {
+    public void setup() {
         pluginManager = new DefaultPluginManager(testFolder.getRoot().toPath());
     }
 
@@ -55,11 +55,11 @@ public class LoadPluginsTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void loadNonExisting() throws Exception {
+    public void loadNonExisting() {
         pluginManager.loadPlugin(Paths.get("nonexisting"));
     }
 
-    @Test
+    @Test(expected = PluginAlreadyLoadedException.class)
     public void loadTwiceFails() throws Exception {
         PluginZip pluginZip = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
@@ -113,7 +113,7 @@ public class LoadPluginsTest {
     }
 
     @Test
-    public void getRoot() throws Exception {
+    public void getRoot() {
         assertEquals(testFolder.getRoot().toPath(), pluginManager.getPluginsRoot());
     }
 
