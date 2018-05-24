@@ -15,9 +15,10 @@
  */
 package org.pf4j;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The classpath of the plugin.
@@ -27,28 +28,35 @@ import java.util.List;
  */
 public class PluginClasspath {
 
-	private List<String> classesDirectories;
-	private List<String> libDirectories;
+    private Set<String> classesDirectories = new HashSet<>();
+    private Set<String> libDirectories = new HashSet<>();
 
-	public PluginClasspath() {
-		classesDirectories = new ArrayList<>();
-		libDirectories = new ArrayList<>();
-	}
+    public Set<String> getClassesDirectories() {
+        return classesDirectories;
+    }
 
-	public List<String> getClassesDirectories() {
-		return classesDirectories;
-	}
+    public PluginClasspath addClassesDirectories(String... classesDirectories) {
+        return addClassesDirectories(Arrays.asList(classesDirectories));
+    }
 
-	public void addClassesDirectories(String... classesDirectories) {
-		this.classesDirectories.addAll(Arrays.asList(classesDirectories));
-	}
+    public PluginClasspath addClassesDirectories(Collection<String> classesDirectories) {
+        this.classesDirectories.addAll(classesDirectories);
 
-	public List<String> getLibDirectories() {
-		return libDirectories;
-	}
+        return this;
+    }
 
-	public void addLibDirectories(String... libDirectories) {
-		this.libDirectories.addAll(Arrays.asList(libDirectories));
-	}
+    public Set<String> getLibDirectories() {
+        return libDirectories;
+    }
+
+    public PluginClasspath addLibDirectories(String... libDirectories) {
+        return addLibDirectories(Arrays.asList(libDirectories));
+    }
+
+    public PluginClasspath addLibDirectories(Collection<String> libDirectories) {
+        this.libDirectories.addAll(libDirectories);
+
+        return this;
+    }
 
 }

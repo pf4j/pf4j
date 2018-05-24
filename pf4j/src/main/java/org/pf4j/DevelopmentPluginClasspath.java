@@ -16,17 +16,39 @@
 package org.pf4j;
 
 /**
- * Overwrite classes directories to {@code target/classes} and lib directories to {@code target/lib}.
+ * It's a compound {@link PluginClasspath} ({@link #MAVEN} + {@link #GRADLE} + {@link #KOTLIN})
+ * used in development mode ({@link RuntimeMode#DEVELOPMENT}).
  *
  * @author Decebal Suiu
  */
 public class DevelopmentPluginClasspath extends PluginClasspath {
 
-	public DevelopmentPluginClasspath() {
-		super();
+    /**
+     * The development plugin classpath for <a href="https://maven.apache.org">Maven</a>.
+     * The classes directory is {@code target/classes} and the lib directory is {@code target/lib}.
+     */
+    public static final PluginClasspath MAVEN = new PluginClasspath().addClassesDirectories("target/classes").addLibDirectories("target/lib");
 
-        addClassesDirectories("target/classes");
-        addLibDirectories("target/lib");
+    /**
+     * The development plugin classpath for <a href="https://gradle.org">Gradle</a>.
+     * The classes directories are {@code build/classes/java/main, build/resources/main}.
+     */
+    public static final PluginClasspath GRADLE = new PluginClasspath().addClassesDirectories("build/classes/java/main", "build/resources/main");
+
+    /**
+     * The development plugin classpath for <a href="https://kotlinlang.org">Kotlin</a>.
+     * The classes directories are {@code build/classes/kotlin/main", build/resources/main, build/tmp/kapt3/classes/main}.
+     */
+    public static final PluginClasspath KOTLIN = new PluginClasspath().addClassesDirectories("build/classes/kotlin/main", "build/resources/main", "build/tmp/kapt3/classes/main");
+
+    public DevelopmentPluginClasspath() {
+        addClassesDirectories(MAVEN.getClassesDirectories());
+        addClassesDirectories(GRADLE.getClassesDirectories());
+        addClassesDirectories(KOTLIN.getClassesDirectories());
+
+        addLibDirectories(MAVEN.getLibDirectories());
+        addLibDirectories(GRADLE.getLibDirectories());
+        addLibDirectories(KOTLIN.getLibDirectories());
     }
 
 }
