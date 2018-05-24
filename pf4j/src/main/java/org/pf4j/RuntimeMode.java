@@ -24,21 +24,26 @@ import java.util.NoSuchElementException;
  */
 public enum RuntimeMode {
 
-	DEVELOPMENT("development"), // development
-    DEPLOYMENT("deployment"); // deployment
+    DEVELOPMENT("development", "dev"), // development
+    DEPLOYMENT("deployment", "prod"); // deployment
 
     private final String name;
+    private final String[] aliases;
 
-	private static final Map<String, RuntimeMode> map = new HashMap<>();
+    private static final Map<String, RuntimeMode> map = new HashMap<>();
 
-	static {
-		for (RuntimeMode mode : RuntimeMode.values()) {
-			map.put(mode.name, mode);
-		}
-	}
+    static {
+        for (RuntimeMode mode : RuntimeMode.values()) {
+            map.put(mode.name, mode);
+            for (String alias : mode.aliases) {
+                map.put(alias, mode);
+            }
+        }
+    }
 
-	private RuntimeMode(final String name) {
+    private RuntimeMode(final String name, final String... aliases) {
         this.name = name;
+        this.aliases = aliases;
     }
 
     @Override
@@ -47,12 +52,12 @@ public enum RuntimeMode {
     }
 
     public static RuntimeMode byName(String name) {
-    	if (map.containsKey(name)) {
-    		return map.get(name);
-    	}
+        if (map.containsKey(name)) {
+            return map.get(name);
+        }
 
-    	throw new NoSuchElementException("Cannot found PF4J runtime mode with name '" + name +
-    			"'. Must be 'development' or 'deployment'.");
+        throw new NoSuchElementException("Cannot found PF4J runtime mode with name '" + name + "'." +
+            "Must be one value from '" + map.keySet() + ".");
     }
 
 }
