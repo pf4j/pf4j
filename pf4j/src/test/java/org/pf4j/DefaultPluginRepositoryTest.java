@@ -48,6 +48,9 @@ public class DefaultPluginRepositoryTest {
         Files.createFile(Paths.get(testFolder.getRoot().getAbsolutePath()).resolve("plugin-1.zip"));
         testFolder.newFolder("plugin-2");
         testFolder.newFolder("plugin-3");
+        // standard maven/gradle bin folder - these should be skipped in development mode because the cause errors
+        testFolder.newFolder("target");
+        testFolder.newFolder("build");
     }
 
     /**
@@ -61,10 +64,27 @@ public class DefaultPluginRepositoryTest {
 
         List<Path> result = instance.getPluginPaths();
 
-        assertEquals(3, result.size());
+        assertEquals(5, result.size());
         assertPathExists(result, pluginsRoot.resolve("plugin-1"));
         assertPathExists(result, pluginsRoot.resolve("plugin-2"));
         assertPathExists(result, pluginsRoot.resolve("plugin-3"));
+        // when not in development mode we will honor these folders
+        assertPathExists(result, pluginsRoot.resolve("target"));
+        assertPathExists(result, pluginsRoot.resolve("build"));
+    }
+
+    @Test
+    public void testGetPluginArchivesInDevelopmentMode() {
+        Path pluginsRoot = getPluginsRoot();
+
+        PluginRepository instance = new DefaultPluginRepository(pluginsRoot, true);
+
+        List<Path> result = instance.getPluginPaths();
+
+        // target and build should be ignored
+        assertEquals(3, result.size());
+        assertPathDoesNotExists(result, pluginsRoot.resolve("target"));
+        assertPathDoesNotExists(result, pluginsRoot.resolve("build"));
     }
 
     /**
@@ -81,6 +101,8 @@ public class DefaultPluginRepositoryTest {
         assertFalse(Files.exists(pluginsRoot.resolve("plugin-1.zip")));
         assertTrue(instance.deletePluginPath(pluginsRoot.resolve("plugin-3")));
         assertFalse(instance.deletePluginPath(pluginsRoot.resolve("plugin-4")));
+        assertTrue(instance.deletePluginPath(pluginsRoot.resolve("target")));
+        assertTrue(instance.deletePluginPath(pluginsRoot.resolve("build")));
 
         List<Path> result = instance.getPluginPaths();
 
@@ -90,6 +112,10 @@ public class DefaultPluginRepositoryTest {
 
     private void assertPathExists(List<Path> paths, Path path) {
         assertTrue("The directory must contain the file " + path, paths.contains(path));
+    }
+
+    private void assertPathDoesNotExists(List<Path> paths, Path path) {
+        assertFalse("The directory must not contain the file " + path, paths.contains(path));
     }
 
     private Path getPluginsRoot() {
