@@ -76,8 +76,9 @@ public class DefaultPluginRepository extends BasePluginRepository {
 
         if (development) {
             // skip default build output folders since these will cause errors in the logs
-            hiddenPluginFilter.addFileFilter(new NameFileFilter("target"))
-                .addFileFilter(new NameFileFilter("build"));
+            hiddenPluginFilter
+                .addFileFilter(new NameFileFilter("target")) // MAVEN
+                .addFileFilter(new NameFileFilter("build")); // GRADLE
         }
 
         return hiddenPluginFilter;
