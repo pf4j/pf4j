@@ -12,6 +12,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
+### [2.3.0] - 2018-06-04
+
+#### Fixed
+- [#202]: Spaces in name produce 'Illegal character in opaque part at index'
+- [#203]: File lock on plugin jar not released
+
+#### Changed
+- [#171]: Change the copyright text from the head of files
+- [#218]: It should not return null after it detects that the plugin has been loaded
+- [#219]: Improve support for Gradle and Kotlin
+
+#### Added
+- [#199]: Make optional the plugin class attribute of plugin manifest
+- [#206]: Support multiple plugin directories
+- Add aliases to the runtime modes (`dev` for `development` and `prod` for `deployment`)
+
+#### Removed
+
 ### [2.2.0] - 2018-02-11
 
 #### Fixed
@@ -227,7 +245,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-2.2.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-2.3.0...HEAD
+[2.3.0]: https://github.com/decebals/pf4j/compare/release-2.2.0...release-2.3.0
 [2.2.0]: https://github.com/decebals/pf4j/compare/release-2.1.0...release-2.2.0
 [2.1.0]: https://github.com/decebals/pf4j/compare/release-2.0.0...release-2.1.0
 [2.0.0]: https://github.com/decebals/pf4j/compare/release-1.3.0...release-2.0.0
@@ -242,7 +261,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#219]: https://github.com/pf4j/pf4j/pull/219
+[#218]: https://github.com/pf4j/pf4j/issues/218
+[#206]: https://github.com/pf4j/pf4j/issues/206
+[#203]: https://github.com/pf4j/pf4j/issues/203
+[#202]: https://github.com/pf4j/pf4j/issues/202
 [#200]: https://github.com/decebals/pf4j/issues/200
+[#199]: https://github.com/pf4j/pf4j/issues/199
 [#197]: https://github.com/decebals/pf4j/pull/197
 [#194]: https://github.com/decebals/pf4j/pull/194
 [#190]: https://github.com/decebals/pf4j/issues/190
@@ -251,6 +276,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [#178]: https://github.com/decebals/pf4j/pull/178
 [#177]: https://github.com/decebals/pf4j/pull/177
 [#172]: https://github.com/decebals/pf4j/pull/172
+[#171]: https://github.com/pf4j/pf4j/issues/171
 [#168]: https://github.com/decebals/pf4j/pull/168
 [#166]: https://github.com/decebals/pf4j/issues/166
 [#156]: https://github.com/decebals/pf4j/issues/156
