@@ -29,7 +29,7 @@ import java.lang.reflect.Modifier;
  */
 public class DefaultPluginFactory implements PluginFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultExtensionFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultPluginFactory.class);
 
     /**
      * Creates a plugin instance. If an error occurs than that error is logged and the method returns null.
