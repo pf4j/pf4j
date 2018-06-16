@@ -739,11 +739,20 @@ public abstract class AbstractPluginManager implements PluginManager {
             // If exact versions are not allowed in requires, rewrite to >= expression
             requires = ">=" + requires;
         }
-        if (systemVersion.equals("0.0.0") || versionManager.checkVersionConstraint(systemVersion, requires)) {
-            return true;
-        }
 
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
+        if (systemVersion.equals("0.0.0") || versionManager.checkVersionConstraint(systemVersion, requires)) {
+            try{
+                PluginClassLoader pluginClassLoaderLoader = (PluginClassLoader)pluginWrapper.getPluginClassLoader();
+                pluginClassLoaderLoader.loadClass(pluginDescriptor.getPluginClass());
+            } catch (ClassNotFoundException e) {
+                log.warn("Plugin '{}' main class '{}' not found",
+                    getPluginLabel(pluginDescriptor), pluginDescriptor.getPluginClass());
+                return false;
+            } catch (ClassCastException e){
+            }
+            return true;
+        }
         log.warn("Plugin '{}' requires a minimum system version of {}, and you have {}",
             getPluginLabel(pluginDescriptor),
             pluginWrapper.getDescriptor().getRequires(),
@@ -787,6 +796,9 @@ public abstract class AbstractPluginManager implements PluginManager {
             if (unresolvedPlugins.remove(pluginWrapper)) {
                 PluginState pluginState = pluginWrapper.getPluginState();
                 pluginWrapper.setPluginState(PluginState.RESOLVED);
+                if(pluginState.equals(PluginState.DISABLED)){
+                    pluginWrapper.setPluginState(PluginState.DISABLED);
+                }
 
                 resolvedPlugins.add(pluginWrapper);
                 log.info("Plugin '{}' resolved", getPluginLabel(pluginWrapper.getDescriptor()));
@@ -839,7 +851,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         // validate the plugin
         if (!isPluginValid(pluginWrapper)) {
-            log.info("Plugin '{}' is disabled", pluginPath);
+            log.warn("Plugin '{}' is invalid", pluginPath);
             pluginWrapper.setPluginState(PluginState.DISABLED);
         }
 
