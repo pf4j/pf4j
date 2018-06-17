@@ -15,71 +15,93 @@
  */
 package org.pf4j;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.pf4j.plugin.PluginZip;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DefaultPluginManagerTest {
 
-    private DefaultPluginDescriptor pd1 = null;
-    private DefaultPluginManager pluginManager = new DefaultPluginManager();
-    private PluginWrapper pw1;
+    private DefaultPluginManager pluginManager;
+    private DefaultPluginDescriptor pluginDescriptor;
+    private PluginWrapper pluginWrapper;
+    private Path pluginsPath;
+
+    @Rule
+    public TemporaryFolder pluginsFolder = new TemporaryFolder();
 
     @Before
-    public void init() throws IOException {
-        pd1 = new DefaultPluginDescriptor();
-        pd1.setPluginId("myPlugin");
-        pd1.setPluginVersion("1.2.3");
-        pd1.setPluginDescription("My plugin");
-        pd1.setDependencies("bar, baz");
-        pd1.setProvider("Me");
-        pd1.setRequires("5.0.0");
+    public void setUp() throws IOException {
+        pluginsPath = pluginsFolder.getRoot().toPath();
+        pluginManager = new DefaultPluginManager(pluginsPath);
 
-        pw1 = new PluginWrapper(pluginManager, pd1, Files.createTempDirectory("test"), getClass().getClassLoader());
+        pluginDescriptor = new DefaultPluginDescriptor();
+        pluginDescriptor.setPluginId("myPlugin");
+        pluginDescriptor.setPluginVersion("1.2.3");
+        pluginDescriptor.setPluginDescription("My plugin");
+        pluginDescriptor.setDependencies("bar, baz");
+        pluginDescriptor.setProvider("Me");
+        pluginDescriptor.setRequires("5.0.0");
+
+        pluginWrapper = new PluginWrapper(pluginManager, pluginDescriptor, Files.createTempDirectory("test"), getClass().getClassLoader());
+    }
+
+    @After
+    public void tearDown() {
+        pluginManager = null;
+        pluginDescriptor = null;
+        pluginWrapper = null;
     }
 
     @Test
     public void validateOK() throws PluginException {
-        pluginManager.validatePluginDescriptor(pd1);
+        pluginManager.validatePluginDescriptor(pluginDescriptor);
     }
 
     @Test(expected = PluginException.class)
     public void validateFailsOnId() throws PluginException {
-        pd1.setPluginId("");
-        pluginManager.validatePluginDescriptor(pd1);
+        pluginDescriptor.setPluginId("");
+        pluginManager.validatePluginDescriptor(pluginDescriptor);
     }
 
     @Test(expected = PluginException.class)
     public void validateFailsOnVersion() throws PluginException {
-        pd1.setPluginVersion(null);
-        pluginManager.validatePluginDescriptor(pd1);
+        pluginDescriptor.setPluginVersion(null);
+        pluginManager.validatePluginDescriptor(pluginDescriptor);
     }
 
     @Test
     public void validateNoPluginClass() throws PluginException {
-        pluginManager.validatePluginDescriptor(pd1);
-        assertEquals(Plugin.class.getName(), pd1.getPluginClass());
+        pluginManager.validatePluginDescriptor(pluginDescriptor);
+        assertEquals(Plugin.class.getName(), pluginDescriptor.getPluginClass());
     }
 
     @Test
     public void isPluginValid() {
         // By default accept all since system version not given
-        assertTrue(pluginManager.isPluginValid(pw1));
+        assertTrue(pluginManager.isPluginValid(pluginWrapper));
 
         pluginManager.setSystemVersion("1.0.0");
-        assertFalse(pluginManager.isPluginValid(pw1));
+        assertFalse(pluginManager.isPluginValid(pluginWrapper));
 
         pluginManager.setSystemVersion("5.0.0");
-        assertTrue(pluginManager.isPluginValid(pw1));
+        assertTrue(pluginManager.isPluginValid(pluginWrapper));
 
         pluginManager.setSystemVersion("6.0.0");
-        assertTrue(pluginManager.isPluginValid(pw1));
+        assertTrue(pluginManager.isPluginValid(pluginWrapper));
     }
 
     @Test
@@ -87,21 +109,52 @@ public class DefaultPluginManagerTest {
         pluginManager.setExactVersionAllowed(true);
 
         // By default accept all since system version not given
-        assertTrue(pluginManager.isPluginValid(pw1));
+        assertTrue(pluginManager.isPluginValid(pluginWrapper));
 
         pluginManager.setSystemVersion("1.0.0");
-        assertFalse(pluginManager.isPluginValid(pw1));
+        assertFalse(pluginManager.isPluginValid(pluginWrapper));
 
         pluginManager.setSystemVersion("5.0.0");
-        assertTrue(pluginManager.isPluginValid(pw1));
+        assertTrue(pluginManager.isPluginValid(pluginWrapper));
 
         pluginManager.setSystemVersion("6.0.0");
-        assertFalse(pluginManager.isPluginValid(pw1));
+        assertFalse(pluginManager.isPluginValid(pluginWrapper));
     }
 
     @Test
     public void testDefaultExactVersionAllowed() {
-        assertEquals(false, pluginManager.isExactVersionAllowed());
+        assertFalse(pluginManager.isExactVersionAllowed());
+    }
+
+    /**
+     * Test that a disabled plugin doesn't start.
+     * See https://github.com/pf4j/pf4j/issues/223.
+     */
+    @Test
+    public void testPluginDisabledNoStart() throws IOException {
+        new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        final PluginStatusProvider statusProvider = mock(PluginStatusProvider.class);
+        when(statusProvider.isPluginDisabled("myPlugin")).thenReturn(true);
+
+        PluginManager pluginManager = new DefaultPluginManager(pluginsPath) {
+
+            protected PluginStatusProvider createPluginStatusProvider() {
+                return statusProvider;
+            }
+
+        };
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        assertEquals(1, pluginManager.getPlugins().size());
+        assertEquals(0, pluginManager.getStartedPlugins().size());
+
+        PluginWrapper plugin = pluginManager.getPlugin("myPlugin");
+        assertSame(PluginState.DISABLED, plugin.getPluginState());
     }
 
 }

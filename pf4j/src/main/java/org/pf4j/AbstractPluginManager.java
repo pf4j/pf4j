@@ -130,8 +130,6 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     /**
      * Returns a copy of plugins.
-     *
-     * @return
      */
     @Override
     public List<PluginWrapper> getPlugins() {
@@ -140,9 +138,6 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     /**
      * Returns a copy of plugins with that state.
-     *
-     * @param pluginState
-     * @return
      */
     @Override
     public List<PluginWrapper> getPlugins(PluginState pluginState) {
@@ -757,7 +752,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     protected void resolvePlugins() throws PluginException {
-        // retrieves the  plugins descriptors
+        // retrieves the plugins descriptors
         List<PluginDescriptor> descriptors = new ArrayList<>();
         for (PluginWrapper plugin : plugins.values()) {
             descriptors.add(plugin.getDescriptor());
@@ -786,7 +781,9 @@ public abstract class AbstractPluginManager implements PluginManager {
             PluginWrapper pluginWrapper = plugins.get(pluginId);
             if (unresolvedPlugins.remove(pluginWrapper)) {
                 PluginState pluginState = pluginWrapper.getPluginState();
-                pluginWrapper.setPluginState(PluginState.RESOLVED);
+                if (pluginState != PluginState.DISABLED) {
+                    pluginWrapper.setPluginState(PluginState.RESOLVED);
+                }
 
                 resolvedPlugins.add(pluginWrapper);
                 log.info("Plugin '{}' resolved", getPluginLabel(pluginWrapper.getDescriptor()));
@@ -839,7 +836,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         // validate the plugin
         if (!isPluginValid(pluginWrapper)) {
-            log.info("Plugin '{}' is disabled", pluginPath);
+            log.warn("Plugin '{}' is invalid and it will be disabled", pluginPath);
             pluginWrapper.setPluginState(PluginState.DISABLED);
         }
 
@@ -919,9 +916,6 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     /**
      * The plugin label is used in logging and it's a string in format {@code pluginId@pluginVersion}.
-     *
-     * @param pluginDescriptor
-     * @return
      */
     protected String getPluginLabel(PluginDescriptor pluginDescriptor) {
         return pluginDescriptor.getPluginId() + "@" + pluginDescriptor.getVersion();
