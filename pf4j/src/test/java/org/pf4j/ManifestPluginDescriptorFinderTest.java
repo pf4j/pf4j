@@ -36,37 +36,40 @@ import static org.junit.Assert.*;
 public class ManifestPluginDescriptorFinderTest {
 
     private VersionManager versionManager;
+    private Path pluginsPath;
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public TemporaryFolder pluginsFolder = new TemporaryFolder();
 
     @Before
     public void setUp() throws IOException {
+        pluginsPath = pluginsFolder.getRoot().toPath();
+
         Charset charset = Charset.forName("UTF-8");
 
-        Path pluginPath = testFolder.newFolder("test-plugin-1", "classes", "META-INF").toPath();
+        Path pluginPath = pluginsFolder.newFolder("test-plugin-1", "classes", "META-INF").toPath();
         Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin1Manifest(), charset);
 
-        pluginPath = testFolder.newFolder("test-plugin-2", "classes", "META-INF").toPath();
+        pluginPath = pluginsFolder.newFolder("test-plugin-2", "classes", "META-INF").toPath();
         Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin2Manifest(), charset);
 
         // empty plugin
-        testFolder.newFolder("test-plugin-3");
+        pluginsFolder.newFolder("test-plugin-3");
 
         // no plugin class
-        pluginPath = testFolder.newFolder("test-plugin-4", "classes", "META-INF").toPath();
+        pluginPath = pluginsFolder.newFolder("test-plugin-4", "classes", "META-INF").toPath();
         Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin4Manifest(), charset);
 
         // no plugin version
-        pluginPath = testFolder.newFolder("test-plugin-5", "classes", "META-INF").toPath();
+        pluginPath = pluginsFolder.newFolder("test-plugin-5", "classes", "META-INF").toPath();
         Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin5Manifest(), charset);
 
         // no plugin id
-        pluginPath = testFolder.newFolder("test-plugin-6", "classes", "META-INF").toPath();
+        pluginPath = pluginsFolder.newFolder("test-plugin-6", "classes", "META-INF").toPath();
         Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin6Manifest(), charset);
 
@@ -78,10 +81,10 @@ public class ManifestPluginDescriptorFinderTest {
      */
     @Test
     public void testFind() throws Exception {
-        PluginDescriptorFinder instance = new ManifestPluginDescriptorFinder();
+        PluginDescriptorFinder descriptorFinder = new ManifestPluginDescriptorFinder();
 
-        PluginDescriptor plugin1 = instance.find(getPluginsRoot().resolve("test-plugin-1"));
-        PluginDescriptor plugin2 = instance.find(getPluginsRoot().resolve("test-plugin-2"));
+        PluginDescriptor plugin1 = descriptorFinder.find(pluginsPath.resolve("test-plugin-1"));
+        PluginDescriptor plugin2 = descriptorFinder.find(pluginsPath.resolve("test-plugin-2"));
 
         assertEquals("test-plugin-1", plugin1.getPluginId());
         assertEquals("Test Plugin 1", plugin1.getPluginDescription());
@@ -109,8 +112,8 @@ public class ManifestPluginDescriptorFinderTest {
      */
     @Test(expected = PluginException.class)
     public void testFindNotFound() throws Exception {
-        PluginDescriptorFinder instance = new ManifestPluginDescriptorFinder();
-        instance.find(getPluginsRoot().resolve("test-plugin-3"));
+        PluginDescriptorFinder descriptorFinder = new ManifestPluginDescriptorFinder();
+        descriptorFinder.find(pluginsPath.resolve("test-plugin-3"));
     }
 
     private List<String> getPlugin1Manifest() {
@@ -227,10 +230,6 @@ public class ManifestPluginDescriptorFinderTest {
         };
 
         return Arrays.asList(lines);
-    }
-
-    private Path getPluginsRoot() {
-        return testFolder.getRoot().toPath();
     }
 
 }

@@ -27,7 +27,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Decebal Suiu
@@ -35,26 +36,26 @@ import static org.junit.Assert.*;
 public class CompoundPluginDescriptorFinderTest {
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public TemporaryFolder pluginsFolder = new TemporaryFolder();
 
     @Test
     public void add() {
-        CompoundPluginDescriptorFinder instance = new CompoundPluginDescriptorFinder();
-        assertEquals(0, instance.size());
+        CompoundPluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder();
+        assertEquals(0, descriptorFinder.size());
 
-        instance.add(new PropertiesPluginDescriptorFinder());
-        assertEquals(1, instance.size());
+        descriptorFinder.add(new PropertiesPluginDescriptorFinder());
+        assertEquals(1, descriptorFinder.size());
     }
 
     @Test
     public void find() throws Exception {
-        Path pluginPath = testFolder.newFolder("test-plugin-1").toPath();
+        Path pluginPath = pluginsFolder.newFolder("test-plugin-1").toPath();
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin1Properties(), StandardCharsets.UTF_8);
 
-        PluginDescriptorFinder instance = new CompoundPluginDescriptorFinder()
+        PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder()
             .add(new PropertiesPluginDescriptorFinder());
 
-        PluginDescriptor pluginDescriptor = instance.find(pluginPath);
+        PluginDescriptor pluginDescriptor = descriptorFinder.find(pluginPath);
         assertNotNull(pluginDescriptor);
         assertEquals("test-plugin-1", pluginDescriptor.getPluginId());
         assertEquals("0.0.1", pluginDescriptor.getVersion());
@@ -62,14 +63,14 @@ public class CompoundPluginDescriptorFinderTest {
 
     @Test
     public void findInJar() throws Exception {
-        PluginDescriptorFinder instance = new CompoundPluginDescriptorFinder()
+        PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder()
             .add(new PropertiesPluginDescriptorFinder());
 
-        PluginZip pluginJar = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.jar"), "myPlugin")
+        PluginZip pluginJar = new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.jar"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
-        PluginDescriptor pluginDescriptor = instance.find(pluginJar.path());
+        PluginDescriptor pluginDescriptor = descriptorFinder.find(pluginJar.path());
         assertNotNull(pluginDescriptor);
         assertEquals("myPlugin", pluginJar.pluginId());
         assertEquals("1.2.3", pluginJar.pluginVersion());
@@ -77,20 +78,21 @@ public class CompoundPluginDescriptorFinderTest {
 
     @Test(expected = PluginException.class)
     public void testNotFound() throws Exception {
-        PluginDescriptorFinder instance = new CompoundPluginDescriptorFinder();
-        instance.find(getPluginsRoot().resolve("test-plugin-3"));
+        PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder();
+        Path pluginsPath = pluginsFolder.getRoot().toPath();
+        descriptorFinder.find(pluginsPath.resolve("test-plugin-3"));
     }
 
     @Test
     public void testSpaceCharacterInFileName() throws Exception {
-        PluginDescriptorFinder instance = new PropertiesPluginDescriptorFinder();
-        File jar = testFolder.newFile("my plugin-1.2.3.jar");
+        PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
+        File jar = pluginsFolder.newFile("my plugin-1.2.3.jar");
 
         PluginZip pluginJar = new PluginZip.Builder(jar, "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
-        PluginDescriptor pluginDescriptor = instance.find(pluginJar.path());
+        PluginDescriptor pluginDescriptor = descriptorFinder.find(pluginJar.path());
         assertNotNull(pluginDescriptor);
     }
 
@@ -109,10 +111,6 @@ public class CompoundPluginDescriptorFinderTest {
         };
 
         return Arrays.asList(lines);
-    }
-
-    private Path getPluginsRoot() {
-        return testFolder.getRoot().toPath();
     }
 
 }

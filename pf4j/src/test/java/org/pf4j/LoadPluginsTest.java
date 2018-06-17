@@ -21,33 +21,37 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.pf4j.plugin.PluginZip;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class LoadPluginsTest {
 
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
-
     private DefaultPluginManager pluginManager;
 
+    @Rule
+    public TemporaryFolder pluginsFolder = new TemporaryFolder();
+
     @Before
-    public void setup() {
-        pluginManager = new DefaultPluginManager(testFolder.getRoot().toPath());
+    public void setUp() {
+        pluginManager = new DefaultPluginManager(pluginsFolder.getRoot().toPath());
     }
 
     @Test
     public void load() throws Exception {
-        PluginZip pluginZip = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+        PluginZip pluginZip = new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
         assertTrue(Files.exists(pluginZip.path()));
         assertEquals(0, pluginManager.getPlugins().size());
         pluginManager.loadPlugins();
+
         assertTrue(Files.exists(pluginZip.path()));
         assertTrue(Files.exists(pluginZip.unzippedPath()));
         assertEquals(1, pluginManager.getPlugins().size());
@@ -61,7 +65,7 @@ public class LoadPluginsTest {
 
     @Test(expected = PluginAlreadyLoadedException.class)
     public void loadTwiceFails() throws Exception {
-        PluginZip pluginZip = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+        PluginZip pluginZip = new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
@@ -71,7 +75,7 @@ public class LoadPluginsTest {
 
     @Test
     public void loadUnloadLoad() throws Exception {
-        PluginZip pluginZip = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+        PluginZip pluginZip = new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
@@ -88,7 +92,7 @@ public class LoadPluginsTest {
 
     @Test
     public void upgrade() throws Exception {
-        new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+        new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
@@ -98,7 +102,7 @@ public class LoadPluginsTest {
         assertEquals(1, pluginManager.getPlugins().size());
         assertEquals(1, pluginManager.getStartedPlugins().size());
 
-        PluginZip pluginZip2 = new PluginZip.Builder(testFolder.newFile("my-plugin-2.0.0.ZIP"), "myPlugin")
+        PluginZip pluginZip2 = new PluginZip.Builder(pluginsFolder.newFile("my-plugin-2.0.0.ZIP"), "myPlugin")
             .pluginVersion("2.0.0")
             .build();
 
@@ -114,12 +118,12 @@ public class LoadPluginsTest {
 
     @Test
     public void getRoot() {
-        assertEquals(testFolder.getRoot().toPath(), pluginManager.getPluginsRoot());
+        assertEquals(pluginsFolder.getRoot().toPath(), pluginManager.getPluginsRoot());
     }
 
     @Test
     public void notAPlugin() throws Exception {
-        testFolder.newFile("not-a-zip");
+        pluginsFolder.newFile("not-a-zip");
 
         pluginManager.loadPlugins();
 
@@ -128,11 +132,11 @@ public class LoadPluginsTest {
 
     @Test
     public void deletePlugin() throws Exception {
-        PluginZip pluginZip1 = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+        PluginZip pluginZip1 = new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
-        PluginZip pluginZip3 = new PluginZip.Builder(testFolder.newFile("other-3.0.0.Zip"), "other")
+        PluginZip pluginZip3 = new PluginZip.Builder(pluginsFolder.newFile("other-3.0.0.Zip"), "other")
             .pluginVersion("3.0.0")
             .build();
 

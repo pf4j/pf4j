@@ -25,6 +25,8 @@ import java.util.List;
 
 /**
  * The default implementation for {@link PluginStatusProvider}.
+ * The enabled plugins are read from {@code enabled.txt} file and
+ * the disabled plugins are read from {@code disabled.txt} file.
  *
  * @author Decebal Suiu
  * @author Mário Franco
@@ -41,10 +43,6 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
     public DefaultPluginStatusProvider(Path pluginsRoot) {
         this.pluginsRoot = pluginsRoot;
 
-        initialize();
-    }
-
-    private void initialize() {
         try {
             // create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
             enabledPlugins = FileUtils.readLines(pluginsRoot.resolve("enabled.txt"), true);
@@ -83,13 +81,13 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
 
     @Override
     public boolean enablePlugin(String pluginId) {
-        try {
-            if (disabledPlugins.remove(pluginId)) {
+        if (disabledPlugins.remove(pluginId)) {
+            try {
                 FileUtils.writeLines(disabledPlugins, pluginsRoot.resolve("disabled.txt").toFile());
+            } catch (IOException e) {
+                log.error("Failed to enable plugin {}", pluginId, e);
+                return false;
             }
-        } catch (IOException e) {
-            log.error("Failed to enable plugin {}", pluginId, e);
-            return false;
         }
 
         return true;

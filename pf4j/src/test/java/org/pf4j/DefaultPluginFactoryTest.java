@@ -16,9 +16,9 @@
 package org.pf4j;
 
 import org.junit.Test;
+import org.pf4j.plugin.AnotherFailTestPlugin;
 import org.pf4j.plugin.FailTestPlugin;
 import org.pf4j.plugin.TestPlugin;
-import org.pf4j.plugin.AnotherFailTestPlugin;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
@@ -28,14 +28,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- *
  * @author Mario Franco
  */
 public class DefaultPluginFactoryTest {
 
-    /**
-     * Test of create method, of class DefaultPluginFactory.
-     */
     @Test
     public void testCreate() {
         PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
@@ -45,16 +41,13 @@ public class DefaultPluginFactoryTest {
         when(pluginWrapper.getDescriptor()).thenReturn(pluginDescriptor);
         when(pluginWrapper.getPluginClassLoader()).thenReturn(getClass().getClassLoader());
 
-        DefaultPluginFactory instance = new DefaultPluginFactory();
+        PluginFactory pluginFactory = new DefaultPluginFactory();
 
-        Plugin result = instance.create(pluginWrapper);
+        Plugin result = pluginFactory.create(pluginWrapper);
         assertNotNull(result);
         assertThat(result, instanceOf(TestPlugin.class));
     }
 
-    /**
-     * Test of create method, of class DefaultPluginFactory.
-     */
     @Test
     public void testCreateFail() {
         PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
@@ -64,15 +57,12 @@ public class DefaultPluginFactoryTest {
         when(pluginWrapper.getDescriptor()).thenReturn(pluginDescriptor);
         when(pluginWrapper.getPluginClassLoader()).thenReturn(getClass().getClassLoader());
 
-        DefaultPluginFactory instance = new DefaultPluginFactory();
+        PluginFactory pluginFactory = new DefaultPluginFactory();
 
-        Plugin result = instance.create(pluginWrapper);
-        assertNull(result);
+        Plugin plugin = pluginFactory.create(pluginWrapper);
+        assertNull(plugin);
     }
 
-    /**
-     * Test of create method, of class DefaultPluginFactory.
-     */
     @Test
     public void testCreateFailNotFound() {
         PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
@@ -82,15 +72,12 @@ public class DefaultPluginFactoryTest {
         when(pluginWrapper.getDescriptor()).thenReturn(pluginDescriptor);
         when(pluginWrapper.getPluginClassLoader()).thenReturn(getClass().getClassLoader());
 
-        DefaultPluginFactory instance = new DefaultPluginFactory();
+        PluginFactory pluginFactory = new DefaultPluginFactory();
 
-        Plugin result = instance.create(pluginWrapper);
-        assertNull(result);
+        Plugin plugin = pluginFactory.create(pluginWrapper);
+        assertNull(plugin);
     }
 
-    /**
-     * Test of create method, of class DefaultPluginFactory.
-     */
     @Test
     public void testCreateFailConstructor() {
         PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
@@ -100,10 +87,10 @@ public class DefaultPluginFactoryTest {
         when(pluginWrapper.getDescriptor()).thenReturn(pluginDescriptor);
         when(pluginWrapper.getPluginClassLoader()).thenReturn(getClass().getClassLoader());
 
-        DefaultPluginFactory instance = new DefaultPluginFactory();
+        PluginFactory pluginFactory = new DefaultPluginFactory();
 
-        Plugin result = instance.create(pluginWrapper);
-        assertNull(result);
+        Plugin plugin = pluginFactory.create(pluginWrapper);
+        assertNull(plugin);
     }
 
 }

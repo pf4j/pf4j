@@ -33,33 +33,36 @@ import static org.junit.Assert.*;
 public class PropertiesPluginDescriptorFinderTest {
 
     private VersionManager versionManager;
+    private Path pluginsPath;
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public TemporaryFolder pluginsFolder = new TemporaryFolder();
 
     @Before
     public void setUp() throws IOException {
+        pluginsPath = pluginsFolder.getRoot().toPath();
+
         Charset charset = Charset.forName("UTF-8");
 
-        Path pluginPath = testFolder.newFolder("test-plugin-1").toPath();
+        Path pluginPath = pluginsFolder.newFolder("test-plugin-1").toPath();
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin1Properties(), charset);
 
-        pluginPath = testFolder.newFolder("test-plugin-2").toPath();
+        pluginPath = pluginsFolder.newFolder("test-plugin-2").toPath();
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin2Properties(), charset);
 
         // empty plugin
-        testFolder.newFolder("test-plugin-3");
+        pluginsFolder.newFolder("test-plugin-3");
 
         // no plugin class
-        pluginPath = testFolder.newFolder("test-plugin-4").toPath();
+        pluginPath = pluginsFolder.newFolder("test-plugin-4").toPath();
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin4Properties(), charset);
 
         // no plugin version
-        pluginPath = testFolder.newFolder("test-plugin-5").toPath();
+        pluginPath = pluginsFolder.newFolder("test-plugin-5").toPath();
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin5Properties(), charset);
 
         // no plugin id
-        pluginPath = testFolder.newFolder("test-plugin-6").toPath();
+        pluginPath = pluginsFolder.newFolder("test-plugin-6").toPath();
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin6Properties(), charset);
 
         versionManager = new DefaultVersionManager();
@@ -67,10 +70,10 @@ public class PropertiesPluginDescriptorFinderTest {
 
     @Test
     public void testFind() throws Exception {
-        PluginDescriptorFinder instance = new PropertiesPluginDescriptorFinder();
+        PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
 
-        PluginDescriptor plugin1 = instance.find(getPluginsRoot().resolve("test-plugin-1"));
-        PluginDescriptor plugin2 = instance.find(getPluginsRoot().resolve("test-plugin-2"));
+        PluginDescriptor plugin1 = descriptorFinder.find(pluginsPath.resolve("test-plugin-1"));
+        PluginDescriptor plugin2 = descriptorFinder.find(pluginsPath.resolve("test-plugin-2"));
 
         assertEquals("test-plugin-1", plugin1.getPluginId());
         assertEquals("Test Plugin 1", plugin1.getPluginDescription());
@@ -98,20 +101,20 @@ public class PropertiesPluginDescriptorFinderTest {
 
     @Test(expected = PluginException.class)
     public void testNotFound() throws Exception {
-        PluginDescriptorFinder instance = new PropertiesPluginDescriptorFinder();
-        instance.find(getPluginsRoot().resolve("test-plugin-3"));
+        PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
+        descriptorFinder.find(pluginsPath.resolve("test-plugin-3"));
     }
 
     @Test
     public void findInJar() throws Exception {
-        PluginZip pluginJar = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.jar"), "myPlugin")
+        PluginZip pluginJar = new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.jar"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
         assertTrue(Files.exists(pluginJar.path()));
 
-        PluginDescriptorFinder instance = new PropertiesPluginDescriptorFinder();
-        PluginDescriptor pluginDescriptor = instance.find(pluginJar.path());
+        PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
+        PluginDescriptor pluginDescriptor = descriptorFinder.find(pluginJar.path());
         assertNotNull(pluginDescriptor);
         assertEquals("myPlugin", pluginJar.pluginId());
         assertEquals("1.2.3", pluginJar.pluginVersion());
@@ -188,10 +191,6 @@ public class PropertiesPluginDescriptorFinderTest {
         };
 
         return Arrays.asList(lines);
-    }
-
-    private Path getPluginsRoot() {
-        return testFolder.getRoot().toPath();
     }
 
 }
