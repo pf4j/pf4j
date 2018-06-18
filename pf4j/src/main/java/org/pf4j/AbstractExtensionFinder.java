@@ -82,16 +82,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
             return result;
         }
 
-        if (pluginId != null) {
-            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
-            if (PluginState.STARTED != pluginWrapper.getPluginState()) {
-                return result;
-            }
-
-            log.trace("Checking extensions from plugin '{}'", pluginId);
-        } else {
-            log.trace("Checking extensions from classpath");
-        }
+        if (pluginNotStarted(pluginId)) return result;
 
         ClassLoader classLoader = (pluginId != null) ? pluginManager.getPluginClassLoader(pluginId) : getClass().getClassLoader();
 
@@ -138,16 +129,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
             return result;
         }
 
-        if (pluginId != null) {
-            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
-            if (PluginState.STARTED != pluginWrapper.getPluginState()) {
-                return result;
-            }
-
-            log.trace("Checking extensions from plugin '{}'", pluginId);
-        } else {
-            log.trace("Checking extensions from classpath");
-        }
+        if (pluginNotStarted(pluginId)) return result;
 
         ClassLoader classLoader = (pluginId != null) ? pluginManager.getPluginClassLoader(pluginId) : getClass().getClassLoader();
 
@@ -174,6 +156,20 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         Collections.sort(result);
 
         return result;
+    }
+
+    private boolean pluginNotStarted(String pluginId) {
+        if (pluginId != null) {
+            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
+            if (PluginState.STARTED != pluginWrapper.getPluginState()) {
+                return true;
+            }
+
+            log.trace("Checking extensions from plugin '{}'", pluginId);
+        } else {
+            log.trace("Checking extensions from classpath");
+        }
+        return false;
     }
 
     @Override
