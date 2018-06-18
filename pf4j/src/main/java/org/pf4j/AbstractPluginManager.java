@@ -244,12 +244,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     private boolean unloadPlugin(String pluginId, boolean unloadDependents) {
         try {
             if (unloadDependents) {
-                List<String> dependents = dependencyResolver.getDependents(pluginId);
-                while (!dependents.isEmpty()) {
-                    String dependent = dependents.remove(0);
-                    unloadPlugin(dependent, false);
-                    dependents.addAll(0, dependencyResolver.getDependents(dependent));
-                }
+                unloadDepndentPlugins(pluginId);
             }
 
             PluginState pluginState = stopPlugin(pluginId, false);
@@ -287,6 +282,15 @@ public abstract class AbstractPluginManager implements PluginManager {
         return false;
     }
 
+    private void unloadDepndentPlugins(String pluginId) {
+        List<String> dependents = dependencyResolver.getDependents(pluginId);
+        while (!dependents.isEmpty()) {
+            String dependent = dependents.remove(0);
+            unloadPlugin(dependent, false);
+            dependents.addAll(0, dependencyResolver.getDependents(dependent));
+        }
+    }
+
     @Override
     public boolean deletePlugin(String pluginId) {
         checkPluginId(pluginId);
@@ -316,16 +320,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
             PluginState pluginState = pluginWrapper.getPluginState();
             if ((PluginState.DISABLED != pluginState) && (PluginState.STARTED != pluginState)) {
-                try {
-                    log.info("Start plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
-                    pluginWrapper.getPlugin().start();
-                    pluginWrapper.setPluginState(PluginState.STARTED);
-                    startedPlugins.add(pluginWrapper);
-
-                    firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
+                tryStartPlugin(pluginWrapper, pluginWrapper.getDescriptor(), pluginState);
             }
         }
     }
@@ -361,6 +356,12 @@ public abstract class AbstractPluginManager implements PluginManager {
             startPlugin(dependency.getPluginId());
         }
 
+        tryStartPlugin(pluginWrapper, pluginDescriptor, pluginState);
+
+        return pluginWrapper.getPluginState();
+    }
+
+    private void tryStartPlugin(PluginWrapper pluginWrapper, PluginDescriptor pluginDescriptor, PluginState pluginState) {
         try {
             log.info("Start plugin '{}'", getPluginLabel(pluginDescriptor));
             pluginWrapper.getPlugin().start();
@@ -371,8 +372,6 @@ public abstract class AbstractPluginManager implements PluginManager {
         } catch (PluginException e) {
             log.error(e.getMessage(), e);
         }
-
-        return pluginWrapper.getPluginState();
     }
 
     /**
@@ -427,12 +426,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         if (stopDependents) {
-            List<String> dependents = dependencyResolver.getDependents(pluginId);
-            while (!dependents.isEmpty()) {
-                String dependent = dependents.remove(0);
-                stopPlugin(dependent, false);
-                dependents.addAll(0, dependencyResolver.getDependents(dependent));
-            }
+            stopDependentPlugins(pluginId);
         }
 
         try {
@@ -447,6 +441,15 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         return pluginWrapper.getPluginState();
+    }
+
+    private void stopDependentPlugins(String pluginId) {
+        List<String> dependents = dependencyResolver.getDependents(pluginId);
+        while (!dependents.isEmpty()) {
+            String dependent = dependents.remove(0);
+            stopPlugin(dependent, false);
+            dependents.addAll(0, dependencyResolver.getDependents(dependent));
+        }
     }
 
     private void checkPluginId(String pluginId) {
