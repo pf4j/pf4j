@@ -320,7 +320,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
             PluginState pluginState = pluginWrapper.getPluginState();
             if ((PluginState.DISABLED != pluginState) && (PluginState.STARTED != pluginState)) {
-                tryStartPlugin(pluginWrapper, pluginWrapper.getDescriptor(), pluginState);
+                tryStartPlugin(pluginWrapper);
             }
         }
     }
@@ -356,19 +356,20 @@ public abstract class AbstractPluginManager implements PluginManager {
             startPlugin(dependency.getPluginId());
         }
 
-        tryStartPlugin(pluginWrapper, pluginDescriptor, pluginState);
+        tryStartPlugin(pluginWrapper);
 
         return pluginWrapper.getPluginState();
     }
 
-    private void tryStartPlugin(PluginWrapper pluginWrapper, PluginDescriptor pluginDescriptor, PluginState pluginState) {
+    private void tryStartPlugin(PluginWrapper pluginWrapper) {
         try {
+            PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
             log.info("Start plugin '{}'", getPluginLabel(pluginDescriptor));
             pluginWrapper.getPlugin().start();
             pluginWrapper.setPluginState(PluginState.STARTED);
             startedPlugins.add(pluginWrapper);
 
-            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
+            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginWrapper.getPluginState()));
         } catch (PluginException e) {
             log.error(e.getMessage(), e);
         }
