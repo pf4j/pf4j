@@ -21,8 +21,8 @@ import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.pf4j.demo.api.Greeting;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A boot class that start the demo.
@@ -59,9 +59,8 @@ public class Boot {
         printIndented(pluginManager.getExtensionClassNames(null));
 
         System.out.println("Extension classes by classpath:");
-        for (Class<Greeting> greeting : pluginManager.getExtensionClasses(Greeting.class)) {
-            System.out.println("   Class: " + greeting.getCanonicalName());
-        }
+        final List<String> classesNames = classesNamesForPrint(pluginManager.getExtensionClasses(Greeting.class));
+        printIndented(classesNames);
 
         // print extensions ids for each started plugin
         for (PluginWrapper plugin : pluginManager.getStartedPlugins()) {
@@ -102,9 +101,17 @@ public class Boot {
         */
     }
 
+    private static List<String> classesNamesForPrint(List<Class<Greeting>> classes) {
+        List<String> classesNames = new ArrayList<>();
+        for (Class<Greeting> greeting : classes) {
+            classesNames.add("Class: " + greeting.getCanonicalName());
+        }
+        return classesNames;
+    }
+
     private static <T> void printIndented(Iterable<T> strings) {
-        for (T extension : strings) {
-            System.out.println("   " + extension);
+        for (T item : strings) {
+            System.out.println("   " + item);
         }
     }
 
