@@ -82,16 +82,8 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
             return result;
         }
 
-        if (pluginId != null) {
-            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
-            if (PluginState.STARTED != pluginWrapper.getPluginState()) {
-                return result;
-            }
-
-            log.trace("Checking extensions from plugin '{}'", pluginId);
-        } else {
-            log.trace("Checking extensions from classpath");
-        }
+        if (pluginNotStarted(pluginId)) return result;
+        logCheckingExtensions(pluginId);
 
         ClassLoader classLoader = (pluginId != null) ? pluginManager.getPluginClassLoader(pluginId) : getClass().getClassLoader();
 
@@ -138,16 +130,8 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
             return result;
         }
 
-        if (pluginId != null) {
-            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
-            if (PluginState.STARTED != pluginWrapper.getPluginState()) {
-                return result;
-            }
-
-            log.trace("Checking extensions from plugin '{}'", pluginId);
-        } else {
-            log.trace("Checking extensions from classpath");
-        }
+        if (pluginNotStarted(pluginId)) return result;
+        logCheckingExtensions(pluginId);
 
         ClassLoader classLoader = (pluginId != null) ? pluginManager.getPluginClassLoader(pluginId) : getClass().getClassLoader();
 
@@ -174,6 +158,22 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         Collections.sort(result);
 
         return result;
+    }
+
+    private void logCheckingExtensions(String pluginId){
+        if (pluginId != null) {
+            log.trace("Checking extensions from plugin '{}'", pluginId);
+        } else {
+            log.trace("Checking extensions from classpath");
+        }
+    }
+
+    private boolean pluginNotStarted(String pluginId) {
+        if (pluginId != null) {
+            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
+            return PluginState.STARTED != pluginWrapper.getPluginState();
+        }
+        return false;
     }
 
     @Override

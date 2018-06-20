@@ -58,17 +58,17 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     }
 
     @Override
-	public SourceVersion getSupportedSourceVersion() {
-		return SourceVersion.latest();
-	}
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latest();
+    }
 
-	@Override
-	public Set<String> getSupportedAnnotationTypes() {
-		Set<String> annotationTypes = new HashSet<>();
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        Set<String> annotationTypes = new HashSet<>();
         annotationTypes.add(Extension.class.getName());
 
         return annotationTypes;
-	}
+    }
 
     @Override
     public Set<String> getSupportedOptions() {
@@ -79,19 +79,32 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     }
 
     @Override
-	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		if (roundEnv.processingOver()) {
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        if (roundEnv.processingOver()) {
             return false;
         }
 
         info("Processing @%s", Extension.class);
-		for (Element element : roundEnv.getElementsAnnotatedWith(Extension.class)) {
-            // check if @Extension is put on class and not on method or constructor
-            if (!(element instanceof TypeElement)) {
-				continue;
-			}
+        readExtensionsFromAnnotatedClasses(roundEnv);
 
-            // check if class extends/implements an extension point
+        // read old extensions
+        oldExtensions = storage.read();
+        copyDataFromTo(oldExtensions, extensions);
+
+        // write extensions
+        storage.write(extensions);
+
+        return false;
+    }
+
+    private void readExtensionsFromAnnotatedClasses(RoundEnvironment roundEnv) {
+        for (Element element : roundEnv.getElementsAnnotatedWith(Extension.class)) {
+// check if @Extension is put on class and not on method or constructor
+            if (!(element instanceof TypeElement)) {
+                continue;
+            }
+
+// check if class extends/implements an extension point
             if (!isExtension(element.asType())) {
                 continue;
             }
@@ -100,7 +113,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
 //            Extension annotation = element.getAnnotation(Extension.class);
             List<TypeElement> extensionPointElements = findExtensionPoints(extensionElement);
             if (extensionPointElements.isEmpty()) {
-                // TODO throw error ?
+// TODO throw error ?
                 continue;
             }
 
@@ -115,23 +128,18 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
                 extensionPoints.add(extension);
             }
         }
+    }
 
-        // read old extensions
-        oldExtensions = storage.read();
-        for (Map.Entry<String, Set<String>> entry : oldExtensions.entrySet()) {
+    private void copyDataFromTo(Map<String, Set<String>> sourceMap, Map<String, Set<String>> targetMap) {
+        for (Map.Entry<String, Set<String>> entry : sourceMap.entrySet()) {
             String extensionPoint = entry.getKey();
-            if (extensions.containsKey(extensionPoint)) {
+            if (targetMap.containsKey(extensionPoint)) {
                 extensions.get(extensionPoint).addAll(entry.getValue());
             } else {
                 extensions.put(extensionPoint, entry.getValue());
             }
         }
-
-        // write extensions
-        storage.write(extensions);
-
-		return false;
-	}
+    }
 
     public ProcessingEnvironment getProcessingEnvironment() {
         return processingEnv;

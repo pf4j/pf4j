@@ -21,8 +21,8 @@ import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.pf4j.demo.api.Greeting;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A boot class that start the demo.
@@ -56,53 +56,35 @@ public class Boot {
 
         // print extensions from classpath (non plugin)
         System.out.println("Extensions added by classpath:");
-        Set<String> extensionClassNames = pluginManager.getExtensionClassNames(null);
-        for (String extension : extensionClassNames) {
-            System.out.println("   " + extension);
-        }
+        printIndented(pluginManager.getExtensionClassNames(null));
 
         System.out.println("Extension classes by classpath:");
-        List<Class<Greeting>> greetingsClasses = pluginManager.getExtensionClasses(Greeting.class);
-        for (Class<Greeting> greeting : greetingsClasses) {
-            System.out.println("   Class: " + greeting.getCanonicalName());
-        }
+        final List<String> classesNames = classesNamesForPrint(pluginManager.getExtensionClasses(Greeting.class));
+        printIndented(classesNames);
 
         // print extensions ids for each started plugin
-        List<PluginWrapper> startedPlugins = pluginManager.getStartedPlugins();
-        for (PluginWrapper plugin : startedPlugins) {
+        for (PluginWrapper plugin : pluginManager.getStartedPlugins()) {
             String pluginId = plugin.getDescriptor().getPluginId();
             System.out.println(String.format("Extensions added by plugin '%s':", pluginId));
-            extensionClassNames = pluginManager.getExtensionClassNames(pluginId);
-            for (String extension : extensionClassNames) {
-                System.out.println("   " + extension);
-            }
+            printIndented(pluginManager.getExtensionClassNames(pluginId));
         }
 
         // print the extensions instances for Greeting extension point for each started plugin
-        for (PluginWrapper plugin : startedPlugins) {
+        for (PluginWrapper plugin : pluginManager.getStartedPlugins()) {
             String pluginId = plugin.getDescriptor().getPluginId();
             System.out.println(String.format("Extensions instances added by plugin '%s' for extension point '%s':", pluginId, Greeting.class.getName()));
-            List<Greeting> extensions = pluginManager.getExtensions(Greeting.class, pluginId);
-            for (Object extension : extensions) {
-                System.out.println("   " + extension);
-            }
+            printIndented(pluginManager.getExtensions(Greeting.class, pluginId));
         }
 
         // print extensions instances from classpath (non plugin)
         System.out.println("Extensions instances added by classpath:");
-        List extensions = pluginManager.getExtensions((String) null);
-        for (Object extension : extensions) {
-            System.out.println("   " + extension);
-        }
+        printIndented(pluginManager.getExtensions((String) null));
 
         // print extensions instances for each started plugin
-        for (PluginWrapper plugin : startedPlugins) {
+        for (PluginWrapper plugin : pluginManager.getStartedPlugins()) {
             String pluginId = plugin.getDescriptor().getPluginId();
             System.out.println(String.format("Extensions instances added by plugin '%s':", pluginId));
-            extensions = pluginManager.getExtensions(pluginId);
-            for (Object extension : extensions) {
-                System.out.println("   " + extension);
-            }
+            printIndented(pluginManager.getExtensions(pluginId));
         }
 
         // stop the plugins
@@ -119,7 +101,21 @@ public class Boot {
         */
     }
 
-	private static void printLogo() {
+    private static List<String> classesNamesForPrint(List<Class<Greeting>> classes) {
+        List<String> classesNames = new ArrayList<>();
+        for (Class<Greeting> greeting : classes) {
+            classesNames.add("Class: " + greeting.getCanonicalName());
+        }
+        return classesNames;
+    }
+
+    private static <T> void printIndented(Iterable<T> strings) {
+        for (T item : strings) {
+            System.out.println("   " + item);
+        }
+    }
+
+    private static void printLogo() {
     	System.out.println(StringUtils.repeat("#", 40));
     	System.out.println(StringUtils.center("PF4J-DEMO", 40));
     	System.out.println(StringUtils.repeat("#", 40));
