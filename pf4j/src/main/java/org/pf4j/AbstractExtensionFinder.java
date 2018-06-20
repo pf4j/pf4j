@@ -83,6 +83,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         }
 
         if (pluginNotStarted(pluginId)) return result;
+        logCheckingExtensions(pluginId);
 
         ClassLoader classLoader = (pluginId != null) ? pluginManager.getPluginClassLoader(pluginId) : getClass().getClassLoader();
 
@@ -130,6 +131,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         }
 
         if (pluginNotStarted(pluginId)) return result;
+        logCheckingExtensions(pluginId);
 
         ClassLoader classLoader = (pluginId != null) ? pluginManager.getPluginClassLoader(pluginId) : getClass().getClassLoader();
 
@@ -158,16 +160,18 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         return result;
     }
 
-    private boolean pluginNotStarted(String pluginId) {
+    private void logCheckingExtensions(String pluginId){
         if (pluginId != null) {
-            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
-            if (PluginState.STARTED != pluginWrapper.getPluginState()) {
-                return true;
-            }
-
             log.trace("Checking extensions from plugin '{}'", pluginId);
         } else {
             log.trace("Checking extensions from classpath");
+        }
+    }
+
+    private boolean pluginNotStarted(String pluginId) {
+        if (pluginId != null) {
+            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
+            return PluginState.STARTED != pluginWrapper.getPluginState();
         }
         return false;
     }
