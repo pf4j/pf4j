@@ -40,12 +40,12 @@ public interface PluginManager {
     /**
      * Retrieves all resolved plugins (with resolved dependency).
      */
-  	List<PluginWrapper> getResolvedPlugins();
+    List<PluginWrapper> getResolvedPlugins();
 
-	/**
-	 * Retrieves all unresolved plugins (with unresolved dependency).
-	 */
-  	List<PluginWrapper> getUnresolvedPlugins();
+    /**
+     * Retrieves all unresolved plugins (with unresolved dependency).
+     */
+    List<PluginWrapper> getUnresolvedPlugins();
 
     /**
      * Retrieves all started plugins.
@@ -71,7 +71,7 @@ public interface PluginManager {
      * @param pluginPath
      * @return the pluginId of the installed plugin or null
      */
-	String loadPlugin(Path pluginPath);
+    String loadPlugin(Path pluginPath);
 
     /**
      * Start all active plugins.
@@ -129,13 +129,13 @@ public interface PluginManager {
      */
     boolean deletePlugin(String pluginId);
 
-	ClassLoader getPluginClassLoader(String pluginId);
+    ClassLoader getPluginClassLoader(String pluginId);
 
     <T> List<Class<T>> getExtensionClasses(Class<T> type);
 
     <T> List<Class<T>> getExtensionClasses(Class<T> type, String pluginId);
 
-	<T> List<T> getExtensions(Class<T> type);
+    <T> List<T> getExtensions(Class<T> type);
 
     <T> List<T> getExtensions(Class<T> type, String pluginId);
 
@@ -146,9 +146,9 @@ public interface PluginManager {
     ExtensionFactory getExtensionFactory();
 
     /**
-	 * The runtime mode. Must currently be either DEVELOPMENT or DEPLOYMENT.
-	 */
-	RuntimeMode getRuntimeMode();
+     * The runtime mode. Must currently be either DEVELOPMENT or DEPLOYMENT.
+     */
+    RuntimeMode getRuntimeMode();
 
     /**
      * Retrieves the {@link PluginWrapper} that loaded the given class 'clazz'.

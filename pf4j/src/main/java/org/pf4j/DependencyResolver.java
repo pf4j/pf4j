@@ -39,9 +39,9 @@ import java.util.Map;
  */
 public class DependencyResolver {
 
-	private static final Logger log = LoggerFactory.getLogger(DependencyResolver.class);
+    private static final Logger log = LoggerFactory.getLogger(DependencyResolver.class);
 
-	private VersionManager versionManager;
+    private VersionManager versionManager;
 
     private DirectedGraph<String> dependenciesGraph; // the value is 'pluginId'
     private DirectedGraph<String> dependentsGraph; // the value is 'pluginId'
@@ -168,10 +168,10 @@ public class DependencyResolver {
             "' for plugin '" + dependent.getPluginId() + "'");
     }
 
-	public static class Result {
+    public static class Result {
 
-	    private boolean cyclicDependency;
-	    private List<String> notFoundDependencies; // value is "pluginId"
+        private boolean cyclicDependency;
+        private List<String> notFoundDependencies; // value is "pluginId"
         private List<String> sortedPlugins; // value is "pluginId"
         private List<WrongDependencyVersion> wrongVersionDependencies;
 
@@ -194,9 +194,9 @@ public class DependencyResolver {
             return cyclicDependency;
         }
 
-	    /**
-	     * Returns a list with dependencies required that were not found.
-	     */
+        /**
+         * Returns a list with dependencies required that were not found.
+         */
         public List<String> getNotFoundDependencies() {
             return notFoundDependencies;
         }

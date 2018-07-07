@@ -34,19 +34,19 @@ import java.util.Properties;
  */
 public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder {
 
-	private static final Logger log = LoggerFactory.getLogger(PropertiesPluginDescriptorFinder.class);
+    private static final Logger log = LoggerFactory.getLogger(PropertiesPluginDescriptorFinder.class);
 
-	private static final String DEFAULT_PROPERTIES_FILE_NAME = "plugin.properties";
+    private static final String DEFAULT_PROPERTIES_FILE_NAME = "plugin.properties";
 
-	protected String propertiesFileName;
+    protected String propertiesFileName;
 
-	public PropertiesPluginDescriptorFinder() {
-		this(DEFAULT_PROPERTIES_FILE_NAME);
-	}
+    public PropertiesPluginDescriptorFinder() {
+        this(DEFAULT_PROPERTIES_FILE_NAME);
+    }
 
-	public PropertiesPluginDescriptorFinder(String propertiesFileName) {
+    public PropertiesPluginDescriptorFinder(String propertiesFileName) {
         this.propertiesFileName = propertiesFileName;
-	}
+    }
 
     @Override
     public boolean isApplicable(Path pluginPath) {
@@ -54,11 +54,11 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     }
 
     @Override
-	public PluginDescriptor find(Path pluginPath) throws PluginException {
+    public PluginDescriptor find(Path pluginPath) throws PluginException {
         Properties properties = readProperties(pluginPath);
 
         return createPluginDescriptor(properties);
-	}
+    }
 
     protected Properties readProperties(Path pluginPath) throws PluginException {
         Path propertiesPath = getPropertiesPath(pluginPath, propertiesFileName);
@@ -82,10 +82,10 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     }
 
     protected Path getPropertiesPath(Path pluginPath, String propertiesFileName) throws PluginException {
-	    if (Files.isDirectory(pluginPath)) {
+        if (Files.isDirectory(pluginPath)) {
             return pluginPath.resolve(Paths.get(propertiesFileName));
         } else {
-	        // it's a jar file
+            // it's a jar file
             try {
                 return FileUtils.getPath(pluginPath, propertiesFileName);
             } catch (IOException e) {

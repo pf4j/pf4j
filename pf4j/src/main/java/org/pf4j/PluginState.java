@@ -23,7 +23,7 @@ public class PluginState {
     /**
      * The runtime knows the plugin is there. It knows about the plugin path, the plugin descriptor.
      */
-	public static final PluginState CREATED = new PluginState("CREATED");
+    public static final PluginState CREATED = new PluginState("CREATED");
 
     /**
      * The plugin cannot be used.
@@ -39,18 +39,18 @@ public class PluginState {
     /**
      * The {@link Plugin#start()} has executed. A started plugin may contribute extensions.
      */
-	public static final PluginState STARTED = new PluginState("STARTED");
+    public static final PluginState STARTED = new PluginState("STARTED");
 
     /**
      * The {@link Plugin#stop()} has executed.
      */
     public static final PluginState STOPPED = new PluginState("STOPPED");
 
-	private String status;
+    private String status;
 
-	private PluginState(String status) {
-		this.status = status;
-	}
+    private PluginState(String status) {
+        this.status = status;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -68,8 +68,8 @@ public class PluginState {
     }
 
     @Override
-	public String toString() {
-		return status;
-	}
+    public String toString() {
+        return status;
+    }
 
 }

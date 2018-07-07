@@ -47,34 +47,34 @@ public class FileUtils {
 
     public static List<String> readLines(Path path, boolean ignoreComments) throws IOException {
         File file = path.toFile();
-		if (!file.exists() || !file.isFile()) {
-			return new ArrayList<>();
-		}
+        if (!file.exists() || !file.isFile()) {
+            return new ArrayList<>();
+        }
 
-		List<String> lines = new ArrayList<>();
+        List<String> lines = new ArrayList<>();
 
-		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				if (ignoreComments && !line.startsWith("#") && !lines.contains(line)) {
-					lines.add(line);
-				}
-			}
-		}
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (ignoreComments && !line.startsWith("#") && !lines.contains(line)) {
+                    lines.add(line);
+                }
+            }
+        }
 
-		return lines;
-	}
+        return lines;
+    }
 
     public static void writeLines(Collection<String> lines, File file) throws IOException {
         Files.write(file.toPath(), lines, StandardCharsets.UTF_8);
     }
 
     /**
-   	 * Delete a file or recursively delete a folder, do not follow symlinks.
-   	 *
-   	 * @param path the file or folder to delete
-   	 * @throws IOException if something goes wrong
-   	 */
+     * Delete a file or recursively delete a folder, do not follow symlinks.
+     *
+     * @param path the file or folder to delete
+     * @throws IOException if something goes wrong
+     */
     public static void delete(Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
 
@@ -95,13 +95,13 @@ public class FileUtils {
            }
 
         });
-	}
+    }
 
-	public static List<File> getJars(Path folder) {
-	    List<File> bucket = new ArrayList<>();
-	    getJars(bucket, folder);
+    public static List<File> getJars(Path folder) {
+        List<File> bucket = new ArrayList<>();
+        getJars(bucket, folder);
 
-	    return bucket;
+        return bucket;
     }
 
     private static void getJars(final List<File> bucket, Path folder) {

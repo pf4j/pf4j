@@ -39,11 +39,11 @@ import java.util.Set;
  */
 public class LegacyExtensionFinder extends AbstractExtensionFinder {
 
-	private static final Logger log = LoggerFactory.getLogger(LegacyExtensionFinder.class);
+    private static final Logger log = LoggerFactory.getLogger(LegacyExtensionFinder.class);
 
-	public LegacyExtensionFinder(PluginManager pluginManager) {
+    public LegacyExtensionFinder(PluginManager pluginManager) {
         super(pluginManager);
-	}
+    }
 
     @Override
     public Map<String, Set<String>> readClasspathStorages() {

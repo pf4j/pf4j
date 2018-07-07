@@ -35,6 +35,6 @@ public interface PluginDescriptorFinder {
      */
     boolean isApplicable(Path pluginPath);
 
-	PluginDescriptor find(Path pluginPath) throws PluginException;
+    PluginDescriptor find(Path pluginPath) throws PluginException;
 
 }

@@ -31,7 +31,7 @@ public class DefaultExtensionFinder implements ExtensionFinder, PluginStateListe
     protected PluginManager pluginManager;
     protected List<ExtensionFinder> finders = new ArrayList<>();
 
-	public DefaultExtensionFinder(PluginManager pluginManager) {
+    public DefaultExtensionFinder(PluginManager pluginManager) {
         this.pluginManager = pluginManager;
 
         add(new LegacyExtensionFinder(pluginManager));

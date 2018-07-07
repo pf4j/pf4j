@@ -43,11 +43,11 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
     }
 
     @Override
-	public PluginDescriptor find(Path pluginPath) throws PluginException {
+    public PluginDescriptor find(Path pluginPath) throws PluginException {
         Manifest manifest = readManifest(pluginPath);
 
         return createPluginDescriptor(manifest);
-	}
+    }
 
     protected Manifest readManifest(Path pluginPath) throws PluginException {
         if (FileUtils.isJarFile(pluginPath)) {

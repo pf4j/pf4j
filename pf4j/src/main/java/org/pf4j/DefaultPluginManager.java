@@ -29,7 +29,7 @@ import java.nio.file.Path;
  */
 public class DefaultPluginManager extends AbstractPluginManager {
 
-	private static final Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
 
     protected PluginClasspath pluginClasspath;
 
@@ -60,7 +60,7 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
     @Override
     protected ExtensionFinder createExtensionFinder() {
-    	DefaultExtensionFinder extensionFinder = new DefaultExtensionFinder(this);
+        DefaultExtensionFinder extensionFinder = new DefaultExtensionFinder(this);
         addPluginStateListener(extensionFinder);
 
         return extensionFinder;
@@ -120,7 +120,7 @@ public class DefaultPluginManager extends AbstractPluginManager {
         }
 
         log.info("PF4J version {} in '{}' mode", getVersion(), getRuntimeMode());
-	}
+    }
 
     /**
      * Load a plugin from disk. If the path is a zip file, first unpack

@@ -28,6 +28,7 @@ import org.pf4j.demo.api.Greeting;
  * @author Decebal Suiu
  */
 public class WelcomePlugin extends Plugin {
+
     private static final Logger logger = LoggerFactory.getLogger(WelcomePlugin.class);
 
     public WelcomePlugin(PluginWrapper wrapper) {
@@ -37,7 +38,7 @@ public class WelcomePlugin extends Plugin {
     @Override
     public void start() {
         logger.info("WelcomePlugin.start()");
-        	logger.info(StringUtils.upperCase("WelcomePlugin"));
+        logger.info(StringUtils.upperCase("WelcomePlugin"));
     }
 
     @Override
@@ -48,7 +49,7 @@ public class WelcomePlugin extends Plugin {
     @Extension
     public static class WelcomeGreeting implements Greeting {
 
-    	@Override
+        @Override
         public String getGreeting() {
             return "Welcome";
         }

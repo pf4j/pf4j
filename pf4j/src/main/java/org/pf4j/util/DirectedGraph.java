@@ -41,7 +41,7 @@ public class DirectedGraph<V> {
      */
     public void addVertex(V vertex) {
         if (containsVertex(vertex)) {
-        	return;
+            return;
         }
 
         neighbors.put(vertex, new ArrayList<V>());
@@ -94,7 +94,7 @@ public class DirectedGraph<V> {
     public Map<V, Integer> outDegree() {
         Map<V, Integer> result = new HashMap<>();
         for (V vertex : neighbors.keySet()) {
-        	result.put(vertex, neighbors.get(vertex).size());
+            result.put(vertex, neighbors.get(vertex).size());
         }
 
         return result;
@@ -106,7 +106,7 @@ public class DirectedGraph<V> {
     public Map<V, Integer> inDegree() {
         Map<V, Integer> result = new HashMap<>();
         for (V vertex : neighbors.keySet()) {
-        	result.put(vertex, 0); // all in-degrees are 0
+            result.put(vertex, 0); // all in-degrees are 0
         }
         for (V from : neighbors.keySet()) {
             for (V to : neighbors.get(from)) {
@@ -128,7 +128,7 @@ public class DirectedGraph<V> {
         Stack<V> zeroVertices = new Stack<>(); // stack as good as any here
         for (V v : degree.keySet()) {
             if (degree.get(v) == 0) {
-            	zeroVertices.push(v);
+                zeroVertices.push(v);
             }
         }
 
@@ -142,14 +142,14 @@ public class DirectedGraph<V> {
                 degree.put(neighbor, degree.get(neighbor) - 1);
                 // remember any vertices that now have zero in-degree
                 if (degree.get(neighbor) == 0) {
-                	zeroVertices.push(neighbor);
+                    zeroVertices.push(neighbor);
                 }
             }
         }
 
         // check that we have used the entire graph (if not, there was a cycle)
         if (result.size() != neighbors.size()) {
-        	return null;
+            return null;
         }
 
         return result;
@@ -159,14 +159,14 @@ public class DirectedGraph<V> {
      * Report (as a List) the reverse topological sort of the vertices; null for no such sort.
      */
     public List<V> reverseTopologicalSort() {
-    	List<V> list = topologicalSort();
-    	if (list == null) {
-    		return null;
-    	}
+        List<V> list = topologicalSort();
+        if (list == null) {
+            return null;
+        }
 
-    	Collections.reverse(list);
+        Collections.reverse(list);
 
-    	return list;
+        return list;
     }
 
     /**
@@ -183,7 +183,7 @@ public class DirectedGraph<V> {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         for (V vertex : neighbors.keySet()) {
-        	sb.append("\n   " + vertex + " -> " + neighbors.get(vertex));
+            sb.append("\n   " + vertex + " -> " + neighbors.get(vertex));
         }
 
         return sb.toString();

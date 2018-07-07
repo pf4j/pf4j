@@ -37,7 +37,7 @@ public class WelcomePlugin extends Plugin {
         System.out.println("WelcomePlugin.start()");
         // for testing the development mode
         if (RuntimeMode.DEVELOPMENT.equals(wrapper.getRuntimeMode())) {
-        	System.out.println(StringUtils.upperCase("WelcomePlugin"));
+            System.out.println(StringUtils.upperCase("WelcomePlugin"));
         }
     }
 
@@ -49,7 +49,7 @@ public class WelcomePlugin extends Plugin {
     @Extension
     public static class WelcomeGreeting implements Greeting {
 
-    	@Override
+        @Override
         public String getGreeting() {
             return "Welcome";
         }

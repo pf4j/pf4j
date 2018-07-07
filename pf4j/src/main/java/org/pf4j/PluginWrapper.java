@@ -25,23 +25,23 @@ import java.nio.file.Path;
 public class PluginWrapper {
 
     private PluginManager pluginManager;
-	private PluginDescriptor descriptor;
-	private Path pluginPath;
-	private ClassLoader pluginClassLoader;
-	private PluginFactory pluginFactory;
-	private PluginState pluginState;
-	private RuntimeMode runtimeMode;
+    private PluginDescriptor descriptor;
+    private Path pluginPath;
+    private ClassLoader pluginClassLoader;
+    private PluginFactory pluginFactory;
+    private PluginState pluginState;
+    private RuntimeMode runtimeMode;
 
     Plugin plugin; // cache
 
-	public PluginWrapper(PluginManager pluginManager, PluginDescriptor descriptor, Path pluginPath, ClassLoader pluginClassLoader) {
+    public PluginWrapper(PluginManager pluginManager, PluginDescriptor descriptor, Path pluginPath, ClassLoader pluginClassLoader) {
         this.pluginManager = pluginManager;
-		this.descriptor = descriptor;
-		this.pluginPath = pluginPath;
-		this.pluginClassLoader = pluginClassLoader;
+        this.descriptor = descriptor;
+        this.pluginPath = pluginPath;
+        this.pluginClassLoader = pluginClassLoader;
 
-		pluginState = PluginState.CREATED;
-	}
+        pluginState = PluginState.CREATED;
+    }
 
     /**
      * Returns the plugin manager.
@@ -54,23 +54,23 @@ public class PluginWrapper {
      * Returns the plugin descriptor.
      */
     public PluginDescriptor getDescriptor() {
-    	return descriptor;
+        return descriptor;
     }
 
     /**
      * Returns the path of this plugin.
      */
     public Path getPluginPath() {
-    	return pluginPath;
+        return pluginPath;
     }
 
     /**
      * Returns the plugin class loader used to load classes and resources
-	 * for this plug-in. The class loader can be used to directly access
-	 * plug-in resources and classes.
-	 */
+     * for this plug-in. The class loader can be used to directly access
+     * plug-in resources and classes.
+     */
     public ClassLoader getPluginClassLoader() {
-    	return pluginClassLoader;
+        return pluginClassLoader;
     }
 
     public Plugin getPlugin() {
@@ -79,15 +79,15 @@ public class PluginWrapper {
         }
 
         return plugin;
-	}
+    }
 
-	public PluginState getPluginState() {
-		return pluginState;
-	}
+    public PluginState getPluginState() {
+        return pluginState;
+    }
 
-	public RuntimeMode getRuntimeMode() {
-		return runtimeMode;
-	}
+    public RuntimeMode getRuntimeMode() {
+        return runtimeMode;
+    }
 
     /**
      * Shortcut
@@ -96,49 +96,49 @@ public class PluginWrapper {
         return getDescriptor().getPluginId();
     }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + descriptor.getPluginId().hashCode();
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + descriptor.getPluginId().hashCode();
 
-		return result;
-	}
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
 
-		if (obj == null) {
-			return false;
-		}
+        if (obj == null) {
+            return false;
+        }
 
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
 
-		PluginWrapper other = (PluginWrapper) obj;
-		if (!descriptor.getPluginId().equals(other.descriptor.getPluginId())) {
-			return false;
-		}
+        PluginWrapper other = (PluginWrapper) obj;
+        if (!descriptor.getPluginId().equals(other.descriptor.getPluginId())) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public String toString() {
-		return "PluginWrapper [descriptor=" + descriptor + ", pluginPath=" + pluginPath + "]";
-	}
+    @Override
+    public String toString() {
+        return "PluginWrapper [descriptor=" + descriptor + ", pluginPath=" + pluginPath + "]";
+    }
 
-	void setPluginState(PluginState pluginState) {
-		this.pluginState = pluginState;
-	}
+    void setPluginState(PluginState pluginState) {
+        this.pluginState = pluginState;
+    }
 
-	void setRuntimeMode(RuntimeMode runtimeMode) {
-		this.runtimeMode = runtimeMode;
-	}
+    void setRuntimeMode(RuntimeMode runtimeMode) {
+        this.runtimeMode = runtimeMode;
+    }
 
     void setPluginFactory(PluginFactory pluginFactory) {
         this.pluginFactory = pluginFactory;

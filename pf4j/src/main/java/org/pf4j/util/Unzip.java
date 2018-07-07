@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Unzip {
 
-	private static final Logger log = LoggerFactory.getLogger(Unzip.class);
+    private static final Logger log = LoggerFactory.getLogger(Unzip.class);
 
     /**
      * Holds the destination directory.
@@ -71,7 +71,7 @@ public class Unzip {
             FileUtils.delete(destination.toPath());
         }
 
-    	try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(source))) {
+        try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(source))) {
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 try {

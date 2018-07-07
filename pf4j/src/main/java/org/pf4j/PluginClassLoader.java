@@ -37,11 +37,11 @@ public class PluginClassLoader extends URLClassLoader {
     private static final Logger log = LoggerFactory.getLogger(PluginClassLoader.class);
 
     private static final String JAVA_PACKAGE_PREFIX = "java.";
-	private static final String PLUGIN_PACKAGE_PREFIX = "org.pf4j.";
+    private static final String PLUGIN_PACKAGE_PREFIX = "org.pf4j.";
 
-	private PluginManager pluginManager;
-	private PluginDescriptor pluginDescriptor;
-	private boolean parentFirst;
+    private PluginManager pluginManager;
+    private PluginDescriptor pluginDescriptor;
+    private boolean parentFirst;
 
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
         this(pluginManager, pluginDescriptor, parent, false);
@@ -52,20 +52,20 @@ public class PluginClassLoader extends URLClassLoader {
      * before trying to load the a class through this loader.
      */
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, boolean parentFirst) {
-		super(new URL[0], parent);
+        super(new URL[0], parent);
 
-		this.pluginManager = pluginManager;
-		this.pluginDescriptor = pluginDescriptor;
-		this.parentFirst = parentFirst;
-	}
+        this.pluginManager = pluginManager;
+        this.pluginDescriptor = pluginDescriptor;
+        this.parentFirst = parentFirst;
+    }
 
     @Override
-	public void addURL(URL url) {
+    public void addURL(URL url) {
         log.debug("Add '{}'", url);
-		super.addURL(url);
-	}
+        super.addURL(url);
+    }
 
-	public void addFile(File file) {
+    public void addFile(File file) {
         try {
             addURL(file.getCanonicalFile().toURI().toURL());
         } catch (IOException e) {
@@ -80,7 +80,7 @@ public class PluginClassLoader extends URLClassLoader {
      * via the standard {@link ClassLoader#loadClass(String)} mechanism.
      * Use {@link #parentFirst} to change the loading strategy.
      */
-	@Override
+    @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
         synchronized (getClassLoadingLock(className)) {
             // first check whether it's a system class, delegate to the system loader
