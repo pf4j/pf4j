@@ -228,9 +228,9 @@ public class FileUtils {
     }
 
     public static Path getPath(URI uri, String first, String... more) throws IOException {
-        FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
-
-        return fileSystem.getPath(first, more);
+        try (FileSystem fileSystem = getFileSystem(uri)) {
+            return fileSystem.getPath(first, more);
+        }
     }
 
     public static Path findFile(Path directoryPath, String fileName) {
@@ -251,6 +251,15 @@ public class FileUtils {
         }
 
         return null;
+    }
+
+    private static FileSystem getFileSystem(URI uri) throws IOException {
+        FileSystem fileSystem = FileSystems.getFileSystem(uri);
+        if (fileSystem != null) {
+            return fileSystem;
+        }
+
+        return FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
     }
 
 }
