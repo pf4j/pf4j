@@ -68,7 +68,8 @@ public class CompoundPluginDescriptorFinder implements PluginDescriptorFinder {
                     }
                 } catch (Exception e) {
                     // log the exception and continue with the next finder
-                    log.error(e.getMessage()); // ?!
+                    log.error(e.getMessage(), e);
+                    log.debug("Try to continue with the next finder");
                 }
             } else {
                 log.debug("'{}' is not applicable for plugin '{}'", finder, pluginPath);
