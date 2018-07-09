@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -228,9 +229,7 @@ public class FileUtils {
     }
 
     public static Path getPath(URI uri, String first, String... more) throws IOException {
-        try (FileSystem fileSystem = getFileSystem(uri)) {
-            return fileSystem.getPath(first, more);
-        }
+        return getFileSystem(uri).getPath(first, more);
     }
 
     public static Path findFile(Path directoryPath, String fileName) {
@@ -254,12 +253,11 @@ public class FileUtils {
     }
 
     private static FileSystem getFileSystem(URI uri) throws IOException {
-        FileSystem fileSystem = FileSystems.getFileSystem(uri);
-        if (fileSystem != null) {
-            return fileSystem;
+        try {
+            return FileSystems.getFileSystem(uri);
+        } catch (FileSystemNotFoundException e) {
+            return FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
         }
-
-        return FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
     }
 
 }
