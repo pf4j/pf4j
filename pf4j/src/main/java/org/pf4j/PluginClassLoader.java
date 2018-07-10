@@ -22,7 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * One instance of this class should be created by plugin manager for every available plug-in.
@@ -43,6 +46,8 @@ public class PluginClassLoader extends URLClassLoader {
     private PluginDescriptor pluginDescriptor;
     private boolean parentFirst;
 
+    private Set<String> loadedClasses;
+
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
         this(pluginManager, pluginDescriptor, parent, false);
     }
@@ -57,6 +62,8 @@ public class PluginClassLoader extends URLClassLoader {
         this.pluginManager = pluginManager;
         this.pluginDescriptor = pluginDescriptor;
         this.parentFirst = parentFirst;
+
+        loadedClasses = new HashSet<>();
     }
 
     @Override
@@ -108,6 +115,7 @@ public class PluginClassLoader extends URLClassLoader {
                 try {
                     loadedClass = findClass(className);
                     log.trace("Found class '{}' in plugin classpath", className);
+                    loadedClasses.add(className);
                     return loadedClass;
                 } catch (ClassNotFoundException e) {
                     // try next step
@@ -138,6 +146,7 @@ public class PluginClassLoader extends URLClassLoader {
                 try {
                     loadedClass = findClass(className);
                     log.trace("Found class '{}' in plugin classpath", className);
+                    loadedClasses.add(className);
                     return loadedClass;
                 } catch (ClassNotFoundException e) {
                     // try next step
@@ -187,6 +196,18 @@ public class PluginClassLoader extends URLClassLoader {
 
             return findResource(name);
         }
+    }
+
+    /**
+     * Returns all classes loaded by this class loader.
+     */
+    public Set<String> getLoadedClasses() {
+        return Collections.unmodifiableSet(loadedClasses);
+    }
+
+    public boolean isClassLoaded(String className) {
+//        return findLoadedClass(className) != null;
+        return loadedClasses.contains(className);
     }
 
     private Class<?> loadClassFromDependencies(String className) {

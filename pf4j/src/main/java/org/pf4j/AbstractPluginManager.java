@@ -619,6 +619,13 @@ public abstract class AbstractPluginManager implements PluginManager {
             if (plugin.getPluginClassLoader() == classLoader) {
                 return plugin;
             }
+
+            if (plugin.getPluginClassLoader() instanceof PluginClassLoader) {
+                PluginClassLoader pluginClassLoader = (PluginClassLoader) plugin.getPluginClassLoader();
+                if (pluginClassLoader.isClassLoaded(clazz.getName())) {
+                    return plugin;
+                }
+            }
         }
 
         return null;
