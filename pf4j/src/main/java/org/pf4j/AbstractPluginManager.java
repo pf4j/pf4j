@@ -522,6 +522,18 @@ public abstract class AbstractPluginManager implements PluginManager {
         return pluginClassLoaders.get(pluginId);
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
+    public List<Class<?>> getExtensionClasses(String pluginId) {
+        List<ExtensionWrapper> extensionsWrapper = extensionFinder.find(pluginId);
+        List<Class<?>> extensionClasses = new ArrayList<>(extensionsWrapper.size());
+        for (ExtensionWrapper extensionWrapper : extensionsWrapper) {
+            Class<?> c = extensionWrapper.getDescriptor().extensionClass;
+            extensionClasses.add(c);
+        }
+        return extensionClasses;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<Class<T>> getExtensionClasses(Class<T> type) {
@@ -572,9 +584,9 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List getExtensions(String pluginId) {
+    public List<Object> getExtensions(String pluginId) {
         List<ExtensionWrapper> extensionsWrapper = extensionFinder.find(pluginId);
-        List extensions = new ArrayList<>(extensionsWrapper.size());
+        List<Object> extensions = new ArrayList<>(extensionsWrapper.size());
         for (ExtensionWrapper extensionWrapper : extensionsWrapper) {
             extensions.add(extensionWrapper.getExtension());
         }
