@@ -584,9 +584,9 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Object> getExtensions(String pluginId) {
+    public List getExtensions(String pluginId) {
         List<ExtensionWrapper> extensionsWrapper = extensionFinder.find(pluginId);
-        List<Object> extensions = new ArrayList<>(extensionsWrapper.size());
+        List extensions = new ArrayList<>(extensionsWrapper.size());
         for (ExtensionWrapper extensionWrapper : extensionsWrapper) {
             extensions.add(extensionWrapper.getExtension());
         }
