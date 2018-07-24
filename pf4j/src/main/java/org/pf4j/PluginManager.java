@@ -131,6 +131,8 @@ public interface PluginManager {
 
     ClassLoader getPluginClassLoader(String pluginId);
 
+    List<Class<?>> getExtensionClasses(String pluginId);
+
     <T> List<Class<T>> getExtensionClasses(Class<T> type);
 
     <T> List<Class<T>> getExtensionClasses(Class<T> type, String pluginId);
