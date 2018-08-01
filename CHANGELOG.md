@@ -12,6 +12,22 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
+### [2.4.0] - 2018-08-01
+
+#### Fixed
+- [#222]: Correct the class passed to `DefaultPluginFactory's` logger
+- [#223]: A disabled plugin is automatically started by `pluginManager.startPlugins()`
+- [#229]: Can't find `plugin.properties` file inside `.jar`
+- Fix error in `FileUtils.getFileSystem`
+
+#### Changed
+
+#### Added
+- [#229]: Add `SingletonExtensionFactory`
+- [#229]: Allow a way to query all extension classes for a given plugin
+
+#### Removed
+
 ### [2.3.0] - 2018-06-04
 
 #### Fixed
@@ -245,7 +261,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-2.3.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-2.4.0...HEAD
+[2.4.0]: https://github.com/decebals/pf4j/compare/release-2.3.0...release-2.4.0
 [2.3.0]: https://github.com/decebals/pf4j/compare/release-2.2.0...release-2.3.0
 [2.2.0]: https://github.com/decebals/pf4j/compare/release-2.1.0...release-2.2.0
 [2.1.0]: https://github.com/decebals/pf4j/compare/release-2.0.0...release-2.1.0
@@ -261,6 +278,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#233]: https://github.com/pf4j/pf4j/pull/233
+[#232]: https://github.com/pf4j/pf4j/issues/232
+[#229]: https://github.com/pf4j/pf4j/issues/229
+[#223]: https://github.com/pf4j/pf4j/issues/223
+[#222]: https://github.com/pf4j/pf4j/pull/222
 [#219]: https://github.com/pf4j/pf4j/pull/219
 [#218]: https://github.com/pf4j/pf4j/issues/218
 [#206]: https://github.com/pf4j/pf4j/issues/206
