@@ -50,7 +50,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 
     @Override
     public boolean isApplicable(Path pluginPath) {
-        return Files.exists(pluginPath) && (Files.isDirectory(pluginPath) || FileUtils.isJarFile(pluginPath));
+        return Files.exists(pluginPath) && Files.isDirectory(pluginPath)/*(Files.isDirectory(pluginPath) || FileUtils.isJarFile(pluginPath)*/);
     }
 
     @Override
