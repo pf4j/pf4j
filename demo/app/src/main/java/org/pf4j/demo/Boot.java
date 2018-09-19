@@ -110,19 +110,19 @@ public class Boot {
         /*
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
-			@Override
-			public void run() {
-				pluginManager.stopPlugins();
-			}
+            @Override
+            public void run() {
+                pluginManager.stopPlugins();
+            }
 
         });
         */
     }
 
-	private static void printLogo() {
-    	System.out.println(StringUtils.repeat("#", 40));
-    	System.out.println(StringUtils.center("PF4J-DEMO", 40));
-    	System.out.println(StringUtils.repeat("#", 40));
-	}
+    private static void printLogo() {
+        System.out.println(StringUtils.repeat("#", 40));
+        System.out.println(StringUtils.center("PF4J-DEMO", 40));
+        System.out.println(StringUtils.repeat("#", 40));
+    }
 
 }
