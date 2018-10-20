@@ -303,6 +303,13 @@ public abstract class AbstractPluginManager implements PluginManager {
             return false;
         }
 
+        try {
+            pluginWrapper.getPlugin().delete();
+        } catch (PluginException e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+
         Path pluginPath = pluginWrapper.getPluginPath();
 
         return pluginRepository.deletePluginPath(pluginPath);
