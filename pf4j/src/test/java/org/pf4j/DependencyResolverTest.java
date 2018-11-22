@@ -59,7 +59,7 @@ public class DependencyResolverTest {
     }
 
     @Test
-    public void notFoundDependencies() throws Exception {
+    public void notFoundDependencies() {
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setDependencies("p2, p3");
