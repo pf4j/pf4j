@@ -88,7 +88,7 @@ public class DependencyResolver {
             String pluginId = plugin.getPluginId();
             String existingVersion = plugin.getVersion();
 
-            List<String> dependents = getDependents(pluginId);
+            List<String> dependents = new ArrayList<>(getDependents(pluginId));
             while (!dependents.isEmpty()) {
                 String dependentId = dependents.remove(0);
                 PluginDescriptor dependent = pluginByIds.get(dependentId);
