@@ -92,7 +92,9 @@ public class LoadPluginsTest {
 
     @Test
     public void upgrade() throws Exception {
-        new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+        String pluginId = "myPlugin";
+
+        new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.zip"), pluginId)
             .pluginVersion("1.2.3")
             .build();
 
@@ -102,18 +104,19 @@ public class LoadPluginsTest {
         assertEquals(1, pluginManager.getPlugins().size());
         assertEquals(1, pluginManager.getStartedPlugins().size());
 
-        PluginZip pluginZip2 = new PluginZip.Builder(pluginsFolder.newFile("my-plugin-2.0.0.ZIP"), "myPlugin")
+        PluginZip pluginZip2 = new PluginZip.Builder(pluginsFolder.newFile("my-plugin-2.0.0.ZIP"), pluginId)
             .pluginVersion("2.0.0")
             .build();
 
-        assertEquals("1.2.3", pluginManager.getPlugin(pluginZip2.pluginId()).getDescriptor().getVersion());
+        assertEquals("1.2.3", pluginManager.getPlugin(pluginId).getDescriptor().getVersion());
 
-        pluginManager.loadPlugins();
-        pluginManager.startPlugin(pluginZip2.pluginId());
+        pluginManager.unloadPlugin(pluginId);
+        pluginManager.loadPlugin(pluginZip2.path()); // or `pluginManager.loadPlugins();`
+        pluginManager.startPlugin(pluginId);
 
         assertEquals(1, pluginManager.getPlugins().size());
-        assertEquals("2.0.0", pluginManager.getPlugin(pluginZip2.pluginId()).getDescriptor().getVersion());
-        assertEquals("2.0.0", pluginManager.getStartedPlugins().get(1).getDescriptor().getVersion());
+        assertEquals("2.0.0", pluginManager.getPlugin(pluginId).getDescriptor().getVersion());
+        assertEquals("2.0.0", pluginManager.getStartedPlugins().get(0).getDescriptor().getVersion());
     }
 
     @Test
