@@ -217,7 +217,7 @@ public class FileUtils {
     public static Path getPath(Path path, String first, String... more) throws IOException {
         URI uri = path.toUri();
         if (isJarFile(path)) {
-            String pathString = path.toString();
+            String pathString = path.toAbsolutePath().toString();
             // transformation for Windows OS
             pathString = StringUtils.addStart(pathString.replace("\\", "/"), "/");
             // space is replaced with %20
