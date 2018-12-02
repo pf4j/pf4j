@@ -620,21 +620,6 @@ public abstract class AbstractPluginManager implements PluginManager {
         return pluginsRoot;
     }
 
-    /**
-     * Add the possibility to override the plugins configuration root.
-     * If a {@code pf4j.pluginsConfigDir} system property is defined than this method returns that root.
-     * Otherwise returns the plugins root
-     *
-     * @return the plugins configuration root
-     */
-    public Path getPluginsConfigRoot() {
-        String configDir = System.getProperty("pf4j.pluginsConfigDir");
-        if (configDir == null) {
-            return pluginsRoot;
-        }
-        return Paths.get(configDir);
-    }
-
     @Override
     public RuntimeMode getRuntimeMode() {
         if (runtimeMode == null) {

@@ -19,8 +19,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.ClearSystemProperties;
-import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import org.junit.rules.TemporaryFolder;
 import org.pf4j.plugin.PluginZip;
 
@@ -36,8 +34,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DefaultPluginManagerTest {
-
-    private static final String CONFIG_DIR_PROPERTY_NAME = "pf4j.pluginsConfigDir";
 
     private DefaultPluginManager pluginManager;
     private DefaultPluginDescriptor pluginDescriptor;
@@ -159,37 +155,6 @@ public class DefaultPluginManagerTest {
 
         PluginWrapper plugin = pluginManager.getPlugin("myPlugin");
         assertSame(PluginState.DISABLED, plugin.getPluginState());
-    }
-
-    public static class TestSystemPropertiesProvided {
-
-        private static final String CONFIG_DIR_PATH = "/test/value";
-        @Rule
-        public final ProvideSystemProperty pluginConfigPropertySet = new ProvideSystemProperty(CONFIG_DIR_PROPERTY_NAME, CONFIG_DIR_PATH);
-
-        private DefaultPluginManager pluginManager = new DefaultPluginManager();
-
-        @Test
-        public void shouldReturnPluginConfigDirectoryIfProvided() {
-            Path path = pluginManager.getPluginsConfigRoot();
-
-            assertEquals(CONFIG_DIR_PATH, path.toString());
-        }
-    }
-
-    public static class TestSystemPropertiesNotProvided {
-
-        @Rule
-        public final ClearSystemProperties pluginConfigPropertyCleared = new ClearSystemProperties(CONFIG_DIR_PROPERTY_NAME);
-
-        private DefaultPluginManager pluginManager = new DefaultPluginManager();
-
-        @Test
-        public void shouldReturnPluginDirectoryIfConfigDirectoryNotProvided() {
-            Path path = pluginManager.getPluginsConfigRoot();
-
-            assertEquals("plugins", path.toString());
-        }
     }
 
 }
