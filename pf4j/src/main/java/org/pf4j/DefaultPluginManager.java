@@ -78,7 +78,7 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
     @Override
     protected PluginStatusProvider createPluginStatusProvider() {
-        return new DefaultPluginStatusProvider(getPluginsRoot());
+        return new DefaultPluginStatusProvider(getPluginsConfigRoot());
     }
 
     @Override
