@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Default implementation of the {@link PluginManager} interface.
@@ -78,7 +79,9 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
     @Override
     protected PluginStatusProvider createPluginStatusProvider() {
-        return new DefaultPluginStatusProvider(getPluginsRoot());
+        String configDir = System.getProperty("pf4j.pluginsConfigDir");
+        Path configPath = configDir != null ? Paths.get(configDir) : getPluginsRoot();
+        return new DefaultPluginStatusProvider(configPath);
     }
 
     @Override
