@@ -5,10 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#248]: Plugin upgrade version order not guaranteed
+- [#250]: Method `DependencyResolver.resolve` removes dependents in check version block 
+- [#252]: `java.nio.file.FileSystemNotFoundException`
 
 #### Changed
+- [#209]: Why "plugin.properties" is required?
 
 #### Added
+- [#242]: Add delete hook method in `Plugin`
+- [#256]: Adds ability to configure plugin directory
 
 #### Removed
 
@@ -278,6 +284,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#256]: https://github.com/pf4j/pf4j/pull/256
+[#252]: https://github.com/pf4j/pf4j/issues/252
+[#250]: https://github.com/pf4j/pf4j/issues/250
+[#248]: https://github.com/pf4j/pf4j/issues/248
+[#242]: https://github.com/pf4j/pf4j/issues/242
 [#233]: https://github.com/pf4j/pf4j/pull/233
 [#232]: https://github.com/pf4j/pf4j/issues/232
 [#229]: https://github.com/pf4j/pf4j/issues/229
@@ -285,6 +296,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [#222]: https://github.com/pf4j/pf4j/pull/222
 [#219]: https://github.com/pf4j/pf4j/pull/219
 [#218]: https://github.com/pf4j/pf4j/issues/218
+[#209]: https://github.com/pf4j/pf4j/issues/209
 [#206]: https://github.com/pf4j/pf4j/issues/206
 [#203]: https://github.com/pf4j/pf4j/issues/203
 [#202]: https://github.com/pf4j/pf4j/issues/202
