@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [2.5.0] - 2018-12-12
+
+#### Fixed
 - [#248]: Plugin upgrade version order not guaranteed
 - [#250]: Method `DependencyResolver.resolve` removes dependents in check version block 
 - [#252]: `java.nio.file.FileSystemNotFoundException`
@@ -267,7 +277,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-2.4.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-2.5.0...HEAD
+[2.5.0]: https://github.com/decebals/pf4j/compare/release-2.4.0...release-2.5.0
 [2.4.0]: https://github.com/decebals/pf4j/compare/release-2.3.0...release-2.4.0
 [2.3.0]: https://github.com/decebals/pf4j/compare/release-2.2.0...release-2.3.0
 [2.2.0]: https://github.com/decebals/pf4j/compare/release-2.1.0...release-2.2.0
