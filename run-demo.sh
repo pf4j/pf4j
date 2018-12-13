@@ -21,4 +21,3 @@ cp demo/plugins/disabled.txt demo-dist/plugins/
 cd demo-dist
 java -jar pf4j-demo-app-*-SNAPSHOT.jar
 cd -
-
