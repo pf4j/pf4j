@@ -14,6 +14,8 @@ REM copy artifacts to demo-dist folder
 xcopy demo\app\target\pf4j-demo-app-*.zip demo-dist /s /i
 xcopy demo\plugins\plugin1\target\*plugin.jar demo-dist\plugins /s
 xcopy demo\plugins\plugin2\target\*plugin.jar demo-dist\plugins /s
+xcopy demo\plugins\enabled.txt demo-dist\plugins /s
+xcopy demo\plugins\disabled.txt demo-dist\plugins /s
 
 cd demo-dist
 
