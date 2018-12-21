@@ -33,6 +33,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -94,18 +95,25 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
             final Set<String> bucket = new HashSet<>();
 
             try {
-                URL url = ((PluginClassLoader) plugin.getPluginClassLoader()).findResource(getExtensionsResource());
-                if (url != null) {
-                    Path extensionPath;
-                    if (url.toURI().getScheme().equals("jar")) {
-                        extensionPath = FileUtils.getPath(url.toURI(), getExtensionsResource());
-                    } else {
-                        extensionPath = Paths.get(url.toURI());
-                    }
-
-                    bucket.addAll(readExtensions(extensionPath));
-                } else {
+                Enumeration<URL> urls = ((PluginClassLoader) plugin.getPluginClassLoader()).findResources(getExtensionsResource());
+                if (urls == null || !urls.hasMoreElements()) {
                     log.debug("Cannot find '{}'", getExtensionsResource());
+                } else {
+                    while (urls.hasMoreElements()) {
+                        URL url = urls.nextElement();
+                        if (url != null) {
+                            Path extensionPath;
+                            if (url.toURI().getScheme().equals("jar")) {
+                                extensionPath = FileUtils.getPath(url.toURI(), getExtensionsResource());
+                            } else {
+                                extensionPath = Paths.get(url.toURI());
+                            }
+
+                            bucket.addAll(readExtensions(extensionPath));
+                        } else {
+                            log.debug("Cannot find '{}'", getExtensionsResource());
+                        }
+                    }
                 }
 
                 debugExtensions(bucket);
