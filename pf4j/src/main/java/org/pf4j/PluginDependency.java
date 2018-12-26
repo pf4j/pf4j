@@ -22,6 +22,7 @@ public class PluginDependency {
 
     private String pluginId;
     private String pluginVersionSupport = "*";
+    private boolean optional;
 
     public PluginDependency(String dependency) {
         int index = dependency.indexOf('@');
@@ -33,6 +34,13 @@ public class PluginDependency {
                 this.pluginVersionSupport = dependency.substring(index + 1);
             }
         }
+
+        // A dependency is considered as optional,
+        // if the plugin id ends with a question mark.
+        this.optional = this.pluginId.endsWith("?");
+        if (this.optional) {
+            this.pluginId = this.pluginId.substring(0, this.pluginId.length() - 1);
+        }
     }
 
     public String getPluginId() {
@@ -43,9 +51,15 @@ public class PluginDependency {
         return pluginVersionSupport;
     }
 
+    public boolean isOptional() {
+        return optional;
+    }
+
     @Override
     public String toString() {
-        return "PluginDependency [pluginId=" + pluginId + ", pluginVersionSupport=" + pluginVersionSupport + "]";
+        return "PluginDependency [pluginId=" + pluginId + ", pluginVersionSupport="
+            + pluginVersionSupport + ", optional="
+            + optional + "]";
     }
 
 }
