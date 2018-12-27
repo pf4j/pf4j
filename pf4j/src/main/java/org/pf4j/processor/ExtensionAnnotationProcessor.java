@@ -22,7 +22,10 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -98,7 +101,29 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
             TypeElement extensionElement = (TypeElement) element;
 //            Extension annotation = element.getAnnotation(Extension.class);
-            List<TypeElement> extensionPointElements = findExtensionPoints(extensionElement);
+            List<TypeElement> extensionPointElements;
+
+            // use extension points, that were explicitly set in the extension annotation
+            AnnotationMirror annotation = getAnnotationMirror(extensionElement, Extension.class);
+            AnnotationValue annotatedExtensionPoints = (annotation != null) ?
+                getAnnotationValue(annotation, "provides") :
+                null;
+            List<? extends AnnotationValue> extensionPointClasses = (annotatedExtensionPoints != null) ?
+                (List<? extends AnnotationValue>) annotatedExtensionPoints.getValue() :
+                null;
+            if (extensionPointClasses != null && !extensionPointClasses.isEmpty()) {
+                extensionPointElements = new ArrayList<>();
+                for (AnnotationValue extensionPointClass : extensionPointClasses) {
+                    String extensionPointClassName = extensionPointClass.getValue().toString();
+                    TypeElement extensionPointElement = processingEnv.getElementUtils().getTypeElement(extensionPointClassName);
+                    extensionPointElements.add(extensionPointElement);
+                }
+            }
+            // detect extension points automatically, if they are not explicitly configured (default behaviour)
+            else {
+                extensionPointElements = findExtensionPoints(extensionElement);
+            }
+
             if (extensionPointElements.isEmpty()) {
                 // TODO throw error ?
                 continue;
@@ -229,4 +254,26 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         return storage;
     }
 
+    private static AnnotationMirror getAnnotationMirror(TypeElement typeElement, Class<?> clazz) {
+        // get annotation of a type element
+        // as described at https://stackoverflow.com/a/10167558
+        String clazzName = clazz.getName();
+        for (AnnotationMirror m : typeElement.getAnnotationMirrors()) {
+            if (m.getAnnotationType().toString().equals(clazzName)) {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    private static AnnotationValue getAnnotationValue(AnnotationMirror annotationMirror, String key) {
+        // get annotation value of a type element
+        // as described at https://stackoverflow.com/a/10167558
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+            if (entry.getKey().getSimpleName().toString().equals(key)) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
 }

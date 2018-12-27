@@ -34,4 +34,13 @@ public @interface Extension {
 
     int ordinal() default 0;
 
+    /**
+     * An array of extension points, that are implemented by this extension.
+     * This explicit configuration overrides the automatic detection of extension points in the
+     * {@link org.pf4j.processor.ExtensionAnnotationProcessor}.
+     *
+     * @return classes of extension points implemented by this extension
+     */
+    Class<? extends ExtensionPoint>[] provides() default {};
+
 }
