@@ -83,14 +83,17 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
             Set<String> bucket = new HashSet<>();
 
             try {
-                URL url = ((PluginClassLoader) plugin.getPluginClassLoader()).findResource(getExtensionsResource());
-                if (url != null) {
-                    log.debug("Read '{}'", url.getFile());
-                    try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
-                        LegacyExtensionStorage.read(reader, bucket);
-                    }
-                } else {
+                Enumeration<URL> urls = ((PluginClassLoader) plugin.getPluginClassLoader()).findResources(getExtensionsResource());
+                if (urls == null || !urls.hasMoreElements()) {
                     log.debug("Cannot find '{}'", getExtensionsResource());
+                } else {
+                    while (urls.hasMoreElements()) {
+                        URL url = urls.nextElement();
+                        log.debug("Read '{}'", url.getFile());
+                        try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
+                            LegacyExtensionStorage.read(reader, bucket);
+                        }
+                    }
                 }
 
                 debugExtensions(bucket);
