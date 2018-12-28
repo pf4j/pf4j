@@ -89,13 +89,9 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
                 } else {
                     while (urls.hasMoreElements()) {
                         URL url = urls.nextElement();
-                        if (url != null) {
-                            log.debug("Read '{}'", url.getFile());
-                            try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
-                                LegacyExtensionStorage.read(reader, bucket);
-                            }
-                        } else {
-                            log.debug("Cannot find '{}'", getExtensionsResource());
+                        log.debug("Read '{}'", url.getFile());
+                        try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
+                            LegacyExtensionStorage.read(reader, bucket);
                         }
                     }
                 }

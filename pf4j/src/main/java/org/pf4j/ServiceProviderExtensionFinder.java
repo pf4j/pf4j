@@ -101,18 +101,14 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
                 } else {
                     while (urls.hasMoreElements()) {
                         URL url = urls.nextElement();
-                        if (url != null) {
-                            Path extensionPath;
-                            if (url.toURI().getScheme().equals("jar")) {
-                                extensionPath = FileUtils.getPath(url.toURI(), getExtensionsResource());
-                            } else {
-                                extensionPath = Paths.get(url.toURI());
-                            }
-
-                            bucket.addAll(readExtensions(extensionPath));
+                        Path extensionPath;
+                        if (url.toURI().getScheme().equals("jar")) {
+                            extensionPath = FileUtils.getPath(url.toURI(), getExtensionsResource());
                         } else {
-                            log.debug("Cannot find '{}'", getExtensionsResource());
+                            extensionPath = Paths.get(url.toURI());
                         }
+
+                        bucket.addAll(readExtensions(extensionPath));
                     }
                 }
 
