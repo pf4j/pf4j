@@ -63,14 +63,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
         try {
             URL url = getClass().getClassLoader().getResource(getExtensionsResource());
             if (url != null) {
-                Path extensionPath;
-                if (url.toURI().getScheme().equals("jar")) {
-                    extensionPath = FileUtils.getPath(url.toURI(), getExtensionsResource());
-                } else {
-                    extensionPath = Paths.get(url.toURI());
-                }
-
-                bucket.addAll(readExtensions(extensionPath));
+                collectExtensions(url, bucket);
             }
 
             debugExtensions(bucket);
@@ -96,20 +89,13 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
 
             try {
                 Enumeration<URL> urls = ((PluginClassLoader) plugin.getPluginClassLoader()).findResources(getExtensionsResource());
-                if (urls == null || !urls.hasMoreElements()) {
-                    log.debug("Cannot find '{}'", getExtensionsResource());
-                } else {
+                if (urls.hasMoreElements()) {
                     while (urls.hasMoreElements()) {
                         URL url = urls.nextElement();
-                        Path extensionPath;
-                        if (url.toURI().getScheme().equals("jar")) {
-                            extensionPath = FileUtils.getPath(url.toURI(), getExtensionsResource());
-                        } else {
-                            extensionPath = Paths.get(url.toURI());
-                        }
-
-                        bucket.addAll(readExtensions(extensionPath));
+                        collectExtensions(url, bucket);
                     }
+                } else {
+                    log.debug("Cannot find '{}'", getExtensionsResource());
                 }
 
                 debugExtensions(bucket);
@@ -121,6 +107,17 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
         }
 
         return result;
+    }
+
+    private void collectExtensions(URL url, Set<String> bucket) throws URISyntaxException, IOException {
+        Path extensionPath;
+        if (url.toURI().getScheme().equals("jar")) {
+            extensionPath = FileUtils.getPath(url.toURI(), getExtensionsResource());
+        } else {
+            extensionPath = Paths.get(url.toURI());
+        }
+
+        bucket.addAll(readExtensions(extensionPath));
     }
 
     private static String getExtensionsResource() {
