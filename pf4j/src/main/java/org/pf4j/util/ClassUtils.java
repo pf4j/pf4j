@@ -82,14 +82,14 @@ public class ClassUtils {
      * See <a href="https://stackoverflow.com/a/10167558">stackoverflow.com</a> for more information.
      *
      * @param typeElement the type element, that contains the requested annotation
-     * @param clazz the class of the requested annotation
-     * @return the requested annotation or null, if no annotation of the provided class was found on the type element
-     * @throws NullPointerException if one of the parameters is null
+     * @param annotationClass the class of the requested annotation
+     * @return the requested annotation or null, if no annotation of the provided class was found
+     * @throws NullPointerException if <code>typeElement</code> or <code>annotationClass</code> is null
      */
-    public static AnnotationMirror getAnnotationMirror(TypeElement typeElement, Class<?> clazz) {
-        String clazzName = clazz.getName();
+    public static AnnotationMirror getAnnotationMirror(TypeElement typeElement, Class<?> annotationClass) {
+        String annotationClassName = annotationClass.getName();
         for (AnnotationMirror m : typeElement.getAnnotationMirrors()) {
-            if (m.getAnnotationType().toString().equals(clazzName)) {
+            if (m.getAnnotationType().toString().equals(annotationClassName)) {
                 return m;
             }
         }
@@ -101,17 +101,34 @@ public class ClassUtils {
      * See <a href="https://stackoverflow.com/a/10167558">stackoverflow.com</a> for more information.
      *
      * @param annotationMirror the annotation, that contains the requested parameter
-     * @param key the name of the requested parameter
-     * @return the requested parameter or null, if no parameter of the provided name was found on the annotation
-     * @throws NullPointerException if the annotationMirror parameter is null
+     * @param annotationParameter the name of the requested annotation parameter
+     * @return the requested parameter or null, if no parameter of the provided name was found
+     * @throws NullPointerException if <code>annotationMirror</code> is null
      */
-    public static AnnotationValue getAnnotationValue(AnnotationMirror annotationMirror, String key) {
+    public static AnnotationValue getAnnotationValue(AnnotationMirror annotationMirror, String annotationParameter) {
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
-            if (entry.getKey().getSimpleName().toString().equals(key)) {
+            if (entry.getKey().getSimpleName().toString().equals(annotationParameter)) {
                 return entry.getValue();
             }
         }
         return null;
+    }
+
+    /**
+     * Get a certain annotation parameter of a {@link TypeElement}.
+     * See <a href="https://stackoverflow.com/a/10167558">stackoverflow.com</a> for more information.
+     *
+     * @param typeElement the type element, that contains the requested annotation
+     * @param annotationClass the class of the requested annotation
+     * @param annotationParameter the name of the requested annotation parameter
+     * @return the requested parameter or null, if no annotation for the provided class was found or no annotation parameter was found
+     * @throws NullPointerException if <code>typeElement</code> or <code>annotationClass</code> is null
+     */
+    public static AnnotationValue getAnnotationValue(TypeElement typeElement, Class<?> annotationClass, String annotationParameter) {
+        AnnotationMirror annotationMirror = getAnnotationMirror(typeElement, annotationClass);
+        return (annotationMirror != null) ?
+            getAnnotationValue(annotationMirror, annotationParameter) :
+            null;
     }
 
     /**
