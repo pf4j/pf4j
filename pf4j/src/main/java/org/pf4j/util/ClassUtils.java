@@ -15,9 +15,14 @@
  */
 package org.pf4j.util;
 
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Decebal Suiu
@@ -71,6 +76,43 @@ public class ClassUtils {
         return list;
     }
     */
+
+    /**
+     * Get a certain annotation of a {@link TypeElement}.
+     * See <a href="https://stackoverflow.com/a/10167558">stackoverflow.com</a> for more information.
+     *
+     * @param typeElement the type element, that contains the requested annotation
+     * @param clazz the class of the requested annotation
+     * @return the requested annotation or null, if no annotation of the provided class was found on the type element
+     * @throws NullPointerException if one of the parameters is null
+     */
+    public static AnnotationMirror getAnnotationMirror(TypeElement typeElement, Class<?> clazz) {
+        String clazzName = clazz.getName();
+        for (AnnotationMirror m : typeElement.getAnnotationMirrors()) {
+            if (m.getAnnotationType().toString().equals(clazzName)) {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get a certain parameter of an {@link AnnotationMirror}.
+     * See <a href="https://stackoverflow.com/a/10167558">stackoverflow.com</a> for more information.
+     *
+     * @param annotationMirror the annotation, that contains the requested parameter
+     * @param key the name of the requested parameter
+     * @return the requested parameter or null, if no parameter of the provided name was found on the annotation
+     * @throws NullPointerException if the annotationMirror parameter is null
+     */
+    public static AnnotationValue getAnnotationValue(AnnotationMirror annotationMirror, String key) {
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+            if (entry.getKey().getSimpleName().toString().equals(key)) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
 
     /**
      * Uses {@link Class#getSimpleName()} to convert from {@link Class} to {@link String}.
