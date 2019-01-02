@@ -38,8 +38,12 @@ public @interface Extension {
      * An array of extension points, that are implemented by this extension.
      * This explicit configuration overrides the automatic detection of extension points in the
      * {@link org.pf4j.processor.ExtensionAnnotationProcessor}.
+     * <p>
+     * In case your extension is directly derived from an extension point this attribute is NOT required.
+     * But under certain <a href="https://github.com/pf4j/pf4j/issues/264">more complex scenarios</a> it
+     * might be useful to explicitly set the extension points for an extension.
      *
-     * @return classes of extension points implemented by this extension
+     * @return classes of extension points, that are implemented by this extension
      */
     Class<? extends ExtensionPoint>[] points() default {};
 
