@@ -171,7 +171,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         List<TypeElement> extensionPointElements = new ArrayList<>();
 
         // use extension points, that were explicitly set in the extension annotation
-        AnnotationValue annotatedExtensionPoints = ClassUtils.getAnnotationValue(extensionElement, Extension.class, "provides");
+        AnnotationValue annotatedExtensionPoints = ClassUtils.getAnnotationValue(extensionElement, Extension.class, "points");
         List<? extends AnnotationValue> extensionPointClasses = (annotatedExtensionPoints != null) ?
             (List<? extends AnnotationValue>) annotatedExtensionPoints.getValue() :
             null;

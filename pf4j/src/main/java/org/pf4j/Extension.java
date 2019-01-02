@@ -41,6 +41,6 @@ public @interface Extension {
      *
      * @return classes of extension points implemented by this extension
      */
-    Class<? extends ExtensionPoint>[] provides() default {};
+    Class<? extends ExtensionPoint>[] points() default {};
 
 }
