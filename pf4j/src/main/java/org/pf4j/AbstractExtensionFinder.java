@@ -15,12 +15,14 @@
  */
 package org.pf4j;
 
+import org.pf4j.asm.ExtensionInfo;
 import org.pf4j.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +37,29 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
     protected PluginManager pluginManager;
     protected volatile Map<String, Set<String>> entries; // cache by pluginId
+    protected volatile Map<String, ExtensionInfo> extensionInfos; // cache extension infos by class name
+    protected boolean checkForExtensionDependencies = false;
 
     public AbstractExtensionFinder(PluginManager pluginManager) {
         this.pluginManager = pluginManager;
+
+        // By default we're assuming, that no checks for extension dependenciess are necessary.
+        //
+        // But if one of the available plugins defines an optional plugin dependency,
+        // extensions might not be loadable due to missing optional dependencies.
+        // Therefore we're enabling a check of optional extensions, if at least one
+        // optional plugin dependency was specified.
+        for (PluginWrapper plugin : this.pluginManager.getPlugins()) {
+            for (PluginDependency dependency : plugin.getDescriptor().getDependencies()) {
+                if (dependency.isOptional()) {
+                    checkForExtensionDependencies = true;
+                    break;
+                }
+            }
+            if (checkForExtensionDependencies) {
+                break;
+            }
+        }
     }
 
     public abstract Map<String, Set<String>> readPluginsStorages();
@@ -97,6 +119,41 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
         for (String className : classNames) {
             try {
+                if (isCheckForExtensionDependencies()) {
+                    // Load extension annotation without initializing the class itself.
+                    //
+                    // If optional dependencies are used, the class loader might not be able
+                    // to load the extension class because of missing optional dependencies.
+                    //
+                    // Therefore we're extracting the extension annotation via asm, in order
+                    // to extract the required plugins for an extension. Only if all required
+                    // plugins are currently available and started, the corresponding
+                    // extension is loaded through the class loader.
+                    ExtensionInfo extensionInfo = getExtensionInfo(className, classLoader);
+                    if (extensionInfo == null) {
+                        log.error("No extension annotation was found for '{}'", className);
+                        continue;
+                    }
+
+                    // Make sure, that all plugins required by this extension are available.
+                    List<String> missingPluginIds = new ArrayList<>();
+                    for (String requiredPluginId : extensionInfo.getPlugins()) {
+                        PluginWrapper requiredPlugin = pluginManager.getPlugin(requiredPluginId);
+                        if (requiredPlugin == null || !PluginState.STARTED.equals(requiredPlugin.getPluginState())) {
+                            missingPluginIds.add(requiredPluginId);
+                        }
+                    }
+                    if (!missingPluginIds.isEmpty()) {
+                        StringBuilder missing = new StringBuilder();
+                        for (String missingPluginId : missingPluginIds) {
+                            if (missing.length() > 0) missing.append(", ");
+                            missing.append(missingPluginId);
+                        }
+                        log.trace("Extension '{}' is ignored due to missing plugins: {}", className, missing);
+                        continue;
+                    }
+                }
+
                 log.debug("Loading class '{}' using class loader '{}'", className, classLoader);
                 Class<?> extensionClass = classLoader.loadClass(className);
 
@@ -188,6 +245,44 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         entries = null;
     }
 
+    /**
+     * Returns true, if the extension finder checks extensions for its required plugins.
+     * This feature has to be enabled, in order check the availability of
+     * {@link Extension#plugins()} configured by an extension.
+     * <p>
+     * This feature is enabled by default, if at least one available plugin makes use of
+     * optional plugin dependencies. Those optional plugins might not be available at runtime.
+     * Therefore any extension is checked by default against available plugins before its
+     * instantiation.
+     * <p>
+     * Notice: This feature requires the optional <a href="https://asm.ow2.io/">ASM library</a>
+     * to be available on the applications classpath.
+     *
+     * @return true, if the extension finder checks extensions for its required plugins
+     */
+    public final boolean isCheckForExtensionDependencies() {
+        return checkForExtensionDependencies;
+    }
+
+    /**
+     * Plugin developers may enable / disable checks for required plugins of an extension.
+     * This feature has to be enabled, in order check the availability of
+     * {@link Extension#plugins()} configured by an extension.
+     * <p>
+     * This feature is enabled by default, if at least one available plugin makes use of
+     * optional plugin dependencies. Those optional plugins might not be available at runtime.
+     * Therefore any extension is checked by default against available plugins before its
+     * instantiation.
+     * <p>
+     * Notice: This feature requires the optional <a href="https://asm.ow2.io/">ASM library</a>
+     * to be available on the applications classpath.
+     *
+     * @param checkForExtensionDependencies true to enable checks for optional extensions, otherwise false
+     */
+    public void setCheckForExtensionDependencies(boolean checkForExtensionDependencies) {
+        this.checkForExtensionDependencies = checkForExtensionDependencies;
+    }
+
     protected void debugExtensions(Set<String> extensions) {
         if (log.isDebugEnabled()) {
             if (extensions.isEmpty()) {
@@ -216,6 +311,34 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         }
 
         return entries;
+    }
+
+    /**
+     * Returns the parameters of an {@link Extension} annotation without loading
+     * the corresponding class into the class loader.
+     *
+     * @param className name of the class, that holds the requested {@link Extension} annotation
+     * @param classLoader class loader to access the class
+     * @return the contents of the {@link Extension} annotation or null, if the class does not
+     * have an {@link Extension} annotation
+     */
+    private ExtensionInfo getExtensionInfo(String className, ClassLoader classLoader) {
+        if (extensionInfos == null) {
+            extensionInfos = new HashMap<>();
+        }
+
+        if (!extensionInfos.containsKey(className)) {
+            log.trace("Load annotation for '{}' using asm", className);
+            ExtensionInfo info = ExtensionInfo.load(className, classLoader);
+            if (info == null) {
+                log.warn("No extension annotation was found for '{}'", className);
+                extensionInfos.put(className, null);
+            } else {
+                extensionInfos.put(className, info);
+            }
+        }
+
+        return extensionInfos.get(className);
     }
 
     private ExtensionWrapper createExtensionWrapper(Class<?> extensionClass) {
