@@ -17,11 +17,13 @@ package org.pf4j.processor;
 
 import org.pf4j.Extension;
 import org.pf4j.ExtensionPoint;
+import org.pf4j.util.ClassUtils;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
@@ -168,22 +170,37 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     private List<TypeElement> findExtensionPoints(TypeElement extensionElement) {
         List<TypeElement> extensionPointElements = new ArrayList<>();
 
-        // search in interfaces
-        for (TypeMirror item : extensionElement.getInterfaces()) {
-            boolean isExtensionPoint = processingEnv.getTypeUtils().isSubtype(item, getExtensionPointType());
-            if (isExtensionPoint) {
-                TypeElement extensionPointElement = (TypeElement) ((DeclaredType) item).asElement();
+        // use extension points, that were explicitly set in the extension annotation
+        AnnotationValue annotatedExtensionPoints = ClassUtils.getAnnotationValue(extensionElement, Extension.class, "points");
+        List<? extends AnnotationValue> extensionPointClasses = (annotatedExtensionPoints != null) ?
+            (List<? extends AnnotationValue>) annotatedExtensionPoints.getValue() :
+            null;
+        if (extensionPointClasses != null && !extensionPointClasses.isEmpty()) {
+            for (AnnotationValue extensionPointClass : extensionPointClasses) {
+                String extensionPointClassName = extensionPointClass.getValue().toString();
+                TypeElement extensionPointElement = processingEnv.getElementUtils().getTypeElement(extensionPointClassName);
                 extensionPointElements.add(extensionPointElement);
             }
         }
+        // detect extension points automatically, if they are not explicitly configured (default behaviour)
+        else {
+            // search in interfaces
+            for (TypeMirror item : extensionElement.getInterfaces()) {
+                boolean isExtensionPoint = processingEnv.getTypeUtils().isSubtype(item, getExtensionPointType());
+                if (isExtensionPoint) {
+                    TypeElement extensionPointElement = (TypeElement) ((DeclaredType) item).asElement();
+                    extensionPointElements.add(extensionPointElement);
+                }
+            }
 
-        // search in superclass
-        TypeMirror superclass = extensionElement.getSuperclass();
-        if (superclass.getKind() != TypeKind.NONE) {
-            boolean isExtensionPoint = processingEnv.getTypeUtils().isSubtype(superclass, getExtensionPointType());
-            if (isExtensionPoint) {
-                TypeElement extensionPointElement = (TypeElement) ((DeclaredType) superclass).asElement();
-                extensionPointElements.add(extensionPointElement);
+            // search in superclass
+            TypeMirror superclass = extensionElement.getSuperclass();
+            if (superclass.getKind() != TypeKind.NONE) {
+                boolean isExtensionPoint = processingEnv.getTypeUtils().isSubtype(superclass, getExtensionPointType());
+                if (isExtensionPoint) {
+                    TypeElement extensionPointElement = (TypeElement) ((DeclaredType) superclass).asElement();
+                    extensionPointElements.add(extensionPointElement);
+                }
             }
         }
 
@@ -228,5 +245,4 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
         return storage;
     }
-
 }
