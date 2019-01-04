@@ -39,8 +39,7 @@ public final class ExtensionInfo {
     private final String className;
     int ordinal = 0;
     List<String> plugins = new ArrayList<>();
-    // TODO: enable after https://github.com/pf4j/pf4j/pull/265 was merged
-    //List<String> points = new ArrayList<>();
+    List<String> points = new ArrayList<>();
 
     ExtensionInfo(String className) {
         super();
@@ -74,16 +73,14 @@ public final class ExtensionInfo {
         return Collections.unmodifiableList(plugins);
     }
 
-    /*
+    /**
      * Get the {@link Extension#points()} value, that was assigned to the extension.
      *
-     * TODO: enable after https://github.com/pf4j/pf4j/pull/265 was merged
-     *
      * @return ordinal value
-     *
+     */
     public List<String> getPoints() {
         return Collections.unmodifiableList(points);
-    }*/
+    }
 
     /**
      * Load an {@link ExtensionInfo} for a certain class.

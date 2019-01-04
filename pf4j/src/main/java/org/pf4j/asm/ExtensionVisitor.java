@@ -78,13 +78,11 @@ class ExtensionVisitor extends ClassVisitor {
                                     //log.debug("found plugin " + value.toString());
                                     extensionInfo.plugins.add(value.toString());
                                 }
+                            } else if ("points".equals(name)) {
+                                String pointClassName = ((Type) value).getClassName();
+                                //log.debug("found point " + pointClassName);
+                                extensionInfo.points.add(pointClassName);
                             }
-                            // TODO: enable after https://github.com/pf4j/pf4j/pull/265 was merged
-                            //else if ("points".equals(name)) {
-                            //    String pointClassName = ((Type) value).getClassName();
-                            //    //log.debug("found point " + pointClassName);
-                            //    extensionInfo.points.add(pointClassName);
-                            //}
 
                             super.visit(key, value);
                         }

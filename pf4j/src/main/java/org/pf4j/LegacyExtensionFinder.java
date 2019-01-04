@@ -15,9 +15,9 @@
  */
 package org.pf4j;
 
+import org.pf4j.processor.LegacyExtensionStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.pf4j.processor.LegacyExtensionStorage;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -53,13 +53,7 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
         Set<String> bucket = new HashSet<>();
         try {
             Enumeration<URL> urls = getClass().getClassLoader().getResources(getExtensionsResource());
-            while (urls.hasMoreElements()) {
-                URL url = urls.nextElement();
-                log.debug("Read '{}'", url.getFile());
-                try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
-                    LegacyExtensionStorage.read(reader, bucket);
-                }
-            }
+            collectExtensions(urls, bucket);
 
             debugExtensions(bucket);
 
@@ -83,12 +77,9 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
             Set<String> bucket = new HashSet<>();
 
             try {
-                URL url = ((PluginClassLoader) plugin.getPluginClassLoader()).findResource(getExtensionsResource());
-                if (url != null) {
-                    log.debug("Read '{}'", url.getFile());
-                    try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
-                        LegacyExtensionStorage.read(reader, bucket);
-                    }
+                Enumeration<URL> urls = ((PluginClassLoader) plugin.getPluginClassLoader()).findResources(getExtensionsResource());
+                if (urls.hasMoreElements()) {
+                    collectExtensions(urls, bucket);
                 } else {
                     log.debug("Cannot find '{}'", getExtensionsResource());
                 }
@@ -102,6 +93,16 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
         }
 
         return result;
+    }
+
+    private void collectExtensions(Enumeration<URL> urls, Set<String> bucket) throws IOException {
+        while (urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            log.debug("Read '{}'", url.getFile());
+            try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
+                LegacyExtensionStorage.read(reader, bucket);
+            }
+        }
     }
 
     private static String getExtensionsResource() {
