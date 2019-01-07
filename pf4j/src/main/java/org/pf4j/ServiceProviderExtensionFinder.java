@@ -61,9 +61,11 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
 
         final Set<String> bucket = new HashSet<>();
         try {
-            URL url = getClass().getClassLoader().getResource(getExtensionsResource());
-            if (url != null) {
-                collectExtensions(url, bucket);
+            Enumeration<URL> urls = getClass().getClassLoader().getResources(getExtensionsResource());
+            if (urls.hasMoreElements()) {
+                collectExtensions(urls, bucket);
+            } else {
+                log.debug("Cannot find '{}'", getExtensionsResource());
             }
 
             debugExtensions(bucket);
@@ -90,10 +92,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
             try {
                 Enumeration<URL> urls = ((PluginClassLoader) plugin.getPluginClassLoader()).findResources(getExtensionsResource());
                 if (urls.hasMoreElements()) {
-                    while (urls.hasMoreElements()) {
-                        URL url = urls.nextElement();
-                        collectExtensions(url, bucket);
-                    }
+                    collectExtensions(urls, bucket);
                 } else {
                     log.debug("Cannot find '{}'", getExtensionsResource());
                 }
@@ -107,6 +106,14 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
         }
 
         return result;
+    }
+
+    private void collectExtensions(Enumeration<URL> urls, Set<String> bucket) throws URISyntaxException, IOException {
+        while (urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            log.debug("Read '{}'", url.getFile());
+            collectExtensions(url, bucket);
+        }
     }
 
     private void collectExtensions(URL url, Set<String> bucket) throws URISyntaxException, IOException {

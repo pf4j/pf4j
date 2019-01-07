@@ -15,7 +15,6 @@
 
     <properties>
         <main.class>org.pf4j.demo.Boot</main.class>
-        <slf4j.version>1.7.5</slf4j.version>
     </properties>
 
     <build>
@@ -25,9 +24,7 @@
                 <version>2.3</version>
                 <configuration>
                     <descriptors>
-                        <descriptor>
-                            src/main/assembly/assembly.xml
-                        </descriptor>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
