@@ -53,7 +53,11 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
         Set<String> bucket = new HashSet<>();
         try {
             Enumeration<URL> urls = getClass().getClassLoader().getResources(getExtensionsResource());
-            collectExtensions(urls, bucket);
+            if (urls.hasMoreElements()) {
+                collectExtensions(urls, bucket);
+            } else {
+                log.debug("Cannot find '{}'", getExtensionsResource());
+            }
 
             debugExtensions(bucket);
 
