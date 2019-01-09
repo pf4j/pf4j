@@ -41,7 +41,7 @@ public final class ExtensionInfo {
     List<String> plugins = new ArrayList<>();
     List<String> points = new ArrayList<>();
 
-    ExtensionInfo(String className) {
+    private ExtensionInfo(String className) {
         super();
         this.className = className;
     }
