@@ -38,28 +38,10 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
     protected PluginManager pluginManager;
     protected volatile Map<String, Set<String>> entries; // cache by pluginId
     protected volatile Map<String, ExtensionInfo> extensionInfos; // cache extension infos by class name
-    protected boolean checkForExtensionDependencies = false;
+    protected Boolean checkForExtensionDependencies = null;
 
     public AbstractExtensionFinder(PluginManager pluginManager) {
         this.pluginManager = pluginManager;
-
-        // By default we're assuming, that no checks for extension dependenciess are necessary.
-        //
-        // But if one of the available plugins defines an optional plugin dependency,
-        // extensions might not be loadable due to missing optional dependencies.
-        // Therefore we're enabling a check of optional extensions, if at least one
-        // optional plugin dependency was specified.
-        for (PluginWrapper plugin : this.pluginManager.getPlugins()) {
-            for (PluginDependency dependency : plugin.getDescriptor().getDependencies()) {
-                if (dependency.isOptional()) {
-                    checkForExtensionDependencies = true;
-                    break;
-                }
-            }
-            if (checkForExtensionDependencies) {
-                break;
-            }
-        }
     }
 
     public abstract Map<String, Set<String>> readPluginsStorages();
@@ -243,6 +225,22 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         // TODO optimize (do only for some transitions)
         // clear cache
         entries = null;
+
+        // By default we're assuming, that no checks for extension dependencies are necessary.
+        //
+        // A plugin, that has an optional dependency to other plugins, might lead to unloadable
+        // Java classes (NoClassDefFoundError) at application runtime due to possibly missing
+        // dependencies. Therefore we're enabling the check for optional extensions, if the
+        // started plugin contains at least one optional plugin dependency.
+        if (checkForExtensionDependencies == null && PluginState.STARTED.equals(event.getPluginState())) {
+            for (PluginDependency dependency : event.getPlugin().getDescriptor().getDependencies()) {
+                if (dependency.isOptional()) {
+                    log.debug("Enable check for extension dependencies via ASM.");
+                    checkForExtensionDependencies = true;
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -261,7 +259,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
      * @return true, if the extension finder checks extensions for its required plugins
      */
     public final boolean isCheckForExtensionDependencies() {
-        return checkForExtensionDependencies;
+        return Boolean.TRUE.equals(checkForExtensionDependencies);
     }
 
     /**
