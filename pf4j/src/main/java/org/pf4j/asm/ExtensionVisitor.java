@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.pf4j.asm;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -21,6 +20,8 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.pf4j.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
@@ -38,8 +39,11 @@ import java.util.Arrays;
  * @author Decebal Suiu
  */
 class ExtensionVisitor extends ClassVisitor {
-    //private static final Logger log = LoggerFactory.getLogger(ExtensionVisitor.class);
+    
+    private static final Logger log = LoggerFactory.getLogger(ExtensionVisitor.class);
+
     private static final int ASM_VERSION = Opcodes.ASM7;
+
     private final ExtensionInfo extensionInfo;
 
     ExtensionVisitor(ExtensionInfo extensionInfo) {
@@ -63,24 +67,23 @@ class ExtensionVisitor extends ClassVisitor {
 
                         @Override
                         public void visit(String key, Object value) {
-                            //log.debug("Load annotation attribute {} = {} ({})", name, value, value.getClass().getName());
-
+                            log.debug("Load annotation attribute {} = {} ({})", name, value, value.getClass().getName());
                             if ("ordinal".equals(name)) {
                                 extensionInfo.ordinal = Integer.parseInt(value.toString());
                             } else if ("plugins".equals(name)) {
                                 if (value instanceof String) {
-                                    //log.debug("found plugin " + value);
+                                    log.debug("Found plugin {}", value);
                                     extensionInfo.plugins.add((String) value);
                                 } else if (value instanceof String[]) {
-                                    //log.debug("found plugins " + Arrays.toString((String[]) value));
+                                    log.debug("Found plugins {}", Arrays.toString((String[]) value));
                                     extensionInfo.plugins.addAll(Arrays.asList((String[]) value));
                                 } else {
-                                    //log.debug("found plugin " + value.toString());
+                                    log.debug("Found plugin {}", value.toString());
                                     extensionInfo.plugins.add(value.toString());
                                 }
-                            } else if ("points".equals(name)) {
+                            } else {
                                 String pointClassName = ((Type) value).getClassName();
-                                //log.debug("found point " + pointClassName);
+                                log.debug("Found point " + pointClassName);
                                 extensionInfo.points.add(pointClassName);
                             }
 
@@ -91,6 +94,8 @@ class ExtensionVisitor extends ClassVisitor {
 
                 return super.visitArray(name);
             }
+
         };
     }
+
 }

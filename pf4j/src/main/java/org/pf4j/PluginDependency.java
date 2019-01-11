@@ -35,8 +35,7 @@ public class PluginDependency {
             }
         }
 
-        // A dependency is considered as optional,
-        // if the plugin id ends with a question mark.
+        // A dependency is considered as optional, if the plugin id ends with a question mark.
         this.optional = this.pluginId.endsWith("?");
         if (this.optional) {
             this.pluginId = this.pluginId.substring(0, this.pluginId.length() - 1);

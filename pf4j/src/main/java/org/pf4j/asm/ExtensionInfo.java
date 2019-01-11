@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.pf4j.asm;
 
 import org.objectweb.asm.ClassReader;
@@ -35,14 +34,16 @@ import java.util.List;
  * @author Decebal Suiu
  */
 public final class ExtensionInfo {
+
     private static final Logger log = LoggerFactory.getLogger(ExtensionInfo.class);
+
     private final String className;
+
     int ordinal = 0;
     List<String> plugins = new ArrayList<>();
     List<String> points = new ArrayList<>();
 
     private ExtensionInfo(String className) {
-        super();
         this.className = className;
     }
 
@@ -93,10 +94,12 @@ public final class ExtensionInfo {
         try (InputStream input = classLoader.getResourceAsStream(className.replace('.', '/') + ".class")) {
             ExtensionInfo info = new ExtensionInfo(className);
             new ClassReader(input).accept(new ExtensionVisitor(info), ClassReader.SKIP_DEBUG);
+
             return info;
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             return null;
         }
     }
+
 }

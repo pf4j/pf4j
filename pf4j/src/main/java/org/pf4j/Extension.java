@@ -59,4 +59,5 @@ public @interface Extension {
      * @return plugin IDs, that have to be available in order to load this extension
      */
     String[] plugins() default {};
+
 }

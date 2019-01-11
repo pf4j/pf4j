@@ -145,8 +145,7 @@ public class DependencyResolver {
         } else {
             boolean edgeAdded = false;
             for (PluginDependency dependency : dependencies) {
-                // Don't register optional plugins in the dependency graph
-                // to avoid automatic disabling of the plugin,
+                // Don't register optional plugins in the dependency graph to avoid automatic disabling of the plugin,
                 // if an optional dependency is missing.
                 if (!dependency.isOptional()) {
                     edgeAdded = true;
@@ -155,8 +154,7 @@ public class DependencyResolver {
                 }
             }
 
-            // Register the plugin without dependencies,
-            // if all of its dependencies are optional.
+            // Register the plugin without dependencies, if all of its dependencies are optional.
             if (!edgeAdded) {
                 dependenciesGraph.addVertex(pluginId);
                 dependentsGraph.addVertex(pluginId);
