@@ -143,9 +143,23 @@ public class DependencyResolver {
             dependenciesGraph.addVertex(pluginId);
             dependentsGraph.addVertex(pluginId);
         } else {
+            boolean edgeAdded = false;
             for (PluginDependency dependency : dependencies) {
-                dependenciesGraph.addEdge(pluginId, dependency.getPluginId());
-                dependentsGraph.addEdge(dependency.getPluginId(), pluginId);
+                // Don't register optional plugins in the dependency graph
+                // to avoid automatic disabling of the plugin,
+                // if an optional dependency is missing.
+                if (!dependency.isOptional()) {
+                    edgeAdded = true;
+                    dependenciesGraph.addEdge(pluginId, dependency.getPluginId());
+                    dependentsGraph.addEdge(dependency.getPluginId(), pluginId);
+                }
+            }
+
+            // Register the plugin without dependencies,
+            // if all of its dependencies are optional.
+            if (!edgeAdded) {
+                dependenciesGraph.addVertex(pluginId);
+                dependentsGraph.addVertex(pluginId);
             }
         }
     }

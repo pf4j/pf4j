@@ -32,15 +32,34 @@ public class PluginDependencyTest {
         PluginDependency instance = new PluginDependency("test");
         assertEquals("test", instance.getPluginId());
         assertEquals("*", instance.getPluginVersionSupport());
+        assertEquals(false, instance.isOptional());
 
         instance = new PluginDependency("test@");
         assertEquals("test", instance.getPluginId());
         assertEquals("*", instance.getPluginVersionSupport());
+        assertEquals(false, instance.isOptional());
+
+        instance = new PluginDependency("test?");
+        assertEquals("test", instance.getPluginId());
+        assertEquals("*", instance.getPluginVersionSupport());
+        assertEquals(true, instance.isOptional());
+
+        instance = new PluginDependency("test?@");
+        assertEquals("test", instance.getPluginId());
+        assertEquals("*", instance.getPluginVersionSupport());
+        assertEquals(true, instance.isOptional());
 
         instance = new PluginDependency("test@1.0");
         assertEquals("test", instance.getPluginId());
         assertEquals("1.0", instance.getPluginVersionSupport());
-        assertEquals("PluginDependency [pluginId=test, pluginVersionSupport=1.0]", instance.toString());
+        assertEquals(false, instance.isOptional());
+        assertEquals("PluginDependency [pluginId=test, pluginVersionSupport=1.0, optional=false]", instance.toString());
+
+        instance = new PluginDependency("test?@1.0");
+        assertEquals("test", instance.getPluginId());
+        assertEquals("1.0", instance.getPluginVersionSupport());
+        assertEquals(true, instance.isOptional());
+        assertEquals("PluginDependency [pluginId=test, pluginVersionSupport=1.0, optional=true]", instance.toString());
     }
 
 }
