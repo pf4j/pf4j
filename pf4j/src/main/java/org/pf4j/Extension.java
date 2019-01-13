@@ -47,4 +47,17 @@ public @interface Extension {
      */
     Class<? extends ExtensionPoint>[] points() default {};
 
+    /**
+     * An array of plugin IDs, that have to be available in order to load this extension.
+     * The {@link AbstractExtensionFinder} won't load this extension, if these plugins are not
+     * available / started at runtime.
+     * <p>
+     * Notice: This feature requires the optional <a href="https://asm.ow2.io/">ASM library</a>
+     * to be available on the applications classpath and has to be explicitly enabled via
+     * {@link AbstractExtensionFinder#setCheckForExtensionDependencies(boolean)}.
+     *
+     * @return plugin IDs, that have to be available in order to load this extension
+     */
+    String[] plugins() default {};
+
 }

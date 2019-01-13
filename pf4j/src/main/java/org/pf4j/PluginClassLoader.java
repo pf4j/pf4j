@@ -194,6 +194,12 @@ public class PluginClassLoader extends URLClassLoader {
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
         for (PluginDependency dependency : dependencies) {
             ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
+
+            // If the dependency is marked as optional, its class loader might not be available.
+            if (classLoader == null && dependency.isOptional()) {
+                continue;
+            }
+
             try {
                 return classLoader.loadClass(className);
             } catch (ClassNotFoundException e) {
