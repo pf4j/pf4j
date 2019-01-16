@@ -102,9 +102,7 @@
             <artifactId>pf4j-demo-api</artifactId>
             <version>${project.version}</version>
             <!-- !!! VERY IMPORTANT -->
-            <!--
             <scope>provided</scope>
-            -->
         </dependency>
     </dependencies>
 
