@@ -16,7 +16,9 @@
 package org.pf4j.demo;
 
 import org.apache.commons.lang.StringUtils;
+import org.pf4j.DefaultExtensionFinder;
 import org.pf4j.DefaultPluginManager;
+import org.pf4j.ExtensionFinder;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.pf4j.demo.api.Greeting;
@@ -36,7 +38,18 @@ public class Boot {
         printLogo();
 
         // create the plugin manager
-        final PluginManager pluginManager = new DefaultPluginManager();
+        final PluginManager pluginManager = new DefaultPluginManager() {
+
+            protected ExtensionFinder createExtensionFinder() {
+                DefaultExtensionFinder extensionFinder = (DefaultExtensionFinder) super.createExtensionFinder();
+                extensionFinder.addServiceProviderExtensionFinder();
+
+                return extensionFinder;
+            }
+
+
+        };
+
 
         // load the plugins
         pluginManager.loadPlugins();
