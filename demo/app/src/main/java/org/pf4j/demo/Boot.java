@@ -42,13 +42,12 @@ public class Boot {
 
             protected ExtensionFinder createExtensionFinder() {
                 DefaultExtensionFinder extensionFinder = (DefaultExtensionFinder) super.createExtensionFinder();
-                extensionFinder.addServiceProviderExtensionFinder();
+                extensionFinder.addServiceProviderExtensionFinder(); // to activate "HowdyGreeting" extension
 
                 return extensionFinder;
             }
 
         };
-
 
         // load the plugins
         pluginManager.loadPlugins();
