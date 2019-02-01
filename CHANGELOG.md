@@ -5,10 +5,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#273]: `ServiceProviderExtensionFinder` should scan the whole classpath
+- [#276]: The plugins in the demo did not load successfully
+- [#277]: Configures plugin manager to load "HowdyGreeting" using the services
 
 #### Changed
+- Improve run demo scripts
+- [#248]: Load extensions from plugin libraries
+- [#271]: Update `slf4j` dependency to version 1.7.25
 
 #### Added
+- [#265]: Explicitly configure extension points for an extension
+- [#270]: Optional plugin dependencies
+- [#275]: Add automatic module name to `pf4j.jar`
 
 #### Removed
 
@@ -295,6 +304,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#277]: https://github.com/pf4j/pf4j/pull/277
+[#276]: https://github.com/pf4j/pf4j/pull/276
+[#275]: https://github.com/pf4j/pf4j/pull/275
+[#273]: https://github.com/pf4j/pf4j/pull/273
+[#271]: https://github.com/pf4j/pf4j/pull/271
+[#270]: https://github.com/pf4j/pf4j/pull/270
+[#265]: https://github.com/pf4j/pf4j/pull/265
+[#262]: https://github.com/pf4j/pf4j/pull/262
 [#256]: https://github.com/pf4j/pf4j/pull/256
 [#252]: https://github.com/pf4j/pf4j/issues/252
 [#250]: https://github.com/pf4j/pf4j/issues/250
