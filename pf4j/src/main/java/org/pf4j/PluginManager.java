@@ -79,7 +79,7 @@ public interface PluginManager {
     void startPlugins();
 
     /**
-     * Start the specified plugin and it's dependencies.
+     * Start the specified plugin and its dependencies.
      *
      * @return the plugin state
      */
@@ -91,7 +91,7 @@ public interface PluginManager {
     void stopPlugins();
 
     /**
-     * Stop the specified plugin and it's dependencies.
+     * Stop the specified plugin and its dependencies.
      *
      * @return the plugin state
      */
