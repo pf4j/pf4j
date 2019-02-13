@@ -106,7 +106,7 @@ public class DependencyResolver {
     /**
      * Retrieves the plugins ids that the given plugin id directly depends on.
      *
-     * @param pluginId
+     * @param pluginId the unique plugin identifier, specified in its metadata
      * @return
      */
     public List<String> getDependencies(String pluginId) {
@@ -117,7 +117,7 @@ public class DependencyResolver {
     /**
      * Retrieves the plugins ids that the given content is a direct dependency of.
      *
-     * @param pluginId
+     * @param pluginId the unique plugin identifier, specified in its metadata
      * @return
      */
     public List<String> getDependents(String pluginId) {

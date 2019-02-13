@@ -55,7 +55,7 @@ public interface PluginManager {
     /**
      * Retrieves the plugin with this id, or null if the plugin does not exist.
      *
-     * @param pluginId The pluginId for the plugin you are trying to get.
+     * @param pluginId the unique plugin identifier, specified in its metadata
      * @return A PluginWrapper object for this plugin, or null if it does not exist.
      */
     PluginWrapper getPlugin(String pluginId);
@@ -68,8 +68,9 @@ public interface PluginManager {
     /**
      * Load a plugin.
      *
-     * @param pluginPath
-     * @return the pluginId of the installed plugin or null
+     * @param pluginPath the plugin location
+     * @return the pluginId of the installed plugin as specified in
+     *     its {@linkplain PluginDescriptor metadata}; or {@code null}
      */
     String loadPlugin(Path pluginPath);
 
@@ -79,7 +80,7 @@ public interface PluginManager {
     void startPlugins();
 
     /**
-     * Start the specified plugin and it's dependencies.
+     * Start the specified plugin and its dependencies.
      *
      * @return the plugin state
      */
@@ -91,7 +92,7 @@ public interface PluginManager {
     void stopPlugins();
 
     /**
-     * Stop the specified plugin and it's dependencies.
+     * Stop the specified plugin and its dependencies.
      *
      * @return the plugin state
      */
@@ -100,7 +101,7 @@ public interface PluginManager {
     /**
      * Unload a plugin.
      *
-     * @param pluginId
+     * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if the plugin was unloaded
      */
     boolean unloadPlugin(String pluginId);
@@ -108,7 +109,7 @@ public interface PluginManager {
     /**
      * Disables a plugin from being loaded.
      *
-     * @param pluginId
+     * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if plugin is disabled
      */
     boolean disablePlugin(String pluginId);
@@ -116,7 +117,7 @@ public interface PluginManager {
     /**
      * Enables a plugin that has previously been disabled.
      *
-     * @param pluginId
+     * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if plugin is enabled
      */
     boolean enablePlugin(String pluginId);
@@ -124,7 +125,7 @@ public interface PluginManager {
     /**
      * Deletes a plugin.
      *
-     * @param pluginId
+     * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if the plugin was deleted
      */
     boolean deletePlugin(String pluginId);

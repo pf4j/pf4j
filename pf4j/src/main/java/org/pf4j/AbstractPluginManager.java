@@ -338,7 +338,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * Start the specified plugin and it's dependencies.
+     * Start the specified plugin and its dependencies.
      */
     @Override
     public PluginState startPlugin(String pluginId) {
