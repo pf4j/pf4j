@@ -12,17 +12,19 @@ mkdir demo-dist\plugins
 
 REM copy artifacts to demo-dist folder
 xcopy demo\app\target\pf4j-demo-app-*.zip demo-dist /s /i
-xcopy demo\plugins\plugin1\target\*plugin.jar demo-dist\plugins /s
-xcopy demo\plugins\plugin2\target\*plugin.jar demo-dist\plugins /s
+xcopy demo\plugins\plugin1\target\pf4j-demo-plugin1-*-all.jar demo-dist\plugins /s
+xcopy demo\plugins\plugin2\target\pf4j-demo-plugin2-*-all.jar demo-dist\plugins /s
 xcopy demo\plugins\enabled.txt demo-dist\plugins /s
 xcopy demo\plugins\disabled.txt demo-dist\plugins /s
 
 cd demo-dist
 
 REM unzip app
-unzip pf4j-demo-app-*.zip
-rm pf4j-demo-app-*.zip
+jar xf pf4j-demo-app-*.zip
+del pf4j-demo-app-*.zip
 
 REM run demo
-java -jar pf4j-demo-app-*-SNAPSHOT.jar
+rename pf4j-demo-app-*-SNAPSHOT.jar pf4j-demo.jar
+java -jar pf4j-demo.jar
+
 cd ..

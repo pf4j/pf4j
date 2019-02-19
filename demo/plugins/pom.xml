@@ -44,7 +44,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>${project.artifactId}-${project.version}-plugin</finalName>
+                    <finalName>${project.artifactId}-${project.version}-all</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <attach>false</attach>
                     <archive>
