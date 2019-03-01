@@ -26,6 +26,8 @@ import java.nio.file.Paths;
 /**
  * Default implementation of the {@link PluginManager} interface.
  *
+ * <p>This class is not thread-safe.
+ *
  * @author Decebal Suiu
  */
 public class DefaultPluginManager extends AbstractPluginManager {

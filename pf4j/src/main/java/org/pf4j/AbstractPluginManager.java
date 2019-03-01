@@ -37,6 +37,8 @@ import java.util.Set;
  * implementation would have to support.
  * It helps cut the noise out of the subclass that handles plugin management.
  *
+ * <p>This class is not thread-safe.
+ *
  * @author Decebal Suiu
  */
 public abstract class AbstractPluginManager implements PluginManager {
