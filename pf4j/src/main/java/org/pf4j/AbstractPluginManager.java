@@ -15,10 +15,6 @@
  */
 package org.pf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.pf4j.util.StringUtils;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,6 +27,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.pf4j.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the boilerplate plugin code that any {@link PluginManager}
@@ -820,18 +819,31 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     protected PluginWrapper loadPluginFromPath(Path pluginPath) throws PluginException {
-        // test for plugin duplication
+        // Test for plugin path duplication
         String pluginId = idForPath(pluginPath);
         if (pluginId != null) {
             throw new PluginAlreadyLoadedException(pluginId, pluginPath);
         }
 
-        // retrieves the plugin descriptor
+        // Retrieve and validate the plugin descriptor
         PluginDescriptorFinder pluginDescriptorFinder = getPluginDescriptorFinder();
         log.debug("Use '{}' to find plugins descriptors", pluginDescriptorFinder);
         log.debug("Finding plugin descriptor for plugin '{}'", pluginPath);
         PluginDescriptor pluginDescriptor = pluginDescriptorFinder.find(pluginPath);
         validatePluginDescriptor(pluginDescriptor);
+
+        // Check there are no loaded plugins with the retrieved id
+        pluginId = pluginDescriptor.getPluginId();
+        if (plugins.containsKey(pluginId)) {
+            PluginWrapper loadedPlugin = getPlugin(pluginId);
+            throw new PluginException(String.format("There is an already loaded plugin (%s) "
+                    + "with the same id (%s) as the plugin at path '%s'. Simultaneous loading "
+                    + "of plugins with the same PluginId is not currently supported.\n"
+                    + "As a workaround you may include PluginVersion and PluginProvider "
+                    + "in PluginId.",
+                loadedPlugin, pluginId, pluginPath));
+        }
+
         log.debug("Found descriptor {}", pluginDescriptor);
         String pluginClassName = pluginDescriptor.getPluginClass();
         log.debug("Class '{}' for plugin '{}'",  pluginClassName, pluginPath);

@@ -15,23 +15,26 @@
  */
 package org.pf4j;
 
-import java.io.File;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.pf4j.plugin.PluginZip;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.pf4j.plugin.PluginZip;
 
 public class LoadPluginsTest {
 
@@ -76,7 +79,7 @@ public class LoadPluginsTest {
         assertNull(pluginManager.loadPluginFromPath(pluginZip.path()));
     }
 
-    @Test(expected = PluginAlreadyLoadedException.class)
+    @Test
     public void loadPluginWithSameIdDifferentPathFails() throws Exception {
         String pluginId = "myPlugin";
         String pluginVersion = "1.2.3";
@@ -92,11 +95,22 @@ public class LoadPluginsTest {
 
         // Verify the first plugin with the given id is loaded
         assertNotNull(pluginManager.loadPluginFromPath(plugin1.path()));
-        // Verify the second plugin is not loaded as it has the same metadata
-        assertNull(pluginManager.loadPluginFromPath(plugin2.path()));
-        // Check the path remains the same
-        PluginWrapper loadedPlugin = pluginManager.getPlugin(pluginId);
-        assertThat(loadedPlugin.getPluginPath(), equalTo(plugin1.path()));
+        Path loadedPlugin1Path = pluginManager.getPlugin(pluginId).getPluginPath();
+
+        try {
+            // Verify the second plugin is not loaded as it has the same metadata
+            pluginManager.loadPluginFromPath(plugin2.path());
+            fail("Expected loadPluginFromPath to fail");
+        } catch (PluginException e) {
+            // Check the path of the loaded plugin remains the same
+            PluginWrapper loadedPlugin = pluginManager.getPlugin(pluginId);
+            assertThat(loadedPlugin.getPluginPath(), equalTo(loadedPlugin1Path));
+            // Check the message includes relevant information
+            String message = e.getMessage();
+            assertThat(message, startsWith("There is an already loaded plugin"));
+            assertThat(message, containsString(pluginId));
+            assertThat(message, containsString("my-plugin-1.2.3-renamed"));
+        }
     }
 
     /**
@@ -104,7 +118,7 @@ public class LoadPluginsTest {
      * versions but with the pluginId cannot be loaded correctly because the API
      * uses pluginId as the unique identifier of the loaded plugin.
      */
-    @Test(expected = PluginAlreadyLoadedException.class)
+    @Test
     public void loadPluginWithSameIdDifferentVersionsFails() throws Exception {
         String pluginId = "myPlugin";
         String plugin1Version = "1.2.3";
@@ -121,12 +135,17 @@ public class LoadPluginsTest {
 
         // Verify the first plugin with the given id is loaded
         assertNotNull(pluginManager.loadPluginFromPath(plugin1.path()));
-        // Verify the second plugin is not loaded as it has the same metadata
-        assertNull(pluginManager.loadPluginFromPath(plugin2.path()));
-        // Check the path and version remain the same
-        PluginWrapper loadedPlugin = pluginManager.getPlugin(pluginId);
-        assertThat(loadedPlugin.getPluginPath(), equalTo(plugin1.path()));
-        assertThat(loadedPlugin.getDescriptor().getVersion(), equalTo(plugin1Version));
+        Path loadedPlugin1Path = pluginManager.getPlugin(pluginId).getPluginPath();
+        try {
+            // Verify the second plugin is not loaded as it has the same pluginId
+            pluginManager.loadPluginFromPath(plugin2.path());
+            fail("Expected loadPluginFromPath to fail");
+        } catch (PluginException e) {
+            // Check the path and version of the loaded plugin remain the same
+            PluginWrapper loadedPlugin = pluginManager.getPlugin(pluginId);
+            assertThat(loadedPlugin.getPluginPath(), equalTo(loadedPlugin1Path));
+            assertThat(loadedPlugin.getDescriptor().getVersion(), equalTo(plugin1Version));
+        }
     }
 
     @Test
