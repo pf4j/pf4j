@@ -49,17 +49,17 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     private PluginDescriptorFinder pluginDescriptorFinder;
 
-    /*
+    /**
      * A map of plugins this manager is responsible for (the key is the 'pluginId').
      */
     protected Map<String, PluginWrapper> plugins;
 
-    /*
+    /**
      * A map of plugin class loaders (the key is the 'pluginId').
      */
     private Map<String, ClassLoader> pluginClassLoaders;
 
-    /*
+    /**
      * A list with unresolved plugins (unresolved dependency).
      */
     private List<PluginWrapper> unresolvedPlugins;
@@ -69,23 +69,23 @@ public abstract class AbstractPluginManager implements PluginManager {
      */
     private List<PluginWrapper> resolvedPlugins;
 
-    /*
+    /**
      * A list with started plugins.
      */
     private List<PluginWrapper> startedPlugins;
 
-    /*
+    /**
      * The registered {@link PluginStateListener}s.
      */
     private List<PluginStateListener> pluginStateListeners;
 
-    /*
+    /**
      * Cache value for the runtime mode.
      * No need to re-read it because it wont change at runtime.
      */
     private RuntimeMode runtimeMode;
 
-    /*
+    /**
      * The system version used for comparisons to the plugin requires attribute.
      */
     private String systemVersion = "0.0.0";
