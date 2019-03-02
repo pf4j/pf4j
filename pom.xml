@@ -48,6 +48,7 @@
         <asm.version>7.0</asm.version>
 
         <junit.version>4.12</junit.version>
+        <hamcrest.version>2.1</hamcrest.version>
         <mockito.version>2.24.0</mockito.version>
         <cobertura.version>2.7</cobertura.version>
         <coveralls.version>3.1.0</coveralls.version>
