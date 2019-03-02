@@ -836,12 +836,12 @@ public abstract class AbstractPluginManager implements PluginManager {
         pluginId = pluginDescriptor.getPluginId();
         if (plugins.containsKey(pluginId)) {
             PluginWrapper loadedPlugin = getPlugin(pluginId);
-            throw new PluginException(String.format("There is an already loaded plugin (%s) "
-                    + "with the same id (%s) as the plugin at path '%s'. Simultaneous loading "
+            throw new PluginException("There is an already loaded plugin ({}) "
+                    + "with the same id ({}) as the plugin at path '{}'. Simultaneous loading "
                     + "of plugins with the same PluginId is not currently supported.\n"
                     + "As a workaround you may include PluginVersion and PluginProvider "
                     + "in PluginId.",
-                loadedPlugin, pluginId, pluginPath));
+                loadedPlugin, pluginId, pluginPath);
         }
 
         log.debug("Found descriptor {}", pluginDescriptor);
