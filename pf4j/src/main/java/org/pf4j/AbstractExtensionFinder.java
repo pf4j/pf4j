@@ -198,7 +198,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                 ExtensionWrapper extensionWrapper = createExtensionWrapper(extensionClass);
                 result.add(extensionWrapper);
                 log.debug("Added extension '{}' with ordinal {}", className, extensionWrapper.getOrdinal());
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException | NoSuchMethodError e) {
                 log.error(e.getMessage(), e);
             }
         }
