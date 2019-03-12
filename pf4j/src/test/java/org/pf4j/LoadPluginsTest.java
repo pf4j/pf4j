@@ -45,7 +45,19 @@ public class LoadPluginsTest {
 
     @Before
     public void setUp() {
-        pluginManager = new DefaultPluginManager(pluginsFolder.getRoot().toPath());
+        pluginManager = new DefaultPluginManager(pluginsFolder.getRoot().toPath()) {
+
+            @Override
+            protected PluginRepository createPluginRepository() {
+                return new DefaultPluginRepository(getPluginsRoot(), isDevelopment());
+            }
+
+            @Override
+            protected PluginLoader createPluginLoader() {
+                return new DefaultPluginLoader(this, pluginClasspath);
+            }
+
+        };
     }
 
     @Test
