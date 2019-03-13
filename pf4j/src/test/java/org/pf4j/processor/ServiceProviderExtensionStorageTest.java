@@ -23,12 +23,16 @@ import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -46,7 +50,6 @@ public class ServiceProviderExtensionStorageTest {
         assertThat(entries.contains("World"), is(true));
     }
 
-
     @Test
     public void ensureReadingExtensionsProducesCorrectListOfExtensions() {
         final StringReader file = new StringReader("#hello\n    World");
@@ -56,6 +59,7 @@ public class ServiceProviderExtensionStorageTest {
 
         given(processor.getExtensions()).willReturn(extensions);
         ServiceProviderExtensionStorage extensionStorage = new ServiceProviderExtensionStorage(processor) {
+
             @Override
             protected Filer getFiler() {
                 try {
@@ -72,6 +76,7 @@ public class ServiceProviderExtensionStorageTest {
                     throw new IllegalStateException("Shouldn't have gotten here");
                 }
             }
+
         };
 
         Map<String, Set<String>> read = extensionStorage.read();
