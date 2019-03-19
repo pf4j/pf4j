@@ -23,7 +23,6 @@
                     <compilerArgument>-proc:none</compilerArgument>
                 </configuration>
                 <executions>
-
                     <!-- compile everything for Java 8 except the module-info.java -->
                     <execution>
                         <id>default-compile</id>
@@ -51,7 +50,6 @@
                             </includes>
                         </configuration>
                     </execution>
-
                 </executions>
             </plugin>
         </plugins>
@@ -89,11 +87,12 @@
         </dependency>
 
         <dependency>
-            <!-- An empty artifact, required while JUnit 4 is on the classpath to override its
-                 dependency on hamcrest.
+            <!-- 
+            An empty artifact, required while JUnit 4 is on the classpath to override its
+            dependency on hamcrest.
 
-                 See http://hamcrest.org/JavaHamcrest/distributables#upgrading-from-hamcrest-1x
-                 -->
+            See http://hamcrest.org/JavaHamcrest/distributables#upgrading-from-hamcrest-1x
+            -->
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
             <version>${hamcrest.version}</version>
