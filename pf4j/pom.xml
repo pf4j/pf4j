@@ -22,17 +22,35 @@
                 <configuration>
                     <compilerArgument>-proc:none</compilerArgument>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Automatic-Module-Name>org.pf4j</Automatic-Module-Name>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
+                <executions>
+                    <!-- compile everything for Java 8 except the module-info.java -->
+                    <execution>
+                        <id>default-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>module-info.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+
+                    <!-- compile module-info.java for Java 9+ -->
+                    <execution>
+                        <id>java9-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>9</release>
+                            <multiReleaseOutput>true</multiReleaseOutput>
+                            <includes>
+                                <include>module-info.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -69,11 +87,12 @@
         </dependency>
 
         <dependency>
-            <!-- An empty artifact, required while JUnit 4 is on the classpath to override its
-                 dependency on hamcrest.
+            <!-- 
+            An empty artifact, required while JUnit 4 is on the classpath to override its
+            dependency on hamcrest.
 
-                 See http://hamcrest.org/JavaHamcrest/distributables#upgrading-from-hamcrest-1x
-                 -->
+            See http://hamcrest.org/JavaHamcrest/distributables#upgrading-from-hamcrest-1x
+            -->
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
             <version>${hamcrest.version}</version>
