@@ -77,7 +77,7 @@ public class FileUtils {
      * @throws IOException if something goes wrong
      */
     public static void delete(Path path) throws IOException {
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(path, new SimpleFileVisitor<>() {
 
            @Override
            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
@@ -172,7 +172,8 @@ public class FileUtils {
 
         FileTime pluginZipDate = Files.getLastModifiedTime(filePath);
         String fileName = filePath.getFileName().toString();
-        Path pluginDirectory = filePath.resolveSibling(fileName.substring(0, fileName.lastIndexOf(".")));
+        String directoryName = fileName.substring(0, fileName.lastIndexOf("."));
+        Path pluginDirectory = filePath.resolveSibling(directoryName);
 
         if (!Files.exists(pluginDirectory) || pluginZipDate.compareTo(Files.getLastModifiedTime(pluginDirectory)) > 0) {
             // do not overwrite an old version, remove it
