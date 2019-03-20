@@ -15,9 +15,12 @@
  */
 package org.pf4j;
 
-import org.junit.Test;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mario Franco
@@ -32,33 +35,33 @@ public class PluginDependencyTest {
         PluginDependency instance = new PluginDependency("test");
         assertEquals("test", instance.getPluginId());
         assertEquals("*", instance.getPluginVersionSupport());
-        assertEquals(false, instance.isOptional());
+        assertFalse(instance.isOptional());
 
         instance = new PluginDependency("test@");
         assertEquals("test", instance.getPluginId());
         assertEquals("*", instance.getPluginVersionSupport());
-        assertEquals(false, instance.isOptional());
+        assertFalse(instance.isOptional());
 
         instance = new PluginDependency("test?");
         assertEquals("test", instance.getPluginId());
         assertEquals("*", instance.getPluginVersionSupport());
-        assertEquals(true, instance.isOptional());
+        assertTrue(instance.isOptional());
 
         instance = new PluginDependency("test?@");
         assertEquals("test", instance.getPluginId());
         assertEquals("*", instance.getPluginVersionSupport());
-        assertEquals(true, instance.isOptional());
+        assertTrue(instance.isOptional());
 
         instance = new PluginDependency("test@1.0");
         assertEquals("test", instance.getPluginId());
         assertEquals("1.0", instance.getPluginVersionSupport());
-        assertEquals(false, instance.isOptional());
+        assertFalse(instance.isOptional());
         assertEquals("PluginDependency [pluginId=test, pluginVersionSupport=1.0, optional=false]", instance.toString());
 
         instance = new PluginDependency("test?@1.0");
         assertEquals("test", instance.getPluginId());
         assertEquals("1.0", instance.getPluginVersionSupport());
-        assertEquals(true, instance.isOptional());
+        assertTrue(instance.isOptional());
         assertEquals("PluginDependency [pluginId=test, pluginVersionSupport=1.0, optional=true]", instance.toString());
     }
 

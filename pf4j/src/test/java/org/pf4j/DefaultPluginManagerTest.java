@@ -15,21 +15,21 @@
  */
 package org.pf4j;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.plugin.PluginZip;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,14 +38,12 @@ public class DefaultPluginManagerTest {
     private DefaultPluginManager pluginManager;
     private DefaultPluginDescriptor pluginDescriptor;
     private PluginWrapper pluginWrapper;
-    private Path pluginsPath;
 
-    @Rule
-    public TemporaryFolder pluginsFolder = new TemporaryFolder();
+    @TempDir
+    Path pluginsPath;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
-        pluginsPath = pluginsFolder.getRoot().toPath();
         pluginManager = new DefaultPluginManager(pluginsPath);
 
         pluginDescriptor = new DefaultPluginDescriptor();
@@ -59,7 +57,7 @@ public class DefaultPluginManagerTest {
         pluginWrapper = new PluginWrapper(pluginManager, pluginDescriptor, Files.createTempDirectory("test"), getClass().getClassLoader());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         pluginManager = null;
         pluginDescriptor = null;
@@ -71,16 +69,16 @@ public class DefaultPluginManagerTest {
         pluginManager.validatePluginDescriptor(pluginDescriptor);
     }
 
-    @Test(expected = PluginException.class)
-    public void validateFailsOnId() throws PluginException {
+    @Test
+    public void validateFailsOnId() {
         pluginDescriptor.setPluginId("");
-        pluginManager.validatePluginDescriptor(pluginDescriptor);
+        assertThrows(PluginException.class, () -> pluginManager.validatePluginDescriptor(pluginDescriptor));
     }
 
-    @Test(expected = PluginException.class)
-    public void validateFailsOnVersion() throws PluginException {
+    @Test
+    public void validateFailsOnVersion() {
         pluginDescriptor.setPluginVersion(null);
-        pluginManager.validatePluginDescriptor(pluginDescriptor);
+        assertThrows(PluginException.class, () -> pluginManager.validatePluginDescriptor(pluginDescriptor));
     }
 
     @Test
@@ -132,7 +130,7 @@ public class DefaultPluginManagerTest {
      */
     @Test
     public void testPluginDisabledNoStart() throws IOException {
-        new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+        new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 

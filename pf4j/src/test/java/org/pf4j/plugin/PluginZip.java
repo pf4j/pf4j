@@ -15,7 +15,6 @@
  */
 package org.pf4j.plugin;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -31,22 +30,18 @@ import java.util.zip.ZipOutputStream;
  */
 public class PluginZip {
 
-    private final File file;
+    private final Path path;
     private final String pluginId;
     private final String pluginVersion;
 
     protected PluginZip(Builder builder) {
-        this.file = builder.file;
+        this.path = builder.path;
         this.pluginId = builder.pluginId;
         this.pluginVersion = builder.pluginVersion;
     }
 
-    public File file() {
-        return file;
-    }
-
     public Path path() {
-        return file.toPath();
+        return path;
     }
 
     public String pluginId() {
@@ -66,13 +61,13 @@ public class PluginZip {
 
     public static class Builder {
 
-        private final File file;
+        private final Path path;
         private final String pluginId;
 
         private String pluginVersion;
 
-        public Builder(File file, String pluginId) {
-            this.file = file;
+        public Builder(Path path, String pluginId) {
+            this.path = path;
             this.pluginId = pluginId;
         }
 
@@ -94,7 +89,7 @@ public class PluginZip {
             properties.setProperty("plugin.version", pluginVersion);
             properties.setProperty("plugin.class", "org.pf4j.plugin.TestPlugin");
 
-            ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(file));
+            ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(path.toFile()));
             ZipEntry propertiesFile = new ZipEntry("plugin.properties");
             outputStream.putNextEntry(propertiesFile);
             properties.store(outputStream, "");

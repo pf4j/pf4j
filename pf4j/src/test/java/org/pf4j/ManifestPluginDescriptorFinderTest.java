@@ -15,19 +15,21 @@
  */
 package org.pf4j;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mario Franco
@@ -36,40 +38,37 @@ import static org.junit.Assert.*;
 public class ManifestPluginDescriptorFinderTest {
 
     private VersionManager versionManager;
-    private Path pluginsPath;
 
-    @Rule
-    public TemporaryFolder pluginsFolder = new TemporaryFolder();
+    @TempDir
+    Path pluginsPath;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
-        pluginsPath = pluginsFolder.getRoot().toPath();
-
         Charset charset = Charset.forName("UTF-8");
 
-        Path pluginPath = pluginsFolder.newFolder("test-plugin-1", "classes", "META-INF").toPath();
+        Path pluginPath = Files.createDirectories(pluginsPath.resolve(Paths.get("test-plugin-1", "classes", "META-INF")));
         Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin1Manifest(), charset);
 
-        pluginPath = pluginsFolder.newFolder("test-plugin-2", "classes", "META-INF").toPath();
+        pluginPath = Files.createDirectories(pluginsPath.resolve(Paths.get("test-plugin-2", "classes", "META-INF")));
         Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin2Manifest(), charset);
 
         // empty plugin
-        pluginsFolder.newFolder("test-plugin-3");
+        Files.createDirectories(pluginsPath.resolve("test-plugin-3"));
 
         // no plugin class
-        pluginPath = pluginsFolder.newFolder("test-plugin-4", "classes", "META-INF").toPath();
+        pluginPath = Files.createDirectories(pluginsPath.resolve(Paths.get("test-plugin-4", "classes", "META-INF")));
         Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin4Manifest(), charset);
 
         // no plugin version
-        pluginPath = pluginsFolder.newFolder("test-plugin-5", "classes", "META-INF").toPath();
+        pluginPath = Files.createDirectories(pluginsPath.resolve(Paths.get("test-plugin-5", "classes", "META-INF")));
         Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin5Manifest(), charset);
 
         // no plugin id
-        pluginPath = pluginsFolder.newFolder("test-plugin-6", "classes", "META-INF").toPath();
+        pluginPath = Files.createDirectories(pluginsPath.resolve(Paths.get("test-plugin-6", "classes", "META-INF")));
         Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
         Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin6Manifest(), charset);
 
@@ -110,10 +109,10 @@ public class ManifestPluginDescriptorFinderTest {
     /**
      * Test of {@link ManifestPluginDescriptorFinder#find(Path)} method.
      */
-    @Test(expected = PluginException.class)
-    public void testFindNotFound() throws Exception {
+    @Test
+    public void testFindNotFound() {
         PluginDescriptorFinder descriptorFinder = new ManifestPluginDescriptorFinder();
-        descriptorFinder.find(pluginsPath.resolve("test-plugin-3"));
+        assertThrows(PluginException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
     }
 
     private List<String> getPlugin1Manifest() {

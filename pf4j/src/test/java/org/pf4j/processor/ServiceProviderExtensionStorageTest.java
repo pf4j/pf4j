@@ -16,7 +16,7 @@
 
 package org.pf4j.processor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.annotation.processing.Filer;
 import javax.tools.FileObject;
@@ -29,8 +29,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;

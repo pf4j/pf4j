@@ -15,10 +15,9 @@
  */
 package org.pf4j;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.plugin.PluginZip;
 
 import java.io.IOException;
@@ -28,41 +27,42 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PropertiesPluginDescriptorFinderTest {
 
     private VersionManager versionManager;
-    private Path pluginsPath;
 
-    @Rule
-    public TemporaryFolder pluginsFolder = new TemporaryFolder();
+    @TempDir
+    Path pluginsPath;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
-        pluginsPath = pluginsFolder.getRoot().toPath();
-
         Charset charset = Charset.forName("UTF-8");
 
-        Path pluginPath = pluginsFolder.newFolder("test-plugin-1").toPath();
+        Path pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-1"));
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin1Properties(), charset);
 
-        pluginPath = pluginsFolder.newFolder("test-plugin-2").toPath();
+        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-2"));
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin2Properties(), charset);
 
         // empty plugin
-        pluginsFolder.newFolder("test-plugin-3");
+        Files.createDirectories(pluginsPath.resolve("test-plugin-3"));
 
         // no plugin class
-        pluginPath = pluginsFolder.newFolder("test-plugin-4").toPath();
+        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-4"));
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin4Properties(), charset);
 
         // no plugin version
-        pluginPath = pluginsFolder.newFolder("test-plugin-5").toPath();
+        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-5"));
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin5Properties(), charset);
 
         // no plugin id
-        pluginPath = pluginsFolder.newFolder("test-plugin-6").toPath();
+        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-6"));
         Files.write(pluginPath.resolve("plugin.properties"), getPlugin6Properties(), charset);
 
         versionManager = new DefaultVersionManager();
@@ -99,15 +99,15 @@ public class PropertiesPluginDescriptorFinderTest {
         assertTrue(versionManager.checkVersionConstraint("1.0.0", plugin2.getRequires()));
     }
 
-    @Test(expected = PluginException.class)
-    public void testNotFound() throws Exception {
+    @Test
+    public void testNotFound() {
         PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
-        descriptorFinder.find(pluginsPath.resolve("test-plugin-3"));
+        assertThrows(PluginException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
     }
 
     @Test
     public void findInJar() throws Exception {
-        PluginZip pluginJar = new PluginZip.Builder(pluginsFolder.newFile("my-plugin-1.2.3.jar"), "myPlugin")
+        PluginZip pluginJar = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.jar"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 

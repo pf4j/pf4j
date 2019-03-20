@@ -15,20 +15,18 @@
  */
 package org.pf4j;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mario Franco
@@ -36,25 +34,21 @@ import static org.junit.Assert.assertTrue;
  */
 public class DefaultPluginRepositoryTest {
 
-    private Path pluginsPath;
+    @TempDir
+    Path pluginsPath;
 
-    @Rule
-    public TemporaryFolder pluginsFolder = new TemporaryFolder();
-
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
-        pluginsPath = pluginsFolder.getRoot().toPath();
-
-        pluginsFolder.newFolder("plugin-1");
+        Path plugin1Path = Files.createDirectories(pluginsPath.resolve("plugin-1"));
         // Prove that we can delete a folder with a file inside
-        Files.createFile(Paths.get(pluginsFolder.getRoot().getAbsolutePath()).resolve("plugin-1").resolve("myfile"));
+        Files.createFile(plugin1Path.resolve("myfile"));
         // Create a zip file for plugin-1 to test that it is deleted when plugin is deleted
-        Files.createFile(Paths.get(pluginsFolder.getRoot().getAbsolutePath()).resolve("plugin-1.zip"));
-        pluginsFolder.newFolder("plugin-2");
-        pluginsFolder.newFolder("plugin-3");
+        Files.createFile(pluginsPath.resolve("plugin-1.zip"));
+        Files.createDirectories(pluginsPath.resolve("plugin-2"));
+        Files.createDirectories(pluginsPath.resolve("plugin-3"));
         // standard maven/gradle bin folder - these should be skipped in development mode because the cause errors
-        pluginsFolder.newFolder("target");
-        pluginsFolder.newFolder("build");
+        Files.createDirectories(pluginsPath.resolve("target"));
+        Files.createDirectories(pluginsPath.resolve("build"));
     }
 
     /**
@@ -109,11 +103,11 @@ public class DefaultPluginRepositoryTest {
     }
 
     private void assertPathExists(List<Path> paths, Path path) {
-        assertTrue("The directory must contain the file " + path, paths.contains(path));
+        assertTrue(paths.contains(path), "The directory must contain the file " + path);
     }
 
     private void assertPathDoesNotExists(List<Path> paths, Path path) {
-        assertFalse("The directory must not contain the file " + path, paths.contains(path));
+        assertFalse(paths.contains(path), "The directory must not contain the file " + path);
     }
 
 }
