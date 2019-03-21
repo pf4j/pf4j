@@ -77,7 +77,7 @@ public class FileUtils {
      * @throws IOException if something goes wrong
      */
     public static void delete(Path path) throws IOException {
-        Files.walkFileTree(path, new SimpleFileVisitor<>() {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
 
            @Override
            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
