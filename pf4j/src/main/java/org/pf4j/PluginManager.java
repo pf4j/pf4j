@@ -70,9 +70,10 @@ public interface PluginManager {
      *
      * @param pluginPath the plugin location
      * @return the pluginId of the installed plugin as specified in
-     *     its {@linkplain PluginDescriptor metadata}; or {@code null}
+     *     its {@linkplain PluginDescriptor metadata}
+     *  @throws PluginException if load of plugin fails
      */
-    String loadPlugin(Path pluginPath);
+    String loadPlugin(Path pluginPath) throws PluginException;
 
     /**
      * Start all active plugins.

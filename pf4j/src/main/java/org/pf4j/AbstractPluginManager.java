@@ -173,25 +173,19 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     @Override
-    public String loadPlugin(Path pluginPath) {
+    public String loadPlugin(Path pluginPath) throws PluginException {
         if ((pluginPath == null) || Files.notExists(pluginPath)) {
             throw new IllegalArgumentException(String.format("Specified plugin %s does not exist!", pluginPath));
         }
 
         log.debug("Loading plugin from '{}'", pluginPath);
 
-        try {
-            PluginWrapper pluginWrapper = loadPluginFromPath(pluginPath);
+        PluginWrapper pluginWrapper = loadPluginFromPath(pluginPath);
 
-            // try to resolve  the loaded plugin together with other possible plugins that depend on this plugin
-            resolvePlugins();
+        // try to resolve  the loaded plugin together with other possible plugins that depend on this plugin
+        resolvePlugins();
 
-            return pluginWrapper.getDescriptor().getPluginId();
-        } catch (PluginException e) {
-            log.error(e.getMessage(), e);
-        }
-
-        return null;
+        return pluginWrapper.getDescriptor().getPluginId();
     }
 
     /**
