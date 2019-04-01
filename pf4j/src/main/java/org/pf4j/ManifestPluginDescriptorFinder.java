@@ -78,7 +78,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
         }
     }
 
-    protected Path getManifestPath(Path pluginPath) throws PluginException {
+    protected Path getManifestPath(Path pluginPath) {
         if (Files.isDirectory(pluginPath)) {
             // legacy (the path is something like "classes/META-INF/MANIFEST.MF")
             return FileUtils.findFile(pluginPath,"MANIFEST.MF");

@@ -109,11 +109,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             String extension = getBinaryName(extensionElement);
             for (TypeElement extensionPointElement : extensionPointElements) {
                 String extensionPoint = getBinaryName(extensionPointElement);
-                Set<String> extensionPoints = extensions.get(extensionPoint);
-                if (extensionPoints == null) {
-                    extensionPoints = new TreeSet<>();
-                    extensions.put(extensionPoint, extensionPoints);
-                }
+                Set<String> extensionPoints = extensions.computeIfAbsent(extensionPoint, k -> new TreeSet<>());
                 extensionPoints.add(extension);
             }
         }

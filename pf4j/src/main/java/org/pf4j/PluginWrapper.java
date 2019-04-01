@@ -120,11 +120,9 @@ public class PluginWrapper {
         }
 
         PluginWrapper other = (PluginWrapper) obj;
-        if (!descriptor.getPluginId().equals(other.descriptor.getPluginId())) {
-            return false;
-        }
 
-        return true;
+        return descriptor.getPluginId().equals(other.descriptor.getPluginId());
+
     }
 
     @Override
