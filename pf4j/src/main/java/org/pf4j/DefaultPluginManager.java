@@ -19,7 +19,6 @@ import org.pf4j.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -38,16 +37,6 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
     public DefaultPluginManager() {
         super();
-    }
-
-    /**
-     * Use {@link DefaultPluginManager#DefaultPluginManager(Path)}.
-     *
-     * @param pluginsDir
-     */
-    @Deprecated
-    public DefaultPluginManager(File pluginsDir) {
-        this(pluginsDir.toPath());
     }
 
     public DefaultPluginManager(Path pluginsRoot) {
