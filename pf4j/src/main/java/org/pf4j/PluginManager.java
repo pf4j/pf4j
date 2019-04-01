@@ -155,6 +155,13 @@ public interface PluginManager {
     RuntimeMode getRuntimeMode();
 
     /**
+     * Returns {@code true} id the runtime mode is {@code RuntimeMode.DEVELOPMENT}.
+     */
+    default boolean isDevelopment() {
+        return RuntimeMode.DEVELOPMENT.equals(getRuntimeMode());
+    }
+
+    /**
      * Retrieves the {@link PluginWrapper} that loaded the given class 'clazz'.
      */
     PluginWrapper whichPlugin(Class<?> clazz);

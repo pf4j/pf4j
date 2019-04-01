@@ -913,11 +913,6 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
     }
 
-    // TODO add this method in PluginManager as default method for Java 8.
-    protected boolean isDevelopment() {
-        return RuntimeMode.DEVELOPMENT.equals(getRuntimeMode());
-    }
-
     /**
      * @return true if exact versions in requires is allowed
      */
