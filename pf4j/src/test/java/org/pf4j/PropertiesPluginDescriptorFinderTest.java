@@ -43,25 +43,25 @@ public class PropertiesPluginDescriptorFinderTest {
     @BeforeEach
     public void setUp() throws IOException {
         Path pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-1"));
-        storePropertiesToPath(getPlugin1Properties(), pluginPath.resolve("plugin.properties"));
+        storePropertiesToPath(getPlugin1Properties(), pluginPath);
 
         pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-2"));
-        storePropertiesToPath(getPlugin2Properties(), pluginPath.resolve("plugin.properties"));
+        storePropertiesToPath(getPlugin2Properties(), pluginPath);
 
         // empty plugin
         Files.createDirectories(pluginsPath.resolve("test-plugin-3"));
 
         // no plugin class
         pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-4"));
-        storePropertiesToPath(getPlugin4Properties(), pluginPath.resolve("plugin.properties"));
+        storePropertiesToPath(getPlugin4Properties(), pluginPath);
 
         // no plugin version
         pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-5"));
-        storePropertiesToPath(getPlugin5Properties(), pluginPath.resolve("plugin.properties"));
+        storePropertiesToPath(getPlugin5Properties(), pluginPath);
 
         // no plugin id
         pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-6"));
-        storePropertiesToPath(getPlugin6Properties(), pluginPath.resolve("plugin.properties"));
+        storePropertiesToPath(getPlugin6Properties(), pluginPath);
 
         versionManager = new DefaultVersionManager();
     }
@@ -105,63 +105,64 @@ public class PropertiesPluginDescriptorFinderTest {
 
     private Properties getPlugin1Properties() {
         Properties properties = new Properties();
-        properties.setProperty("plugin.id", "test-plugin-1");
-        properties.setProperty("plugin.version", "0.0.1");
-        properties.setProperty("plugin.description", "Test Plugin 1");
-        properties.setProperty("plugin.provider", "Decebal Suiu");
-        properties.setProperty("plugin.class", "org.pf4j.plugin.TestPlugin");
-        properties.setProperty("plugin.dependencies", "test-plugin-2,test-plugin-3@~1.0");
-        properties.setProperty("plugin.requires", ">=1");
-        properties.setProperty("plugin.license", "Apache-2.0");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-1");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DESCRIPTION, "Test Plugin 1");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "test-plugin-2,test-plugin-3@~1.0");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, ">=1");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
 
         return properties;
     }
 
     private Properties getPlugin2Properties() {
         Properties properties = new Properties();
-        properties.setProperty("plugin.id", "test-plugin-2");
-        properties.setProperty("plugin.version", "0.0.1");
-        properties.setProperty("plugin.provider", "Decebal Suiu");
-        properties.setProperty("plugin.class", "org.pf4j.plugin.TestPlugin");
-        properties.setProperty("plugin.dependencies", "");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
 
         return properties;
     }
 
     private Properties getPlugin4Properties() {
         Properties properties = new Properties();
-        properties.setProperty("plugin.id", "test-plugin-2");
-        properties.setProperty("plugin.version", "0.0.1");
-        properties.setProperty("plugin.provider", "Decebal Suiu");
-        properties.setProperty("plugin.dependencies", "");
-        properties.setProperty("plugin.requires", "*");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 
         return properties;
     }
 
     private Properties getPlugin5Properties() {
         Properties properties = new Properties();
-        properties.setProperty("plugin.id", "test-plugin-2");
-        properties.setProperty("plugin.provider", "Decebal Suiu");
-        properties.setProperty("plugin.class", "org.pf4j.plugin.TestPlugin");
-        properties.setProperty("plugin.dependencies", "");
-        properties.setProperty("plugin.requires", "*");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 
         return properties;
     }
 
     private Properties getPlugin6Properties() {
         Properties properties = new Properties();
-        properties.setProperty("plugin.version", "0.0.1");
-        properties.setProperty("plugin.provider", "Decebal Suiu");
-        properties.setProperty("plugin.class", "org.pf4j.plugin.TestPlugin");
-        properties.setProperty("plugin.dependencies", "");
-        properties.setProperty("plugin.requires", "*");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
+        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 
         return properties;
     }
 
-    private void storePropertiesToPath(Properties properties, Path path) throws IOException {
+    private void storePropertiesToPath(Properties properties, Path pluginPath) throws IOException {
+        Path path = pluginPath.resolve(PropertiesPluginDescriptorFinder.DEFAULT_PROPERTIES_FILE_NAME);
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), StandardCharsets.UTF_8)) {
             properties.store(writer, "");
         }

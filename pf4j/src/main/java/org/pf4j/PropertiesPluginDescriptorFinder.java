@@ -36,7 +36,16 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 
     private static final Logger log = LoggerFactory.getLogger(PropertiesPluginDescriptorFinder.class);
 
-    private static final String DEFAULT_PROPERTIES_FILE_NAME = "plugin.properties";
+    public static final String DEFAULT_PROPERTIES_FILE_NAME = "plugin.properties";
+
+    public static final String PLUGIN_ID = "plugin.id";
+    public static final String PLUGIN_DESCRIPTION = "plugin.description";
+    public static final String PLUGIN_CLASS = "plugin.class";
+    public static final String PLUGIN_VERSION = "plugin.version";
+    public static final String PLUGIN_PROVIDER = "plugin.provider";
+    public static final String PLUGIN_DEPENDENCIES = "plugin.dependencies";
+    public static final String PLUGIN_REQUIRES = "plugin.requires";
+    public static final String PLUGIN_LICENSE = "plugin.license";
 
     protected String propertiesFileName;
 
@@ -98,38 +107,38 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
         DefaultPluginDescriptor pluginDescriptor = createPluginDescriptorInstance();
 
         // TODO validate !!!
-        String id = properties.getProperty("plugin.id");
+        String id = properties.getProperty(PLUGIN_ID);
         pluginDescriptor.setPluginId(id);
 
-        String description = properties.getProperty("plugin.description");
+        String description = properties.getProperty(PLUGIN_DESCRIPTION);
         if (StringUtils.isNullOrEmpty(description)) {
             pluginDescriptor.setPluginDescription("");
         } else {
             pluginDescriptor.setPluginDescription(description);
         }
 
-        String clazz = properties.getProperty("plugin.class");
+        String clazz = properties.getProperty(PLUGIN_CLASS);
         if (StringUtils.isNotNullOrEmpty(clazz)) {
             pluginDescriptor.setPluginClass(clazz);
         }
 
-        String version = properties.getProperty("plugin.version");
+        String version = properties.getProperty(PLUGIN_VERSION);
         if (StringUtils.isNotNullOrEmpty(version)) {
             pluginDescriptor.setPluginVersion(version);
         }
 
-        String provider = properties.getProperty("plugin.provider");
+        String provider = properties.getProperty(PLUGIN_PROVIDER);
         pluginDescriptor.setProvider(provider);
 
-        String dependencies = properties.getProperty("plugin.dependencies");
+        String dependencies = properties.getProperty(PLUGIN_DEPENDENCIES);
         pluginDescriptor.setDependencies(dependencies);
 
-        String requires = properties.getProperty("plugin.requires");
+        String requires = properties.getProperty(PLUGIN_REQUIRES);
         if (StringUtils.isNotNullOrEmpty(requires)) {
             pluginDescriptor.setRequires(requires);
         }
 
-        pluginDescriptor.setLicense(properties.getProperty("plugin.license"));
+        pluginDescriptor.setLicense(properties.getProperty(PLUGIN_LICENSE));
 
         return pluginDescriptor;
     }
