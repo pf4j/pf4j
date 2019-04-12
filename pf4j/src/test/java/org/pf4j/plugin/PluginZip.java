@@ -18,13 +18,14 @@ package org.pf4j.plugin;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Represents a plugin zip/jar file.
- * The "plugin.properties" file is created on the fly from the information supplied in Builder.
+ * Represents a plugin {@code zip} file.
+ * The {@code plugin.properties} file is created on the fly from the information supplied in {@link Builder}.
  *
  * @author Decebal Suiu
  */
@@ -65,6 +66,7 @@ public class PluginZip {
         private final String pluginId;
 
         private String pluginVersion;
+        private Map<String, String> properties;
 
         public Builder(Path path, String pluginId) {
             this.path = path;
@@ -77,6 +79,15 @@ public class PluginZip {
             return this;
         }
 
+        /**
+         * Add extra properties to the {@code properties} file.
+         */
+        public Builder properties(Map<String, String> properties) {
+            this.properties = properties;
+
+            return this;
+        }
+
         public PluginZip build() throws IOException {
             createPropertiesFile();
 
@@ -84,15 +95,18 @@ public class PluginZip {
         }
 
         protected void createPropertiesFile() throws IOException {
-            Properties properties = new Properties();
-            properties.setProperty("plugin.id", pluginId);
-            properties.setProperty("plugin.version", pluginVersion);
-            properties.setProperty("plugin.class", "org.pf4j.plugin.TestPlugin");
+            Properties props = new Properties();
+            props.setProperty("plugin.id", pluginId);
+            props.setProperty("plugin.version", pluginVersion);
+            props.setProperty("plugin.class", "org.pf4j.plugin.TestPlugin");
+            if (properties != null) {
+                props.putAll(properties);
+            }
 
             ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(path.toFile()));
             ZipEntry propertiesFile = new ZipEntry("plugin.properties");
             outputStream.putNextEntry(propertiesFile);
-            properties.store(outputStream, "");
+            props.store(outputStream, "");
             outputStream.closeEntry();
             outputStream.close();
         }
