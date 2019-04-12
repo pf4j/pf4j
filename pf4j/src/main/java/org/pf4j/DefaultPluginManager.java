@@ -24,6 +24,8 @@ import java.nio.file.Paths;
 
 /**
  * Default implementation of the {@link PluginManager} interface.
+ * In essence it is a {@link ZipPluginManager} plus a {@link JarPluginManager}.
+ * So, it can load plugins from jar and zip, simultaneous.
  *
  * <p>This class is not thread-safe.
  *
