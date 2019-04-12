@@ -18,8 +18,10 @@ package org.pf4j;
 /**
  * It's a {@link PluginManager} that loads each plugin from a {@code zip} file.
  * The structure of the zip file is:
- * - {@code lib} directory that contains all dependencies (as jar files); it's optional (no dependencies)
- * - {@code classes} directory that contains all plugin's classes
+ * <ul>
+ * <li>{@code lib} directory that contains all dependencies (as jar files); it's optional (no dependencies)
+ * <li>{@code classes} directory that contains all plugin's classes
+ * </ul>
  *
  * @author Decebal Suiu
  */
