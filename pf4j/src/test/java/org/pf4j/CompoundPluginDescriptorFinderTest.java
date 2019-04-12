@@ -17,6 +17,7 @@ package org.pf4j;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.plugin.PluginJar;
 import org.pf4j.plugin.PluginZip;
 
 import java.nio.charset.StandardCharsets;
@@ -64,9 +65,9 @@ public class CompoundPluginDescriptorFinderTest {
     @Test
     public void findInJar() throws Exception {
         PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder()
-            .add(new PropertiesPluginDescriptorFinder());
+            .add(new ManifestPluginDescriptorFinder());
 
-        PluginZip pluginJar = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.jar"), "myPlugin")
+        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("my-plugin-1.2.3.jar"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
@@ -86,11 +87,11 @@ public class CompoundPluginDescriptorFinderTest {
     public void testSpaceCharacterInFileName() throws Exception {
         PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
 
-        PluginZip pluginJar = new PluginZip.Builder(pluginsPath.resolve("my plugin-1.2.3.jar"), "myPlugin")
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my plugin-1.2.3.jar"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
-        PluginDescriptor pluginDescriptor = descriptorFinder.find(pluginJar.path());
+        PluginDescriptor pluginDescriptor = descriptorFinder.find(pluginZip.path());
         assertNotNull(pluginDescriptor);
     }
 

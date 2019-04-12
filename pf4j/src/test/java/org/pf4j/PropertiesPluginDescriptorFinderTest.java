@@ -18,7 +18,6 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.pf4j.plugin.PluginZip;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,7 +28,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -103,21 +101,6 @@ public class PropertiesPluginDescriptorFinderTest {
     public void testNotFound() {
         PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
         assertThrows(PluginException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
-    }
-
-    @Test
-    public void findInJar() throws Exception {
-        PluginZip pluginJar = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.jar"), "myPlugin")
-            .pluginVersion("1.2.3")
-            .build();
-
-        assertTrue(Files.exists(pluginJar.path()));
-
-        PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
-        PluginDescriptor pluginDescriptor = descriptorFinder.find(pluginJar.path());
-        assertNotNull(pluginDescriptor);
-        assertEquals("myPlugin", pluginJar.pluginId());
-        assertEquals("1.2.3", pluginJar.pluginVersion());
     }
 
     private List<String> getPlugin1Properties() {
