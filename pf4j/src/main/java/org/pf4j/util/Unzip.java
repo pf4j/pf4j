@@ -63,10 +63,14 @@ public class Unzip {
         this.destination = destination;
     }
 
+    /**
+     * Extract the content of zip file ({@code source}) to destination directory.
+     * If destination directory already exists it will be deleted before.
+     */
     public void extract() throws IOException {
         log.debug("Extract content of '{}' to '{}'", source, destination);
 
-        // delete destination file if exists
+        // delete destination directory if exists
         if (destination.exists() && destination.isDirectory()) {
             FileUtils.delete(destination.toPath());
         }
