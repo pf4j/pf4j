@@ -39,16 +39,16 @@ public class DefaultPluginRepositoryTest {
 
     @BeforeEach
     public void setUp() throws IOException {
-        Path plugin1Path = Files.createDirectories(pluginsPath.resolve("plugin-1"));
+        Path plugin1Path = Files.createDirectory(pluginsPath.resolve("plugin-1"));
         // Prove that we can delete a folder with a file inside
         Files.createFile(plugin1Path.resolve("myfile"));
         // Create a zip file for plugin-1 to test that it is deleted when plugin is deleted
         Files.createFile(pluginsPath.resolve("plugin-1.zip"));
-        Files.createDirectories(pluginsPath.resolve("plugin-2"));
-        Files.createDirectories(pluginsPath.resolve("plugin-3"));
+        Files.createDirectory(pluginsPath.resolve("plugin-2"));
+        Files.createDirectory(pluginsPath.resolve("plugin-3"));
         // standard maven/gradle bin folder - these should be skipped in development mode because the cause errors
-        Files.createDirectories(pluginsPath.resolve("target"));
-        Files.createDirectories(pluginsPath.resolve("build"));
+        Files.createDirectory(pluginsPath.resolve("target"));
+        Files.createDirectory(pluginsPath.resolve("build"));
     }
 
     /**

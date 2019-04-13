@@ -15,9 +15,12 @@
  */
 package org.pf4j.plugin;
 
+import org.pf4j.PropertiesPluginDescriptorFinder;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
@@ -60,6 +63,13 @@ public class PluginZip {
         return path.getParent().resolve(fileName.substring(0, fileName.length() - 4)); // without ".zip" suffix
     }
 
+    public static Properties createProperties(Map<String, String> map) {
+        Properties properties = new Properties();
+        properties.putAll(map);
+
+        return properties;
+    }
+
     public static class Builder {
 
         private final Path path;
@@ -95,18 +105,18 @@ public class PluginZip {
         }
 
         protected void createPropertiesFile() throws IOException {
-            Properties props = new Properties();
-            props.setProperty("plugin.id", pluginId);
-            props.setProperty("plugin.version", pluginVersion);
-            props.setProperty("plugin.class", "org.pf4j.plugin.TestPlugin");
+            Map<String, String> map = new LinkedHashMap<>();
+            map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, pluginId);
+            map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, pluginVersion);
+            map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
             if (properties != null) {
-                props.putAll(properties);
+                map.putAll(properties);
             }
 
             ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(path.toFile()));
-            ZipEntry propertiesFile = new ZipEntry("plugin.properties");
+            ZipEntry propertiesFile = new ZipEntry(PropertiesPluginDescriptorFinder.DEFAULT_PROPERTIES_FILE_NAME);
             outputStream.putNextEntry(propertiesFile);
-            props.store(outputStream, "");
+            createProperties(map).store(outputStream, "");
             outputStream.closeEntry();
             outputStream.close();
         }

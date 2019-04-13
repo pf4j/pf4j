@@ -18,6 +18,7 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.plugin.PluginZip;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,6 +27,8 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,25 +45,25 @@ public class PropertiesPluginDescriptorFinderTest {
 
     @BeforeEach
     public void setUp() throws IOException {
-        Path pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-1"));
+        Path pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-1"));
         storePropertiesToPath(getPlugin1Properties(), pluginPath);
 
-        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-2"));
+        pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-2"));
         storePropertiesToPath(getPlugin2Properties(), pluginPath);
 
         // empty plugin
         Files.createDirectories(pluginsPath.resolve("test-plugin-3"));
 
         // no plugin class
-        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-4"));
+        pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-4"));
         storePropertiesToPath(getPlugin4Properties(), pluginPath);
 
         // no plugin version
-        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-5"));
+        pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-5"));
         storePropertiesToPath(getPlugin5Properties(), pluginPath);
 
         // no plugin id
-        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-6"));
+        pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-6"));
         storePropertiesToPath(getPlugin6Properties(), pluginPath);
 
         versionManager = new DefaultVersionManager();
@@ -104,61 +107,61 @@ public class PropertiesPluginDescriptorFinderTest {
     }
 
     private Properties getPlugin1Properties() {
-        Properties properties = new Properties();
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-1");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DESCRIPTION, "Test Plugin 1");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "test-plugin-2,test-plugin-3@~1.0");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, ">=1");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
+        Map<String, String> map = new LinkedHashMap<>(8);
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DESCRIPTION, "Test Plugin 1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "test-plugin-2,test-plugin-3@~1.0");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, ">=1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
 
-        return properties;
+        return PluginZip.createProperties(map);
     }
 
     private Properties getPlugin2Properties() {
-        Properties properties = new Properties();
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
+        Map<String, String> map = new LinkedHashMap<>(5);
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
 
-        return properties;
+        return PluginZip.createProperties(map);
     }
 
     private Properties getPlugin4Properties() {
-        Properties properties = new Properties();
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
+        Map<String, String> map = new LinkedHashMap<>(5);
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 
-        return properties;
+        return PluginZip.createProperties(map);
     }
 
     private Properties getPlugin5Properties() {
-        Properties properties = new Properties();
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
+        Map<String, String> map = new LinkedHashMap<>(5);
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 
-        return properties;
+        return PluginZip.createProperties(map);
     }
 
     private Properties getPlugin6Properties() {
-        Properties properties = new Properties();
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
-        properties.setProperty(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
+        Map<String, String> map = new LinkedHashMap<>(5);
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 
-        return properties;
+        return PluginZip.createProperties(map);
     }
 
     private void storePropertiesToPath(Properties properties, Path pluginPath) throws IOException {

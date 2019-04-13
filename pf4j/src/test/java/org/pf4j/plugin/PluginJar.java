@@ -20,8 +20,8 @@ import org.pf4j.ManifestPluginDescriptorFinder;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -55,6 +55,17 @@ public class PluginJar {
 
     public String pluginVersion() {
         return pluginVersion;
+    }
+
+    public static Manifest createManifest(Map<String, String> map) {
+        Manifest manifest = new Manifest();
+        Attributes attributes = manifest.getMainAttributes();
+        attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0.0");
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            attributes.put(new Attributes.Name(entry.getKey()), entry.getValue());
+        }
+
+        return manifest;
     }
 
     public static class Builder {
@@ -92,20 +103,15 @@ public class PluginJar {
         }
 
         protected void createManifestFile() throws IOException {
-            Manifest manifest = new Manifest();
-            Attributes attrs = manifest.getMainAttributes();
-            attrs.put(Attributes.Name.MANIFEST_VERSION, "1.0.0");
-            attrs.put(new Attributes.Name(ManifestPluginDescriptorFinder.PLUGIN_ID), pluginId);
-            attrs.put(new Attributes.Name(ManifestPluginDescriptorFinder.PLUGIN_VERSION), pluginVersion);
-            attrs.put(new Attributes.Name(ManifestPluginDescriptorFinder.PLUGIN_CLASS), "org.pf4j.plugin.TestPlugin");
+            Map<String, String> map = new LinkedHashMap<>();
+            map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, pluginId);
+            map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, pluginVersion);
+            map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
             if (attributes != null) {
-                Set<String> names = attributes.keySet();
-                for (String name : names) {
-                    attrs.put(new Attributes.Name(name), attributes.get(name));
-                }
+                map.putAll(attributes);
             }
 
-            JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(path.toFile()), manifest);
+            JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(path.toFile()), createManifest(map));
             outputStream.close();
         }
 

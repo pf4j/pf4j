@@ -18,14 +18,16 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.plugin.PluginJar;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.jar.Manifest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -44,33 +46,26 @@ public class ManifestPluginDescriptorFinderTest {
 
     @BeforeEach
     public void setUp() throws IOException {
-        Charset charset = Charset.forName("UTF-8");
+        Path pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-1"));
+        storeManifestToPath(getPlugin1Manifest(), pluginPath);
 
-        Path pluginPath = Files.createDirectories(pluginsPath.resolve(Paths.get("test-plugin-1", "classes", "META-INF")));
-        Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
-        Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin1Manifest(), charset);
-
-        pluginPath = Files.createDirectories(pluginsPath.resolve(Paths.get("test-plugin-2", "classes", "META-INF")));
-        Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
-        Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin2Manifest(), charset);
+        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-2"));
+        storeManifestToPath(getPlugin2Manifest(), pluginPath);
 
         // empty plugin
         Files.createDirectories(pluginsPath.resolve("test-plugin-3"));
 
         // no plugin class
-        pluginPath = Files.createDirectories(pluginsPath.resolve(Paths.get("test-plugin-4", "classes", "META-INF")));
-        Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
-        Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin4Manifest(), charset);
+        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-4"));
+        storeManifestToPath(getPlugin4Manifest(), pluginPath);
 
         // no plugin version
-        pluginPath = Files.createDirectories(pluginsPath.resolve(Paths.get("test-plugin-5", "classes", "META-INF")));
-        Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
-        Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin5Manifest(), charset);
+        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-5"));
+        storeManifestToPath(getPlugin5Manifest(), pluginPath);
 
         // no plugin id
-        pluginPath = Files.createDirectories(pluginsPath.resolve(Paths.get("test-plugin-6", "classes", "META-INF")));
-        Files.write(pluginPath.resolve("extensions.idx"), "org.pf4j.demo.hello.HelloPlugin$HelloGreeting".getBytes());
-        Files.write(pluginPath.resolve("MANIFEST.MF"), getPlugin6Manifest(), charset);
+        pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-6"));
+        storeManifestToPath(getPlugin6Manifest(), pluginPath);
 
         versionManager = new DefaultVersionManager();
     }
@@ -115,120 +110,62 @@ public class ManifestPluginDescriptorFinderTest {
         assertThrows(PluginException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
     }
 
-    private List<String> getPlugin1Manifest() {
-        String[] lines = new String[] {
-            "Manifest-Version: 1.0\n"
-            + "Implementation-Title: Test Plugin #1\n"
-            + "Implementation-Version: 0.10.0-SNAPSHOT\n"
-            + "Archiver-Version: Plexus Archiver\n"
-            + "Built-By: Mario Franco\n"
-            + "Specification-Title: Test Plugin #1\n"
-            + "Implementation-Vendor-Id: org.pf4j.demo\n"
-            + "Plugin-Version: 0.0.1\n"
-            + "Plugin-Id: test-plugin-1\n"
-            + "Plugin-Description: Test Plugin 1\n"
-            + "Plugin-Provider: Decebal Suiu\n"
-            + "Plugin-Class: org.pf4j.plugin.TestPlugin\n"
-            + "Plugin-Dependencies: test-plugin-2,test-plugin-3@~1.0\n"
-            + "Plugin-Requires: *\n"
-            + "Plugin-License: Apache-2.0\n"
-            + "Created-By: Apache Maven 3.0.5\n"
-            + "Build-Jdk: 1.8.0_45\n"
-            + "Specification-Version: 0.10.0-SNAPSHOT\n"
-            + "\n"
-            + ""
-        };
+    private Manifest getPlugin1Manifest() {
+        Map<String, String> map = new LinkedHashMap<>(8);
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, "test-plugin-1");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_DESCRIPTION, "Test Plugin 1");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "test-plugin-2,test-plugin-3@~1.0");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
 
-        return Arrays.asList(lines);
+        return PluginJar.createManifest(map);
     }
 
-    private List<String> getPlugin2Manifest() {
-        String[] lines = new String[] {
-            "Manifest-Version: 1.0\n"
-            + "Plugin-Dependencies: \n"
-            + "Implementation-Title: Test Plugin #2\n"
-            + "Implementation-Version: 0.10.0-SNAPSHOT\n"
-            + "Archiver-Version: Plexus Archiver\n"
-            + "Built-By: Mario Franco\n"
-            + "Specification-Title: Test Plugin #2\n"
-            + "Implementation-Vendor-Id: org.pf4j.demo\n"
-            + "Plugin-Version: 0.0.1\n"
-            + "Plugin-Id: test-plugin-2\n"
-            + "Plugin-Provider: Decebal Suiu\n"
-            + "Plugin-Class: org.pf4j.plugin.TestPlugin\n"
-            + "Created-By: Apache Maven 3.0.5\n"
-            + "Build-Jdk: 1.8.0_45\n"
-            + "Specification-Version: 0.10.0-SNAPSHOT\n"
-            + "\n"
-            + ""
-        };
+    private Manifest getPlugin2Manifest() {
+        Map<String, String> map = new LinkedHashMap<>(5);
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
 
-        return Arrays.asList(lines);
+        return PluginJar.createManifest(map);
     }
 
-    private List<String> getPlugin4Manifest() {
-        String[] lines = new String[] {
-            "Manifest-Version: 1.0\n"
-            + "Implementation-Title: Test Plugin #4\n"
-            + "Implementation-Version: 0.10.0-SNAPSHOT\n"
-            + "Archiver-Version: Plexus Archiver\n"
-            + "Built-By: Mario Franco\n"
-            + "Specification-Title: Test Plugin #4\n"
-            + "Implementation-Vendor-Id: org.pf4j.demo\n"
-            + "Plugin-Version: 0.0.1\n"
-            + "Plugin-Id: test-plugin-2\n"
-            + "Plugin-Provider: Decebal Suiu\n"
-            + "Created-By: Apache Maven 3.0.5\n"
-            + "Build-Jdk: 1.8.0_45\n"
-            + "Specification-Version: 0.10.0-SNAPSHOT\n"
-            + "\n"
-            + ""
-        };
+    private Manifest getPlugin4Manifest() {
+        Map<String, String> map = new LinkedHashMap<>(3);
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, "test-plugin-1");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
 
-        return Arrays.asList(lines);
+        return PluginJar.createManifest(map);
     }
 
-    private List<String> getPlugin5Manifest() {
-        String[] lines = new String[] {
-            "Manifest-Version: 1.0\n"
-            + "Implementation-Title: Test Plugin #5\n"
-            + "Implementation-Version: 0.10.0-SNAPSHOT\n"
-            + "Archiver-Version: Plexus Archiver\n"
-            + "Built-By: Mario Franco\n"
-            + "Specification-Title: Test Plugin #5\n"
-            + "Implementation-Vendor-Id: org.pf4j.demo\n"
-            + "Plugin-Id: test-plugin-2\n"
-            + "Plugin-Provider: Decebal Suiu\n"
-            + "Plugin-Class: org.pf4j.plugin.TestPlugin\n"
-            + "Created-By: Apache Maven 3.0.5\n"
-            + "Build-Jdk: 1.8.0_45\n"
-            + "Specification-Version: 0.10.0-SNAPSHOT\n"
-            + "\n"
-            + ""
-        };
+    private Manifest getPlugin5Manifest() {
+        Map<String, String> map = new LinkedHashMap<>(3);
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
 
-        return Arrays.asList(lines);
+        return PluginJar.createManifest(map);
     }
 
-    private List<String> getPlugin6Manifest() {
-        String[] lines = new String[] {
-            "Manifest-Version: 1.0\n"
-            + "Implementation-Title: Test Plugin #6\n"
-            + "Implementation-Version: 0.10.0-SNAPSHOT\n"
-            + "Archiver-Version: Plexus Archiver\n"
-            + "Built-By: Mario Franco\n"
-            + "Specification-Title: Test Plugin #6\n"
-            + "Implementation-Vendor-Id: org.pf4j.demo\n"
-            + "Plugin-Provider: Decebal Suiu\n"
-            + "Plugin-Class: org.pf4j.plugin.TestPlugin\n"
-            + "Created-By: Apache Maven 3.0.5\n"
-            + "Build-Jdk: 1.8.0_45\n"
-            + "Specification-Version: 0.10.0-SNAPSHOT\n"
-            + "\n"
-            + ""
-        };
+    private Manifest getPlugin6Manifest() {
+        Map<String, String> map = new LinkedHashMap<>(2);
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+        map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
 
-        return Arrays.asList(lines);
+        return PluginJar.createManifest(map);
+    }
+
+    private void storeManifestToPath(Manifest manifest, Path pluginPath) throws IOException {
+        Path path = Files.createDirectory(pluginPath.resolve("META-INF"));
+        try (OutputStream output = new FileOutputStream(path.resolve("MANIFEST.MF").toFile())) {
+            manifest.write(output);
+        }
     }
 
 }
