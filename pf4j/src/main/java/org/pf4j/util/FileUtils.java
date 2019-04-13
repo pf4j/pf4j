@@ -176,14 +176,6 @@ public class FileUtils {
         Path pluginDirectory = filePath.resolveSibling(directoryName);
 
         if (!Files.exists(pluginDirectory) || pluginZipDate.compareTo(Files.getLastModifiedTime(pluginDirectory)) > 0) {
-            // do not overwrite an old version, remove it
-            if (Files.exists(pluginDirectory)) {
-                FileUtils.delete(pluginDirectory);
-            }
-
-            // create root for plugin
-            Files.createDirectories(pluginDirectory);
-
             // expand '.zip' file
             Unzip unzip = new Unzip();
             unzip.setSource(filePath.toFile());
