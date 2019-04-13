@@ -19,7 +19,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Directory that contains plugins. A plugin could be a zip file.
+ * Directory that contains plugins. A plugin could be a {@code directory}, @code zip} or {@code jar} file.
  *
  * @author Decebal Suiu
  * @author Mário Franco
@@ -27,11 +27,11 @@ import java.util.List;
 public interface PluginRepository {
 
     /**
-     * List all plugin paths.
+     * List all plugins paths.
      *
-     * @return a list of files
+     * @return a list with paths
      */
-    List<Path> getPluginPaths();
+    List<Path> getPluginsPaths();
 
     /**
      * Removes a plugin from the repository.

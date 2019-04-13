@@ -52,33 +52,33 @@ public class DefaultPluginRepositoryTest {
     }
 
     /**
-     * Test of {@link DefaultPluginRepository#getPluginPaths()} method.
+     * Test of {@link DefaultPluginRepository#getPluginsPaths()} method.
      */
     @Test
     public void testGetPluginArchives() {
         PluginRepository repository = new DefaultPluginRepository(pluginsPath, false);
 
-        List<Path> pluginPaths = repository.getPluginPaths();
+        List<Path> pluginsPaths = repository.getPluginsPaths();
 
-        assertEquals(5, pluginPaths.size());
-        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-1"));
-        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-2"));
-        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-3"));
+        assertEquals(5, pluginsPaths.size());
+        assertPathExists(pluginsPaths, pluginsPath.resolve("plugin-1"));
+        assertPathExists(pluginsPaths, pluginsPath.resolve("plugin-2"));
+        assertPathExists(pluginsPaths, pluginsPath.resolve("plugin-3"));
         // when not in development mode we will honor these folders
-        assertPathExists(pluginPaths, pluginsPath.resolve("target"));
-        assertPathExists(pluginPaths, pluginsPath.resolve("build"));
+        assertPathExists(pluginsPaths, pluginsPath.resolve("target"));
+        assertPathExists(pluginsPaths, pluginsPath.resolve("build"));
     }
 
     @Test
     public void testGetPluginArchivesInDevelopmentMode() {
         PluginRepository repository = new DefaultPluginRepository(pluginsPath, true);
 
-        List<Path> pluginPaths = repository.getPluginPaths();
+        List<Path> pluginsPaths = repository.getPluginsPaths();
 
         // target and build should be ignored
-        assertEquals(3, pluginPaths.size());
-        assertPathDoesNotExists(pluginPaths, pluginsPath.resolve("target"));
-        assertPathDoesNotExists(pluginPaths, pluginsPath.resolve("build"));
+        assertEquals(3, pluginsPaths.size());
+        assertPathDoesNotExists(pluginsPaths, pluginsPath.resolve("target"));
+        assertPathDoesNotExists(pluginsPaths, pluginsPath.resolve("build"));
     }
 
     /**
@@ -96,10 +96,10 @@ public class DefaultPluginRepositoryTest {
         assertTrue(repository.deletePluginPath(pluginsPath.resolve("target")));
         assertTrue(repository.deletePluginPath(pluginsPath.resolve("build")));
 
-        List<Path> pluginPaths = repository.getPluginPaths();
+        List<Path> pluginsPaths = repository.getPluginsPaths();
 
-        assertEquals(1, pluginPaths.size());
-        assertEquals(pluginsPath.relativize(pluginPaths.get(0)).toString(), "plugin-2");
+        assertEquals(1, pluginsPaths.size());
+        assertEquals(pluginsPath.relativize(pluginsPaths.get(0)).toString(), "plugin-2");
     }
 
     private void assertPathExists(List<Path> paths, Path path) {

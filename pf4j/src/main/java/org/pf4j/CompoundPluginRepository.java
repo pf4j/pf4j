@@ -38,10 +38,10 @@ public class CompoundPluginRepository implements PluginRepository {
     }
 
     @Override
-    public List<Path> getPluginPaths() {
+    public List<Path> getPluginsPaths() {
         List<Path> paths = new ArrayList<>();
         for (PluginRepository repository : repositories) {
-            paths.addAll(repository.getPluginPaths());
+            paths.addAll(repository.getPluginsPaths());
         }
 
         return paths;

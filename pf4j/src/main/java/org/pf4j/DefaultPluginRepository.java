@@ -48,7 +48,7 @@ public class DefaultPluginRepository extends BasePluginRepository {
     }
 
     @Override
-    public List<Path> getPluginPaths() {
+    public List<Path> getPluginsPaths() {
         // expand plugins zip files
         File[] pluginZips = pluginsRoot.toFile().listFiles(new ZipFileFilter());
         if ((pluginZips != null) && pluginZips.length > 0) {
@@ -62,7 +62,7 @@ public class DefaultPluginRepository extends BasePluginRepository {
             }
         }
 
-        return super.getPluginPaths();
+        return super.getPluginsPaths();
     }
 
     @Override

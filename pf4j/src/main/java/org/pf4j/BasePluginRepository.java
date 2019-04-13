@@ -57,7 +57,7 @@ public class BasePluginRepository implements PluginRepository {
 
     /**
      * Set a {@link File} {@link Comparator} used to sort the listed files from {@code pluginsRoot}.
-     * This comparator is used in {@link #getPluginPaths()} method.
+     * This comparator is used in {@link #getPluginsPaths()} method.
      * By default is used a file comparator that returns the last modified files first.
      * If you don't want a file comparator, then call this method with {@code null}.
      */
@@ -66,7 +66,7 @@ public class BasePluginRepository implements PluginRepository {
     }
 
     @Override
-    public List<Path> getPluginPaths() {
+    public List<Path> getPluginsPaths() {
         File[] files = pluginsRoot.toFile().listFiles(filter);
 
         if ((files == null) || files.length == 0) {
