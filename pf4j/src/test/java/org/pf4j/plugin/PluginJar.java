@@ -37,16 +37,22 @@ public class PluginJar {
 
     private final Path path;
     private final String pluginId;
+    private final String pluginClass;
     private final String pluginVersion;
 
     protected PluginJar(Builder builder) {
         this.path = builder.path;
         this.pluginId = builder.pluginId;
+        this.pluginClass = builder.pluginClass;
         this.pluginVersion = builder.pluginVersion;
     }
 
     public Path path() {
         return path;
+    }
+
+    public String pluginClass() {
+        return pluginClass;
     }
 
     public String pluginId() {
@@ -73,12 +79,19 @@ public class PluginJar {
         private final Path path;
         private final String pluginId;
 
+        private String pluginClass;
         private String pluginVersion;
         private Map<String, String> attributes;
 
         public Builder(Path path, String pluginId) {
             this.path = path;
             this.pluginId = pluginId;
+        }
+
+        public Builder pluginClass(String pluginClass) {
+            this.pluginClass = pluginClass;
+
+            return this;
         }
 
         public Builder pluginVersion(String pluginVersion) {
@@ -106,7 +119,9 @@ public class PluginJar {
             Map<String, String> map = new LinkedHashMap<>();
             map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, pluginId);
             map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, pluginVersion);
-            map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+            if (pluginClass != null) {
+                map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, pluginClass);
+            }
             if (attributes != null) {
                 map.putAll(attributes);
             }

@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.plugin.PluginZip;
+import org.pf4j.plugin.TestPlugin;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -78,7 +79,7 @@ public class PropertiesPluginDescriptorFinderTest {
 
         assertEquals("test-plugin-1", plugin1.getPluginId());
         assertEquals("Test Plugin 1", plugin1.getPluginDescription());
-        assertEquals("org.pf4j.plugin.TestPlugin", plugin1.getPluginClass());
+        assertEquals(TestPlugin.class.getName(), plugin1.getPluginClass());
         assertEquals("0.0.1", plugin1.getVersion());
         assertEquals("Decebal Suiu", plugin1.getProvider());
         assertEquals(2, plugin1.getDependencies().size());
@@ -92,7 +93,7 @@ public class PropertiesPluginDescriptorFinderTest {
 
         assertEquals("test-plugin-2", plugin2.getPluginId());
         assertEquals("", plugin2.getPluginDescription());
-        assertEquals("org.pf4j.plugin.TestPlugin", plugin2.getPluginClass());
+        assertEquals(TestPlugin.class.getName(), plugin2.getPluginClass());
         assertEquals("0.0.1", plugin2.getVersion());
         assertEquals("Decebal Suiu", plugin2.getProvider());
         assertEquals(0, plugin2.getDependencies().size());
@@ -109,10 +110,10 @@ public class PropertiesPluginDescriptorFinderTest {
     private Properties getPlugin1Properties() {
         Map<String, String> map = new LinkedHashMap<>(8);
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, TestPlugin.class.getName());
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_DESCRIPTION, "Test Plugin 1");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "test-plugin-2,test-plugin-3@~1.0");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, ">=1");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
@@ -123,9 +124,9 @@ public class PropertiesPluginDescriptorFinderTest {
     private Properties getPlugin2Properties() {
         Map<String, String> map = new LinkedHashMap<>(5);
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, TestPlugin.class.getName());
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
 
         return PluginZip.createProperties(map);
@@ -145,8 +146,8 @@ public class PropertiesPluginDescriptorFinderTest {
     private Properties getPlugin5Properties() {
         Map<String, String> map = new LinkedHashMap<>(5);
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, TestPlugin.class.getName());
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 
@@ -155,9 +156,9 @@ public class PropertiesPluginDescriptorFinderTest {
 
     private Properties getPlugin6Properties() {
         Map<String, String> map = new LinkedHashMap<>(5);
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, TestPlugin.class.getName());
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 

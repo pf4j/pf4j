@@ -36,11 +36,13 @@ public class PluginZip {
 
     private final Path path;
     private final String pluginId;
+    private final String pluginClass;
     private final String pluginVersion;
 
     protected PluginZip(Builder builder) {
         this.path = builder.path;
         this.pluginId = builder.pluginId;
+        this.pluginClass = builder.pluginClass;
         this.pluginVersion = builder.pluginVersion;
     }
 
@@ -50,6 +52,10 @@ public class PluginZip {
 
     public String pluginId() {
         return pluginId;
+    }
+
+    public String pluginClass() {
+        return pluginClass;
     }
 
     public String pluginVersion() {
@@ -75,12 +81,19 @@ public class PluginZip {
         private final Path path;
         private final String pluginId;
 
+        private String pluginClass;
         private String pluginVersion;
         private Map<String, String> properties;
 
         public Builder(Path path, String pluginId) {
             this.path = path;
             this.pluginId = pluginId;
+        }
+
+        public Builder pluginClass(String pluginClass) {
+            this.pluginClass = pluginClass;
+
+            return this;
         }
 
         public Builder pluginVersion(String pluginVersion) {
@@ -108,7 +121,9 @@ public class PluginZip {
             Map<String, String> map = new LinkedHashMap<>();
             map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, pluginId);
             map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, pluginVersion);
-            map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
+            if (pluginClass != null) {
+                map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, pluginClass);
+            }
             if (properties != null) {
                 map.putAll(properties);
             }

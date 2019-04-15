@@ -19,12 +19,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.plugin.PluginJar;
 import org.pf4j.plugin.PluginZip;
+import org.pf4j.plugin.TestPlugin;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,9 +55,8 @@ public class CompoundPluginDescriptorFinderTest {
 
     @Test
     public void find() throws Exception {
-        Path pluginPath = pluginsPath.resolve("test-plugin-1");
-        Files.createDirectories(pluginPath);
-        Files.write(pluginPath.resolve("plugin.properties"), getPlugin1Properties(), StandardCharsets.UTF_8);
+        Path pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-1"));
+        storePropertiesToPath(getPlugin1Properties(), pluginPath);
 
         PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder()
             .add(new PropertiesPluginDescriptorFinder());
@@ -68,12 +73,14 @@ public class CompoundPluginDescriptorFinderTest {
             .add(new ManifestPluginDescriptorFinder());
 
         PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("my-plugin-1.2.3.jar"), "myPlugin")
+            .pluginClass(TestPlugin.class.getName())
             .pluginVersion("1.2.3")
             .build();
 
         PluginDescriptor pluginDescriptor = descriptorFinder.find(pluginJar.path());
         assertNotNull(pluginDescriptor);
         assertEquals("myPlugin", pluginJar.pluginId());
+        assertEquals(TestPlugin.class.getName(), pluginJar.pluginClass());
         assertEquals("1.2.3", pluginJar.pluginVersion());
     }
 
@@ -95,21 +102,24 @@ public class CompoundPluginDescriptorFinderTest {
         assertNotNull(pluginDescriptor);
     }
 
-    private List<String> getPlugin1Properties() {
-        String[] lines = new String[] {
-            "plugin.id=test-plugin-1\n"
-            + "plugin.version=0.0.1\n"
-            + "plugin.description=Test Plugin 1\n"
-            + "plugin.provider=Decebal Suiu\n"
-            + "plugin.class=org.pf4j.plugin.TestPlugin\n"
-            + "plugin.dependencies=test-plugin-2,test-plugin-3@~1.0\n"
-            + "plugin.requires=>=1\n"
-            + "plugin.license=Apache-2.0\n"
-            + "\n"
-            + ""
-        };
+    private Properties getPlugin1Properties() {
+        Map<String, String> map = new LinkedHashMap<>(7);
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, TestPlugin.class.getName());
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "test-plugin-2,test-plugin-3@~1.0");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, ">=1");
+        map.put(PropertiesPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
 
-        return Arrays.asList(lines);
+        return PluginZip.createProperties(map);
+    }
+
+    private void storePropertiesToPath(Properties properties, Path pluginPath) throws IOException {
+        Path path = pluginPath.resolve(PropertiesPluginDescriptorFinder.DEFAULT_PROPERTIES_FILE_NAME);
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), StandardCharsets.UTF_8)) {
+            properties.store(writer, "");
+        }
     }
 
 }
