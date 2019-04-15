@@ -287,19 +287,25 @@ public abstract class AbstractPluginManager implements PluginManager {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
+        // stop the plugin if it's started
         PluginState pluginState = stopPlugin(pluginId);
         if (PluginState.STARTED == pluginState) {
             log.error("Failed to stop plugin '{}' on delete", pluginId);
             return false;
         }
 
+        // get an instance of plugin before the plugin is unloaded
+        // for reason see https://github.com/pf4j/pf4j/issues/309
+        Plugin plugin = pluginWrapper.getPlugin();
+
         if (!unloadPlugin(pluginId)) {
             log.error("Failed to unload plugin '{}' on delete", pluginId);
             return false;
         }
 
+        // notify the plugin as it's deleted
         try {
-            pluginWrapper.getPlugin().delete();
+            plugin.delete();
         } catch (PluginException e) {
             log.error(e.getMessage(), e);
             return false;
