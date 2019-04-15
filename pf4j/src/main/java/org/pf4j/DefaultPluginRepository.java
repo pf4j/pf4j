@@ -49,19 +49,7 @@ public class DefaultPluginRepository extends BasePluginRepository {
 
     @Override
     public List<Path> getPluginsPaths() {
-        // expand plugins zip files
-        File[] pluginZips = pluginsRoot.toFile().listFiles(new ZipFileFilter());
-        if ((pluginZips != null) && pluginZips.length > 0) {
-            for (File pluginZip : pluginZips) {
-                try {
-                    FileUtils.expandIfZip(pluginZip.toPath());
-                } catch (IOException e) {
-                    log.error("Cannot expand plugin zip '{}'", pluginZip);
-                    log.error(e.getMessage(), e);
-                }
-            }
-        }
-
+        extractZipFiles();
         return super.getPluginsPaths();
     }
 
@@ -83,4 +71,20 @@ public class DefaultPluginRepository extends BasePluginRepository {
 
         return hiddenPluginFilter;
     }
+
+    private void extractZipFiles() {
+        // expand plugins zip files
+        File[] zipFiles = pluginsRoot.toFile().listFiles(new ZipFileFilter());
+        if ((zipFiles != null) && zipFiles.length > 0) {
+            for (File pluginZip : zipFiles) {
+                try {
+                    FileUtils.expandIfZip(pluginZip.toPath());
+                } catch (IOException e) {
+                    log.error("Cannot expand plugin zip '{}'", pluginZip);
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+    }
+
 }
