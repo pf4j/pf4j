@@ -16,6 +16,8 @@
 package org.pf4j.demo;
 
 import org.apache.commons.lang.StringUtils;
+import org.pf4j.AsyncPluginManager;
+import org.pf4j.DefaultAsyncPluginManager;
 import org.pf4j.DefaultExtensionFinder;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.ExtensionFinder;
@@ -25,6 +27,7 @@ import org.pf4j.demo.api.Greeting;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * A boot class that start the demo.
@@ -33,12 +36,13 @@ import java.util.Set;
  */
 public class Boot {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // print logo
         printLogo();
 
         // create the plugin manager
-        final PluginManager pluginManager = new DefaultPluginManager() {
+        final AsyncPluginManager pluginManager = new DefaultAsyncPluginManager() {
+//        final PluginManager pluginManager = new DefaultPluginManager() {
 
             protected ExtensionFinder createExtensionFinder() {
                 DefaultExtensionFinder extensionFinder = (DefaultExtensionFinder) super.createExtensionFinder();
@@ -50,13 +54,20 @@ public class Boot {
         };
 
         // load the plugins
-        pluginManager.loadPlugins();
+//        pluginManager.loadPlugins();
+        CompletableFuture<Void> feature = pluginManager.loadPluginsAsync();
+        feature.thenRun(() -> System.out.println("Plugins loaded"));
 
         // enable a disabled plugin
 //        pluginManager.enablePlugin("welcome-plugin");
 
         // start (active/resolved) the plugins
-        pluginManager.startPlugins();
+//        pluginManager.startPlugins();
+        feature.thenCompose(v -> pluginManager.startPluginsAsync());
+        feature.thenRun(() -> System.out.println("Plugins started"));
+
+        // block and wait for the future to complete (not the best approach in real applications)
+        feature.get();
 
         // retrieves the extensions for Greeting extension point
         List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);

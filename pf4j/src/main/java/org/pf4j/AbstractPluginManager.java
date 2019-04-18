@@ -696,6 +696,10 @@ public abstract class AbstractPluginManager implements PluginManager {
         return pluginClassLoaders;
     }
 
+    protected PluginRepository getPluginRepository() {
+        return pluginRepository;
+    }
+
     protected void initialize() {
         plugins = new HashMap<>();
         pluginClassLoaders = new HashMap<>();
