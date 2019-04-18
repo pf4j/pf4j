@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * It's an extension of {@link DefaultPluginManager} that supports asynchronous methods (@{AsyncPluginManager}).
+ * An extension of {@link DefaultPluginManager} that supports asynchronous methods (@{AsyncPluginManager}).
  *
  * @author Decebal Suiu
  */
