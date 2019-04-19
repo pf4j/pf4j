@@ -27,7 +27,7 @@ import org.pf4j.demo.api.Greeting;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * A boot class that start the demo.
@@ -55,19 +55,19 @@ public class Boot {
 
         // load the plugins
 //        pluginManager.loadPlugins();
-        CompletableFuture<Void> feature = pluginManager.loadPluginsAsync();
-        feature.thenRun(() -> System.out.println("Plugins loaded"));
+        CompletionStage<Void> stage = pluginManager.loadPluginsAsync();
+        stage.thenRun(() -> System.out.println("Plugins loaded"));
 
         // enable a disabled plugin
 //        pluginManager.enablePlugin("welcome-plugin");
 
         // start (active/resolved) the plugins
 //        pluginManager.startPlugins();
-        feature.thenCompose(v -> pluginManager.startPluginsAsync());
-        feature.thenRun(() -> System.out.println("Plugins started"));
+        stage.thenCompose(v -> pluginManager.startPluginsAsync());
+        stage.thenRun(() -> System.out.println("Plugins started"));
 
         // block and wait for the future to complete (not the best approach in real applications)
-        feature.get();
+        stage.toCompletableFuture().get();
 
         // retrieves the extensions for Greeting extension point
         List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);

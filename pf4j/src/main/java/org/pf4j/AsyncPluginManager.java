@@ -15,7 +15,7 @@
  */
 package org.pf4j;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * A {@link PluginManager} that supports asynchronous operation with the methods ending in {@code Async}.
@@ -24,8 +24,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface AsyncPluginManager extends PluginManager {
 
-    CompletableFuture<Void> loadPluginsAsync();
+    CompletionStage<Void> loadPluginsAsync();
 
-    CompletableFuture<Void> startPluginsAsync();
+    CompletionStage<Void> startPluginsAsync();
 
 }

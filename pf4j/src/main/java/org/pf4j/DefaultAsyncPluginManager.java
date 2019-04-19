@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * An extension of {@link DefaultPluginManager} that supports asynchronous methods (@{AsyncPluginManager}).
@@ -34,7 +35,7 @@ public class DefaultAsyncPluginManager extends DefaultPluginManager implements A
     private static final Logger log = LoggerFactory.getLogger(DefaultAsyncPluginManager.class);
 
     @Override
-    public CompletableFuture<Void> loadPluginsAsync() {
+    public CompletionStage<Void> loadPluginsAsync() {
         Path pluginsRoot = getPluginsRoot();
         PluginRepository pluginRepository = getPluginRepository();
 
@@ -75,7 +76,7 @@ public class DefaultAsyncPluginManager extends DefaultPluginManager implements A
     }
 
     @Override
-    public CompletableFuture<Void> startPluginsAsync() {
+    public CompletionStage<Void> startPluginsAsync() {
         /*
         // chain start plugins one after another
         CompletableFuture<Void> feature = CompletableFuture.completedFuture(null);
@@ -91,7 +92,7 @@ public class DefaultAsyncPluginManager extends DefaultPluginManager implements A
             .toArray(CompletableFuture[]::new));
     }
 
-    protected CompletableFuture<PluginWrapper> loadPluginFromPathAsync(Path pluginPath) {
+    protected CompletionStage<PluginWrapper> loadPluginFromPathAsync(Path pluginPath) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return loadPluginFromPath(pluginPath);
@@ -102,7 +103,7 @@ public class DefaultAsyncPluginManager extends DefaultPluginManager implements A
         });
     }
 
-    protected CompletableFuture<Void> startPluginAsync(PluginWrapper pluginWrapper) {
+    protected CompletionStage<Void> startPluginAsync(PluginWrapper pluginWrapper) {
         return CompletableFuture.runAsync(() -> {
             PluginState pluginState = pluginWrapper.getPluginState();
             if ((PluginState.DISABLED != pluginState) && (PluginState.STARTED != pluginState)) {
