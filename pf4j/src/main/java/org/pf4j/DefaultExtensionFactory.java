@@ -29,20 +29,16 @@ public class DefaultExtensionFactory implements ExtensionFactory {
     private static final Logger log = LoggerFactory.getLogger(DefaultExtensionFactory.class);
 
     /**
-     * Creates an extension instance. If an error occurs than that error is logged and the method returns {@code null}.
-     * @param extensionClass
-     * @return
+     * Creates an extension instance.
      */
     @Override
-    public Object create(Class<?> extensionClass) {
+    public <T> T create(Class<T> extensionClass) throws PluginException {
         log.debug("Create instance for extension '{}'", extensionClass.getName());
         try {
             return extensionClass.newInstance();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            throw new PluginException(e);
         }
-
-        return null;
     }
 
 }

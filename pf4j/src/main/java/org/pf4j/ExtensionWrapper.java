@@ -32,7 +32,7 @@ public class ExtensionWrapper<T> implements Comparable<ExtensionWrapper<T>> {
     }
 
     @SuppressWarnings("unchecked")
-    public T getExtension() {
+    public T getExtension() throws PluginException {
         if (extension == null) {
             extension = (T) extensionFactory.create(descriptor.extensionClass);
         }

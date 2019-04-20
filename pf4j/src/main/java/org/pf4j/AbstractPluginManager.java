@@ -521,6 +521,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             Class<?> c = extensionWrapper.getDescriptor().extensionClass;
             extensionClasses.add(c);
         }
+
         return extensionClasses;
     }
 
@@ -555,7 +556,11 @@ public abstract class AbstractPluginManager implements PluginManager {
         List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
         List<T> extensions = new ArrayList<>(extensionsWrapper.size());
         for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            extensions.add(extensionWrapper.getExtension());
+            try {
+                extensions.add(extensionWrapper.getExtension());
+            } catch (PluginException e) {
+                log.error("Cannot retrieve extension", e);
+            }
         }
 
         return extensions;
@@ -566,7 +571,11 @@ public abstract class AbstractPluginManager implements PluginManager {
         List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type, pluginId);
         List<T> extensions = new ArrayList<>(extensionsWrapper.size());
         for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            extensions.add(extensionWrapper.getExtension());
+            try {
+                extensions.add(extensionWrapper.getExtension());
+            } catch (PluginException e) {
+                log.error("Cannot retrieve extension", e);
+            }
         }
 
         return extensions;
@@ -578,7 +587,11 @@ public abstract class AbstractPluginManager implements PluginManager {
         List<ExtensionWrapper> extensionsWrapper = extensionFinder.find(pluginId);
         List extensions = new ArrayList<>(extensionsWrapper.size());
         for (ExtensionWrapper extensionWrapper : extensionsWrapper) {
-            extensions.add(extensionWrapper.getExtension());
+            try {
+                extensions.add(extensionWrapper.getExtension());
+            } catch (PluginException e) {
+                log.error("Cannot retrieve extension", e);
+            }
         }
 
         return extensions;

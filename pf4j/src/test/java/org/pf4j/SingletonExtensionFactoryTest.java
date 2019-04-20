@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 public class SingletonExtensionFactoryTest {
 
     @Test
-    public void create() {
+    public void create() throws PluginException {
         ExtensionFactory extensionFactory = new SingletonExtensionFactory();
         Object extensionOne = extensionFactory.create(TestExtension.class);
         Object extensionTwo = extensionFactory.create(TestExtension.class);
@@ -36,7 +36,7 @@ public class SingletonExtensionFactoryTest {
     }
 
     @Test
-    public void createNewEachTime() {
+    public void createNewEachTime() throws PluginException {
         ExtensionFactory extensionFactory = new SingletonExtensionFactory(FailTestExtension.class.getName());
         Object extensionOne = extensionFactory.create(TestExtension.class);
         Object extensionTwo = extensionFactory.create(TestExtension.class);
