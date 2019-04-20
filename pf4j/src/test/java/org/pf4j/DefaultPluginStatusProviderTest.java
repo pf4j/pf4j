@@ -60,58 +60,59 @@ public class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    public void testDisablePlugin() throws IOException {
+    public void testDisablePlugin() throws Exception {
         createEnabledFile();
         createDisabledFile();
 
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        statusProvider.disablePlugin("plugin-1");
 
-        assertTrue(statusProvider.disablePlugin("plugin-1"));
         assertTrue(statusProvider.isPluginDisabled("plugin-1"));
         assertTrue(statusProvider.isPluginDisabled("plugin-2"));
         assertTrue(statusProvider.isPluginDisabled("plugin-3"));
     }
 
     @Test
-    public void testDisablePluginWithEnableEmpty() throws IOException {
+    public void testDisablePluginWithEnableEmpty() throws Exception {
         createDisabledFile();
 
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        statusProvider.disablePlugin("plugin-1");
 
-        assertTrue(statusProvider.disablePlugin("plugin-1"));
         assertTrue(statusProvider.isPluginDisabled("plugin-1"));
         assertTrue(statusProvider.isPluginDisabled("plugin-2"));
         assertFalse(statusProvider.isPluginDisabled("plugin-3"));
     }
 
     @Test
-    public void testEnablePlugin() throws IOException {
+    public void testEnablePlugin() throws Exception {
         createEnabledFile();
 
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        statusProvider.enablePlugin("plugin-2");
 
-        assertTrue(statusProvider.enablePlugin("plugin-2"));
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));
         assertFalse(statusProvider.isPluginDisabled("plugin-2"));
         assertTrue(statusProvider.isPluginDisabled("plugin-3"));
     }
 
     @Test
-    public void testEnablePluginWithEnableEmpty() {
+    public void testEnablePluginWithEnableEmpty() throws Exception{
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        statusProvider.enablePlugin("plugin-2");
 
-        assertTrue(statusProvider.enablePlugin("plugin-2"));
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));
         assertFalse(statusProvider.isPluginDisabled("plugin-2"));
         assertFalse(statusProvider.isPluginDisabled("plugin-3"));
     }
 
     @Test
-    public void testDisablePluginWithoutDisabledFile() {
+    public void testDisablePluginWithoutDisabledFile() throws Exception {
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
 
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));
-        assertTrue(statusProvider.disablePlugin("plugin-1"));
+
+        statusProvider.disablePlugin("plugin-1");
         assertTrue(statusProvider.isPluginDisabled("plugin-1"));
     }
 

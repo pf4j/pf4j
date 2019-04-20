@@ -33,16 +33,14 @@ public interface PluginStatusProvider {
      * Disables a plugin from being loaded.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
-     * @return true if plugin is disabled
      */
-    boolean disablePlugin(String pluginId);
+    void disablePlugin(String pluginId) throws PluginException;
 
     /**
      * Enables a plugin that has previously been disabled.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
-     * @return true if plugin is enabled
      */
-    boolean enablePlugin(String pluginId);
+    void enablePlugin(String pluginId) throws PluginException;
 
 }

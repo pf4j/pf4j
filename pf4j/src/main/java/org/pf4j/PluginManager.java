@@ -85,7 +85,7 @@ public interface PluginManager {
      *
      * @return the plugin state
      */
-    PluginState startPlugin(String pluginId);
+    PluginState startPlugin(String pluginId) throws PluginException;
 
     /**
      * Stop all active plugins.
@@ -97,7 +97,7 @@ public interface PluginManager {
      *
      * @return the plugin state
      */
-    PluginState stopPlugin(String pluginId);
+    PluginState stopPlugin(String pluginId) throws PluginException;
 
     /**
      * Unload a plugin.
@@ -105,7 +105,7 @@ public interface PluginManager {
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if the plugin was unloaded
      */
-    boolean unloadPlugin(String pluginId);
+    boolean unloadPlugin(String pluginId) throws PluginException;
 
     /**
      * Disables a plugin from being loaded.
@@ -113,7 +113,7 @@ public interface PluginManager {
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if plugin is disabled
      */
-    boolean disablePlugin(String pluginId);
+    boolean disablePlugin(String pluginId) throws PluginException;
 
     /**
      * Enables a plugin that has previously been disabled.
@@ -121,7 +121,7 @@ public interface PluginManager {
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if plugin is enabled
      */
-    boolean enablePlugin(String pluginId);
+    boolean enablePlugin(String pluginId) throws PluginException;
 
     /**
      * Deletes a plugin.
@@ -129,7 +129,7 @@ public interface PluginManager {
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if the plugin was deleted
      */
-    boolean deletePlugin(String pluginId);
+    boolean deletePlugin(String pluginId) throws PluginException;
 
     ClassLoader getPluginClassLoader(String pluginId);
 

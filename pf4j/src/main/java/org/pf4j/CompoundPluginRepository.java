@@ -48,7 +48,7 @@ public class CompoundPluginRepository implements PluginRepository {
     }
 
     @Override
-    public boolean deletePluginPath(Path pluginPath) {
+    public boolean deletePluginPath(Path pluginPath) throws PluginException {
         for (PluginRepository repository : repositories) {
             if (repository.deletePluginPath(pluginPath)) {
                 return true;

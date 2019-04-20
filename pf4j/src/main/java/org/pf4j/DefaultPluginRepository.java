@@ -54,7 +54,7 @@ public class DefaultPluginRepository extends BasePluginRepository {
     }
 
     @Override
-    public boolean deletePluginPath(Path pluginPath) {
+    public boolean deletePluginPath(Path pluginPath) throws PluginException {
         FileUtils.optimisticDelete(FileUtils.findWithEnding(pluginPath, ".zip", ".ZIP", ".Zip"));
         return super.deletePluginPath(pluginPath);
     }

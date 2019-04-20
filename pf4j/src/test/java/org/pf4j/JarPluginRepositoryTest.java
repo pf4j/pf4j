@@ -18,7 +18,6 @@ package org.pf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -39,7 +38,7 @@ public class JarPluginRepositoryTest {
      * Test of {@link JarPluginRepository#deletePluginPath(Path)} method.
      */
     @Test
-    public void testDeletePluginPath() throws IOException {
+    public void testDeletePluginPath() throws Exception {
         PluginRepository repository = new JarPluginRepository(pluginsPath);
 
         Path plugin1Path = Files.createDirectory(pluginsPath.resolve("plugin-1"));

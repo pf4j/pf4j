@@ -86,7 +86,7 @@ public class BasePluginRepository implements PluginRepository {
     }
 
     @Override
-    public boolean deletePluginPath(Path pluginPath) {
+    public boolean deletePluginPath(Path pluginPath) throws PluginException {
         if (!filter.accept(pluginPath.toFile())) {
             return false;
         }
@@ -97,7 +97,7 @@ public class BasePluginRepository implements PluginRepository {
         } catch (NoSuchFileException e) {
             return false; // Return false on not found to be compatible with previous API (#135)
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new PluginException(e);
         }
     }
 

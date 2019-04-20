@@ -39,6 +39,6 @@ public interface PluginRepository {
      * @param pluginPath the plugin path
      * @return true if deleted
      */
-    boolean deletePluginPath(Path pluginPath);
+    boolean deletePluginPath(Path pluginPath) throws PluginException;
 
 }

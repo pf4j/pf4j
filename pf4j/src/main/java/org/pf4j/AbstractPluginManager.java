@@ -232,11 +232,11 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Unload the specified plugin and it's dependents.
      */
     @Override
-    public boolean unloadPlugin(String pluginId) {
+    public boolean unloadPlugin(String pluginId) throws PluginException {
         return unloadPlugin(pluginId, true);
     }
 
-    private boolean unloadPlugin(String pluginId, boolean unloadDependents) {
+    private boolean unloadPlugin(String pluginId, boolean unloadDependents) throws PluginException {
         try {
             if (unloadDependents) {
                 List<String> dependents = dependencyResolver.getDependents(pluginId);
@@ -269,7 +269,7 @@ public abstract class AbstractPluginManager implements PluginManager {
                     try {
                         ((Closeable) classLoader).close();
                     } catch (IOException e) {
-                        log.error("Cannot close classloader", e);
+                        throw new PluginException("Cannot close classloader", e);
                     }
                 }
             }
@@ -283,7 +283,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     @Override
-    public boolean deletePlugin(String pluginId) {
+    public boolean deletePlugin(String pluginId) throws PluginException {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -304,12 +304,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         // notify the plugin as it's deleted
-        try {
-            plugin.delete();
-        } catch (PluginException e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
+        plugin.delete();
 
         Path pluginPath = pluginWrapper.getPluginPath();
 
@@ -342,7 +337,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Start the specified plugin and its dependencies.
      */
     @Override
-    public PluginState startPlugin(String pluginId) {
+    public PluginState startPlugin(String pluginId) throws PluginException {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -369,16 +364,12 @@ public abstract class AbstractPluginManager implements PluginManager {
             startPlugin(dependency.getPluginId());
         }
 
-        try {
-            log.info("Start plugin '{}'", getPluginLabel(pluginDescriptor));
-            pluginWrapper.getPlugin().start();
-            pluginWrapper.setPluginState(PluginState.STARTED);
-            startedPlugins.add(pluginWrapper);
+        log.info("Start plugin '{}'", getPluginLabel(pluginDescriptor));
+        pluginWrapper.getPlugin().start();
+        pluginWrapper.setPluginState(PluginState.STARTED);
+        startedPlugins.add(pluginWrapper);
 
-            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-        } catch (PluginException e) {
-            log.error(e.getMessage(), e);
-        }
+        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
 
         return pluginWrapper.getPluginState();
     }
@@ -413,11 +404,11 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Stop the specified plugin and it's dependents.
      */
     @Override
-    public PluginState stopPlugin(String pluginId) {
+    public PluginState stopPlugin(String pluginId) throws PluginException {
         return stopPlugin(pluginId, true);
     }
 
-    private PluginState stopPlugin(String pluginId, boolean stopDependents) {
+    private PluginState stopPlugin(String pluginId, boolean stopDependents) throws PluginException {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -443,16 +434,12 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
-        try {
-            log.info("Stop plugin '{}'", getPluginLabel(pluginDescriptor));
-            pluginWrapper.getPlugin().stop();
-            pluginWrapper.setPluginState(PluginState.STOPPED);
-            startedPlugins.remove(pluginWrapper);
+        log.info("Stop plugin '{}'", getPluginLabel(pluginDescriptor));
+        pluginWrapper.getPlugin().stop();
+        pluginWrapper.setPluginState(PluginState.STOPPED);
+        startedPlugins.remove(pluginWrapper);
 
-            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-        } catch (PluginException e) {
-            log.error(e.getMessage(), e);
-        }
+        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
 
         return pluginWrapper.getPluginState();
     }
@@ -464,7 +451,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     @Override
-    public boolean disablePlugin(String pluginId) {
+    public boolean disablePlugin(String pluginId) throws PluginException {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -480,10 +467,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, PluginState.STOPPED));
 
-            if (!pluginStatusProvider.disablePlugin(pluginId)) {
-                return false;
-            }
-
+            pluginStatusProvider.disablePlugin(pluginId);
             log.info("Disabled plugin '{}'", getPluginLabel(pluginDescriptor));
 
             return true;
@@ -493,7 +477,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     @Override
-    public boolean enablePlugin(String pluginId) {
+    public boolean enablePlugin(String pluginId) throws PluginException {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -509,9 +493,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             return true;
         }
 
-        if (!pluginStatusProvider.enablePlugin(pluginId)) {
-            return false;
-        }
+        pluginStatusProvider.enablePlugin(pluginId);
 
         pluginWrapper.setPluginState(PluginState.CREATED);
 
@@ -612,7 +594,6 @@ public abstract class AbstractPluginManager implements PluginManager {
         return extensionFactory;
     }
 
-    // TODO remove
     public PluginLoader getPluginLoader() {
         return pluginLoader;
     }
