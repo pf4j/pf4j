@@ -15,6 +15,10 @@
  */
 package org.pf4j;
 
+import org.pf4j.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,9 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.pf4j.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the boilerplate plugin code that any {@link PluginManager}
@@ -820,7 +821,6 @@ public abstract class AbstractPluginManager implements PluginManager {
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
         PluginWrapper pluginWrapper = new PluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
         pluginWrapper.setPluginFactory(getPluginFactory());
-        pluginWrapper.setRuntimeMode(getRuntimeMode());
 
         // test for disabled plugin
         if (isPluginDisabled(pluginDescriptor.getPluginId())) {

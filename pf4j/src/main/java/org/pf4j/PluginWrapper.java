@@ -41,6 +41,7 @@ public class PluginWrapper {
         this.pluginClassLoader = pluginClassLoader;
 
         pluginState = PluginState.CREATED;
+        runtimeMode = pluginManager.getRuntimeMode();
     }
 
     /**
@@ -132,10 +133,6 @@ public class PluginWrapper {
 
     void setPluginState(PluginState pluginState) {
         this.pluginState = pluginState;
-    }
-
-    void setRuntimeMode(RuntimeMode runtimeMode) {
-        this.runtimeMode = runtimeMode;
     }
 
     void setPluginFactory(PluginFactory pluginFactory) {
