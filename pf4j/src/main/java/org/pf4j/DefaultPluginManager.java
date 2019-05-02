@@ -35,6 +35,8 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
 
+    public static final String PLUGINS_DIR_CONFIG_PROPERTY_NAME = "pf4j.pluginsConfigDir";
+
     protected PluginClasspath pluginClasspath;
 
     public DefaultPluginManager() {
@@ -72,7 +74,7 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
     @Override
     protected PluginStatusProvider createPluginStatusProvider() {
-        String configDir = System.getProperty("pf4j.pluginsConfigDir");
+        String configDir = System.getProperty(PLUGINS_DIR_CONFIG_PROPERTY_NAME);
         Path configPath = configDir != null ? Paths.get(configDir) : getPluginsRoot();
         return new DefaultPluginStatusProvider(configPath);
     }
@@ -97,9 +99,8 @@ public class DefaultPluginManager extends AbstractPluginManager {
     }
 
     /**
-     * By default if {@link DefaultPluginManager#isDevelopment()} returns true
-     * than a {@link DevelopmentPluginClasspath} is returned
-     * else this method returns {@link DefaultPluginClasspath}.
+     * By default if {@link #isDevelopment()} returns {@code true} than a {@link DevelopmentPluginClasspath}
+     * is returned, else this method returns {@link DefaultPluginClasspath}.
      */
     protected PluginClasspath createPluginClasspath() {
         return isDevelopment() ? new DevelopmentPluginClasspath() : new DefaultPluginClasspath();
