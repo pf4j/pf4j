@@ -73,8 +73,8 @@ public class Boot {
         }
 
         System.out.println("Extension classes by classpath:");
-        List<Class<Greeting>> greetingsClasses = pluginManager.getExtensionClasses(Greeting.class);
-        for (Class<Greeting> greeting : greetingsClasses) {
+        List<Class<? extends Greeting>> greetingsClasses = pluginManager.getExtensionClasses(Greeting.class);
+        for (Class<? extends Greeting> greeting : greetingsClasses) {
             System.out.println("   Class: " + greeting.getCanonicalName());
         }
 

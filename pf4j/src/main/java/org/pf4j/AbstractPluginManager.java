@@ -525,60 +525,25 @@ public abstract class AbstractPluginManager implements PluginManager {
         return extensionClasses;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> List<Class<T>> getExtensionClasses(Class<T> type) {
-        List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
-        List<Class<T>> extensionClasses = new ArrayList<>(extensionsWrapper.size());
-        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            Class<T> c = (Class<T>) extensionWrapper.getDescriptor().extensionClass;
-            extensionClasses.add(c);
-        }
 
-        return extensionClasses;
+    @Override
+    public <T> List<Class<? extends T>> getExtensionClasses(Class<T> type) {
+        return getExtensionClasses(extensionFinder.find(type));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> List<Class<T>> getExtensionClasses(Class<T> type, String pluginId) {
-        List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type, pluginId);
-        List<Class<T>> extensionClasses = new ArrayList<>(extensionsWrapper.size());
-        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            Class<T> c = (Class<T>) extensionWrapper.getDescriptor().extensionClass;
-            extensionClasses.add(c);
-        }
-
-        return extensionClasses;
+    public <T> List<Class<? extends T>> getExtensionClasses(Class<T> type, String pluginId) {
+        return getExtensionClasses(extensionFinder.find(type, pluginId));
     }
 
     @Override
     public <T> List<T> getExtensions(Class<T> type) {
-        List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
-        List<T> extensions = new ArrayList<>(extensionsWrapper.size());
-        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            try {
-                extensions.add(extensionWrapper.getExtension());
-            } catch (PluginException e) {
-                log.error("Cannot retrieve extension", e);
-            }
-        }
-
-        return extensions;
+        return getExtensions(extensionFinder.find(type));
     }
 
     @Override
     public <T> List<T> getExtensions(Class<T> type, String pluginId) {
-        List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type, pluginId);
-        List<T> extensions = new ArrayList<>(extensionsWrapper.size());
-        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            try {
-                extensions.add(extensionWrapper.getExtension());
-            } catch (PluginException e) {
-                log.error("Cannot retrieve extension", e);
-            }
-        }
-
-        return extensions;
+        return getExtensions(extensionFinder.find(type, pluginId));
     }
 
     @Override
@@ -941,6 +906,30 @@ public abstract class AbstractPluginManager implements PluginManager {
      */
     protected String getPluginLabel(PluginDescriptor pluginDescriptor) {
         return pluginDescriptor.getPluginId() + "@" + pluginDescriptor.getVersion();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> List<Class<? extends T>> getExtensionClasses(List<ExtensionWrapper<T>> extensionsWrapper) {
+        List<Class<? extends T>> extensionClasses = new ArrayList<>(extensionsWrapper.size());
+        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
+            Class<T> c = (Class<T>) extensionWrapper.getDescriptor().extensionClass;
+            extensionClasses.add(c);
+        }
+
+        return extensionClasses;
+    }
+
+    private <T> List<T> getExtensions(List<ExtensionWrapper<T>> extensionsWrapper) {
+        List<T> extensions = new ArrayList<>(extensionsWrapper.size());
+        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
+            try {
+                extensions.add(extensionWrapper.getExtension());
+            } catch (PluginException e) {
+                log.error("Cannot retrieve extension", e);
+            }
+        }
+
+        return extensions;
     }
 
 }
