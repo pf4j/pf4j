@@ -45,6 +45,8 @@ public abstract class AbstractPluginManager implements PluginManager {
     private static final Logger log = LoggerFactory.getLogger(AbstractPluginManager.class);
 
     public static final String PLUGINS_DIR_PROPERTY_NAME = "pf4j.pluginsDir";
+    public static final String DEFAULT_PLUGINS_DIR = "plugins";
+    public static final String DEVELOPMENT_PLUGINS_DIR = "../plugins";
 
     private Path pluginsRoot;
 
@@ -685,19 +687,15 @@ public abstract class AbstractPluginManager implements PluginManager {
     /**
      * Add the possibility to override the plugins root.
      * If a {@link #PLUGINS_DIR_PROPERTY_NAME} system property is defined than this method returns that root.
-     * If {@link #getRuntimeMode()} returns {@link RuntimeMode#DEVELOPMENT} than {@code ../plugins}
-     * is returned else this method returns {@code plugins}.
+     * If {@link #getRuntimeMode()} returns {@link RuntimeMode#DEVELOPMENT} than {@link #DEVELOPMENT_PLUGINS_DIR}
+     * is returned else this method returns {@link #DEFAULT_PLUGINS_DIR}.
      *
      * @return the plugins root
      */
     protected Path createPluginsRoot() {
         String pluginsDir = System.getProperty(PLUGINS_DIR_PROPERTY_NAME);
         if (pluginsDir == null) {
-            if (isDevelopment()) {
-                pluginsDir = "../plugins";
-            } else {
-                pluginsDir = "plugins";
-            }
+            pluginsDir = isDevelopment() ? DEVELOPMENT_PLUGINS_DIR : DEFAULT_PLUGINS_DIR;
         }
 
         return Paths.get(pluginsDir);
