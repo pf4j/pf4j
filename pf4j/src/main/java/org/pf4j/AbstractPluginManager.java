@@ -45,6 +45,8 @@ public abstract class AbstractPluginManager implements PluginManager {
     private static final Logger log = LoggerFactory.getLogger(AbstractPluginManager.class);
 
     public static final String PLUGINS_DIR_PROPERTY_NAME = "pf4j.pluginsDir";
+    public static final String MODE_PROPERTY_NAME = "pf4j.mode";
+
     public static final String DEFAULT_PLUGINS_DIR = "plugins";
     public static final String DEVELOPMENT_PLUGINS_DIR = "../plugins";
 
@@ -588,7 +590,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     public RuntimeMode getRuntimeMode() {
         if (runtimeMode == null) {
             // retrieves the runtime mode from system
-            String modeAsString = System.getProperty("pf4j.mode", RuntimeMode.DEPLOYMENT.toString());
+            String modeAsString = System.getProperty(MODE_PROPERTY_NAME, RuntimeMode.DEPLOYMENT.toString());
             runtimeMode = RuntimeMode.byName(modeAsString);
         }
 

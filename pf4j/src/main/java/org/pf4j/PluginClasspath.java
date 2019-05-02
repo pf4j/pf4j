@@ -22,14 +22,15 @@ import java.util.Set;
 
 /**
  * The classpath of the plugin.
- * It contains {@code classes} directories and {@code lib} directories (directories that contains jars).
+ * It contains {@code classes} directories (directories that contain classes files)
+ * and {@code jars} directories (directories that contain jars files).
  *
  * @author Decebal Suiu
  */
 public class PluginClasspath {
 
     private Set<String> classesDirectories = new HashSet<>();
-    private Set<String> libDirectories = new HashSet<>();
+    private Set<String> jarsDirectories = new HashSet<>();
 
     public Set<String> getClassesDirectories() {
         return classesDirectories;
@@ -45,16 +46,16 @@ public class PluginClasspath {
         return this;
     }
 
-    public Set<String> getLibDirectories() {
-        return libDirectories;
+    public Set<String> getJarsDirectories() {
+        return jarsDirectories;
     }
 
-    public PluginClasspath addLibDirectories(String... libDirectories) {
-        return addLibDirectories(Arrays.asList(libDirectories));
+    public PluginClasspath addJarsDirectories(String... jarsDirectories) {
+        return addJarsDirectories(Arrays.asList(jarsDirectories));
     }
 
-    public PluginClasspath addLibDirectories(Collection<String> libDirectories) {
-        this.libDirectories.addAll(libDirectories);
+    public PluginClasspath addJarsDirectories(Collection<String> jarsDirectories) {
+        this.jarsDirectories.addAll(jarsDirectories);
 
         return this;
     }

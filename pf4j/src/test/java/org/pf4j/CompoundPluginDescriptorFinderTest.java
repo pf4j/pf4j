@@ -92,13 +92,14 @@ public class CompoundPluginDescriptorFinderTest {
 
     @Test
     public void testSpaceCharacterInFileName() throws Exception {
-        PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
+        PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder()
+            .add(new ManifestPluginDescriptorFinder());
 
-        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my plugin-1.2.3.jar"), "myPlugin")
+        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("my plugin-1.2.3.jar"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
-        PluginDescriptor pluginDescriptor = descriptorFinder.find(pluginZip.path());
+        PluginDescriptor pluginDescriptor = descriptorFinder.find(pluginJar.path());
         assertNotNull(pluginDescriptor);
     }
 

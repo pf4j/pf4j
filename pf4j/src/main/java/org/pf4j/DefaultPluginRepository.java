@@ -39,11 +39,11 @@ public class DefaultPluginRepository extends BasePluginRepository {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultPluginRepository.class);
 
-    public DefaultPluginRepository(Path pluginsRoot, boolean development) {
+    public DefaultPluginRepository(Path pluginsRoot) {
         super(pluginsRoot);
 
         AndFileFilter pluginsFilter = new AndFileFilter(new DirectoryFileFilter());
-        pluginsFilter.addFileFilter(new NotFileFilter(createHiddenPluginFilter(development)));
+        pluginsFilter.addFileFilter(new NotFileFilter(createHiddenPluginFilter()));
         setFilter(pluginsFilter);
     }
 
@@ -59,17 +59,8 @@ public class DefaultPluginRepository extends BasePluginRepository {
         return super.deletePluginPath(pluginPath);
     }
 
-    protected FileFilter createHiddenPluginFilter(boolean development) {
-        OrFileFilter hiddenPluginFilter = new OrFileFilter(new HiddenFilter());
-
-        if (development) {
-            // skip default build output folders since these will cause errors in the logs
-            hiddenPluginFilter
-                .addFileFilter(new NameFileFilter("target")) // MAVEN
-                .addFileFilter(new NameFileFilter("build")); // GRADLE
-        }
-
-        return hiddenPluginFilter;
+    protected FileFilter createHiddenPluginFilter() {
+        return new OrFileFilter(new HiddenFilter());
     }
 
     private void extractZipFiles() {

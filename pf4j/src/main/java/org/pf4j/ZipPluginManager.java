@@ -34,12 +34,16 @@ public class ZipPluginManager extends DefaultPluginManager {
 
     @Override
     protected PluginLoader createPluginLoader() {
-        return new DefaultPluginLoader(this, pluginClasspath);
+        return new CompoundPluginLoader()
+            .add(new DevelopmentPluginLoader(this), this::isDevelopment)
+            .add(new DefaultPluginLoader(this), this::isNotDevelopment);
     }
 
     @Override
     protected PluginRepository createPluginRepository() {
-        return new DefaultPluginRepository(getPluginsRoot(), isDevelopment());
+        return new CompoundPluginRepository()
+            .add(new DevelopmentPluginRepository(getPluginsRoot()), this::isDevelopment)
+            .add(new DefaultPluginRepository(getPluginsRoot()), this::isNotDevelopment);
     }
 
 }

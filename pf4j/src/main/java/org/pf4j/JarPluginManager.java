@@ -31,12 +31,16 @@ public class JarPluginManager extends DefaultPluginManager {
 
     @Override
     protected PluginLoader createPluginLoader() {
-        return new JarPluginLoader(this);
+        return new CompoundPluginLoader()
+            .add(new DevelopmentPluginLoader(this), this::isDevelopment)
+            .add(new JarPluginLoader(this), this::isNotDevelopment);
     }
 
     @Override
     protected PluginRepository createPluginRepository() {
-        return new JarPluginRepository(getPluginsRoot());
+        return new CompoundPluginRepository()
+            .add(new DevelopmentPluginRepository(getPluginsRoot()), this::isDevelopment)
+            .add(new JarPluginRepository(getPluginsRoot()), this::isNotDevelopment);
     }
 
 }

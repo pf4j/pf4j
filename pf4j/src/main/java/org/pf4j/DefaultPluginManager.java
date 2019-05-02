@@ -37,8 +37,6 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
     public static final String PLUGINS_DIR_CONFIG_PROPERTY_NAME = "pf4j.pluginsConfigDir";
 
-    protected PluginClasspath pluginClasspath;
-
     public DefaultPluginManager() {
         super();
     }
@@ -76,21 +74,24 @@ public class DefaultPluginManager extends AbstractPluginManager {
     protected PluginStatusProvider createPluginStatusProvider() {
         String configDir = System.getProperty(PLUGINS_DIR_CONFIG_PROPERTY_NAME);
         Path configPath = configDir != null ? Paths.get(configDir) : getPluginsRoot();
+
         return new DefaultPluginStatusProvider(configPath);
     }
 
     @Override
     protected PluginRepository createPluginRepository() {
         return new CompoundPluginRepository()
-            .add(new JarPluginRepository(getPluginsRoot()))
-            .add(new DefaultPluginRepository(getPluginsRoot(), isDevelopment()));
+            .add(new DevelopmentPluginRepository(getPluginsRoot()), this::isDevelopment)
+            .add(new JarPluginRepository(getPluginsRoot()), this::isNotDevelopment)
+            .add(new DefaultPluginRepository(getPluginsRoot()), this::isNotDevelopment);
     }
 
     @Override
     protected PluginLoader createPluginLoader() {
         return new CompoundPluginLoader()
-            .add(new JarPluginLoader(this))
-            .add(new DefaultPluginLoader(this, pluginClasspath));
+            .add(new DevelopmentPluginLoader(this), this::isDevelopment)
+            .add(new JarPluginLoader(this), this::isNotDevelopment)
+            .add(new DefaultPluginLoader(this), this::isNotDevelopment);
     }
 
     @Override
@@ -98,18 +99,8 @@ public class DefaultPluginManager extends AbstractPluginManager {
         return new DefaultVersionManager();
     }
 
-    /**
-     * By default if {@link #isDevelopment()} returns {@code true} than a {@link DevelopmentPluginClasspath}
-     * is returned, else this method returns {@link DefaultPluginClasspath}.
-     */
-    protected PluginClasspath createPluginClasspath() {
-        return isDevelopment() ? new DevelopmentPluginClasspath() : new DefaultPluginClasspath();
-    }
-
     @Override
     protected void initialize() {
-        pluginClasspath = createPluginClasspath();
-
         super.initialize();
 
         if (isDevelopment()) {

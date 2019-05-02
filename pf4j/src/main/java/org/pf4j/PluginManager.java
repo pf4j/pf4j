@@ -155,10 +155,17 @@ public interface PluginManager {
     RuntimeMode getRuntimeMode();
 
     /**
-     * Returns {@code true} id the runtime mode is {@code RuntimeMode.DEVELOPMENT}.
+     * Returns {@code true} if the runtime mode is {@code RuntimeMode.DEVELOPMENT}.
      */
     default boolean isDevelopment() {
         return RuntimeMode.DEVELOPMENT.equals(getRuntimeMode());
+    }
+
+    /**
+     * Returns {@code true} if the runtime mode is not {@code RuntimeMode.DEVELOPMENT}.
+     */
+    default boolean isNotDevelopment() {
+        return !isDevelopment();
     }
 
     /**

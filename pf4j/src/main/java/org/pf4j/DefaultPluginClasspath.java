@@ -16,17 +16,20 @@
 package org.pf4j;
 
 /**
- * The default values are {@code classes} and {@code lib}.
+ * The default values are {@link #CLASSES_DIR} and {@code #LIB_DIR}.
  *
  * @author Decebal Suiu
  */
 public class DefaultPluginClasspath extends PluginClasspath {
 
+    public static final String CLASSES_DIR = "classes";
+    public static final String LIB_DIR = "lib";
+
     public DefaultPluginClasspath() {
         super();
 
-        addClassesDirectories("classes");
-        addLibDirectories("lib");
+        addClassesDirectories(CLASSES_DIR);
+        addJarsDirectories(LIB_DIR);
     }
 
 }

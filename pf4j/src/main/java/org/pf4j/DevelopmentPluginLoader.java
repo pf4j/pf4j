@@ -15,23 +15,15 @@
  */
 package org.pf4j;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 /**
- * Load all information needed by a plugin from {@link DefaultPluginClasspath}.
+ * Load all information needed by a plugin from {@link DevelopmentPluginClasspath}.
  *
  * @author Decebal Suiu
  */
-public class DefaultPluginLoader extends BasePluginLoader {
+public class DevelopmentPluginLoader extends BasePluginLoader {
 
-    public DefaultPluginLoader(PluginManager pluginManager) {
-        super(pluginManager, new DefaultPluginClasspath());
-    }
-
-    @Override
-    public boolean isApplicable(Path pluginPath) {
-        return super.isApplicable(pluginPath) && Files.isDirectory(pluginPath);
+    public DevelopmentPluginLoader(PluginManager pluginManager) {
+        super(pluginManager, new DevelopmentPluginClasspath());
     }
 
 }

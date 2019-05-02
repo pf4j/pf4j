@@ -46,9 +46,6 @@ public class DefaultPluginRepositoryTest {
         Files.createFile(pluginsPath.resolve("plugin-1.zip"));
         Files.createDirectory(pluginsPath.resolve("plugin-2"));
         Files.createDirectory(pluginsPath.resolve("plugin-3"));
-        // standard maven/gradle bin folder - these should be skipped in development mode because the cause errors
-        Files.createDirectory(pluginsPath.resolve("target"));
-        Files.createDirectory(pluginsPath.resolve("build"));
     }
 
     /**
@@ -56,29 +53,14 @@ public class DefaultPluginRepositoryTest {
      */
     @Test
     public void testGetPluginArchives() {
-        PluginRepository repository = new DefaultPluginRepository(pluginsPath, false);
+        PluginRepository repository = new DefaultPluginRepository(pluginsPath);
 
         List<Path> pluginsPaths = repository.getPluginsPaths();
 
-        assertEquals(5, pluginsPaths.size());
+        assertEquals(3, pluginsPaths.size());
         assertPathExists(pluginsPaths, pluginsPath.resolve("plugin-1"));
         assertPathExists(pluginsPaths, pluginsPath.resolve("plugin-2"));
         assertPathExists(pluginsPaths, pluginsPath.resolve("plugin-3"));
-        // when not in development mode we will honor these folders
-        assertPathExists(pluginsPaths, pluginsPath.resolve("target"));
-        assertPathExists(pluginsPaths, pluginsPath.resolve("build"));
-    }
-
-    @Test
-    public void testGetPluginArchivesInDevelopmentMode() {
-        PluginRepository repository = new DefaultPluginRepository(pluginsPath, true);
-
-        List<Path> pluginsPaths = repository.getPluginsPaths();
-
-        // target and build should be ignored
-        assertEquals(3, pluginsPaths.size());
-        assertPathDoesNotExists(pluginsPaths, pluginsPath.resolve("target"));
-        assertPathDoesNotExists(pluginsPaths, pluginsPath.resolve("build"));
     }
 
     /**
@@ -86,15 +68,13 @@ public class DefaultPluginRepositoryTest {
      */
     @Test
     public void testDeletePluginPath() throws PluginException {
-        PluginRepository repository = new DefaultPluginRepository(pluginsPath, false);
+        PluginRepository repository = new DefaultPluginRepository(pluginsPath);
 
         assertTrue(Files.exists(pluginsPath.resolve("plugin-1.zip")));
         assertTrue(repository.deletePluginPath(pluginsPath.resolve("plugin-1")));
         assertFalse(Files.exists(pluginsPath.resolve("plugin-1.zip")));
         assertTrue(repository.deletePluginPath(pluginsPath.resolve("plugin-3")));
         assertFalse(repository.deletePluginPath(pluginsPath.resolve("plugin-4")));
-        assertTrue(repository.deletePluginPath(pluginsPath.resolve("target")));
-        assertTrue(repository.deletePluginPath(pluginsPath.resolve("build")));
 
         List<Path> pluginsPaths = repository.getPluginsPaths();
 
@@ -104,10 +84,6 @@ public class DefaultPluginRepositoryTest {
 
     private void assertPathExists(List<Path> paths, Path path) {
         assertTrue(paths.contains(path), "The directory must contain the file " + path);
-    }
-
-    private void assertPathDoesNotExists(List<Path> paths, Path path) {
-        assertFalse(paths.contains(path), "The directory must not contain the file " + path);
     }
 
 }
