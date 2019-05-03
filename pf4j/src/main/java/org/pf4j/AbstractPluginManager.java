@@ -532,7 +532,6 @@ public abstract class AbstractPluginManager implements PluginManager {
         return extensionClasses;
     }
 
-
     @Override
     public <T> List<Class<? extends T>> getExtensionClasses(Class<T> type) {
         return getExtensionClasses(extensionFinder.find(type));
