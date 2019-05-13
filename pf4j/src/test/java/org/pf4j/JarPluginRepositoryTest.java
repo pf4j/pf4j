@@ -46,13 +46,13 @@ public class JarPluginRepositoryTest {
 
         assertFalse(repository.deletePluginPath(plugin1Path));
 
-        List<Path> pluginsPaths = repository.getPluginsPaths();
-        assertEquals(1, pluginsPaths.size());
+        List<Path> pluginPaths = repository.getPluginPaths();
+        assertEquals(1, pluginPaths.size());
 
         assertTrue(repository.deletePluginPath(plugin1JarPath));
 
-        pluginsPaths = repository.getPluginsPaths();
-        assertEquals(0, pluginsPaths.size());
+        pluginPaths = repository.getPluginPaths();
+        assertEquals(0, pluginPaths.size());
     }
 
 }

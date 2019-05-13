@@ -48,9 +48,9 @@ public class DefaultPluginRepository extends BasePluginRepository {
     }
 
     @Override
-    public List<Path> getPluginsPaths() {
+    public List<Path> getPluginPaths() {
         extractZipFiles();
-        return super.getPluginsPaths();
+        return super.getPluginPaths();
     }
 
     @Override

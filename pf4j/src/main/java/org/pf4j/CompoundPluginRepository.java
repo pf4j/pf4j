@@ -56,10 +56,10 @@ public class CompoundPluginRepository implements PluginRepository {
     }
 
     @Override
-    public List<Path> getPluginsPaths() {
+    public List<Path> getPluginPaths() {
         Set<Path> paths = new LinkedHashSet<>();
         for (PluginRepository repository : repositories) {
-            paths.addAll(repository.getPluginsPaths());
+            paths.addAll(repository.getPluginPaths());
         }
 
         return new ArrayList<>(paths);

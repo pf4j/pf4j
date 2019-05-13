@@ -46,12 +46,12 @@ public class DevelopmentPluginRepositoryTest {
     public void testGetPluginArchivesInDevelopmentMode() {
         PluginRepository repository = new DevelopmentPluginRepository(pluginsPath);
 
-        List<Path> pluginsPaths = repository.getPluginsPaths();
+        List<Path> pluginPaths = repository.getPluginPaths();
 
         // target and build should be ignored
-        assertEquals(0, pluginsPaths.size());
-        assertPathDoesNotExists(pluginsPaths, pluginsPath.resolve(DevelopmentPluginRepository.MAVEN_BUILD_DIR));
-        assertPathDoesNotExists(pluginsPaths, pluginsPath.resolve(DevelopmentPluginRepository.GRADLE_BUILD_DIR));
+        assertEquals(0, pluginPaths.size());
+        assertPathDoesNotExists(pluginPaths, pluginsPath.resolve(DevelopmentPluginRepository.MAVEN_BUILD_DIR));
+        assertPathDoesNotExists(pluginPaths, pluginsPath.resolve(DevelopmentPluginRepository.GRADLE_BUILD_DIR));
     }
 
     private void assertPathDoesNotExists(List<Path> paths, Path path) {

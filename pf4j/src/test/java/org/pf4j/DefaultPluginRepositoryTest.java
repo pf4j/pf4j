@@ -49,18 +49,18 @@ public class DefaultPluginRepositoryTest {
     }
 
     /**
-     * Test of {@link DefaultPluginRepository#getPluginsPaths()} method.
+     * Test of {@link DefaultPluginRepository#getPluginPaths()} method.
      */
     @Test
     public void testGetPluginArchives() {
         PluginRepository repository = new DefaultPluginRepository(pluginsPath);
 
-        List<Path> pluginsPaths = repository.getPluginsPaths();
+        List<Path> pluginPaths = repository.getPluginPaths();
 
-        assertEquals(3, pluginsPaths.size());
-        assertPathExists(pluginsPaths, pluginsPath.resolve("plugin-1"));
-        assertPathExists(pluginsPaths, pluginsPath.resolve("plugin-2"));
-        assertPathExists(pluginsPaths, pluginsPath.resolve("plugin-3"));
+        assertEquals(3, pluginPaths.size());
+        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-1"));
+        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-2"));
+        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-3"));
     }
 
     /**
@@ -76,10 +76,10 @@ public class DefaultPluginRepositoryTest {
         assertTrue(repository.deletePluginPath(pluginsPath.resolve("plugin-3")));
         assertFalse(repository.deletePluginPath(pluginsPath.resolve("plugin-4")));
 
-        List<Path> pluginsPaths = repository.getPluginsPaths();
+        List<Path> pluginPaths = repository.getPluginPaths();
 
-        assertEquals(1, pluginsPaths.size());
-        assertEquals(pluginsPath.relativize(pluginsPaths.get(0)).toString(), "plugin-2");
+        assertEquals(1, pluginPaths.size());
+        assertEquals(pluginsPath.relativize(pluginPaths.get(0)).toString(), "plugin-2");
     }
 
     private void assertPathExists(List<Path> paths, Path path) {

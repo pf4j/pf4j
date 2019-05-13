@@ -27,11 +27,11 @@ import java.util.List;
 public interface PluginRepository {
 
     /**
-     * List all plugins paths.
+     * List all plugin paths.
      *
      * @return a list with paths
      */
-    List<Path> getPluginsPaths();
+    List<Path> getPluginPaths();
 
     /**
      * Removes a plugin from the repository.

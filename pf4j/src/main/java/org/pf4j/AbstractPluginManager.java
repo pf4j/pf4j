@@ -207,19 +207,19 @@ public abstract class AbstractPluginManager implements PluginManager {
             return;
         }
 
-        // get all plugins paths from repository
-        List<Path> pluginsPaths = pluginRepository.getPluginsPaths();
+        // get all plugin paths from repository
+        List<Path> pluginPaths = pluginRepository.getPluginPaths();
 
         // check for no plugins
-        if (pluginsPaths.isEmpty()) {
+        if (pluginPaths.isEmpty()) {
             log.info("No plugins");
             return;
         }
 
-        log.debug("Found {} possible plugins: {}", pluginsPaths.size(), pluginsPaths);
+        log.debug("Found {} possible plugins: {}", pluginPaths.size(), pluginPaths);
 
         // load plugins from plugin paths
-        for (Path pluginPath : pluginsPaths) {
+        for (Path pluginPath : pluginPaths) {
             try {
                 loadPluginFromPath(pluginPath);
             } catch (PluginException e) {
