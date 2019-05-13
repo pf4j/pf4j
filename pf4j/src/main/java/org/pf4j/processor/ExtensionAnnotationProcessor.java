@@ -55,7 +55,6 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
-        info("%s init", ExtensionAnnotationProcessor.class);
         storage = createStorage();
     }
 
