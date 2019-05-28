@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -80,12 +81,14 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
             log.debug("Reading extensions storage from plugin '{}'", pluginId);
             Set<String> bucket = new HashSet<>();
 
-            try {
-                Enumeration<URL> urls = ((PluginClassLoader) plugin.getPluginClassLoader()).findResources(getExtensionsResource());
-                if (urls.hasMoreElements()) {
-                    collectExtensions(urls, bucket);
-                } else {
+            log.debug("Read '{}'", getExtensionsResource());
+            PluginClassLoader pluginClassLoader = (PluginClassLoader) plugin.getPluginClassLoader();
+            try (InputStream extensionResourceStream = pluginClassLoader.getResourceAsStream(getExtensionsResource())) {
+
+                if (extensionResourceStream == null) {
                     log.debug("Cannot find '{}'", getExtensionsResource());
+                } else {
+                    collectExtensions(extensionResourceStream, bucket);
                 }
 
                 debugExtensions(bucket);
@@ -103,9 +106,13 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
             log.debug("Read '{}'", url.getFile());
-            try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
-                LegacyExtensionStorage.read(reader, bucket);
-            }
+            collectExtensions(url.openStream(), bucket);
+        }
+    }
+
+    private void collectExtensions(InputStream extensionResourceStream, Set<String> bucket) throws IOException {
+        try (Reader reader = new InputStreamReader(extensionResourceStream, StandardCharsets.UTF_8)) {
+            LegacyExtensionStorage.read(reader, bucket);
         }
     }
 
