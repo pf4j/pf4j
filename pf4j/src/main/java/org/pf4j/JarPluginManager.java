@@ -15,6 +15,8 @@
  */
 package org.pf4j;
 
+import java.nio.file.Path;
+
 /**
  * It's a {@link PluginManager} that loads each plugin from a {@code jar} file.
  * Actually, a plugin is a fat jar, a jar which contains classes from all the libraries,
@@ -23,6 +25,14 @@ package org.pf4j;
  * @author Decebal Suiu
  */
 public class JarPluginManager extends DefaultPluginManager {
+
+    public JarPluginManager() {
+        super();
+    }
+
+    public JarPluginManager(Path pluginsRoot) {
+        super(pluginsRoot);
+    }
 
     @Override
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
