@@ -17,6 +17,7 @@ package org.pf4j.plugin;
 
 import org.pf4j.ManifestPluginDescriptorFinder;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -51,6 +52,10 @@ public class PluginJar {
         return path;
     }
 
+    public File file() {
+        return path.toFile();
+    }
+
     public String pluginClass() {
         return pluginClass;
     }
@@ -81,7 +86,7 @@ public class PluginJar {
 
         private String pluginClass;
         private String pluginVersion;
-        private Map<String, String> attributes;
+        private Map<String, String> manifestAttributes = new LinkedHashMap<>();
 
         public Builder(Path path, String pluginId) {
             this.path = path;
@@ -102,9 +107,20 @@ public class PluginJar {
 
         /**
          * Add extra attributes to the {@code manifest} file.
+         * As possible attribute name please see {@link ManifestPluginDescriptorFinder}.
          */
-        public Builder attributes(Map<String, String> attributes) {
-            this.attributes = attributes;
+        public Builder manifestAttributes(Map<String, String> manifestAttributes) {
+            this.manifestAttributes.putAll(manifestAttributes);
+
+            return this;
+        }
+
+        /**
+         * Add extra attribute to the {@code manifest} file.
+         * As possible attribute name please see {@link ManifestPluginDescriptorFinder}.
+         */
+        public Builder manifestAttribute(String name, String value) {
+            manifestAttributes.put(name, value);
 
             return this;
         }
@@ -122,11 +138,12 @@ public class PluginJar {
             if (pluginClass != null) {
                 map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, pluginClass);
             }
-            if (attributes != null) {
-                map.putAll(attributes);
+            if (manifestAttributes != null) {
+                map.putAll(manifestAttributes);
             }
 
-            JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(path.toFile()), createManifest(map));
+            Manifest manifest = createManifest(map);
+            JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(path.toFile()), manifest);
             outputStream.close();
         }
 
