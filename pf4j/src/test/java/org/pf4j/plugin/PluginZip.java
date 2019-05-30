@@ -17,6 +17,7 @@ package org.pf4j.plugin;
 
 import org.pf4j.PropertiesPluginDescriptorFinder;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -48,6 +49,10 @@ public class PluginZip {
 
     public Path path() {
         return path;
+    }
+
+    public File file() {
+        return path.toFile();
     }
 
     public String pluginId() {
@@ -83,7 +88,7 @@ public class PluginZip {
 
         private String pluginClass;
         private String pluginVersion;
-        private Map<String, String> properties;
+        private Map<String, String> properties = new LinkedHashMap<>();
 
         public Builder(Path path, String pluginId) {
             this.path = path;
@@ -104,9 +109,20 @@ public class PluginZip {
 
         /**
          * Add extra properties to the {@code properties} file.
+         * As possible attribute name please see {@link PropertiesPluginDescriptorFinder}.
          */
         public Builder properties(Map<String, String> properties) {
-            this.properties = properties;
+            this.properties.putAll(properties);
+
+            return this;
+        }
+
+        /**
+         * Add extra property to the {@code properties} file.
+         * As possible property name please see {@link PropertiesPluginDescriptorFinder}.
+         */
+        public Builder property(String name, String value) {
+            properties.put(name, value);
 
             return this;
         }
