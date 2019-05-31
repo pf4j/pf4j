@@ -22,4 +22,6 @@ import org.pf4j.ExtensionPoint;
  */
 public interface TestExtensionPoint extends ExtensionPoint {
 
+    String saySomething();
+
 }

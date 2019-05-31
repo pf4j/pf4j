@@ -20,10 +20,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.plugin.PluginJar;
+import org.pf4j.plugin.TestExtension;
+import org.pf4j.plugin.TestExtensionPoint;
 import org.pf4j.plugin.TestPlugin;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,6 +45,7 @@ public class JarPluginManagerTest {
         pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), "test-plugin")
             .pluginClass(TestPlugin.class.getName())
             .pluginVersion("1.2.3")
+            .extension(TestExtension.class.getName())
             .build();
 
         pluginManager = new JarPluginManager(pluginsPath);
@@ -51,6 +55,18 @@ public class JarPluginManagerTest {
     public void tearDown() {
         pluginJar = null;
         pluginManager = null;
+    }
+
+    @Test
+    public void getExtensions() {
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        List<TestExtensionPoint> extensions = pluginManager.getExtensions(TestExtensionPoint.class);
+        assertEquals(1, extensions.size());
+
+        String something = extensions.get(0).saySomething();
+        assertEquals(new TestExtension().saySomething(), something);
     }
 
     @Test

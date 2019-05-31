@@ -17,18 +17,23 @@ package org.pf4j.plugin;
 
 import org.pf4j.ManifestPluginDescriptorFinder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 /**
- /**
  * Represents a plugin {@code jar} file.
  * The {@code MANIFEST.MF} file is created on the fly from the information supplied in {@link Builder}.
  *
@@ -87,6 +92,8 @@ public class PluginJar {
         private String pluginClass;
         private String pluginVersion;
         private Map<String, String> manifestAttributes = new LinkedHashMap<>();
+        private Set<String> extensions = new LinkedHashSet<>();
+        private ClassDataProvider classDataProvider = new DefaultClassDataProvider();
 
         public Builder(Path path, String pluginId) {
             this.path = path;
@@ -125,13 +132,44 @@ public class PluginJar {
             return this;
         }
 
+        public Builder extension(String extensionClassName) {
+            extensions.add(extensionClassName);
+
+            return this;
+        }
+
+        public Builder classDataProvider(ClassDataProvider classDataProvider) {
+             this.classDataProvider = classDataProvider;
+
+             return this;
+        }
+
         public PluginJar build() throws IOException {
-            createManifestFile();
+            Manifest manifest = createManifest();
+            try (OutputStream outputStream = new FileOutputStream(path.toFile())) {
+                JarOutputStream jarOutputStream = new JarOutputStream(outputStream, manifest);
+                if (!extensions.isEmpty()) {
+                    // add extensions.idx
+                    JarEntry jarEntry = new JarEntry("META-INF/extensions.idx");
+                    jarOutputStream.putNextEntry(jarEntry);
+                    jarOutputStream.write(extensionsAsByteArray());
+                    jarOutputStream.closeEntry();
+                    // add extensions classes
+                    for (String extension : extensions) {
+                        String extensionPath = extension.replace('.', '/') + ".class";
+                        JarEntry classEntry = new JarEntry(extensionPath);
+                        jarOutputStream.putNextEntry(classEntry);
+                        jarOutputStream.write(classDataProvider.getClassData(extension));
+                        jarOutputStream.closeEntry();
+                    }
+                }
+                jarOutputStream.close();
+            }
 
             return new PluginJar(this);
         }
 
-        protected void createManifestFile() throws IOException {
+        private Manifest createManifest() {
             Map<String, String> map = new LinkedHashMap<>();
             map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, pluginId);
             map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, pluginVersion);
@@ -142,9 +180,19 @@ public class PluginJar {
                 map.putAll(manifestAttributes);
             }
 
-            Manifest manifest = createManifest(map);
-            JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(path.toFile()), manifest);
-            outputStream.close();
+            return PluginJar.createManifest(map);
+        }
+
+        private byte[] extensionsAsByteArray() throws IOException {
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                PrintWriter writer = new PrintWriter(outputStream);
+                for (String extension : extensions) {
+                    writer.println(extension);
+                }
+                writer.flush();
+
+                return outputStream.toByteArray();
+            }
         }
 
     }
