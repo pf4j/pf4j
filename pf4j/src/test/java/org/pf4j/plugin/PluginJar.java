@@ -17,17 +17,23 @@ package org.pf4j.plugin;
 
 import org.pf4j.ManifestPluginDescriptorFinder;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 /**
- /**
  * Represents a plugin {@code jar} file.
  * The {@code MANIFEST.MF} file is created on the fly from the information supplied in {@link Builder}.
  *
@@ -49,6 +55,10 @@ public class PluginJar {
 
     public Path path() {
         return path;
+    }
+
+    public File file() {
+        return path.toFile();
     }
 
     public String pluginClass() {
@@ -81,7 +91,9 @@ public class PluginJar {
 
         private String pluginClass;
         private String pluginVersion;
-        private Map<String, String> attributes;
+        private Map<String, String> manifestAttributes = new LinkedHashMap<>();
+        private Set<String> extensions = new LinkedHashSet<>();
+        private ClassDataProvider classDataProvider = new DefaultClassDataProvider();
 
         public Builder(Path path, String pluginId) {
             this.path = path;
@@ -102,32 +114,85 @@ public class PluginJar {
 
         /**
          * Add extra attributes to the {@code manifest} file.
+         * As possible attribute name please see {@link ManifestPluginDescriptorFinder}.
          */
-        public Builder attributes(Map<String, String> attributes) {
-            this.attributes = attributes;
+        public Builder manifestAttributes(Map<String, String> manifestAttributes) {
+            this.manifestAttributes.putAll(manifestAttributes);
 
             return this;
         }
 
+        /**
+         * Add extra attribute to the {@code manifest} file.
+         * As possible attribute name please see {@link ManifestPluginDescriptorFinder}.
+         */
+        public Builder manifestAttribute(String name, String value) {
+            manifestAttributes.put(name, value);
+
+            return this;
+        }
+
+        public Builder extension(String extensionClassName) {
+            extensions.add(extensionClassName);
+
+            return this;
+        }
+
+        public Builder classDataProvider(ClassDataProvider classDataProvider) {
+             this.classDataProvider = classDataProvider;
+
+             return this;
+        }
+
         public PluginJar build() throws IOException {
-            createManifestFile();
+            Manifest manifest = createManifest();
+            try (OutputStream outputStream = new FileOutputStream(path.toFile())) {
+                JarOutputStream jarOutputStream = new JarOutputStream(outputStream, manifest);
+                if (!extensions.isEmpty()) {
+                    // add extensions.idx
+                    JarEntry jarEntry = new JarEntry("META-INF/extensions.idx");
+                    jarOutputStream.putNextEntry(jarEntry);
+                    jarOutputStream.write(extensionsAsByteArray());
+                    jarOutputStream.closeEntry();
+                    // add extensions classes
+                    for (String extension : extensions) {
+                        String extensionPath = extension.replace('.', '/') + ".class";
+                        JarEntry classEntry = new JarEntry(extensionPath);
+                        jarOutputStream.putNextEntry(classEntry);
+                        jarOutputStream.write(classDataProvider.getClassData(extension));
+                        jarOutputStream.closeEntry();
+                    }
+                }
+                jarOutputStream.close();
+            }
 
             return new PluginJar(this);
         }
 
-        protected void createManifestFile() throws IOException {
+        private Manifest createManifest() {
             Map<String, String> map = new LinkedHashMap<>();
             map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, pluginId);
             map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, pluginVersion);
             if (pluginClass != null) {
                 map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, pluginClass);
             }
-            if (attributes != null) {
-                map.putAll(attributes);
+            if (manifestAttributes != null) {
+                map.putAll(manifestAttributes);
             }
 
-            JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(path.toFile()), createManifest(map));
-            outputStream.close();
+            return PluginJar.createManifest(map);
+        }
+
+        private byte[] extensionsAsByteArray() throws IOException {
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                PrintWriter writer = new PrintWriter(outputStream);
+                for (String extension : extensions) {
+                    writer.println(extension);
+                }
+                writer.flush();
+
+                return outputStream.toByteArray();
+            }
         }
 
     }

@@ -15,20 +15,19 @@
  */
 package org.pf4j.plugin;
 
-import org.pf4j.Extension;
-
 /**
- * @author Mario Franco
+ * Defines the interface for classes that know to supply class data for a class name.
+ * The idea is to have the possibility to retrieve the data for a class from different sources:
+ * <ul>
+ * <li>Class path - the class is already loaded by the class loader</li>
+ * <li>String - the string (the source code) is compiled dynamically via {@link javax.tools.JavaCompiler}</>
+ * <li>Generate the source code programmatically using something like {@code https://github.com/square/javapoet}</li>
+ * </ul>
+ *
+ * @author Decebal Suiu
  */
-@Extension
-public class FailTestExtension implements TestExtensionPoint {
+public interface ClassDataProvider {
 
-    public FailTestExtension(String name) {
-    }
-
-    @Override
-    public String saySomething() {
-        return "I am a fail test extension";
-    }
+    byte[] getClassData(String className);
 
 }
