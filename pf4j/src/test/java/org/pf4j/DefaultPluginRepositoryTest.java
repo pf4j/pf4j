@@ -67,7 +67,7 @@ public class DefaultPluginRepositoryTest {
      * Test of {@link DefaultPluginRepository#deletePluginPath(Path)} method.
      */
     @Test
-    public void testDeletePluginPath() throws PluginException {
+    public void testDeletePluginPath() {
         PluginRepository repository = new DefaultPluginRepository(pluginsPath);
 
         assertTrue(Files.exists(pluginsPath.resolve("plugin-1.zip")));

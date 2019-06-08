@@ -63,34 +63,34 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     }
 
     @Override
-    public PluginDescriptor find(Path pluginPath) throws PluginException {
+    public PluginDescriptor find(Path pluginPath) {
         Properties properties = readProperties(pluginPath);
 
         return createPluginDescriptor(properties);
     }
 
-    protected Properties readProperties(Path pluginPath) throws PluginException {
+    protected Properties readProperties(Path pluginPath) {
         Path propertiesPath = getPropertiesPath(pluginPath, propertiesFileName);
         if (propertiesPath == null) {
-            throw new PluginException("Cannot find the properties path");
+            throw new PluginRuntimeException("Cannot find the properties path");
         }
 
         log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
         if (Files.notExists(propertiesPath)) {
-            throw new PluginException("Cannot find '{}' path", propertiesPath);
+            throw new PluginRuntimeException("Cannot find '{}' path", propertiesPath);
         }
 
         Properties properties = new Properties();
         try (InputStream input = Files.newInputStream(propertiesPath)) {
             properties.load(input);
         } catch (IOException e) {
-            throw new PluginException(e);
+            throw new PluginRuntimeException(e);
         }
 
         return properties;
     }
 
-    protected Path getPropertiesPath(Path pluginPath, String propertiesFileName) throws PluginException {
+    protected Path getPropertiesPath(Path pluginPath, String propertiesFileName) {
         if (Files.isDirectory(pluginPath)) {
             return pluginPath.resolve(Paths.get(propertiesFileName));
         } else {
@@ -98,7 +98,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
             try {
                 return FileUtils.getPath(pluginPath, propertiesFileName);
             } catch (IOException e) {
-                throw new PluginException(e);
+                throw new PluginRuntimeException(e);
             }
         }
     }

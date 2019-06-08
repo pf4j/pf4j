@@ -20,6 +20,6 @@ package org.pf4j;
  */
 public interface ExtensionFactory {
 
-    <T> T create(Class<T> extensionClass) throws PluginException;
+    <T> T create(Class<T> extensionClass);
 
 }

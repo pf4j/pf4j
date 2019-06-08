@@ -20,7 +20,7 @@ import java.nio.file.Path;
 /**
  * @author Decebal Suiu
  */
-public class PluginAlreadyLoadedException extends PluginException {
+public class PluginAlreadyLoadedException extends PluginRuntimeException {
 
     private final String pluginId;
     private final Path pluginPath;

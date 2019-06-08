@@ -65,24 +65,24 @@ public class DefaultPluginManagerTest {
     }
 
     @Test
-    public void validateOK() throws PluginException {
+    public void validateOK() {
         pluginManager.validatePluginDescriptor(pluginDescriptor);
     }
 
     @Test
     public void validateFailsOnId() {
         pluginDescriptor.setPluginId("");
-        assertThrows(PluginException.class, () -> pluginManager.validatePluginDescriptor(pluginDescriptor));
+        assertThrows(PluginRuntimeException.class, () -> pluginManager.validatePluginDescriptor(pluginDescriptor));
     }
 
     @Test
     public void validateFailsOnVersion() {
         pluginDescriptor.setPluginVersion(null);
-        assertThrows(PluginException.class, () -> pluginManager.validatePluginDescriptor(pluginDescriptor));
+        assertThrows(PluginRuntimeException.class, () -> pluginManager.validatePluginDescriptor(pluginDescriptor));
     }
 
     @Test
-    public void validateNoPluginClass() throws PluginException {
+    public void validateNoPluginClass() {
         pluginManager.validatePluginDescriptor(pluginDescriptor);
         assertEquals(Plugin.class.getName(), pluginDescriptor.getPluginClass());
     }

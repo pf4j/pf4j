@@ -180,7 +180,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     @Override
-    public String loadPlugin(Path pluginPath) throws PluginException {
+    public String loadPlugin(Path pluginPath) {
         if ((pluginPath == null) || Files.notExists(pluginPath)) {
             throw new IllegalArgumentException(String.format("Specified plugin %s does not exist!", pluginPath));
         }
@@ -222,7 +222,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         for (Path pluginPath : pluginPaths) {
             try {
                 loadPluginFromPath(pluginPath);
-            } catch (PluginException e) {
+            } catch (PluginRuntimeException e) {
                 log.error(e.getMessage(), e);
             }
         }
@@ -230,7 +230,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         // resolve plugins
         try {
             resolvePlugins();
-        } catch (PluginException e) {
+        } catch (PluginRuntimeException e) {
             log.error(e.getMessage(), e);
         }
     }
@@ -239,11 +239,11 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Unload the specified plugin and it's dependents.
      */
     @Override
-    public boolean unloadPlugin(String pluginId) throws PluginException {
+    public boolean unloadPlugin(String pluginId) {
         return unloadPlugin(pluginId, true);
     }
 
-    private boolean unloadPlugin(String pluginId, boolean unloadDependents) throws PluginException {
+    private boolean unloadPlugin(String pluginId, boolean unloadDependents) {
         try {
             if (unloadDependents) {
                 List<String> dependents = dependencyResolver.getDependents(pluginId);
@@ -276,7 +276,7 @@ public abstract class AbstractPluginManager implements PluginManager {
                     try {
                         ((Closeable) classLoader).close();
                     } catch (IOException e) {
-                        throw new PluginException("Cannot close classloader", e);
+                        throw new PluginRuntimeException(e, "Cannot close classloader");
                     }
                 }
             }
@@ -290,7 +290,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     @Override
-    public boolean deletePlugin(String pluginId) throws PluginException {
+    public boolean deletePlugin(String pluginId) {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -344,7 +344,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Start the specified plugin and its dependencies.
      */
     @Override
-    public PluginState startPlugin(String pluginId) throws PluginException {
+    public PluginState startPlugin(String pluginId) {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -400,7 +400,7 @@ public abstract class AbstractPluginManager implements PluginManager {
                     itr.remove();
 
                     firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-                } catch (PluginException e) {
+                } catch (PluginRuntimeException e) {
                     log.error(e.getMessage(), e);
                 }
             }
@@ -411,11 +411,11 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Stop the specified plugin and it's dependents.
      */
     @Override
-    public PluginState stopPlugin(String pluginId) throws PluginException {
+    public PluginState stopPlugin(String pluginId) {
         return stopPlugin(pluginId, true);
     }
 
-    private PluginState stopPlugin(String pluginId, boolean stopDependents) throws PluginException {
+    private PluginState stopPlugin(String pluginId, boolean stopDependents) {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -458,7 +458,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     @Override
-    public boolean disablePlugin(String pluginId) throws PluginException {
+    public boolean disablePlugin(String pluginId) {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -484,7 +484,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     @Override
-    public boolean enablePlugin(String pluginId) throws PluginException {
+    public boolean enablePlugin(String pluginId) {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -560,7 +560,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         for (ExtensionWrapper extensionWrapper : extensionsWrapper) {
             try {
                 extensions.add(extensionWrapper.getExtension());
-            } catch (PluginException e) {
+            } catch (PluginRuntimeException e) {
                 log.error("Cannot retrieve extension", e);
             }
         }
@@ -732,7 +732,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         return pluginStatusProvider.isPluginDisabled(pluginId);
     }
 
-    protected void resolvePlugins() throws PluginException {
+    protected void resolvePlugins() {
         // retrieves the plugins descriptors
         List<PluginDescriptor> descriptors = new ArrayList<>();
         for (PluginWrapper plugin : plugins.values()) {
@@ -781,7 +781,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
     }
 
-    protected PluginWrapper loadPluginFromPath(Path pluginPath) throws PluginException {
+    protected PluginWrapper loadPluginFromPath(Path pluginPath) {
         // Test for plugin path duplication
         String pluginId = idForPath(pluginPath);
         if (pluginId != null) {
@@ -799,7 +799,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         pluginId = pluginDescriptor.getPluginId();
         if (plugins.containsKey(pluginId)) {
             PluginWrapper loadedPlugin = getPlugin(pluginId);
-            throw new PluginException("There is an already loaded plugin ({}) "
+            throw new PluginRuntimeException("There is an already loaded plugin ({}) "
                     + "with the same id ({}) as the plugin at path '{}'. Simultaneous loading "
                     + "of plugins with the same PluginId is not currently supported.\n"
                     + "As a workaround you may include PluginVersion and PluginProvider "
@@ -867,15 +867,15 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Override this to change the validation criteria.
      *
      * @param descriptor the plugin descriptor to validate
-     * @throws PluginException if validation fails
+     * @throws PluginRuntimeException if validation fails
      */
-    protected void validatePluginDescriptor(PluginDescriptor descriptor) throws PluginException {
+    protected void validatePluginDescriptor(PluginDescriptor descriptor) {
         if (StringUtils.isNullOrEmpty(descriptor.getPluginId())) {
-            throw new PluginException("Field 'id' cannot be empty");
+            throw new PluginRuntimeException("Field 'id' cannot be empty");
         }
 
         if (descriptor.getVersion() == null) {
-            throw new PluginException("Field 'version' cannot be empty");
+            throw new PluginRuntimeException("Field 'version' cannot be empty");
         }
     }
 
@@ -925,7 +925,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
             try {
                 extensions.add(extensionWrapper.getExtension());
-            } catch (PluginException e) {
+            } catch (PluginRuntimeException e) {
                 log.error("Cannot retrieve extension", e);
             }
         }

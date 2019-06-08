@@ -111,13 +111,14 @@ public class DefaultPluginManager extends AbstractPluginManager {
     }
 
     /**
-     * Load a plugin from disk. If the path is a zip file, first unpack
+     * Load a plugin from disk. If the path is a zip file, first unpack.
+     *
      * @param pluginPath plugin location on disk
      * @return PluginWrapper for the loaded plugin or null if not loaded
-     * @throws PluginException if problems during load
+     * @throws PluginRuntimeException if problems during load
      */
     @Override
-    protected PluginWrapper loadPluginFromPath(Path pluginPath) throws PluginException {
+    protected PluginWrapper loadPluginFromPath(Path pluginPath) {
         // First unzip any ZIP files
         try {
             pluginPath = FileUtils.expandIfZip(pluginPath);

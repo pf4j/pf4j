@@ -107,7 +107,7 @@ public class ManifestPluginDescriptorFinderTest {
     @Test
     public void testFindNotFound() {
         PluginDescriptorFinder descriptorFinder = new ManifestPluginDescriptorFinder();
-        assertThrows(PluginException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
+        assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
     }
 
     private Manifest getPlugin1Manifest() {

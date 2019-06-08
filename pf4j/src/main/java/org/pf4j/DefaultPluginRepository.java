@@ -24,7 +24,6 @@ import org.pf4j.util.OrFileFilter;
 import org.pf4j.util.ZipFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.pf4j.util.NameFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -54,7 +53,7 @@ public class DefaultPluginRepository extends BasePluginRepository {
     }
 
     @Override
-    public boolean deletePluginPath(Path pluginPath) throws PluginException {
+    public boolean deletePluginPath(Path pluginPath) {
         FileUtils.optimisticDelete(FileUtils.findWithEnding(pluginPath, ".zip", ".ZIP", ".Zip"));
         return super.deletePluginPath(pluginPath);
     }

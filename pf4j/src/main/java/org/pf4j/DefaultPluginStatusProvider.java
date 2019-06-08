@@ -66,22 +66,22 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
     }
 
     @Override
-    public void disablePlugin(String pluginId) throws PluginException {
+    public void disablePlugin(String pluginId) {
         disabledPlugins.add(pluginId);
         try {
             FileUtils.writeLines(disabledPlugins, pluginsRoot.resolve("disabled.txt").toFile());
         } catch (IOException e) {
-            throw new PluginException(e);
+            throw new PluginRuntimeException(e);
         }
     }
 
     @Override
-    public void enablePlugin(String pluginId) throws PluginException {
+    public void enablePlugin(String pluginId) {
         disabledPlugins.remove(pluginId);
         try {
             FileUtils.writeLines(disabledPlugins, pluginsRoot.resolve("disabled.txt").toFile());
         } catch (IOException e) {
-            throw new PluginException(e);
+            throw new PluginRuntimeException(e);
         }
     }
 

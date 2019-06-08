@@ -40,7 +40,7 @@ public class SingletonExtensionFactory extends DefaultExtensionFactory {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T create(Class<T> extensionClass) throws PluginException {
+    public <T> T create(Class<T> extensionClass) {
         String extensionClassName = extensionClass.getName();
         if (cache.containsKey(extensionClassName)) {
             return (T) cache.get(extensionClassName);

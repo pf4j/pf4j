@@ -69,11 +69,10 @@ public interface PluginManager {
      * Load a plugin.
      *
      * @param pluginPath the plugin location
-     * @return the pluginId of the installed plugin as specified in
-     *     its {@linkplain PluginDescriptor metadata}
-     *  @throws PluginException if load of plugin fails
+     * @return the pluginId of the installed plugin as specified in its {@linkplain PluginDescriptor metadata}
+     * @throws PluginRuntimeException if something goes wrong
      */
-    String loadPlugin(Path pluginPath) throws PluginException;
+    String loadPlugin(Path pluginPath);
 
     /**
      * Start all active plugins.
@@ -84,8 +83,9 @@ public interface PluginManager {
      * Start the specified plugin and its dependencies.
      *
      * @return the plugin state
+     * @throws PluginRuntimeException if something goes wrong
      */
-    PluginState startPlugin(String pluginId) throws PluginException;
+    PluginState startPlugin(String pluginId);
 
     /**
      * Stop all active plugins.
@@ -96,40 +96,45 @@ public interface PluginManager {
      * Stop the specified plugin and its dependencies.
      *
      * @return the plugin state
+     * @throws PluginRuntimeException if something goes wrong
      */
-    PluginState stopPlugin(String pluginId) throws PluginException;
+    PluginState stopPlugin(String pluginId);
 
     /**
      * Unload a plugin.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if the plugin was unloaded
+     * @throws PluginRuntimeException if something goes wrong
      */
-    boolean unloadPlugin(String pluginId) throws PluginException;
+    boolean unloadPlugin(String pluginId);
 
     /**
      * Disables a plugin from being loaded.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if plugin is disabled
+     * @throws PluginRuntimeException if something goes wrong
      */
-    boolean disablePlugin(String pluginId) throws PluginException;
+    boolean disablePlugin(String pluginId);
 
     /**
      * Enables a plugin that has previously been disabled.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if plugin is enabled
+     * @throws PluginRuntimeException if something goes wrong
      */
-    boolean enablePlugin(String pluginId) throws PluginException;
+    boolean enablePlugin(String pluginId);
 
     /**
      * Deletes a plugin.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if the plugin was deleted
+     * @throws PluginRuntimeException if something goes wrong
      */
-    boolean deletePlugin(String pluginId) throws PluginException;
+    boolean deletePlugin(String pluginId);
 
     ClassLoader getPluginClassLoader(String pluginId);
 
@@ -195,7 +200,8 @@ public interface PluginManager {
     String getSystemVersion();
 
     /**
-     * Gets the path of the folder where plugins are installed
+     * Gets the path of the folder where plugins are installed.
+     *
      * @return Path of plugins root
      */
     Path getPluginsRoot();

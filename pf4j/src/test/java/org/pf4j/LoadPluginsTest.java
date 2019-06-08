@@ -102,7 +102,7 @@ public class LoadPluginsTest {
             // Verify the second plugin is not loaded as it has the same metadata
             pluginManager.loadPluginFromPath(plugin2.path());
             fail("Expected loadPluginFromPath to fail");
-        } catch (PluginException e) {
+        } catch (PluginRuntimeException e) {
             // Check the path of the loaded plugin remains the same
             PluginWrapper loadedPlugin = pluginManager.getPlugin(pluginId);
             assertThat(loadedPlugin.getPluginPath(), equalTo(loadedPlugin1Path));
@@ -141,7 +141,7 @@ public class LoadPluginsTest {
             // Verify the second plugin is not loaded as it has the same pluginId
             pluginManager.loadPluginFromPath(plugin2.path());
             fail("Expected loadPluginFromPath to fail");
-        } catch (PluginException e) {
+        } catch (PluginRuntimeException e) {
             // Check the path and version of the loaded plugin remain the same
             PluginWrapper loadedPlugin = pluginManager.getPlugin(pluginId);
             assertThat(loadedPlugin.getPluginPath(), equalTo(loadedPlugin1Path));

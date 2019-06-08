@@ -104,7 +104,7 @@ public class PropertiesPluginDescriptorFinderTest {
     @Test
     public void testNotFound() {
         PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
-        assertThrows(PluginException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
+        assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
     }
 
     private Properties getPlugin1Properties() {

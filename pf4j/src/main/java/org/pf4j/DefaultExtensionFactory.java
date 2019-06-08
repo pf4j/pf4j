@@ -32,12 +32,12 @@ public class DefaultExtensionFactory implements ExtensionFactory {
      * Creates an extension instance.
      */
     @Override
-    public <T> T create(Class<T> extensionClass) throws PluginException {
+    public <T> T create(Class<T> extensionClass) {
         log.debug("Create instance for extension '{}'", extensionClass.getName());
         try {
             return extensionClass.newInstance();
         } catch (Exception e) {
-            throw new PluginException(e);
+            throw new PluginRuntimeException(e);
         }
     }
 

@@ -60,21 +60,21 @@ public class Plugin {
      * This method is called by the application when the plugin is started.
      * See {@link PluginManager#startPlugin(String)}.
      */
-    public void start() throws PluginException {
+    public void start() {
     }
 
     /**
      * This method is called by the application when the plugin is stopped.
      * See {@link PluginManager#stopPlugin(String)}.
      */
-    public void stop() throws PluginException {
+    public void stop() {
     }
 
     /**
      * This method is called by the application when the plugin is deleted.
      * See {@link PluginManager#deletePlugin(String)}.
      */
-    public void delete() throws PluginException {
+    public void delete() {
     }
 
 }

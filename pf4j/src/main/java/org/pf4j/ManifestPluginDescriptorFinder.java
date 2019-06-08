@@ -52,13 +52,13 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
     }
 
     @Override
-    public PluginDescriptor find(Path pluginPath) throws PluginException {
+    public PluginDescriptor find(Path pluginPath) {
         Manifest manifest = readManifest(pluginPath);
 
         return createPluginDescriptor(manifest);
     }
 
-    protected Manifest readManifest(Path pluginPath) throws PluginException {
+    protected Manifest readManifest(Path pluginPath) {
         if (FileUtils.isJarFile(pluginPath)) {
             try (JarFile jar = new JarFile(pluginPath.toFile())) {
                 Manifest manifest = jar.getManifest();
@@ -66,24 +66,24 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
                     return manifest;
                 }
             } catch (IOException e) {
-                throw new PluginException(e);
+                throw new PluginRuntimeException(e);
             }
         }
 
         Path manifestPath = getManifestPath(pluginPath);
         if (manifestPath == null) {
-            throw new PluginException("Cannot find the manifest path");
+            throw new PluginRuntimeException("Cannot find the manifest path");
         }
 
         log.debug("Lookup plugin descriptor in '{}'", manifestPath);
         if (Files.notExists(manifestPath)) {
-            throw new PluginException("Cannot find '{}' path", manifestPath);
+            throw new PluginRuntimeException("Cannot find '{}' path", manifestPath);
         }
 
         try (InputStream input = Files.newInputStream(manifestPath)) {
             return new Manifest(input);
         } catch (IOException e) {
-            throw new PluginException(e);
+            throw new PluginRuntimeException(e);
         }
     }
 
