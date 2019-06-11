@@ -155,7 +155,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#133]: Support for adding license information to the plugins 
 - [#136]: Delete plugin zip on uninstall
 - [#139]: Ability to get `pluginsRoot` from PluginManager
-- Add constructors with varargs in PippoException
+- Add constructors with varargs in PluginException
 
 #### Removed
 
