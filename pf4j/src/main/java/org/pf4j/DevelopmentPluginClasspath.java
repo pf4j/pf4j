@@ -41,14 +41,22 @@ public class DevelopmentPluginClasspath extends PluginClasspath {
      */
     public static final PluginClasspath KOTLIN = new PluginClasspath().addClassesDirectories("build/classes/kotlin/main", "build/resources/main", "build/tmp/kapt3/classes/main");
 
+    /**
+     * The development plugin classpath for <a href="https://www.jetbrains.com/help/idea/specifying-compilation-settings.html">IDEA</a>.
+     * The classes directories are {@code out/production/classes", out/production/resource}.
+     */
+    public static final PluginClasspath IDEA = new PluginClasspath().addClassesDirectories("out/production/classes", "out/production/resource");
+
     public DevelopmentPluginClasspath() {
         addClassesDirectories(MAVEN.getClassesDirectories());
         addClassesDirectories(GRADLE.getClassesDirectories());
         addClassesDirectories(KOTLIN.getClassesDirectories());
+        addClassesDirectories(IDEA.getClassesDirectories());
 
         addLibDirectories(MAVEN.getLibDirectories());
         addLibDirectories(GRADLE.getLibDirectories());
         addLibDirectories(KOTLIN.getLibDirectories());
+        addLibDirectories(IDEA.getLibDirectories());
     }
 
 }
