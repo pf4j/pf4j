@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 /**
  * @author Decebal Suiu
@@ -37,6 +38,21 @@ public class CompoundPluginLoader implements PluginLoader {
         }
 
         loaders.add(loader);
+
+        return this;
+    }
+
+    /**
+     * Add a {@link PluginLoader} only if the {@code condition} is satisfied.
+     *
+     * @param loader
+     * @param condition
+     * @return
+     */
+    public CompoundPluginLoader add(PluginLoader loader, BooleanSupplier condition) {
+        if (condition.getAsBoolean()) {
+            return add(loader);
+        }
 
         return this;
     }

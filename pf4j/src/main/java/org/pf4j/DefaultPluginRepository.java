@@ -24,7 +24,6 @@ import org.pf4j.util.OrFileFilter;
 import org.pf4j.util.ZipFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.pf4j.util.NameFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -39,29 +38,17 @@ public class DefaultPluginRepository extends BasePluginRepository {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultPluginRepository.class);
 
-    public DefaultPluginRepository(Path pluginsRoot, boolean development) {
+    public DefaultPluginRepository(Path pluginsRoot) {
         super(pluginsRoot);
 
         AndFileFilter pluginsFilter = new AndFileFilter(new DirectoryFileFilter());
-        pluginsFilter.addFileFilter(new NotFileFilter(createHiddenPluginFilter(development)));
+        pluginsFilter.addFileFilter(new NotFileFilter(createHiddenPluginFilter()));
         setFilter(pluginsFilter);
     }
 
     @Override
     public List<Path> getPluginPaths() {
-        // expand plugins zip files
-        File[] pluginZips = pluginsRoot.toFile().listFiles(new ZipFileFilter());
-        if ((pluginZips != null) && pluginZips.length > 0) {
-            for (File pluginZip : pluginZips) {
-                try {
-                    FileUtils.expandIfZip(pluginZip.toPath());
-                } catch (IOException e) {
-                    log.error("Cannot expand plugin zip '{}'", pluginZip);
-                    log.error(e.getMessage(), e);
-                }
-            }
-        }
-
+        extractZipFiles();
         return super.getPluginPaths();
     }
 
@@ -71,16 +58,23 @@ public class DefaultPluginRepository extends BasePluginRepository {
         return super.deletePluginPath(pluginPath);
     }
 
-    protected FileFilter createHiddenPluginFilter(boolean development) {
-        OrFileFilter hiddenPluginFilter = new OrFileFilter(new HiddenFilter());
-
-        if (development) {
-            // skip default build output folders since these will cause errors in the logs
-            hiddenPluginFilter
-                .addFileFilter(new NameFileFilter("target")) // MAVEN
-                .addFileFilter(new NameFileFilter("build")); // GRADLE
-        }
-
-        return hiddenPluginFilter;
+    protected FileFilter createHiddenPluginFilter() {
+        return new OrFileFilter(new HiddenFilter());
     }
+
+    private void extractZipFiles() {
+        // expand plugins zip files
+        File[] zipFiles = pluginsRoot.toFile().listFiles(new ZipFileFilter());
+        if ((zipFiles != null) && zipFiles.length > 0) {
+            for (File pluginZip : zipFiles) {
+                try {
+                    FileUtils.expandIfZip(pluginZip.toPath());
+                } catch (IOException e) {
+                    log.error("Cannot expand plugin zip '{}'", pluginZip);
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+    }
+
 }

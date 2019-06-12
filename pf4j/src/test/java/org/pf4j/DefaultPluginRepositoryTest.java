@@ -15,20 +15,18 @@
  */
 package org.pf4j;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mario Franco
@@ -36,25 +34,18 @@ import static org.junit.Assert.assertTrue;
  */
 public class DefaultPluginRepositoryTest {
 
-    private Path pluginsPath;
+    @TempDir
+    Path pluginsPath;
 
-    @Rule
-    public TemporaryFolder pluginsFolder = new TemporaryFolder();
-
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
-        pluginsPath = pluginsFolder.getRoot().toPath();
-
-        pluginsFolder.newFolder("plugin-1");
+        Path plugin1Path = Files.createDirectory(pluginsPath.resolve("plugin-1"));
         // Prove that we can delete a folder with a file inside
-        Files.createFile(Paths.get(pluginsFolder.getRoot().getAbsolutePath()).resolve("plugin-1").resolve("myfile"));
+        Files.createFile(plugin1Path.resolve("myfile"));
         // Create a zip file for plugin-1 to test that it is deleted when plugin is deleted
-        Files.createFile(Paths.get(pluginsFolder.getRoot().getAbsolutePath()).resolve("plugin-1.zip"));
-        pluginsFolder.newFolder("plugin-2");
-        pluginsFolder.newFolder("plugin-3");
-        // standard maven/gradle bin folder - these should be skipped in development mode because the cause errors
-        pluginsFolder.newFolder("target");
-        pluginsFolder.newFolder("build");
+        Files.createFile(pluginsPath.resolve("plugin-1.zip"));
+        Files.createDirectory(pluginsPath.resolve("plugin-2"));
+        Files.createDirectory(pluginsPath.resolve("plugin-3"));
     }
 
     /**
@@ -62,29 +53,14 @@ public class DefaultPluginRepositoryTest {
      */
     @Test
     public void testGetPluginArchives() {
-        PluginRepository repository = new DefaultPluginRepository(pluginsPath, false);
+        PluginRepository repository = new DefaultPluginRepository(pluginsPath);
 
         List<Path> pluginPaths = repository.getPluginPaths();
 
-        assertEquals(5, pluginPaths.size());
+        assertEquals(3, pluginPaths.size());
         assertPathExists(pluginPaths, pluginsPath.resolve("plugin-1"));
         assertPathExists(pluginPaths, pluginsPath.resolve("plugin-2"));
         assertPathExists(pluginPaths, pluginsPath.resolve("plugin-3"));
-        // when not in development mode we will honor these folders
-        assertPathExists(pluginPaths, pluginsPath.resolve("target"));
-        assertPathExists(pluginPaths, pluginsPath.resolve("build"));
-    }
-
-    @Test
-    public void testGetPluginArchivesInDevelopmentMode() {
-        PluginRepository repository = new DefaultPluginRepository(pluginsPath, true);
-
-        List<Path> pluginPaths = repository.getPluginPaths();
-
-        // target and build should be ignored
-        assertEquals(3, pluginPaths.size());
-        assertPathDoesNotExists(pluginPaths, pluginsPath.resolve("target"));
-        assertPathDoesNotExists(pluginPaths, pluginsPath.resolve("build"));
     }
 
     /**
@@ -92,15 +68,13 @@ public class DefaultPluginRepositoryTest {
      */
     @Test
     public void testDeletePluginPath() {
-        PluginRepository repository = new DefaultPluginRepository(pluginsPath, false);
+        PluginRepository repository = new DefaultPluginRepository(pluginsPath);
 
         assertTrue(Files.exists(pluginsPath.resolve("plugin-1.zip")));
         assertTrue(repository.deletePluginPath(pluginsPath.resolve("plugin-1")));
         assertFalse(Files.exists(pluginsPath.resolve("plugin-1.zip")));
         assertTrue(repository.deletePluginPath(pluginsPath.resolve("plugin-3")));
         assertFalse(repository.deletePluginPath(pluginsPath.resolve("plugin-4")));
-        assertTrue(repository.deletePluginPath(pluginsPath.resolve("target")));
-        assertTrue(repository.deletePluginPath(pluginsPath.resolve("build")));
 
         List<Path> pluginPaths = repository.getPluginPaths();
 
@@ -109,11 +83,7 @@ public class DefaultPluginRepositoryTest {
     }
 
     private void assertPathExists(List<Path> paths, Path path) {
-        assertTrue("The directory must contain the file " + path, paths.contains(path));
-    }
-
-    private void assertPathDoesNotExists(List<Path> paths, Path path) {
-        assertFalse("The directory must not contain the file " + path, paths.contains(path));
+        assertTrue(paths.contains(path), "The directory must contain the file " + path);
     }
 
 }

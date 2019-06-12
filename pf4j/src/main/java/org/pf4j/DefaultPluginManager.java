@@ -19,12 +19,13 @@ import org.pf4j.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
  * Default implementation of the {@link PluginManager} interface.
+ * In essence it is a {@link ZipPluginManager} plus a {@link JarPluginManager}.
+ * So, it can load plugins from jar and zip, simultaneous.
  *
  * <p>This class is not thread-safe.
  *
@@ -34,20 +35,10 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
 
-    protected PluginClasspath pluginClasspath;
+    public static final String PLUGINS_DIR_CONFIG_PROPERTY_NAME = "pf4j.pluginsConfigDir";
 
     public DefaultPluginManager() {
         super();
-    }
-
-    /**
-     * Use {@link DefaultPluginManager#DefaultPluginManager(Path)}.
-     *
-     * @param pluginsDir
-     */
-    @Deprecated
-    public DefaultPluginManager(File pluginsDir) {
-        this(pluginsDir.toPath());
     }
 
     public DefaultPluginManager(Path pluginsRoot) {
@@ -81,23 +72,26 @@ public class DefaultPluginManager extends AbstractPluginManager {
 
     @Override
     protected PluginStatusProvider createPluginStatusProvider() {
-        String configDir = System.getProperty("pf4j.pluginsConfigDir");
+        String configDir = System.getProperty(PLUGINS_DIR_CONFIG_PROPERTY_NAME);
         Path configPath = configDir != null ? Paths.get(configDir) : getPluginsRoot();
+
         return new DefaultPluginStatusProvider(configPath);
     }
 
     @Override
     protected PluginRepository createPluginRepository() {
         return new CompoundPluginRepository()
-            .add(new DefaultPluginRepository(getPluginsRoot(), isDevelopment()))
-            .add(new JarPluginRepository(getPluginsRoot()));
+            .add(new DevelopmentPluginRepository(getPluginsRoot()), this::isDevelopment)
+            .add(new JarPluginRepository(getPluginsRoot()), this::isNotDevelopment)
+            .add(new DefaultPluginRepository(getPluginsRoot()), this::isNotDevelopment);
     }
 
     @Override
     protected PluginLoader createPluginLoader() {
         return new CompoundPluginLoader()
-            .add(new DefaultPluginLoader(this, pluginClasspath))
-            .add(new JarPluginLoader(this));
+            .add(new DevelopmentPluginLoader(this), this::isDevelopment)
+            .add(new JarPluginLoader(this), this::isNotDevelopment)
+            .add(new DefaultPluginLoader(this), this::isNotDevelopment);
     }
 
     @Override
@@ -105,19 +99,8 @@ public class DefaultPluginManager extends AbstractPluginManager {
         return new DefaultVersionManager();
     }
 
-    /**
-     * By default if {@link DefaultPluginManager#isDevelopment()} returns true
-     * than a {@link DevelopmentPluginClasspath} is returned
-     * else this method returns {@link DefaultPluginClasspath}.
-     */
-    protected PluginClasspath createPluginClasspath() {
-        return isDevelopment() ? new DevelopmentPluginClasspath() : new DefaultPluginClasspath();
-    }
-
     @Override
     protected void initialize() {
-        pluginClasspath = createPluginClasspath();
-
         super.initialize();
 
         if (isDevelopment()) {
@@ -128,13 +111,14 @@ public class DefaultPluginManager extends AbstractPluginManager {
     }
 
     /**
-     * Load a plugin from disk. If the path is a zip file, first unpack
+     * Load a plugin from disk. If the path is a zip file, first unpack.
+     *
      * @param pluginPath plugin location on disk
      * @return PluginWrapper for the loaded plugin or null if not loaded
-     * @throws PluginException if problems during load
+     * @throws PluginRuntimeException if problems during load
      */
     @Override
-    protected PluginWrapper loadPluginFromPath(Path pluginPath) throws PluginException {
+    protected PluginWrapper loadPluginFromPath(Path pluginPath) {
         // First unzip any ZIP files
         try {
             pluginPath = FileUtils.expandIfZip(pluginPath);

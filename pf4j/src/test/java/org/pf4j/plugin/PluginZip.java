@@ -15,42 +15,52 @@
  */
 package org.pf4j.plugin;
 
+import org.pf4j.PropertiesPluginDescriptorFinder;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Represents a plugin zip/jar file.
- * The "plugin.properties" file is created on the fly from the information supplied in Builder.
+ * Represents a plugin {@code zip} file.
+ * The {@code plugin.properties} file is created on the fly from the information supplied in {@link Builder}.
  *
  * @author Decebal Suiu
  */
 public class PluginZip {
 
-    private final File file;
+    private final Path path;
     private final String pluginId;
+    private final String pluginClass;
     private final String pluginVersion;
 
     protected PluginZip(Builder builder) {
-        this.file = builder.file;
+        this.path = builder.path;
         this.pluginId = builder.pluginId;
+        this.pluginClass = builder.pluginClass;
         this.pluginVersion = builder.pluginVersion;
     }
 
-    public File file() {
-        return file;
+    public Path path() {
+        return path;
     }
 
-    public Path path() {
-        return file.toPath();
+    public File file() {
+        return path.toFile();
     }
 
     public String pluginId() {
         return pluginId;
+    }
+
+    public String pluginClass() {
+        return pluginClass;
     }
 
     public String pluginVersion() {
@@ -64,20 +74,55 @@ public class PluginZip {
         return path.getParent().resolve(fileName.substring(0, fileName.length() - 4)); // without ".zip" suffix
     }
 
+    public static Properties createProperties(Map<String, String> map) {
+        Properties properties = new Properties();
+        properties.putAll(map);
+
+        return properties;
+    }
+
     public static class Builder {
 
-        private final File file;
+        private final Path path;
         private final String pluginId;
 
+        private String pluginClass;
         private String pluginVersion;
+        private Map<String, String> properties = new LinkedHashMap<>();
 
-        public Builder(File file, String pluginId) {
-            this.file = file;
+        public Builder(Path path, String pluginId) {
+            this.path = path;
             this.pluginId = pluginId;
+        }
+
+        public Builder pluginClass(String pluginClass) {
+            this.pluginClass = pluginClass;
+
+            return this;
         }
 
         public Builder pluginVersion(String pluginVersion) {
             this.pluginVersion = pluginVersion;
+
+            return this;
+        }
+
+        /**
+         * Add extra properties to the {@code properties} file.
+         * As possible attribute name please see {@link PropertiesPluginDescriptorFinder}.
+         */
+        public Builder properties(Map<String, String> properties) {
+            this.properties.putAll(properties);
+
+            return this;
+        }
+
+        /**
+         * Add extra property to the {@code properties} file.
+         * As possible property name please see {@link PropertiesPluginDescriptorFinder}.
+         */
+        public Builder property(String name, String value) {
+            properties.put(name, value);
 
             return this;
         }
@@ -89,15 +134,20 @@ public class PluginZip {
         }
 
         protected void createPropertiesFile() throws IOException {
-            Properties properties = new Properties();
-            properties.setProperty("plugin.id", pluginId);
-            properties.setProperty("plugin.version", pluginVersion);
-            properties.setProperty("plugin.class", "org.pf4j.plugin.TestPlugin");
+            Map<String, String> map = new LinkedHashMap<>();
+            map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, pluginId);
+            map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, pluginVersion);
+            if (pluginClass != null) {
+                map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, pluginClass);
+            }
+            if (properties != null) {
+                map.putAll(properties);
+            }
 
-            ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(file));
-            ZipEntry propertiesFile = new ZipEntry("plugin.properties");
+            ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(path.toFile()));
+            ZipEntry propertiesFile = new ZipEntry(PropertiesPluginDescriptorFinder.DEFAULT_PROPERTIES_FILE_NAME);
             outputStream.putNextEntry(propertiesFile);
-            properties.store(outputStream, "");
+            createProperties(map).store(outputStream, "");
             outputStream.closeEntry();
             outputStream.close();
         }

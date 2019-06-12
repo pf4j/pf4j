@@ -15,20 +15,17 @@
  */
 package org.pf4j;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.util.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mario Franco
@@ -36,15 +33,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class DefaultPluginStatusProviderTest {
 
-    private Path pluginsPath;
-
-    @Rule
-    public TemporaryFolder pluginsFolder = new TemporaryFolder();
-
-    @Before
-    public void setUp() {
-        pluginsPath = pluginsFolder.getRoot().toPath();
-    }
+    @TempDir
+    Path pluginsPath;
 
     @Test
     public void testIsPluginDisabled() throws IOException {
@@ -70,58 +60,59 @@ public class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    public void testDisablePlugin() throws IOException {
+    public void testDisablePlugin() throws Exception {
         createEnabledFile();
         createDisabledFile();
 
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        statusProvider.disablePlugin("plugin-1");
 
-        assertTrue(statusProvider.disablePlugin("plugin-1"));
         assertTrue(statusProvider.isPluginDisabled("plugin-1"));
         assertTrue(statusProvider.isPluginDisabled("plugin-2"));
         assertTrue(statusProvider.isPluginDisabled("plugin-3"));
     }
 
     @Test
-    public void testDisablePluginWithEnableEmpty() throws IOException {
+    public void testDisablePluginWithEnableEmpty() throws Exception {
         createDisabledFile();
 
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        statusProvider.disablePlugin("plugin-1");
 
-        assertTrue(statusProvider.disablePlugin("plugin-1"));
         assertTrue(statusProvider.isPluginDisabled("plugin-1"));
         assertTrue(statusProvider.isPluginDisabled("plugin-2"));
         assertFalse(statusProvider.isPluginDisabled("plugin-3"));
     }
 
     @Test
-    public void testEnablePlugin() throws IOException {
+    public void testEnablePlugin() throws Exception {
         createEnabledFile();
 
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        statusProvider.enablePlugin("plugin-2");
 
-        assertTrue(statusProvider.enablePlugin("plugin-2"));
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));
         assertFalse(statusProvider.isPluginDisabled("plugin-2"));
         assertTrue(statusProvider.isPluginDisabled("plugin-3"));
     }
 
     @Test
-    public void testEnablePluginWithEnableEmpty() {
+    public void testEnablePluginWithEnableEmpty() throws Exception{
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        statusProvider.enablePlugin("plugin-2");
 
-        assertTrue(statusProvider.enablePlugin("plugin-2"));
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));
         assertFalse(statusProvider.isPluginDisabled("plugin-2"));
         assertFalse(statusProvider.isPluginDisabled("plugin-3"));
     }
 
     @Test
-    public void testDisablePluginWithoutDisabledFile() {
+    public void testDisablePluginWithoutDisabledFile() throws Exception {
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
 
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));
-        assertTrue(statusProvider.disablePlugin("plugin-1"));
+
+        statusProvider.disablePlugin("plugin-1");
         assertTrue(statusProvider.isPluginDisabled("plugin-1"));
     }
 
@@ -129,8 +120,8 @@ public class DefaultPluginStatusProviderTest {
         List<String> disabledPlugins = new ArrayList<>();
         disabledPlugins.add("plugin-2");
 
-        File disabledFile = pluginsFolder.newFile("disabled.txt");
-        FileUtils.writeLines(disabledPlugins, disabledFile);
+        Path disabledPath = pluginsPath.resolve("disabled.txt");
+        FileUtils.writeLines(disabledPlugins, disabledPath.toFile());
     }
 
     private void createEnabledFile() throws IOException {
@@ -138,8 +129,8 @@ public class DefaultPluginStatusProviderTest {
         enabledPlugins.add("plugin-1");
         enabledPlugins.add("plugin-2");
 
-        File enabledFile = pluginsFolder.newFile("enabled.txt");
-        FileUtils.writeLines(enabledPlugins, enabledFile);
+        Path enabledPath = pluginsPath.resolve("enabled.txt");
+        FileUtils.writeLines(enabledPlugins, enabledPath.toFile());
     }
 
 }

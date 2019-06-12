@@ -20,6 +20,6 @@ package org.pf4j;
  */
 public interface ExtensionFactory {
 
-    Object create(Class<?> extensionClass);
+    <T> T create(Class<T> extensionClass);
 
 }

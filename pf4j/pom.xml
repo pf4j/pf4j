@@ -4,12 +4,12 @@
     <parent>
         <groupId>org.pf4j</groupId>
         <artifactId>pf4j-parent</artifactId>
-        <version>2.7.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>pf4j</artifactId>
-    <version>2.7.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>PF4J</name>
     <description>Plugin Framework for Java</description>
@@ -22,6 +22,35 @@
                 <configuration>
                     <compilerArgument>-proc:none</compilerArgument>
                 </configuration>
+                <executions>
+                    <!-- compile everything for Java 8 except the module-info.java -->
+                    <execution>
+                        <id>default-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>module-info.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+
+                    <!-- compile module-info.java for Java 9+ -->
+                    <execution>
+                        <id>java9-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>9</release>
+                            <multiReleaseOutput>true</multiReleaseOutput>
+                            <includes>
+                                <include>module-info.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -29,7 +58,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>org.pf4j</Automatic-Module-Name>
+                            <Multi-Release>true</Multi-Release>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -69,11 +98,12 @@
         </dependency>
 
         <dependency>
-            <!-- An empty artifact, required while JUnit 4 is on the classpath to override its
-                 dependency on hamcrest.
+            <!-- 
+            An empty artifact, required while JUnit 4 is on the classpath to override its
+            dependency on hamcrest.
 
-                 See http://hamcrest.org/JavaHamcrest/distributables#upgrading-from-hamcrest-1x
-                 -->
+            See http://hamcrest.org/JavaHamcrest/distributables#upgrading-from-hamcrest-1x
+            -->
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
             <version>${hamcrest.version}</version>
@@ -81,11 +111,12 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>

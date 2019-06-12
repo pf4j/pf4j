@@ -23,29 +23,25 @@ import org.pf4j.util.StringUtils;
  *
  * @author Decebal Suiu
  */
-public class PluginException extends Exception {
+public class PluginRuntimeException extends RuntimeException {
 
-    public PluginException() {
+    public PluginRuntimeException() {
         super();
     }
 
-    public PluginException(String message) {
+    public PluginRuntimeException(String message) {
         super(message);
     }
 
-    public PluginException(Throwable cause) {
+    public PluginRuntimeException(Throwable cause) {
         super(cause);
     }
 
-    public PluginException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public PluginException(Throwable cause, String message, Object... args) {
+    public PluginRuntimeException(Throwable cause, String message, Object... args) {
         super(StringUtils.format(message, args), cause);
     }
 
-    public PluginException(String message, Object... args) {
+    public PluginRuntimeException(String message, Object... args) {
         super(StringUtils.format(message, args));
     }
 

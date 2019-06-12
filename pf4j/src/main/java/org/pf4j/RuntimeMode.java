@@ -41,7 +41,7 @@ public enum RuntimeMode {
         }
     }
 
-    private RuntimeMode(final String name, final String... aliases) {
+    RuntimeMode(final String name, final String... aliases) {
         this.name = name;
         this.aliases = aliases;
     }

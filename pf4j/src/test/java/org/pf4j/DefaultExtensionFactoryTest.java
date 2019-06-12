@@ -15,26 +15,38 @@
  */
 package org.pf4j;
 
-import org.junit.Test;
-import org.pf4j.plugin.TestExtension;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.pf4j.plugin.FailTestExtension;
+import org.pf4j.plugin.TestExtension;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- *
  * @author Mario Franco
  */
 public class DefaultExtensionFactoryTest {
+
+    private ExtensionFactory extensionFactory;
+
+    @BeforeEach
+    public void setUp() {
+        extensionFactory = new DefaultExtensionFactory();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        extensionFactory = null;
+    }
 
     /**
      * Test of create method, of class DefaultExtensionFactory.
      */
     @Test
     public void testCreate() {
-        DefaultExtensionFactory instance = new DefaultExtensionFactory();
-        Object result = instance.create(TestExtension.class);
-        assertNotNull(result);
+        assertNotNull(extensionFactory.create(TestExtension.class));
     }
 
     /**
@@ -42,9 +54,7 @@ public class DefaultExtensionFactoryTest {
      */
     @Test
     public void testCreateFailConstructor() {
-        DefaultExtensionFactory instance = new DefaultExtensionFactory();
-        Object result = instance.create(FailTestExtension.class);
-        assertNull(result);
+        assertThrows(PluginRuntimeException.class, () -> extensionFactory.create(FailTestExtension.class));
     }
 
 }

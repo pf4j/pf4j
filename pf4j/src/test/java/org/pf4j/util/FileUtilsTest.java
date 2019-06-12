@@ -15,24 +15,24 @@
  */
 package org.pf4j.util;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.plugin.PluginZip;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileUtilsTest {
 
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    @TempDir
+    Path pluginsPath;
 
     @Test
     public void expandIfZip() throws Exception {
-        PluginZip pluginZip = new PluginZip.Builder(testFolder.newFile("my-plugin-1.2.3.zip"), "myPlugin")
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
 
@@ -41,10 +41,10 @@ public class FileUtilsTest {
         assertTrue(Files.exists(unzipped.resolve("plugin.properties")));
 
         // File without .suffix
-        Path extra = testFolder.newFile("extra").toPath();
+        Path extra = pluginsPath.resolve("extra");
         assertEquals(extra, FileUtils.expandIfZip(extra));
         // Folder
-        Path folder = testFolder.newFile("folder").toPath();
+        Path folder = pluginsPath.resolve("folder");
         assertEquals(folder, FileUtils.expandIfZip(folder));
     }
 
