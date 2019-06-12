@@ -5,13 +5,40 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#297]: Loading extensions may shutdown the application
+- Fix the plugin directory will be deleted anyway in unzip `extract` method
+- [#309]: Can't delete/remove unloaded plugin
+- [#311]: Wrong file delete on `JarPluginRepository.deletePluginPath`
+- [#322]: Fix `FileSystemException` in Windows on plugin delete
 
 #### Changed
+- Improve `run-demo` scripts
+- [#294]: Configure compound classes to use JAR plugins first
+- [#296]: Return extension classes with wildcard type arguments
+- [#298]: update ASM library to version 7.1
+- Migrate to JUnit 5
+- Improve `PluginZip` (used in tests)
+- Improve readability of `PropertiesPluginDescriptorFinderTest`
+- Convert `PluginException` in `PluginRuntimeException` and use unchecked exceptions in PF4J
 
 #### Added
+- [#278]: Make the project build on Java 11
+- [#287]: Check no plugin with same `pluginId` is loaded
+- [#288]: Document thread safety of `PluginManager`s
+- [#292]: Communicate errors with Exceptions where appropriate
+- [#306]: Provide an Archetype for new PF4J based projects
+- [#307]: Add `JarPluginManager` and `ZipPluginManager`
+- Add constants for manifest's attributes names
+- Add constants for properties names
+- Add `PluginJar` (used in tests)
+- Add `AbstractPluginManagerTest`
+- Add `DirectedGraphTest`
+- Add `JarPluginManagerTest`
+- Extract constants for some system property names
 
 #### Removed
-
+- Remove deprecated constructor in `DefaultPluginManager`
+ 
 ### [2.6.0] - 2019-02-01
 
 #### Fixed
@@ -315,6 +342,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#322]: https://github.com/pf4j/pf4j/pull/322
+[#311]: https://github.com/pf4j/pf4j/issues/311
+[#309]: https://github.com/pf4j/pf4j/issues/309
+[#307]: https://github.com/pf4j/pf4j/issues/307
+[#306]: https://github.com/pf4j/pf4j/issues/306
+[#298]: https://github.com/pf4j/pf4j/pull/298
+[#297]: https://github.com/pf4j/pf4j/issues/297
+[#296]: https://github.com/pf4j/pf4j/issues/296
+[#294]: https://github.com/pf4j/pf4j/issues/294
+[#292]: https://github.com/pf4j/pf4j/issues/292
+[#288]: https://github.com/pf4j/pf4j/pull/288
+[#287]: https://github.com/pf4j/pf4j/pull/287
+[#278]: https://github.com/pf4j/pf4j/pull/278
 [#277]: https://github.com/pf4j/pf4j/pull/277
 [#276]: https://github.com/pf4j/pf4j/pull/276
 [#275]: https://github.com/pf4j/pf4j/pull/275
