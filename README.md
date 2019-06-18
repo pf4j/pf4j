@@ -41,7 +41,7 @@ Any java interface or abstract class can be marked as an extension point (implem
 
 **PLUGIN** = a container for **EXTENSION POINTS** and **EXTENSIONS** + lifecycle methods (start, stop, delete)
 
-A **PLUGIN** is similar with a **MODULE** from other systems. If you don't need lifecycle methods (hook methods for start, stop, ...) you are not forced to supply a plugin class (the `PluginClass` property from the plugin descriptor is optional). You only need to supply some description of plugin (id, version, author, ...) for a good tracking (your application want to know who supplied the extensions or extensions points).
+A **PLUGIN** is similar with a **MODULE** from other systems. If you don't need lifecycle methods (hook methods for start, stop, delete) you are not forced to supply a plugin class (the `PluginClass` property from the plugin descriptor is optional). You only need to supply some description of plugin (id, version, author, ...) for a good tracking (your application wants to know who supplied the extensions or extensions points).
 
 How to use
 -------------------
