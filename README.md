@@ -33,7 +33,7 @@ Also, PF4J can be used in web applications. For my web applications when I want 
 Components
 -------------------
 - **Plugin** is the base class for all plugins types. Each plugin is loaded into a separate class loader to avoid conflicts.
-- **PluginManager** is used for all aspects of plugins management (loading, starting, stopping). You can use a built-in implementation as `DefaultPluginManager`, `JarPluginManager` or you can implement a custom plugin manager starting from `AbstractPluginManager` (implement only factory methods).
+- **PluginManager** is used for all aspects of plugins management (loading, starting, stopping). You can use a built-in implementation as `JarPluginManager`, `ZipPluginManager`, `DefaultPluginManager` (it's a `JarPluginManager` + `ZipPluginManager`) or you can implement a custom plugin manager starting from `AbstractPluginManager` (implement only factory methods).
 - **PluginLoader** loads all information (classes) needed by a plugin.
 - **ExtensionPoint** is a point in the application where custom code can be invoked. It's a java interface marker.   
 Any java interface or abstract class can be marked as an extension point (implements `ExtensionPoint` interface).
@@ -61,7 +61,7 @@ Create an extension using `@Extension` annotation:
  
 ```java
 @Extension
-public static class WelcomeGreeting implements Greeting {
+public class WelcomeGreeting implements Greeting {
 
     public String getGreeting() {
         return "Welcome";
@@ -116,8 +116,8 @@ Plugin-Provider: Decebal Suiu
 Plugin-Version: 0.0.1
 ```
 
-In above manifest I described a plugin with id `welcome-plugin` (mandatory), with class `org.pf4j.demo.welcome.WelcomePlugin` (optional), with version `0.0.1` (mandatory) and with dependencies
-to plugins `x, y, z` (optional).
+In above manifest I described a plugin with id `welcome-plugin` (mandatory attribute), with class `org.pf4j.demo.welcome.WelcomePlugin` (optional attribute), with version `0.0.1` (mandatory attribute) and with dependencies
+to plugins `x, y, z` (optional attribute).
 
 Now you can play with plugins and extensions in your code:
 
@@ -126,7 +126,7 @@ public static void main(String[] args) {
     ...
 
     // create the plugin manager
-    PluginManager pluginManager = new DefaultPluginManager(); // or "new JarPluginManager()"
+    PluginManager pluginManager = new JarPluginManager(); // or "new ZipPluginManager() / new DefaultPluginManager()"
     
     // start and load all plugins of application
     pluginManager.loadPlugins();
