@@ -131,11 +131,11 @@ public class PluginWrapper {
         return "PluginWrapper [descriptor=" + descriptor + ", pluginPath=" + pluginPath + "]";
     }
 
-    void setPluginState(PluginState pluginState) {
+    public void setPluginState(PluginState pluginState) {
         this.pluginState = pluginState;
     }
 
-    void setPluginFactory(PluginFactory pluginFactory) {
+    public void setPluginFactory(PluginFactory pluginFactory) {
         this.pluginFactory = pluginFactory;
     }
 
