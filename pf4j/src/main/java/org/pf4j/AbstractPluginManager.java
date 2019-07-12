@@ -51,11 +51,11 @@ public abstract class AbstractPluginManager implements PluginManager {
     public static final String DEFAULT_PLUGINS_DIR = "plugins";
     public static final String DEVELOPMENT_PLUGINS_DIR = "../plugins";
 
-    private Path pluginsRoot;
+    protected Path pluginsRoot;
 
     protected ExtensionFinder extensionFinder;
 
-    private PluginDescriptorFinder pluginDescriptorFinder;
+    protected PluginDescriptorFinder pluginDescriptorFinder;
 
     /**
      * A map of plugins this manager is responsible for (the key is the 'pluginId').
@@ -65,48 +65,48 @@ public abstract class AbstractPluginManager implements PluginManager {
     /**
      * A map of plugin class loaders (the key is the 'pluginId').
      */
-    private Map<String, ClassLoader> pluginClassLoaders;
+    protected Map<String, ClassLoader> pluginClassLoaders;
 
     /**
      * A list with unresolved plugins (unresolved dependency).
      */
-    private List<PluginWrapper> unresolvedPlugins;
+    protected List<PluginWrapper> unresolvedPlugins;
 
     /**
      * A list with all resolved plugins (resolved dependency).
      */
-    private List<PluginWrapper> resolvedPlugins;
+    protected List<PluginWrapper> resolvedPlugins;
 
     /**
      * A list with started plugins.
      */
-    private List<PluginWrapper> startedPlugins;
+    protected List<PluginWrapper> startedPlugins;
 
     /**
      * The registered {@link PluginStateListener}s.
      */
-    private List<PluginStateListener> pluginStateListeners;
+    protected List<PluginStateListener> pluginStateListeners;
 
     /**
      * Cache value for the runtime mode.
      * No need to re-read it because it wont change at runtime.
      */
-    private RuntimeMode runtimeMode;
+    protected RuntimeMode runtimeMode;
 
     /**
      * The system version used for comparisons to the plugin requires attribute.
      */
-    private String systemVersion = "0.0.0";
+    protected String systemVersion = "0.0.0";
 
-    private PluginRepository pluginRepository;
-    private PluginFactory pluginFactory;
-    private ExtensionFactory extensionFactory;
-    private PluginStatusProvider pluginStatusProvider;
-    private DependencyResolver dependencyResolver;
-    private PluginLoader pluginLoader;
-    private boolean exactVersionAllowed = false;
+    protected PluginRepository pluginRepository;
+    protected PluginFactory pluginFactory;
+    protected ExtensionFactory extensionFactory;
+    protected PluginStatusProvider pluginStatusProvider;
+    protected DependencyResolver dependencyResolver;
+    protected PluginLoader pluginLoader;
+    protected boolean exactVersionAllowed = false;
 
-    private VersionManager versionManager;
+    protected VersionManager versionManager;
 
     /**
      * The plugins root is supplied by {@code System.getProperty("pf4j.pluginsDir", "plugins")}.
