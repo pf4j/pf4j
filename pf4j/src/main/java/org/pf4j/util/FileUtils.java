@@ -66,8 +66,16 @@ public class FileUtils {
         return lines;
     }
 
+    /**
+     * Use {@link #writeLines(Collection, Path)} instead.
+     */
+    @Deprecated
     public static void writeLines(Collection<String> lines, File file) throws IOException {
-        Files.write(file.toPath(), lines, StandardCharsets.UTF_8);
+        writeLines(lines, file.toPath());
+    }
+
+    public static void writeLines(Collection<String> lines, Path path) throws IOException {
+        Files.write(path, lines, StandardCharsets.UTF_8);
     }
 
     /**

@@ -20,6 +20,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.util.FileUtils;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,31 +75,67 @@ public class DefaultPluginStatusProviderTest {
 
     @Test
     public void testDisablePluginWithEnableEmpty() throws Exception {
+        // scenario with "disabled.txt"
         createDisabledFile();
 
-        PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        DefaultPluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
         statusProvider.disablePlugin("plugin-1");
 
         assertTrue(statusProvider.isPluginDisabled("plugin-1"));
         assertTrue(statusProvider.isPluginDisabled("plugin-2"));
         assertFalse(statusProvider.isPluginDisabled("plugin-3"));
 
-        List<String> disabledPlugins = FileUtils.readLines(pluginsPath.resolve("disabled.txt"), true);
+        List<String> disabledPlugins = FileUtils.readLines(statusProvider.getDisabledFilePath(), true);
         assertTrue(disabledPlugins.contains("plugin-1"));
+
+        assertTrue(Files.notExists(statusProvider.getEnabledFilePath()));
+
+        // scenario with "enabled.txt"
+        Files.delete(statusProvider.getDisabledFilePath());
+        assertTrue(Files.notExists(statusProvider.getDisabledFilePath()));
+
+        createEnabledFile();
+
+        statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        statusProvider.disablePlugin("plugin-1");
+
+        assertTrue(statusProvider.isPluginDisabled("plugin-1"));
+        assertFalse(statusProvider.isPluginDisabled("plugin-2"));
+
+        List<String> enabledPlugins = FileUtils.readLines(statusProvider.getEnabledFilePath(), true);
+        assertFalse(enabledPlugins.contains("plugin-1"));
     }
 
     @Test
     public void testEnablePlugin() throws Exception {
+        // scenario with "enabled.txt"
         createEnabledFile();
 
-        PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        DefaultPluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
         statusProvider.enablePlugin("plugin-2");
 
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));
         assertFalse(statusProvider.isPluginDisabled("plugin-2"));
         assertTrue(statusProvider.isPluginDisabled("plugin-3"));
 
-        List<String> disabledPlugins = FileUtils.readLines(pluginsPath.resolve("disabled.txt"), true);
+        List<String> enabledPlugins = FileUtils.readLines(statusProvider.getEnabledFilePath(), true);
+        assertTrue(enabledPlugins.contains("plugin-2"));
+
+        assertTrue(Files.notExists(statusProvider.getDisabledFilePath()));
+
+        // scenario with "disabled.txt"
+        Files.delete(statusProvider.getEnabledFilePath());
+        assertTrue(Files.notExists(statusProvider.getEnabledFilePath()));
+
+        createDisabledFile();
+
+        statusProvider = new DefaultPluginStatusProvider(pluginsPath);
+        statusProvider.enablePlugin("plugin-2");
+
+        assertFalse(statusProvider.isPluginDisabled("plugin-1"));
+        assertFalse(statusProvider.isPluginDisabled("plugin-2"));
+
+        List<String> disabledPlugins = FileUtils.readLines(statusProvider.getDisabledFilePath(), true);
         assertFalse(disabledPlugins.contains("plugin-2"));
     }
 
@@ -126,7 +163,7 @@ public class DefaultPluginStatusProviderTest {
         List<String> disabledPlugins = new ArrayList<>();
         disabledPlugins.add("plugin-2");
 
-        FileUtils.writeLines(disabledPlugins, pluginsPath.resolve("disabled.txt").toFile());
+        FileUtils.writeLines(disabledPlugins, DefaultPluginStatusProvider.getDisabledFilePath(pluginsPath));
     }
 
     private void createEnabledFile() throws IOException {
@@ -134,7 +171,7 @@ public class DefaultPluginStatusProviderTest {
         enabledPlugins.add("plugin-1");
         enabledPlugins.add("plugin-2");
 
-        FileUtils.writeLines(enabledPlugins, pluginsPath.resolve("enabled.txt").toFile());
+        FileUtils.writeLines(enabledPlugins, DefaultPluginStatusProvider.getEnabledFilePath(pluginsPath));
     }
 
 }

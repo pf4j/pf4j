@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -45,11 +46,11 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
 
         try {
             // create a list with plugin identifiers that should be only accepted by this manager (whitelist from plugins/enabled.txt file)
-            enabledPlugins = FileUtils.readLines(pluginsRoot.resolve("enabled.txt"), true);
+            enabledPlugins = FileUtils.readLines(getEnabledFilePath(), true);
             log.info("Enabled plugins: {}", enabledPlugins);
 
             // create a list with plugin identifiers that should not be accepted by this manager (blacklist from plugins/disabled.txt file)
-            disabledPlugins = FileUtils.readLines(pluginsRoot.resolve("disabled.txt"), true);
+            disabledPlugins = FileUtils.readLines(getDisabledFilePath(), true);
             log.info("Disabled plugins: {}", disabledPlugins);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -67,22 +68,70 @@ public class DefaultPluginStatusProvider implements PluginStatusProvider {
 
     @Override
     public void disablePlugin(String pluginId) {
-        disabledPlugins.add(pluginId);
-        try {
-            FileUtils.writeLines(disabledPlugins, pluginsRoot.resolve("disabled.txt").toFile());
-        } catch (IOException e) {
-            throw new PluginRuntimeException(e);
+        if (isPluginDisabled(pluginId)) {
+            // do nothing
+            return;
+        }
+
+        if (Files.exists(getEnabledFilePath())) {
+            enabledPlugins.remove(pluginId);
+
+            try {
+                FileUtils.writeLines(enabledPlugins, getEnabledFilePath());
+            } catch (IOException e) {
+                throw new PluginRuntimeException(e);
+            }
+        } else {
+            disabledPlugins.add(pluginId);
+
+            try {
+                FileUtils.writeLines(disabledPlugins, getDisabledFilePath());
+            } catch (IOException e) {
+                throw new PluginRuntimeException(e);
+            }
         }
     }
 
     @Override
     public void enablePlugin(String pluginId) {
-        disabledPlugins.remove(pluginId);
-        try {
-            FileUtils.writeLines(disabledPlugins, pluginsRoot.resolve("disabled.txt").toFile());
-        } catch (IOException e) {
-            throw new PluginRuntimeException(e);
+        if (!isPluginDisabled(pluginId)) {
+            // do nothing
+            return;
         }
+
+        if (Files.exists(getEnabledFilePath())) {
+            enabledPlugins.add(pluginId);
+
+            try {
+                FileUtils.writeLines(enabledPlugins, getEnabledFilePath());
+            } catch (IOException e) {
+                throw new PluginRuntimeException(e);
+            }
+        } else {
+            disabledPlugins.remove(pluginId);
+
+            try {
+                FileUtils.writeLines(disabledPlugins, getDisabledFilePath());
+            } catch (IOException e) {
+                throw new PluginRuntimeException(e);
+            }
+        }
+    }
+
+    public Path getEnabledFilePath() {
+        return getEnabledFilePath(pluginsRoot);
+    }
+
+    public Path getDisabledFilePath() {
+        return getDisabledFilePath(pluginsRoot);
+    }
+
+    public static Path getEnabledFilePath(Path pluginsRoot) {
+        return pluginsRoot.resolve("enabled.txt");
+    }
+
+    public static Path getDisabledFilePath(Path pluginsRoot) {
+        return pluginsRoot.resolve("disabled.txt");
     }
 
 }
