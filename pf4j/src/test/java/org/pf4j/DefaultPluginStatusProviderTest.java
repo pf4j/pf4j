@@ -82,6 +82,9 @@ public class DefaultPluginStatusProviderTest {
         assertTrue(statusProvider.isPluginDisabled("plugin-1"));
         assertTrue(statusProvider.isPluginDisabled("plugin-2"));
         assertFalse(statusProvider.isPluginDisabled("plugin-3"));
+
+        List<String> disabledPlugins = FileUtils.readLines(pluginsPath.resolve("disabled.txt"), true);
+        assertTrue(disabledPlugins.contains("plugin-1"));
     }
 
     @Test
@@ -94,10 +97,13 @@ public class DefaultPluginStatusProviderTest {
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));
         assertFalse(statusProvider.isPluginDisabled("plugin-2"));
         assertTrue(statusProvider.isPluginDisabled("plugin-3"));
+
+        List<String> disabledPlugins = FileUtils.readLines(pluginsPath.resolve("disabled.txt"), true);
+        assertFalse(disabledPlugins.contains("plugin-2"));
     }
 
     @Test
-    public void testEnablePluginWithEnableEmpty() throws Exception{
+    public void testEnablePluginWithEnableEmpty() {
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
         statusProvider.enablePlugin("plugin-2");
 
@@ -107,7 +113,7 @@ public class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    public void testDisablePluginWithoutDisabledFile() throws Exception {
+    public void testDisablePluginWithoutDisabledFile() {
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
 
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));
@@ -120,8 +126,7 @@ public class DefaultPluginStatusProviderTest {
         List<String> disabledPlugins = new ArrayList<>();
         disabledPlugins.add("plugin-2");
 
-        Path disabledPath = pluginsPath.resolve("disabled.txt");
-        FileUtils.writeLines(disabledPlugins, disabledPath.toFile());
+        FileUtils.writeLines(disabledPlugins, pluginsPath.resolve("disabled.txt").toFile());
     }
 
     private void createEnabledFile() throws IOException {
@@ -129,8 +134,7 @@ public class DefaultPluginStatusProviderTest {
         enabledPlugins.add("plugin-1");
         enabledPlugins.add("plugin-2");
 
-        Path enabledPath = pluginsPath.resolve("enabled.txt");
-        FileUtils.writeLines(enabledPlugins, enabledPath.toFile());
+        FileUtils.writeLines(enabledPlugins, pluginsPath.resolve("enabled.txt").toFile());
     }
 
 }
