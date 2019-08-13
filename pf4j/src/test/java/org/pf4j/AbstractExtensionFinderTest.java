@@ -15,9 +15,9 @@
  */
 package org.pf4j;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.pf4j.plugin.FailTestPlugin;
 import org.pf4j.plugin.TestExtensionPoint;
 
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -40,7 +40,7 @@ public class AbstractExtensionFinderTest {
 
     private PluginManager pluginManager;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         PluginWrapper pluginStarted = mock(PluginWrapper.class);
         when(pluginStarted.getPluginClassLoader()).thenReturn(getClass().getClassLoader());
@@ -57,7 +57,7 @@ public class AbstractExtensionFinderTest {
         when(pluginManager.getExtensionFactory()).thenReturn(new DefaultExtensionFactory());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         pluginManager = null;
     }

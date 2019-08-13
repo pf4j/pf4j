@@ -69,8 +69,8 @@ public interface PluginManager {
      * Load a plugin.
      *
      * @param pluginPath the plugin location
-     * @return the pluginId of the installed plugin as specified in
-     *     its {@linkplain PluginDescriptor metadata}; or {@code null}
+     * @return the pluginId of the installed plugin as specified in its {@linkplain PluginDescriptor metadata}
+     * @throws PluginRuntimeException if something goes wrong
      */
     String loadPlugin(Path pluginPath);
 
@@ -83,6 +83,7 @@ public interface PluginManager {
      * Start the specified plugin and its dependencies.
      *
      * @return the plugin state
+     * @throws PluginRuntimeException if something goes wrong
      */
     PluginState startPlugin(String pluginId);
 
@@ -95,6 +96,7 @@ public interface PluginManager {
      * Stop the specified plugin and its dependencies.
      *
      * @return the plugin state
+     * @throws PluginRuntimeException if something goes wrong
      */
     PluginState stopPlugin(String pluginId);
 
@@ -103,6 +105,7 @@ public interface PluginManager {
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if the plugin was unloaded
+     * @throws PluginRuntimeException if something goes wrong
      */
     boolean unloadPlugin(String pluginId);
 
@@ -111,6 +114,7 @@ public interface PluginManager {
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if plugin is disabled
+     * @throws PluginRuntimeException if something goes wrong
      */
     boolean disablePlugin(String pluginId);
 
@@ -119,6 +123,7 @@ public interface PluginManager {
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if plugin is enabled
+     * @throws PluginRuntimeException if something goes wrong
      */
     boolean enablePlugin(String pluginId);
 
@@ -127,6 +132,7 @@ public interface PluginManager {
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
      * @return true if the plugin was deleted
+     * @throws PluginRuntimeException if something goes wrong
      */
     boolean deletePlugin(String pluginId);
 
@@ -134,9 +140,9 @@ public interface PluginManager {
 
     List<Class<?>> getExtensionClasses(String pluginId);
 
-    <T> List<Class<T>> getExtensionClasses(Class<T> type);
+    <T> List<Class<? extends T>> getExtensionClasses(Class<T> type);
 
-    <T> List<Class<T>> getExtensionClasses(Class<T> type, String pluginId);
+    <T> List<Class<? extends T>> getExtensionClasses(Class<T> type, String pluginId);
 
     <T> List<T> getExtensions(Class<T> type);
 
@@ -152,6 +158,20 @@ public interface PluginManager {
      * The runtime mode. Must currently be either DEVELOPMENT or DEPLOYMENT.
      */
     RuntimeMode getRuntimeMode();
+
+    /**
+     * Returns {@code true} if the runtime mode is {@code RuntimeMode.DEVELOPMENT}.
+     */
+    default boolean isDevelopment() {
+        return RuntimeMode.DEVELOPMENT.equals(getRuntimeMode());
+    }
+
+    /**
+     * Returns {@code true} if the runtime mode is not {@code RuntimeMode.DEVELOPMENT}.
+     */
+    default boolean isNotDevelopment() {
+        return !isDevelopment();
+    }
 
     /**
      * Retrieves the {@link PluginWrapper} that loaded the given class 'clazz'.
@@ -180,7 +200,8 @@ public interface PluginManager {
     String getSystemVersion();
 
     /**
-     * Gets the path of the folder where plugins are installed
+     * Gets the path of the folder where plugins are installed.
+     *
      * @return Path of plugins root
      */
     Path getPluginsRoot();

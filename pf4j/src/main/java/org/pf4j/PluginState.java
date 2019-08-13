@@ -18,33 +18,33 @@ package org.pf4j;
 /**
  * @author Decebal Suiu
  */
-public class PluginState {
+public enum PluginState {
 
     /**
      * The runtime knows the plugin is there. It knows about the plugin path, the plugin descriptor.
      */
-    public static final PluginState CREATED = new PluginState("CREATED");
-
+    CREATED("CREATED"),
+    
     /**
      * The plugin cannot be used.
      */
-    public static final PluginState DISABLED = new PluginState("DISABLED");
-
+    DISABLED("DISABLED"),
+    
     /**
      * The plugin is created. All the dependencies are created and resolved.
      * The plugin is ready to be started.
      */
-    public static final PluginState RESOLVED = new PluginState("RESOLVED");
+    RESOLVED("RESOLVED"),
 
     /**
      * The {@link Plugin#start()} has executed. A started plugin may contribute extensions.
      */
-    public static final PluginState STARTED = new PluginState("STARTED");
+    STARTED("STARTED"),
 
     /**
      * The {@link Plugin#stop()} has executed.
      */
-    public static final PluginState STOPPED = new PluginState("STOPPED");
+    STOPPED("STOPPED");
 
     private String status;
 
@@ -52,19 +52,8 @@ public class PluginState {
         this.status = status;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        PluginState that = (PluginState) o;
-
-        return status.equals(that.status);
-    }
-
-    @Override
-    public int hashCode() {
-        return status.hashCode();
+    public boolean equals(String status) {
+    	return (status == null ? false : this.status.equalsIgnoreCase(status));
     }
 
     @Override
@@ -72,4 +61,13 @@ public class PluginState {
         return status;
     }
 
+    public static PluginState parse(String string) {
+		for (PluginState status : values()) {
+			if (status.equals(string)) {
+				return status;
+			}
+		}
+
+		return null;
+	}
 }

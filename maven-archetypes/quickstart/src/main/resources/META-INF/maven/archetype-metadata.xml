@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor name="quickstart">
+
+    <fileSets>
+        <fileSet encoding="UTF-8">
+            <directory></directory>
+            <includes>
+                <include>run.sh</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+
+    <modules>
+        <module id="${rootArtifactId}-app" dir="app" name="${rootArtifactId}-app">
+            <fileSets>
+                <fileSet filtered="true" packaged="true" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true" encoding="UTF-8">
+                    <directory>src/main/resources</directory>
+                    <includes>
+                        <include>**/*.properties</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true" encoding="UTF-8">
+                    <directory>src/main/assembly</directory>
+                    <includes>
+                        <include>**/*.xml</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+
+        <module id="${rootArtifactId}-plugins" dir="plugins" name="${rootArtifactId}-plugins">
+            <fileSets>
+                <fileSet filtered="true" encoding="UTF-8">
+                    <directory></directory>
+                    <includes>
+                        <include>enabled.txt</include>
+                        <include>disabled.txt</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+
+            <modules>
+                <module id="hello-plugin" dir="hello" name="hello-plugin">
+                    <fileSets>
+                        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+                            <directory>src/main/java</directory>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                        </fileSet>
+                        <fileSet filtered="true" encoding="UTF-8">
+                            <directory></directory>
+                            <includes>
+                                <include>plugin.properties</include>
+                            </includes>
+                        </fileSet>
+                    </fileSets>
+                </module>
+
+                <module id="welcome-plugin" dir="welcome" name="welcome-plugin">
+                    <fileSets>
+                        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+                            <directory>src/main/java</directory>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                        </fileSet>
+                        <fileSet filtered="true" encoding="UTF-8">
+                            <directory></directory>
+                            <includes>
+                                <include>plugin.properties</include>
+                            </includes>
+                        </fileSet>
+                    </fileSets>
+                </module>
+            </modules>
+        </module>
+    </modules>
+
+</archetype-descriptor>

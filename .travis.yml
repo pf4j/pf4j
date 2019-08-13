@@ -1,9 +1,5 @@
 language: java
 jdk:
-    - openjdk7
-# JDK7 is not supported anymore; https://github.com/travis-ci/travis-ci/issues/7884#issuecomment-308451879
-#    - oraclejdk7
-    - oraclejdk8
     - openjdk11
 after_success:
   - mvn clean cobertura:cobertura coveralls:report

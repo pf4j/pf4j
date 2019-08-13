@@ -15,7 +15,7 @@
  */
 package org.pf4j;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.pf4j.processor.LegacyExtensionStorage;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Decebal Suiu

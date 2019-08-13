@@ -16,10 +16,12 @@
 package org.pf4j;
 
 import com.github.zafarkhaja.semver.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Decebal Suiu
@@ -28,7 +30,7 @@ public class DefaultVersionManagerTest {
 
     private VersionManager versionManager;
 
-    @Before
+    @BeforeEach
     public void init() {
         versionManager = new DefaultVersionManager();
     }
@@ -39,14 +41,14 @@ public class DefaultVersionManagerTest {
         assertTrue(versionManager.checkVersionConstraint("1.4.3", ">=1.4.0 & <1.6.0")); // range
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullOrEmptyVersion() {
-        assertFalse(versionManager.checkVersionConstraint(null, ">2.0.0"));
+        assertThrows(IllegalArgumentException.class, () -> versionManager.checkVersionConstraint(null, ">2.0.0"));
     }
 
-    @Test(expected = ParseException.class)
+    @Test
     public void invalidVersion() {
-        assertFalse(versionManager.checkVersionConstraint("1.0", ">2.0.0"));
+        assertThrows(ParseException.class, () -> versionManager.checkVersionConstraint("1.0", ">2.0.0"));
     }
 
     @Test

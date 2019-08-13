@@ -15,6 +15,10 @@
  */
 package org.pf4j;
 
+import org.pf4j.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,9 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.pf4j.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the boilerplate plugin code that any {@link PluginManager}
@@ -44,11 +45,17 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractPluginManager.class);
 
-    private Path pluginsRoot;
+    public static final String PLUGINS_DIR_PROPERTY_NAME = "pf4j.pluginsDir";
+    public static final String MODE_PROPERTY_NAME = "pf4j.mode";
+
+    public static final String DEFAULT_PLUGINS_DIR = "plugins";
+    public static final String DEVELOPMENT_PLUGINS_DIR = "../plugins";
+
+    protected Path pluginsRoot;
 
     protected ExtensionFinder extensionFinder;
 
-    private PluginDescriptorFinder pluginDescriptorFinder;
+    protected PluginDescriptorFinder pluginDescriptorFinder;
 
     /**
      * A map of plugins this manager is responsible for (the key is the 'pluginId').
@@ -58,48 +65,48 @@ public abstract class AbstractPluginManager implements PluginManager {
     /**
      * A map of plugin class loaders (the key is the 'pluginId').
      */
-    private Map<String, ClassLoader> pluginClassLoaders;
+    protected Map<String, ClassLoader> pluginClassLoaders;
 
     /**
      * A list with unresolved plugins (unresolved dependency).
      */
-    private List<PluginWrapper> unresolvedPlugins;
+    protected List<PluginWrapper> unresolvedPlugins;
 
     /**
      * A list with all resolved plugins (resolved dependency).
      */
-    private List<PluginWrapper> resolvedPlugins;
+    protected List<PluginWrapper> resolvedPlugins;
 
     /**
      * A list with started plugins.
      */
-    private List<PluginWrapper> startedPlugins;
+    protected List<PluginWrapper> startedPlugins;
 
     /**
      * The registered {@link PluginStateListener}s.
      */
-    private List<PluginStateListener> pluginStateListeners;
+    protected List<PluginStateListener> pluginStateListeners;
 
     /**
      * Cache value for the runtime mode.
      * No need to re-read it because it wont change at runtime.
      */
-    private RuntimeMode runtimeMode;
+    protected RuntimeMode runtimeMode;
 
     /**
      * The system version used for comparisons to the plugin requires attribute.
      */
-    private String systemVersion = "0.0.0";
+    protected String systemVersion = "0.0.0";
 
-    private PluginRepository pluginRepository;
-    private PluginFactory pluginFactory;
-    private ExtensionFactory extensionFactory;
-    private PluginStatusProvider pluginStatusProvider;
-    private DependencyResolver dependencyResolver;
-    private PluginLoader pluginLoader;
-    private boolean exactVersionAllowed = false;
+    protected PluginRepository pluginRepository;
+    protected PluginFactory pluginFactory;
+    protected ExtensionFactory extensionFactory;
+    protected PluginStatusProvider pluginStatusProvider;
+    protected DependencyResolver dependencyResolver;
+    protected PluginLoader pluginLoader;
+    protected boolean exactVersionAllowed = false;
 
-    private VersionManager versionManager;
+    protected VersionManager versionManager;
 
     /**
      * The plugins root is supplied by {@code System.getProperty("pf4j.pluginsDir", "plugins")}.
@@ -180,18 +187,12 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         log.debug("Loading plugin from '{}'", pluginPath);
 
-        try {
-            PluginWrapper pluginWrapper = loadPluginFromPath(pluginPath);
+        PluginWrapper pluginWrapper = loadPluginFromPath(pluginPath);
 
-            // try to resolve  the loaded plugin together with other possible plugins that depend on this plugin
-            resolvePlugins();
+        // try to resolve  the loaded plugin together with other possible plugins that depend on this plugin
+        resolvePlugins();
 
-            return pluginWrapper.getDescriptor().getPluginId();
-        } catch (PluginException e) {
-            log.error(e.getMessage(), e);
-        }
-
-        return null;
+        return pluginWrapper.getDescriptor().getPluginId();
     }
 
     /**
@@ -221,7 +222,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         for (Path pluginPath : pluginPaths) {
             try {
                 loadPluginFromPath(pluginPath);
-            } catch (PluginException e) {
+            } catch (PluginRuntimeException e) {
                 log.error(e.getMessage(), e);
             }
         }
@@ -229,7 +230,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         // resolve plugins
         try {
             resolvePlugins();
-        } catch (PluginException e) {
+        } catch (PluginRuntimeException e) {
             log.error(e.getMessage(), e);
         }
     }
@@ -275,7 +276,7 @@ public abstract class AbstractPluginManager implements PluginManager {
                     try {
                         ((Closeable) classLoader).close();
                     } catch (IOException e) {
-                        log.error("Cannot close classloader", e);
+                        throw new PluginRuntimeException(e, "Cannot close classloader");
                     }
                 }
             }
@@ -293,23 +294,24 @@ public abstract class AbstractPluginManager implements PluginManager {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
+        // stop the plugin if it's started
         PluginState pluginState = stopPlugin(pluginId);
         if (PluginState.STARTED == pluginState) {
             log.error("Failed to stop plugin '{}' on delete", pluginId);
             return false;
         }
 
+        // get an instance of plugin before the plugin is unloaded
+        // for reason see https://github.com/pf4j/pf4j/issues/309
+        Plugin plugin = pluginWrapper.getPlugin();
+
         if (!unloadPlugin(pluginId)) {
             log.error("Failed to unload plugin '{}' on delete", pluginId);
             return false;
         }
 
-        try {
-            pluginWrapper.getPlugin().delete();
-        } catch (PluginException e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
+        // notify the plugin as it's deleted
+        plugin.delete();
 
         Path pluginPath = pluginWrapper.getPluginPath();
 
@@ -369,16 +371,12 @@ public abstract class AbstractPluginManager implements PluginManager {
             startPlugin(dependency.getPluginId());
         }
 
-        try {
-            log.info("Start plugin '{}'", getPluginLabel(pluginDescriptor));
-            pluginWrapper.getPlugin().start();
-            pluginWrapper.setPluginState(PluginState.STARTED);
-            startedPlugins.add(pluginWrapper);
+        log.info("Start plugin '{}'", getPluginLabel(pluginDescriptor));
+        pluginWrapper.getPlugin().start();
+        pluginWrapper.setPluginState(PluginState.STARTED);
+        startedPlugins.add(pluginWrapper);
 
-            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-        } catch (PluginException e) {
-            log.error(e.getMessage(), e);
-        }
+        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
 
         return pluginWrapper.getPluginState();
     }
@@ -402,7 +400,7 @@ public abstract class AbstractPluginManager implements PluginManager {
                     itr.remove();
 
                     firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-                } catch (PluginException e) {
+                } catch (PluginRuntimeException e) {
                     log.error(e.getMessage(), e);
                 }
             }
@@ -443,16 +441,12 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
-        try {
-            log.info("Stop plugin '{}'", getPluginLabel(pluginDescriptor));
-            pluginWrapper.getPlugin().stop();
-            pluginWrapper.setPluginState(PluginState.STOPPED);
-            startedPlugins.remove(pluginWrapper);
+        log.info("Stop plugin '{}'", getPluginLabel(pluginDescriptor));
+        pluginWrapper.getPlugin().stop();
+        pluginWrapper.setPluginState(PluginState.STOPPED);
+        startedPlugins.remove(pluginWrapper);
 
-            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-        } catch (PluginException e) {
-            log.error(e.getMessage(), e);
-        }
+        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
 
         return pluginWrapper.getPluginState();
     }
@@ -480,10 +474,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, PluginState.STOPPED));
 
-            if (!pluginStatusProvider.disablePlugin(pluginId)) {
-                return false;
-            }
-
+            pluginStatusProvider.disablePlugin(pluginId);
             log.info("Disabled plugin '{}'", getPluginLabel(pluginDescriptor));
 
             return true;
@@ -509,9 +500,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             return true;
         }
 
-        if (!pluginStatusProvider.enablePlugin(pluginId)) {
-            return false;
-        }
+        pluginStatusProvider.enablePlugin(pluginId);
 
         pluginWrapper.setPluginState(PluginState.CREATED);
 
@@ -539,55 +528,28 @@ public abstract class AbstractPluginManager implements PluginManager {
             Class<?> c = extensionWrapper.getDescriptor().extensionClass;
             extensionClasses.add(c);
         }
-        return extensionClasses;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> List<Class<T>> getExtensionClasses(Class<T> type) {
-        List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
-        List<Class<T>> extensionClasses = new ArrayList<>(extensionsWrapper.size());
-        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            Class<T> c = (Class<T>) extensionWrapper.getDescriptor().extensionClass;
-            extensionClasses.add(c);
-        }
 
         return extensionClasses;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> List<Class<T>> getExtensionClasses(Class<T> type, String pluginId) {
-        List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type, pluginId);
-        List<Class<T>> extensionClasses = new ArrayList<>(extensionsWrapper.size());
-        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            Class<T> c = (Class<T>) extensionWrapper.getDescriptor().extensionClass;
-            extensionClasses.add(c);
-        }
+    public <T> List<Class<? extends T>> getExtensionClasses(Class<T> type) {
+        return getExtensionClasses(extensionFinder.find(type));
+    }
 
-        return extensionClasses;
+    @Override
+    public <T> List<Class<? extends T>> getExtensionClasses(Class<T> type, String pluginId) {
+        return getExtensionClasses(extensionFinder.find(type, pluginId));
     }
 
     @Override
     public <T> List<T> getExtensions(Class<T> type) {
-        List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type);
-        List<T> extensions = new ArrayList<>(extensionsWrapper.size());
-        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            extensions.add(extensionWrapper.getExtension());
-        }
-
-        return extensions;
+        return getExtensions(extensionFinder.find(type));
     }
 
     @Override
     public <T> List<T> getExtensions(Class<T> type, String pluginId) {
-        List<ExtensionWrapper<T>> extensionsWrapper = extensionFinder.find(type, pluginId);
-        List<T> extensions = new ArrayList<>(extensionsWrapper.size());
-        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
-            extensions.add(extensionWrapper.getExtension());
-        }
-
-        return extensions;
+        return getExtensions(extensionFinder.find(type, pluginId));
     }
 
     @Override
@@ -596,7 +558,11 @@ public abstract class AbstractPluginManager implements PluginManager {
         List<ExtensionWrapper> extensionsWrapper = extensionFinder.find(pluginId);
         List extensions = new ArrayList<>(extensionsWrapper.size());
         for (ExtensionWrapper extensionWrapper : extensionsWrapper) {
-            extensions.add(extensionWrapper.getExtension());
+            try {
+                extensions.add(extensionWrapper.getExtension());
+            } catch (PluginRuntimeException e) {
+                log.error("Cannot retrieve extension", e);
+            }
         }
 
         return extensions;
@@ -612,7 +578,6 @@ public abstract class AbstractPluginManager implements PluginManager {
         return extensionFactory;
     }
 
-    // TODO remove
     public PluginLoader getPluginLoader() {
         return pluginLoader;
     }
@@ -625,7 +590,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     public RuntimeMode getRuntimeMode() {
         if (runtimeMode == null) {
             // retrieves the runtime mode from system
-            String modeAsString = System.getProperty("pf4j.mode", RuntimeMode.DEPLOYMENT.toString());
+            String modeAsString = System.getProperty(MODE_PROPERTY_NAME, RuntimeMode.DEPLOYMENT.toString());
             runtimeMode = RuntimeMode.byName(modeAsString);
         }
 
@@ -723,20 +688,16 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     /**
      * Add the possibility to override the plugins root.
-     * If a {@code pf4j.pluginsDir} system property is defined than this method returns that root.
-     * If {@link #getRuntimeMode()} returns {@link RuntimeMode#DEVELOPMENT} than {@code ../plugins}
-     * is returned else this method returns {@code plugins}.
+     * If a {@link #PLUGINS_DIR_PROPERTY_NAME} system property is defined than this method returns that root.
+     * If {@link #getRuntimeMode()} returns {@link RuntimeMode#DEVELOPMENT} than {@link #DEVELOPMENT_PLUGINS_DIR}
+     * is returned else this method returns {@link #DEFAULT_PLUGINS_DIR}.
      *
      * @return the plugins root
      */
     protected Path createPluginsRoot() {
-        String pluginsDir = System.getProperty("pf4j.pluginsDir");
+        String pluginsDir = System.getProperty(PLUGINS_DIR_PROPERTY_NAME);
         if (pluginsDir == null) {
-            if (isDevelopment()) {
-                pluginsDir = "../plugins";
-            } else {
-                pluginsDir = "plugins";
-            }
+            pluginsDir = isDevelopment() ? DEVELOPMENT_PLUGINS_DIR : DEFAULT_PLUGINS_DIR;
         }
 
         return Paths.get(pluginsDir);
@@ -771,7 +732,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         return pluginStatusProvider.isPluginDisabled(pluginId);
     }
 
-    protected void resolvePlugins() throws PluginException {
+    protected void resolvePlugins() {
         // retrieves the plugins descriptors
         List<PluginDescriptor> descriptors = new ArrayList<>();
         for (PluginWrapper plugin : plugins.values()) {
@@ -820,7 +781,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
     }
 
-    protected PluginWrapper loadPluginFromPath(Path pluginPath) throws PluginException {
+    protected PluginWrapper loadPluginFromPath(Path pluginPath) {
         // Test for plugin path duplication
         String pluginId = idForPath(pluginPath);
         if (pluginId != null) {
@@ -838,7 +799,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         pluginId = pluginDescriptor.getPluginId();
         if (plugins.containsKey(pluginId)) {
             PluginWrapper loadedPlugin = getPlugin(pluginId);
-            throw new PluginException("There is an already loaded plugin ({}) "
+            throw new PluginRuntimeException("There is an already loaded plugin ({}) "
                     + "with the same id ({}) as the plugin at path '{}'. Simultaneous loading "
                     + "of plugins with the same PluginId is not currently supported.\n"
                     + "As a workaround you may include PluginVersion and PluginProvider "
@@ -859,7 +820,6 @@ public abstract class AbstractPluginManager implements PluginManager {
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
         PluginWrapper pluginWrapper = new PluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
         pluginWrapper.setPluginFactory(getPluginFactory());
-        pluginWrapper.setRuntimeMode(getRuntimeMode());
 
         // test for disabled plugin
         if (isPluginDisabled(pluginDescriptor.getPluginId())) {
@@ -907,21 +867,16 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Override this to change the validation criteria.
      *
      * @param descriptor the plugin descriptor to validate
-     * @throws PluginException if validation fails
+     * @throws PluginRuntimeException if validation fails
      */
-    protected void validatePluginDescriptor(PluginDescriptor descriptor) throws PluginException {
+    protected void validatePluginDescriptor(PluginDescriptor descriptor) {
         if (StringUtils.isNullOrEmpty(descriptor.getPluginId())) {
-            throw new PluginException("Field 'id' cannot be empty");
+            throw new PluginRuntimeException("Field 'id' cannot be empty");
         }
 
         if (descriptor.getVersion() == null) {
-            throw new PluginException("Field 'version' cannot be empty");
+            throw new PluginRuntimeException("Field 'version' cannot be empty");
         }
-    }
-
-    // TODO add this method in PluginManager as default method for Java 8.
-    protected boolean isDevelopment() {
-        return RuntimeMode.DEVELOPMENT.equals(getRuntimeMode());
     }
 
     /**
@@ -952,6 +907,30 @@ public abstract class AbstractPluginManager implements PluginManager {
      */
     protected String getPluginLabel(PluginDescriptor pluginDescriptor) {
         return pluginDescriptor.getPluginId() + "@" + pluginDescriptor.getVersion();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> List<Class<? extends T>> getExtensionClasses(List<ExtensionWrapper<T>> extensionsWrapper) {
+        List<Class<? extends T>> extensionClasses = new ArrayList<>(extensionsWrapper.size());
+        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
+            Class<T> c = (Class<T>) extensionWrapper.getDescriptor().extensionClass;
+            extensionClasses.add(c);
+        }
+
+        return extensionClasses;
+    }
+
+    private <T> List<T> getExtensions(List<ExtensionWrapper<T>> extensionsWrapper) {
+        List<T> extensions = new ArrayList<>(extensionsWrapper.size());
+        for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
+            try {
+                extensions.add(extensionWrapper.getExtension());
+            } catch (PluginRuntimeException e) {
+                log.error("Cannot retrieve extension", e);
+            }
+        }
+
+        return extensions;
     }
 
 }

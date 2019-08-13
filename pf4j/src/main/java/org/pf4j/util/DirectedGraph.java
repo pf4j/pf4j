@@ -44,7 +44,7 @@ public class DirectedGraph<V> {
             return;
         }
 
-        neighbors.put(vertex, new ArrayList<V>());
+        neighbors.put(vertex, new ArrayList<>());
     }
 
     /**
@@ -85,7 +85,7 @@ public class DirectedGraph<V> {
     }
 
     public List<V> getNeighbors(V vertex) {
-        return containsVertex(vertex) ? neighbors.get(vertex) : new ArrayList<V>();
+        return containsVertex(vertex) ? neighbors.get(vertex) : new ArrayList<>();
     }
 
     /**
@@ -101,7 +101,7 @@ public class DirectedGraph<V> {
     }
 
     /**
-     * Report (as a Map) the in-degree (the number of head ends adjacent to a vertex) of each vertex.
+     * Report (as a {@link Map}) the in-degree (the number of head ends adjacent to a vertex) of each vertex.
      */
     public Map<V, Integer> inDegree() {
         Map<V, Integer> result = new HashMap<>();
@@ -181,9 +181,9 @@ public class DirectedGraph<V> {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (V vertex : neighbors.keySet()) {
-            sb.append("\n   " + vertex + " -> " + neighbors.get(vertex));
+            sb.append("\n   ").append(vertex).append(" -> ").append(neighbors.get(vertex));
         }
 
         return sb.toString();

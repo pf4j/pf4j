@@ -27,7 +27,7 @@ public class DevelopmentPluginClasspath extends PluginClasspath {
      * The development plugin classpath for <a href="https://maven.apache.org">Maven</a>.
      * The classes directory is {@code target/classes} and the lib directory is {@code target/lib}.
      */
-    public static final PluginClasspath MAVEN = new PluginClasspath().addClassesDirectories("target/classes").addLibDirectories("target/lib");
+    public static final PluginClasspath MAVEN = new PluginClasspath().addClassesDirectories("target/classes").addJarsDirectories("target/lib");
 
     /**
      * The development plugin classpath for <a href="https://gradle.org">Gradle</a>.
@@ -53,10 +53,10 @@ public class DevelopmentPluginClasspath extends PluginClasspath {
         addClassesDirectories(KOTLIN.getClassesDirectories());
         addClassesDirectories(IDEA.getClassesDirectories());
 
-        addLibDirectories(MAVEN.getLibDirectories());
-        addLibDirectories(GRADLE.getLibDirectories());
-        addLibDirectories(KOTLIN.getLibDirectories());
-        addLibDirectories(IDEA.getLibDirectories());
+        addJarsDirectories(MAVEN.getJarsDirectories());
+        addJarsDirectories(GRADLE.getJarsDirectories());
+        addJarsDirectories(KOTLIN.getJarsDirectories());
+        addJarsDirectories(IDEA.getJarsDirectories());
     }
 
 }

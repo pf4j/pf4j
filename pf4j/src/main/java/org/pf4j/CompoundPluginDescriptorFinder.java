@@ -57,7 +57,7 @@ public class CompoundPluginDescriptorFinder implements PluginDescriptorFinder {
     }
 
     @Override
-    public PluginDescriptor find(Path pluginPath) throws PluginException {
+    public PluginDescriptor find(Path pluginPath) {
         for (PluginDescriptorFinder finder : finders) {
             if (finder.isApplicable(pluginPath)) {
                 log.debug("'{}' is applicable for plugin '{}'", finder, pluginPath);
@@ -81,7 +81,7 @@ public class CompoundPluginDescriptorFinder implements PluginDescriptorFinder {
             }
         }
 
-        throw new PluginException("No PluginDescriptorFinder for plugin '{}'", pluginPath);
+        throw new PluginRuntimeException("No PluginDescriptorFinder for plugin '{}'", pluginPath);
     }
 
 }

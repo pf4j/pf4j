@@ -23,11 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * This filter providing conditional OR logic across a list of
- * file filters. This filter returns <code>true</code> if one filter in the
- * list return <code>true</code>. Otherwise, it returns <code>false</code>.
- * Checking of the file filter list stops when the first filter returns
- * <code>true</code>.
+ * This filter providing conditional OR logic across a list of file filters.
+ * This filter returns {@code true} if one filter in the list return {@code true}. Otherwise, it returns {@code false}.
+ * Checking of the file filter list stops when the first filter returns {@code true}.
  *
  * @author Decebal Suiu
  */
@@ -37,7 +35,7 @@ public class OrFileFilter implements FileFilter {
     private List<FileFilter> fileFilters;
 
     public OrFileFilter() {
-        this(new ArrayList<FileFilter>());
+        this(new ArrayList<>());
     }
 
     public OrFileFilter(FileFilter... fileFilters) {
@@ -68,7 +66,7 @@ public class OrFileFilter implements FileFilter {
 
     @Override
     public boolean accept(File file) {
-        if (this.fileFilters.size() == 0) {
+        if (this.fileFilters.isEmpty()) {
             return true;
         }
 

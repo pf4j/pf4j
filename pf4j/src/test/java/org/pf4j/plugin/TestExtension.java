@@ -23,4 +23,9 @@ import org.pf4j.Extension;
 @Extension
 public class TestExtension implements TestExtensionPoint {
 
+    @Override
+    public String saySomething() {
+        return "I am a test extension";
+    }
+
 }

@@ -17,7 +17,10 @@ package org.pf4j;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 /**
  * @author Decebal Suiu
@@ -37,14 +40,29 @@ public class CompoundPluginRepository implements PluginRepository {
         return this;
     }
 
+    /**
+     * Add a {@link PluginRepository} only if the {@code condition} is satisfied.
+     *
+     * @param repository
+     * @param condition
+     * @return
+     */
+    public CompoundPluginRepository add(PluginRepository repository, BooleanSupplier condition) {
+        if (condition.getAsBoolean()) {
+            return add(repository);
+        }
+
+        return this;
+    }
+
     @Override
     public List<Path> getPluginPaths() {
-        List<Path> paths = new ArrayList<>();
+        Set<Path> paths = new LinkedHashSet<>();
         for (PluginRepository repository : repositories) {
             paths.addAll(repository.getPluginPaths());
         }
 
-        return paths;
+        return new ArrayList<>(paths);
     }
 
     @Override

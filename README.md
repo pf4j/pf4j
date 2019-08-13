@@ -15,7 +15,7 @@ declared by application or other plugins. Also a plugin can define extension poi
 Features/Benefits
 -------------------
 With PF4J you can easily transform a monolithic java application in a modular application.  
-PF4J is an open source (Apache license) lightweight (around __50 KB__) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see PluginDescriptorFinder and ExtensionFinder).   
+PF4J is an open source (Apache license) lightweight (around __50 KB__) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see `PluginDescriptorFinder` and `ExtensionFinder`).   
 
 Practically PF4J is a microframework and the aim is to keep the core simple but extensible. I try to create a little ecosystem (extensions) based on this core with the help of the comunity.  
 For now are available these extensions:
@@ -33,17 +33,21 @@ Also, PF4J can be used in web applications. For my web applications when I want 
 Components
 -------------------
 - **Plugin** is the base class for all plugins types. Each plugin is loaded into a separate class loader to avoid conflicts.
-- **PluginManager** is used for all aspects of plugins management (loading, starting, stopping). You can use a built-in implementation as `DefaultPluginManager`, `JarPluginManager` or you can implement a custom plugin manager starting from `AbstractPluginManager` (implement only factory methods).
+- **PluginManager** is used for all aspects of plugins management (loading, starting, stopping). You can use a built-in implementation as `JarPluginManager`, `ZipPluginManager`, `DefaultPluginManager` (it's a `JarPluginManager` + `ZipPluginManager`) or you can implement a custom plugin manager starting from `AbstractPluginManager` (implement only factory methods).
 - **PluginLoader** loads all information (classes) needed by a plugin.
 - **ExtensionPoint** is a point in the application where custom code can be invoked. It's a java interface marker.   
 Any java interface or abstract class can be marked as an extension point (implements `ExtensionPoint` interface).
 - **Extension** is an implementation of an extension point. It's a java annotation on a class.
 
+**PLUGIN** = a container for **EXTENSION POINTS** and **EXTENSIONS** + lifecycle methods (start, stop, delete)
+
+A **PLUGIN** is similar with a **MODULE** from other systems. If you don't need lifecycle methods (hook methods for start, stop, delete) you are not forced to supply a plugin class (the `PluginClass` property from the plugin descriptor is optional). You only need to supply some description of plugin (id, version, author, ...) for a good tracking (your application wants to know who supplied the extensions or extensions points).
+
 How to use
 -------------------
 It's very simple to add pf4j in your application.
 
-Define an extension point in your application using **ExtensionPoint** interface marker:
+Define an extension point in your application/plugin using **ExtensionPoint** interface marker:
 
 ```java
 public interface Greeting extends ExtensionPoint {
@@ -53,28 +57,49 @@ public interface Greeting extends ExtensionPoint {
 }
 ```
 
-Create a plugin that contribute with an extension:
+Create an extension using `@Extension` annotation:
  
 ```java
-public class WelcomePlugin extends Plugin {
+@Extension
+public class WelcomeGreeting implements Greeting {
 
-    public WelcomePlugin(PluginWrapper wrapper) {
-        super(wrapper);
-    }
-
-    @Extension
-    public static class WelcomeGreeting implements Greeting {
-
-        public String getGreeting() {
-            return "Welcome";
-        }
-
+    public String getGreeting() {
+        return "Welcome";
     }
 
 }
 ```
 
-In above code I created a plugin that comes with one extension for the `Greeting` extension point.
+Create (it's optional) a `Plugin` class if you are interested for plugin's lifecycle events (start, stop, ...):
+
+```java
+public class WelcomePlugin extends Plugin {
+
+    public WelcomePlugin(PluginWrapper wrapper) {
+        super(wrapper);
+
+        // you can use "wrapper" to have access to the plugin context (plugin manager, descriptor, ...)
+    }
+
+    @Override
+    public void start() {
+        System.out.println("WelcomePlugin.start()");
+    }
+
+    @Override
+    public void stop() {
+        System.out.println("WelcomePlugin.stop()");
+    }
+    
+    @Override
+    public void delete() {
+        System.out.println("WelcomePlugin.delete()");
+    }
+    
+}
+```
+
+In above code I created a plugin (welcome) that comes with one extension for the `Greeting` extension point.
 
 You can distribute you plugin as a jar file (the simple solution). In this case add the plugin's metadata in `MANIFEST.MF` file of jar:
 
@@ -91,8 +116,8 @@ Plugin-Provider: Decebal Suiu
 Plugin-Version: 0.0.1
 ```
 
-In above manifest I described a plugin with id `welcome-plugin`, with class `org.pf4j.demo.welcome.WelcomePlugin`, with version `0.0.1` and with dependencies
-to plugins `x, y, z`.
+In above manifest I described a plugin with id `welcome-plugin` (mandatory attribute), with class `org.pf4j.demo.welcome.WelcomePlugin` (optional attribute), with version `0.0.1` (mandatory attribute) and with dependencies
+to plugins `x, y, z` (optional attribute).
 
 Now you can play with plugins and extensions in your code:
 
@@ -101,7 +126,7 @@ public static void main(String[] args) {
     ...
 
     // create the plugin manager
-    PluginManager pluginManager = new DefaultPluginManager();
+    PluginManager pluginManager = new JarPluginManager(); // or "new ZipPluginManager() / new DefaultPluginManager()"
     
     // start and load all plugins of application
     pluginManager.loadPlugins();

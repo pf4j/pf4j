@@ -26,4 +26,9 @@ public class FailTestExtension implements TestExtensionPoint {
     public FailTestExtension(String name) {
     }
 
+    @Override
+    public String saySomething() {
+        return "I am a fail test extension";
+    }
+
 }

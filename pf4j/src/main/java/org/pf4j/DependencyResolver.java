@@ -272,7 +272,7 @@ public class DependencyResolver {
     /**
      * It will be thrown if a cyclic dependency is detected.
      */
-    public static class CyclicDependencyException extends PluginException {
+    public static class CyclicDependencyException extends PluginRuntimeException {
 
         public CyclicDependencyException() {
             super("Cyclic dependencies");
@@ -283,7 +283,7 @@ public class DependencyResolver {
     /**
      * Indicates that the dependencies required were not found.
      */
-    public static class DependenciesNotFoundException extends PluginException {
+    public static class DependenciesNotFoundException extends PluginRuntimeException {
 
         private List<String> dependencies;
 
@@ -302,7 +302,7 @@ public class DependencyResolver {
     /**
      * Indicates that some dependencies have wrong version.
      */
-    public static class DependenciesWrongVersionException extends PluginException {
+    public static class DependenciesWrongVersionException extends PluginRuntimeException {
 
         private List<WrongDependencyVersion> dependencies;
 

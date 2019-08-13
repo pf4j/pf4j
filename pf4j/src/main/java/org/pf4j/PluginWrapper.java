@@ -41,6 +41,7 @@ public class PluginWrapper {
         this.pluginClassLoader = pluginClassLoader;
 
         pluginState = PluginState.CREATED;
+        runtimeMode = pluginManager.getRuntimeMode();
     }
 
     /**
@@ -120,11 +121,9 @@ public class PluginWrapper {
         }
 
         PluginWrapper other = (PluginWrapper) obj;
-        if (!descriptor.getPluginId().equals(other.descriptor.getPluginId())) {
-            return false;
-        }
 
-        return true;
+        return descriptor.getPluginId().equals(other.descriptor.getPluginId());
+
     }
 
     @Override
@@ -132,15 +131,11 @@ public class PluginWrapper {
         return "PluginWrapper [descriptor=" + descriptor + ", pluginPath=" + pluginPath + "]";
     }
 
-    void setPluginState(PluginState pluginState) {
+    public void setPluginState(PluginState pluginState) {
         this.pluginState = pluginState;
     }
 
-    void setRuntimeMode(RuntimeMode runtimeMode) {
-        this.runtimeMode = runtimeMode;
-    }
-
-    void setPluginFactory(PluginFactory pluginFactory) {
+    public void setPluginFactory(PluginFactory pluginFactory) {
         this.pluginFactory = pluginFactory;
     }
 

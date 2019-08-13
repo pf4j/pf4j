@@ -15,11 +15,12 @@
  */
 package org.pf4j;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.pf4j.plugin.FailTestExtension;
 import org.pf4j.plugin.TestExtension;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Decebal Suiu

@@ -15,15 +15,15 @@
  */
 package org.pf4j;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.pf4j.plugin.AnotherFailTestPlugin;
 import org.pf4j.plugin.FailTestPlugin;
 import org.pf4j.plugin.TestPlugin;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
