@@ -19,17 +19,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.plugin.PluginZip;
 import org.pf4j.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -62,20 +61,14 @@ public class PluginClassLoaderTest {
         pluginDescriptor.setProvider("Me");
         pluginDescriptor.setRequires("5.0.0");
 
-        Path metaInfPluginDirectory = pluginsPath.resolve(Paths.get(pluginDescriptor.getPluginId(), "classes", "META-INF"));
-        assertTrue(metaInfPluginDirectory.toFile().mkdirs());
+        Path pluginPath = pluginsPath.resolve(pluginDescriptor.getPluginId() + "-" + pluginDescriptor.getVersion() + ".zip");
+        PluginZip pluginZip = new PluginZip.Builder(pluginPath, pluginDescriptor.getPluginId())
+            .pluginVersion(pluginDescriptor.getVersion())
+            .addFile(Paths.get("classes/META-INF/plugin-file"), "plugin")
+            .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-plugin"), "plugin")
+            .build();
 
-        File pluginFile = pluginsPath.resolve(Paths.get(pluginDescriptor.getPluginId(), "classes", "META-INF", "plugin-file")).toFile();
-        assertTrue(pluginFile.createNewFile());
-        try (PrintWriter writer = new PrintWriter(pluginFile)) {
-            writer.println("plugin");
-        }
-
-        File pluginAndParentFile = pluginsPath.resolve(Paths.get(pluginDescriptor.getPluginId(), "classes", "META-INF", "file-in-both-parent-and-plugin")).toFile();
-        assertTrue(pluginAndParentFile.createNewFile());
-        try (PrintWriter writer = new PrintWriter(pluginAndParentFile)) {
-            writer.println("plugin");
-        }
+        FileUtils.expandIfZip(pluginZip.path());
 
         PluginClasspath pluginClasspath = new DefaultPluginClasspath();
 
@@ -83,13 +76,13 @@ public class PluginClassLoaderTest {
         parentFirstPluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, PluginClassLoaderTest.class.getClassLoader(), true);
 
         for (String classesDirectory : pluginClasspath.getClassesDirectories()) {
-            File classesDirectoryFile = pluginsPath.resolve(pluginDescriptor.getPluginId()).resolve(classesDirectory).toFile();
+            File classesDirectoryFile = pluginZip.unzippedPath().resolve(classesDirectory).toFile();
             parentLastPluginClassLoader.addFile(classesDirectoryFile);
             parentFirstPluginClassLoader.addFile(classesDirectoryFile);
         }
 
         for (String jarsDirectory : pluginClasspath.getJarsDirectories()) {
-            Path jarsDirectoryPath = pluginsPath.resolve(pluginDescriptor.getPluginId()).resolve(jarsDirectory);
+            Path jarsDirectoryPath = pluginZip.unzippedPath().resolve(jarsDirectory);
             List<File> jars = FileUtils.getJars(jarsDirectoryPath);
             for (File jar : jars) {
                 parentLastPluginClassLoader.addFile(jar);
