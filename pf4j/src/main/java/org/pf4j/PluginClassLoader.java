@@ -22,6 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -186,6 +189,23 @@ public class PluginClassLoader extends URLClassLoader {
             log.trace("Couldn't find resource '{}' in parent", name);
 
             return findResource(name);
+        }
+    }
+
+    @Override
+    public Enumeration<URL> getResources(String name) throws IOException {
+        if (!parentFirst) {
+            List<URL> resources = new ArrayList<>();
+
+            resources.addAll(Collections.list(findResources(name)));
+
+            if (getParent() != null) {
+                resources.addAll(Collections.list(getParent().getResources(name)));
+            }
+
+            return Collections.enumeration(resources);
+        } else {
+            return super.getResources(name);
         }
     }
 

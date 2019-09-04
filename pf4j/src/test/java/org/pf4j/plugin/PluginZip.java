@@ -89,6 +89,7 @@ public class PluginZip {
         private String pluginClass;
         private String pluginVersion;
         private Map<String, String> properties = new LinkedHashMap<>();
+        private Map<Path, byte[]> files = new LinkedHashMap<>();
 
         public Builder(Path path, String pluginId) {
             this.path = path;
@@ -127,6 +128,30 @@ public class PluginZip {
             return this;
         }
 
+        /**
+         * Adds a file to the archive.
+         *
+         * @param path the relative path of the file
+         * @param content the content of the file
+         */
+        public Builder addFile(Path path, byte[] content) {
+            files.put(path, content.clone());
+
+            return this;
+        }
+
+        /**
+         * Adds a file to the archive.
+         *
+         * @param path the relative path of the file
+         * @param content the content of the file
+         */
+        public Builder addFile(Path path, String content) {
+            files.put(path, content.getBytes());
+
+            return this;
+        }
+
         public PluginZip build() throws IOException {
             createPropertiesFile();
 
@@ -144,12 +169,19 @@ public class PluginZip {
                 map.putAll(properties);
             }
 
-            ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(path.toFile()));
-            ZipEntry propertiesFile = new ZipEntry(PropertiesPluginDescriptorFinder.DEFAULT_PROPERTIES_FILE_NAME);
-            outputStream.putNextEntry(propertiesFile);
-            createProperties(map).store(outputStream, "");
-            outputStream.closeEntry();
-            outputStream.close();
+            try (ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(path.toFile()))) {
+                ZipEntry propertiesFile = new ZipEntry(PropertiesPluginDescriptorFinder.DEFAULT_PROPERTIES_FILE_NAME);
+                outputStream.putNextEntry(propertiesFile);
+                createProperties(map).store(outputStream, "");
+                outputStream.closeEntry();
+
+                for (Map.Entry<Path, byte[]> fileEntry : files.entrySet()) {
+                    ZipEntry file = new ZipEntry(fileEntry.getKey().toString());
+                    outputStream.putNextEntry(file);
+                    outputStream.write(fileEntry.getValue());
+                    outputStream.closeEntry();
+                }
+            }
         }
 
     }
