@@ -16,6 +16,7 @@
 package org.pf4j;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -24,6 +25,7 @@ import org.pf4j.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -49,6 +51,30 @@ public class PluginClassLoaderTest {
     @TempDir
     Path pluginsPath;
 
+    @BeforeAll
+    static void setUpGlobal() throws IOException, URISyntaxException {
+        Path parentClassPathBase = Paths.get(PluginClassLoaderTest.class.getClassLoader().getResource(".").toURI());
+
+        File metaInfFile = parentClassPathBase.resolve("META-INF").toFile();
+        if (metaInfFile.mkdir()) {
+            // Only delete the directory if this test created it, guarding for any future usages of the directory.
+            metaInfFile.deleteOnExit();
+        }
+
+        createFile(parentClassPathBase.resolve("META-INF").resolve("file-only-in-parent"));
+        createFile(parentClassPathBase.resolve("META-INF").resolve("file-in-both-parent-and-plugin"));
+    }
+
+    private static void createFile(Path pathToFile) throws IOException {
+        File file = pathToFile.toFile();
+
+        file.deleteOnExit();
+        assertTrue(file.createNewFile(), "failed to create '" + pathToFile + "'");
+        try (PrintWriter printWriter = new PrintWriter(file)) {
+            printWriter.write("parent");
+        }
+    }
+
     @BeforeEach
     void setUp() throws IOException {
         pluginManager = new DefaultPluginManager(pluginsPath);
@@ -63,10 +89,10 @@ public class PluginClassLoaderTest {
 
         Path pluginPath = pluginsPath.resolve(pluginDescriptor.getPluginId() + "-" + pluginDescriptor.getVersion() + ".zip");
         PluginZip pluginZip = new PluginZip.Builder(pluginPath, pluginDescriptor.getPluginId())
-            .pluginVersion(pluginDescriptor.getVersion())
-            .addFile(Paths.get("classes/META-INF/plugin-file"), "plugin")
-            .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-plugin"), "plugin")
-            .build();
+                .pluginVersion(pluginDescriptor.getVersion())
+                .addFile(Paths.get("classes/META-INF/plugin-file"), "plugin")
+                .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-plugin"), "plugin")
+                .build();
 
         FileUtils.expandIfZip(pluginZip.path());
 
@@ -109,13 +135,13 @@ public class PluginClassLoaderTest {
 
     @Test
     void parentLastGetResourceExistsInParent() throws IOException, URISyntaxException {
-        URL resource = parentLastPluginClassLoader.getResource("META-INF/file");
+        URL resource = parentLastPluginClassLoader.getResource("META-INF/file-only-in-parent");
         assertFirstLine("parent", resource);
     }
 
     @Test
     void parentFirstGetResourceExistsInParent() throws IOException, URISyntaxException {
-        URL resource = parentFirstPluginClassLoader.getResource("META-INF/file");
+        URL resource = parentFirstPluginClassLoader.getResource("META-INF/file-only-in-parent");
         assertFirstLine("parent", resource);
     }
 
@@ -155,13 +181,13 @@ public class PluginClassLoaderTest {
 
     @Test
     void parentLastGetResourcesExistsInParent() throws IOException, URISyntaxException {
-        Enumeration<URL> resources = parentLastPluginClassLoader.getResources("META-INF/file");
+        Enumeration<URL> resources = parentLastPluginClassLoader.getResources("META-INF/file-only-in-parent");
         assertNumberOfResourcesAndFirstLineOfFirstElement(1, "parent", resources);
     }
 
     @Test
     void parentFirstGetResourcesExistsInParent() throws IOException, URISyntaxException {
-        Enumeration<URL> resources = parentFirstPluginClassLoader.getResources("META-INF/file");
+        Enumeration<URL> resources = parentFirstPluginClassLoader.getResources("META-INF/file-only-in-parent");
         assertNumberOfResourcesAndFirstLineOfFirstElement(1, "parent", resources);
     }
 
