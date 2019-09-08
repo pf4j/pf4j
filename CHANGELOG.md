@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [3.0.0] - 2019-06-12
+
+#### Fixed
 - [#297]: Loading extensions may shutdown the application
 - Fix the plugin directory will be deleted anyway in unzip `extract` method
 - [#309]: Can't delete/remove unloaded plugin
@@ -323,7 +333,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-2.6.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.0.0...HEAD
+[3.0.0]: https://github.com/decebals/pf4j/compare/release-2.6.0...release-3.0.0
 [2.6.0]: https://github.com/decebals/pf4j/compare/release-2.5.0...release-2.6.0
 [2.5.0]: https://github.com/decebals/pf4j/compare/release-2.4.0...release-2.5.0
 [2.4.0]: https://github.com/decebals/pf4j/compare/release-2.3.0...release-2.4.0
