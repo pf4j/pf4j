@@ -5,10 +5,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#335]: `DefaultPluginStatusProvider.enablePlugin` function seems to be wrong
 
 #### Changed
+- [#328]: Modified `PluginState` to an enum
+- [#330]: Make `AbstractPluginManager` fields protected
 
 #### Added
+- [#323]: Add IDEA classpath for Development mode
+- [#337]: Implement `PluginClassLoader.getResources`
 
 #### Removed
 
@@ -353,6 +358,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#337]: https://github.com/pf4j/pf4j/pull/337
+[#335]: https://github.com/pf4j/pf4j/issues/335
+[#330]: https://github.com/pf4j/pf4j/pull/330
+[#328]: https://github.com/pf4j/pf4j/pull/328
+[#323]: https://github.com/pf4j/pf4j/pull/323
 [#322]: https://github.com/pf4j/pf4j/pull/322
 [#311]: https://github.com/pf4j/pf4j/issues/311
 [#309]: https://github.com/pf4j/pf4j/issues/309
