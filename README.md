@@ -161,3 +161,9 @@ Documentation is available on [pf4j.org](http://www.pf4j.org)
 Demo
 ---------------
 Demo applications are available in [demo](https://github.com/pf4j/pf4j/tree/master/demo) folder
+
+Quickstart (call to action)
+---------------
+1. Read this file to have an overview about what this project does
+2. Read [Getting started](https://pf4j.org/doc/getting-started.html) section of documentation to understand the basic concepts
+3. Read [Quickstart](https://pf4j.org/dev/quickstart.html) section of documentation to create your first PF4J-based modular application
