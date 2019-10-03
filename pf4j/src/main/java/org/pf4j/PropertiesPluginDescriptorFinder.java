@@ -68,6 +68,13 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 
         log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
         if (Files.notExists(propertiesPath)) {
+
+            try {
+                propertiesPath.getFileSystem().close();
+            } catch (IOException e) {
+                throw new PluginException("Failed to close FileSystem that creates '{}' path", propertiesPath);
+            }
+
             throw new PluginException("Cannot find '{}' path", propertiesPath);
         }
 
