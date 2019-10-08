@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -103,7 +104,10 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
             log.debug("Read '{}'", url.getFile());
-            try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
+            URLConnection connection = url.openConnection();
+            // set useCaches to false so that the connection doesn't hold up the file
+            connection.setUseCaches(false);
+            try (Reader reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8)) {
                 LegacyExtensionStorage.read(reader, bucket);
             }
         }
