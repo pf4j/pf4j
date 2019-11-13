@@ -95,11 +95,13 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         for (Element element : roundEnv.getElementsAnnotatedWith(Extension.class)) {
             // check if @Extension is put on class and not on method or constructor
             if (!(element instanceof TypeElement)) {
+                error(element, "Put annotation only on classes (no methods, no fields)");
                 continue;
             }
 
             // check if class extends/implements an extension point
             if (!isExtension(element.asType())) {
+                error(element, "%s is not an extension (it doesn't implement ExtensionPoint)", element);
                 continue;
             }
 
