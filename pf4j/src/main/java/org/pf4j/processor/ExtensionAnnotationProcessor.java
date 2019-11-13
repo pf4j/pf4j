@@ -40,6 +40,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ * Processes {@link Extension} annotations and generates an {@link ExtensionStorage}.
+ * You can specify the concrete {@link ExtensionStorage} via processor's environment options
+ * ({@link ProcessingEnvironment#getOptions()}) or system property.
+ * In both variants the option/property name is {@code pf4j.storageClassName}.
+ *
  * @author Decebal Suiu
  */
 public class ExtensionAnnotationProcessor extends AbstractProcessor {
@@ -241,4 +246,5 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
         return storage;
     }
+
 }

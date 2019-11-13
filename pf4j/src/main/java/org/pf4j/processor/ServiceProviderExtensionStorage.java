@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
+ * Stores {@link org.pf4j.Extension}s in {@code META-INF/services}.
+ *
  * @author Decebal Suiu
  */
 public class ServiceProviderExtensionStorage extends ExtensionStorage {

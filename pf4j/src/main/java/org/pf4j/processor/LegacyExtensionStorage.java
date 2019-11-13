@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
+ * Stores {@link org.pf4j.Extension}s in {@code META-INF/extensions.idx}.
+ *
  * @author Decebal Suiu
  */
 public class LegacyExtensionStorage extends ExtensionStorage {

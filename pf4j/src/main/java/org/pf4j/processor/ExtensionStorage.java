@@ -21,6 +21,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * It's a storage (database) that persists {@link org.pf4j.Extension}s.
+ * The standard operations supported by storage are {@link #read} and {@link #write}.
+ * The storage is populated by {@link ExtensionAnnotationProcessor}.
+ *
  * @author Decebal Suiu
  */
 public abstract class ExtensionStorage {
