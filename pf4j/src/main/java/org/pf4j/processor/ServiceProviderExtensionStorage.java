@@ -18,17 +18,14 @@ package org.pf4j.processor;
 import javax.annotation.processing.FilerException;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.NoSuchFileException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Stores {@link org.pf4j.Extension}s in {@code META-INF/services}.
@@ -39,26 +36,8 @@ public class ServiceProviderExtensionStorage extends ExtensionStorage {
 
     public static final String EXTENSIONS_RESOURCE = "META-INF/services";
 
-    private static final Pattern COMMENT = Pattern.compile("#.*");
-    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
-
     public ServiceProviderExtensionStorage(ExtensionAnnotationProcessor processor) {
         super(processor);
-    }
-
-    public static void read(Reader reader, Set<String> entries) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(reader);
-
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            line = COMMENT.matcher(line).replaceFirst("");
-            line = WHITESPACE.matcher(line).replaceAll("");
-            if (line.length() > 0) {
-                entries.add(line);
-            }
-        }
-
-        bufferedReader.close();
     }
 
     @Override

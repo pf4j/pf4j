@@ -17,8 +17,12 @@ package org.pf4j.processor;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * It's a storage (database) that persists {@link org.pf4j.Extension}s.
@@ -28,6 +32,9 @@ import java.util.Set;
  * @author Decebal Suiu
  */
 public abstract class ExtensionStorage {
+
+    private static final Pattern COMMENT = Pattern.compile("#.*");
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     protected final ExtensionAnnotationProcessor processor;
 
@@ -72,6 +79,21 @@ public abstract class ExtensionStorage {
      */
     protected void info(Element element, String message, Object... args) {
         processor.info(element, message, args);
+    }
+
+    public static void read(Reader reader, Set<String> entries) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
+
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            line = COMMENT.matcher(line).replaceFirst("");
+            line = WHITESPACE.matcher(line).replaceAll("");
+            if (line.length() > 0) {
+                entries.add(line);
+            }
+        }
+
+        bufferedReader.close();
     }
 
 }
