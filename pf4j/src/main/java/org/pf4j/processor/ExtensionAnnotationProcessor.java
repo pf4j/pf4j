@@ -33,6 +33,7 @@ import javax.tools.Diagnostic;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -60,32 +61,13 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     private List<Class<? extends Annotation>> extensionAnnotations;
 
     @Override
-    @SuppressWarnings("unchecked")
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
         info("%s init", ExtensionAnnotationProcessor.class);
-        storage = createStorage();
 
-        extensionAnnotations = new ArrayList<>();
-        String option = processingEnv.getOptions().get(EXTENSION_ANNOTATIONS);
-        if (option != null) {
-            String[] items = option.split(",");
-            if (items.length > 0) {
-                for (String item : items) {
-                    try {
-                        Class<? extends Annotation> clazz = (Class<? extends Annotation>) getClass().getClassLoader().loadClass(item);
-                        if (clazz.isAnnotationPresent(Extension.class)) {
-                            extensionAnnotations.add(clazz);
-                        } else {
-                            error("$s doesn't contain @Extension", item);
-                        }
-                    } catch (ClassNotFoundException e) {
-                        error(e.getMessage());
-                    }
-                }
-            }
-        }
+        initStorage();
+        initExtensionAnnotations();
     }
 
     @Override
@@ -95,11 +77,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        Set<String> annotationTypes = new HashSet<>();
-        annotationTypes.add(Extension.class.getName());
-        extensionAnnotations.forEach(clazz -> annotationTypes.add(clazz.getName()));
-
-        return annotationTypes;
+        return Collections.singleton("*");
     }
 
     @Override
@@ -178,6 +156,14 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         return oldExtensions;
     }
 
+    public ExtensionStorage getStorage() {
+        return storage;
+    }
+
+    public List<Class<? extends Annotation>> getExtensionAnnotations() {
+        return extensionAnnotations;
+    }
+
     @SuppressWarnings("unchecked")
     private List<TypeElement> findExtensionPoints(TypeElement extensionElement) {
         List<TypeElement> extensionPointElements = new ArrayList<>();
@@ -228,9 +214,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     }
 
     @SuppressWarnings("unchecked")
-    private ExtensionStorage createStorage() {
-        ExtensionStorage storage = null;
-
+    private void initStorage() {
         // search in processing options
         String storageClassName = processingEnv.getOptions().get(STORAGE_CLASS_NAME);
         if (storageClassName == null) {
@@ -253,8 +237,29 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             // default storage
             storage = new LegacyExtensionStorage(this);
         }
+    }
 
-        return storage;
+    @SuppressWarnings("unchecked")
+    private void initExtensionAnnotations() {
+        extensionAnnotations = new ArrayList<>();
+        String option = processingEnv.getOptions().get(EXTENSION_ANNOTATIONS);
+        if (option != null) {
+            String[] items = option.split(",");
+            if (items.length > 0) {
+                for (String item : items) {
+                    try {
+                        Class<? extends Annotation> clazz = (Class<? extends Annotation>) getClass().getClassLoader().loadClass(item);
+                        if (clazz.isAnnotationPresent(Extension.class)) {
+                            extensionAnnotations.add(clazz);
+                        } else {
+                            error("$s doesn't contain @Extension", item);
+                        }
+                    } catch (ClassNotFoundException e) {
+                        error(e.getMessage());
+                    }
+                }
+            }
+        }
     }
 
     private void processExtensionElement(Element element) {
