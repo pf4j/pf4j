@@ -61,7 +61,8 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         super.init(processingEnv);
 
         info("%s init", ExtensionAnnotationProcessor.class);
-        storage = createStorage();
+
+        initStorage();
     }
 
     @Override
@@ -170,6 +171,11 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         return oldExtensions;
     }
 
+    public ExtensionStorage getStorage() {
+        return storage;
+    }
+
+    @SuppressWarnings("unchecked")
     private List<TypeElement> findExtensionPoints(TypeElement extensionElement) {
         List<TypeElement> extensionPointElements = new ArrayList<>();
 
@@ -214,15 +220,12 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         return processingEnv.getTypeUtils().isAssignable(typeMirror, getExtensionPointType());
     }
 
-
     private TypeMirror getExtensionPointType() {
         return processingEnv.getElementUtils().getTypeElement(ExtensionPoint.class.getName()).asType();
     }
 
     @SuppressWarnings("unchecked")
-    private ExtensionStorage createStorage() {
-        ExtensionStorage storage = null;
-
+    private void initStorage() {
         // search in processing options
         String storageClassName = processingEnv.getOptions().get(STORAGE_CLASS_NAME);
         if (storageClassName == null) {
@@ -245,8 +248,6 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             // default storage
             storage = new LegacyExtensionStorage(this);
         }
-
-        return storage;
     }
 
 }
