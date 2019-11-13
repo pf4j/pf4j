@@ -22,7 +22,9 @@ import org.pf4j.processor.ExtensionAnnotationProcessor;
 import org.pf4j.processor.LegacyExtensionStorage;
 
 import javax.tools.JavaFileObject;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,12 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Mario Franco
+ * @author Decebal Suiu
  */
 public class ExtensionAnnotationProcessorTest {
 
     private static final JavaFileObject Greeting = JavaFileObjects.forSourceLines(
         "Greeting",
-        "package com.mycompany;",
+        "package test;",
         "import org.pf4j.ExtensionPoint;",
         "",
         "public interface Greeting extends ExtensionPoint {",
@@ -46,7 +49,7 @@ public class ExtensionAnnotationProcessorTest {
 
     private static final JavaFileObject WhazzupGreeting = JavaFileObjects.forSourceLines(
         "WhazzupGreeting",
-        "package com.mycompany;",
+        "package test;",
         "import org.pf4j.Extension;",
         "",
         "@Extension",
@@ -59,7 +62,7 @@ public class ExtensionAnnotationProcessorTest {
 
     private static final JavaFileObject WhazzupGreeting_No_ExtensionPoint = JavaFileObjects.forSourceLines(
         "WhazzupGreeting",
-        "package com.mycompany;",
+        "package test;",
         "import org.pf4j.Extension;",
         "",
         "@Extension",
@@ -69,6 +72,7 @@ public class ExtensionAnnotationProcessorTest {
         "       return \"Whazzup\";",
         "    }",
         "}");
+
     @Test
     public void getSupportedAnnotationTypes() {
         ExtensionAnnotationProcessor instance = new ExtensionAnnotationProcessor();
@@ -90,10 +94,10 @@ public class ExtensionAnnotationProcessorTest {
         Compilation compilation = javac().withProcessors(processor).withOptions("-Ab=2", "-Ac=3")
             .compile(Greeting, WhazzupGreeting);
         assertEquals(compilation.status(), Compilation.Status.SUCCESS);
-        Map<String, String> result = new HashMap<>();
-        result.put("b", "2");
-        result.put("c", "3");
-        assertEquals(processor.getProcessingEnvironment().getOptions(), result);
+        Map<String, String> options = new HashMap<>();
+        options.put("b", "2");
+        options.put("c", "3");
+        assertEquals(options, processor.getProcessingEnvironment().getOptions());
     }
 
     @Test
@@ -120,6 +124,16 @@ public class ExtensionAnnotationProcessorTest {
             .inFile(WhazzupGreeting_No_ExtensionPoint)
             .onLine(5)
             .atColumn(8);
+    }
+
+    @Test
+    public void getExtensions() {
+        ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
+        Compilation compilation = javac().withProcessors(processor).compile(Greeting, WhazzupGreeting);
+        assertThat(compilation).succeededWithoutWarnings();
+        Map<String, Set<String>> extensions = new HashMap<>();
+        extensions.put("test.Greeting", new HashSet<>(Collections.singletonList("test.WhazzupGreeting")));
+        assertEquals(extensions, processor.getExtensions());
     }
 
 }
