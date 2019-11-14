@@ -92,12 +92,17 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         }
 
         info("Processing @%s", Extension.class.getName());
-        List<TypeElement> extensionAnnotations = new ArrayList<>();
         for (Element element : roundEnv.getElementsAnnotatedWith(Extension.class)) {
-            if (element.getKind() == ElementKind.ANNOTATION_TYPE) {
-                extensionAnnotations.add((TypeElement) element);
-            } else {
+            if (element.getKind() != ElementKind.ANNOTATION_TYPE) {
                 processExtensionElement(element);
+            }
+        }
+
+        // collect nested extension annotations
+        List<TypeElement> extensionAnnotations = new ArrayList<>();
+        for (TypeElement annotation : annotations) {
+            if (ClassUtils.getAnnotationMirror(annotation, Extension.class) != null) {
+                extensionAnnotations.add(annotation);
             }
         }
 
