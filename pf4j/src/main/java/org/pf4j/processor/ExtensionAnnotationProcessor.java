@@ -25,12 +25,12 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,22 +52,19 @@ import java.util.TreeSet;
 public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
     private static final String STORAGE_CLASS_NAME = "pf4j.storageClassName";
-    private static final String EXTENSION_ANNOTATIONS = "pf4j.extensionAnnotations";
 
     private Map<String, Set<String>> extensions = new HashMap<>(); // the key is the extension point
     private Map<String, Set<String>> oldExtensions = new HashMap<>(); // the key is the extension point
 
     private ExtensionStorage storage;
-    private List<Class<? extends Annotation>> extensionAnnotations;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
-        info("%s init", ExtensionAnnotationProcessor.class);
+        info("%s init", ExtensionAnnotationProcessor.class.getName());
 
         initStorage();
-        initExtensionAnnotations();
     }
 
     @Override
@@ -84,7 +81,6 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     public Set<String> getSupportedOptions() {
         Set<String> options = new HashSet<>();
         options.add(STORAGE_CLASS_NAME);
-        options.add(EXTENSION_ANNOTATIONS);
 
         return options;
     }
@@ -95,14 +91,20 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             return false;
         }
 
-        info("Processing @%s", Extension.class);
+        info("Processing @%s", Extension.class.getName());
+        List<TypeElement> extensionAnnotations = new ArrayList<>();
         for (Element element : roundEnv.getElementsAnnotatedWith(Extension.class)) {
-            processExtensionElement(element);
+            if (element.getKind() == ElementKind.ANNOTATION_TYPE) {
+                extensionAnnotations.add((TypeElement) element);
+            } else {
+                processExtensionElement(element);
+            }
         }
 
-        for (Class<? extends Annotation> extensionAnnotation : extensionAnnotations) {
-            info("Processing @%s", extensionAnnotation);
-            for (Element element : roundEnv.getElementsAnnotatedWith(extensionAnnotation)) {
+        // process nested extension annotations
+        for (TypeElement te : extensionAnnotations) {
+            info("Processing @%s", te);
+            for (Element element : roundEnv.getElementsAnnotatedWith(te)) {
                 processExtensionElement(element);
             }
         }
@@ -158,10 +160,6 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
     public ExtensionStorage getStorage() {
         return storage;
-    }
-
-    public List<Class<? extends Annotation>> getExtensionAnnotations() {
-        return extensionAnnotations;
     }
 
     @SuppressWarnings("unchecked")
@@ -239,29 +237,6 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void initExtensionAnnotations() {
-        extensionAnnotations = new ArrayList<>();
-        String option = processingEnv.getOptions().get(EXTENSION_ANNOTATIONS);
-        if (option != null) {
-            String[] items = option.split(",");
-            if (items.length > 0) {
-                for (String item : items) {
-                    try {
-                        Class<? extends Annotation> clazz = (Class<? extends Annotation>) getClass().getClassLoader().loadClass(item);
-                        if (clazz.isAnnotationPresent(Extension.class)) {
-                            extensionAnnotations.add(clazz);
-                        } else {
-                            error("$s doesn't contain @Extension", item);
-                        }
-                    } catch (ClassNotFoundException e) {
-                        error(e.getMessage());
-                    }
-                }
-            }
-        }
-    }
-
     private void processExtensionElement(Element element) {
         // check if @Extension is put on class and not on method or constructor
         if (!(element instanceof TypeElement)) {
@@ -278,7 +253,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         TypeElement extensionElement = (TypeElement) element;
         List<TypeElement> extensionPointElements = findExtensionPoints(extensionElement);
         if (extensionPointElements.isEmpty()) {
-            // TODO throw error ?
+            error(element, "No extension points found for extension %s", extensionElement);
             return;
         }
 
