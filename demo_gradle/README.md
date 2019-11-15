@@ -26,7 +26,10 @@ This demo assumes that you know the basics of Gradle (Please look at [gradle](ht
 [main] INFO org.pf4j.demo.Boot - ########################################
 [main] INFO org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
 [main] INFO org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
-[main] INFO org.pf4j.DefaultPluginManager - PF4J version 2.0.0 in 'deployment' mode
+[main] INFO org.pf4j.DefaultPluginManager - PF4J version 3.1.0 in 'deployment' mode
+[main] INFO org.pf4j.util.FileUtils - Expanded plugin zip 'plugin-hello-plugin-0.0.1.zip' in 'plugin-hello-plugin-0.0.1'
+[main] INFO org.pf4j.util.FileUtils - Expanded plugin zip 'plugin-KotlinPlugin-1.0.0.zip' in 'plugin-KotlinPlugin-1.0.0'
+[main] INFO org.pf4j.util.FileUtils - Expanded plugin zip 'plugin-welcome-plugin-0.0.1.zip' in 'plugin-welcome-plugin-0.0.1'
 [main] INFO org.pf4j.AbstractPluginManager - Plugin 'welcome-plugin@0.0.1' resolved
 [main] INFO org.pf4j.AbstractPluginManager - Plugin 'KotlinPlugin@1.0.0' resolved
 [main] INFO org.pf4j.AbstractPluginManager - Plugin 'hello-plugin@0.0.1' resolved
