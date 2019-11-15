@@ -115,7 +115,7 @@ public class ExtensionAnnotationProcessorTest {
     public void getSupportedOptions() {
         ExtensionAnnotationProcessor instance = new ExtensionAnnotationProcessor();
         Set<String> result = instance.getSupportedOptions();
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
     }
 
     @Test
