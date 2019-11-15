@@ -15,6 +15,7 @@
  */
 package org.pf4j;
 
+import org.pf4j.processor.ExtensionStorage;
 import org.pf4j.processor.LegacyExtensionStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,7 +114,7 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
 
     private void collectExtensions(InputStream inputStream, Set<String> bucket) throws IOException {
         try (Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-            LegacyExtensionStorage.read(reader, bucket);
+            ExtensionStorage.read(reader, bucket);
         }
     }
 

@@ -15,6 +15,7 @@
  */
 package org.pf4j;
 
+import org.pf4j.processor.ExtensionStorage;
 import org.pf4j.processor.ServiceProviderExtensionStorage;
 import org.pf4j.util.FileUtils;
 import org.slf4j.Logger;
@@ -139,7 +140,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 log.debug("Read '{}'", file);
                 try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-                    ServiceProviderExtensionStorage.read(reader, result);
+                    ExtensionStorage.read(reader, result);
                 }
 
                 return FileVisitResult.CONTINUE;

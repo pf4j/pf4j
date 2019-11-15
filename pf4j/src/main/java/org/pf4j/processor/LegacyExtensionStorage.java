@@ -48,7 +48,7 @@ public class LegacyExtensionStorage extends ExtensionStorage {
             FileObject file = getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", EXTENSIONS_RESOURCE);
             // TODO try to calculate the extension point
             Set<String> entries = new HashSet<>();
-            read(file.openReader(true), entries);
+            ExtensionStorage.read(file.openReader(true), entries);
             extensions.put(null, entries);
         } catch (FileNotFoundException | NoSuchFileException e) {
             // doesn't exist, ignore
