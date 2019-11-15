@@ -18,6 +18,7 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.plugin.PluginZip;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,7 +44,7 @@ public class DefaultPluginRepositoryTest {
         // Prove that we can delete a folder with a file inside
         Files.createFile(plugin1Path.resolve("myfile"));
         // Create a zip file for plugin-1 to test that it is deleted when plugin is deleted
-        Files.createFile(pluginsPath.resolve("plugin-1.zip"));
+        new PluginZip.Builder(pluginsPath.resolve("plugin-1.zip"), "plugin-1").pluginVersion("1.0").build();
         Files.createDirectory(pluginsPath.resolve("plugin-2"));
         Files.createDirectory(pluginsPath.resolve("plugin-3"));
     }
