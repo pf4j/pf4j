@@ -1,10 +1,14 @@
 apply plugin: 'application'
 
 mainClassName = 'org.pf4j.demo.Boot'
+run {
+  systemProperty 'pf4j.pluginsDir', '../build/plugins'
+}
 
 dependencies {
   compile project(':api')
   compile group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}"
+  annotationProcessor(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
 
@@ -13,19 +17,19 @@ dependencies {
 
 task uberjar(type: Jar, dependsOn: ['compileJava']) {
   zip64 true
-  from configurations.runtime.asFileTree.files.collect {
+  from configurations.runtimeClasspath.asFileTree.files.collect {
     exclude "META-INF/*.SF"
     exclude "META-INF/*.DSA"
     exclude "META-INF/*.RSA"
     zipTree(it)
   }
-  from files(sourceSets.main.output.classesDir)
+  from files(sourceSets.main.output.classesDirs)
   from files(sourceSets.main.resources)
   manifest {
     attributes 'Main-Class': mainClassName
   }
 
-  baseName = "${project.name}-plugin-demo"
-  classifier = "uberjar"
+  archiveBaseName = "${project.name}-plugin-demo"
+  archiveClassifier = "uberjar"
 }
 
