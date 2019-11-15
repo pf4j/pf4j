@@ -25,6 +25,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -32,6 +33,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +62,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
-        info("%s init", ExtensionAnnotationProcessor.class);
+        info("%s init", ExtensionAnnotationProcessor.class.getName());
 
         initStorage();
     }
@@ -72,10 +74,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        Set<String> annotationTypes = new HashSet<>();
-        annotationTypes.add(Extension.class.getName());
-
-        return annotationTypes;
+        return Collections.singleton("*");
     }
 
     @Override
@@ -92,33 +91,26 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             return false;
         }
 
-        info("Processing @%s", Extension.class);
+        info("Processing @%s", Extension.class.getName());
         for (Element element : roundEnv.getElementsAnnotatedWith(Extension.class)) {
-            // check if @Extension is put on class and not on method or constructor
-            if (!(element instanceof TypeElement)) {
-                error(element, "Put annotation only on classes (no methods, no fields)");
-                continue;
+            if (element.getKind() != ElementKind.ANNOTATION_TYPE) {
+                processExtensionElement(element);
             }
+        }
 
-            // check if class extends/implements an extension point
-            if (!isExtension(element.asType())) {
-                error(element, "%s is not an extension (it doesn't implement ExtensionPoint)", element);
-                continue;
+        // collect nested extension annotations
+        List<TypeElement> extensionAnnotations = new ArrayList<>();
+        for (TypeElement annotation : annotations) {
+            if (ClassUtils.getAnnotationMirror(annotation, Extension.class) != null) {
+                extensionAnnotations.add(annotation);
             }
+        }
 
-            TypeElement extensionElement = (TypeElement) element;
-//            Extension annotation = element.getAnnotation(Extension.class);
-            List<TypeElement> extensionPointElements = findExtensionPoints(extensionElement);
-            if (extensionPointElements.isEmpty()) {
-                // TODO throw error ?
-                continue;
-            }
-
-            String extension = getBinaryName(extensionElement);
-            for (TypeElement extensionPointElement : extensionPointElements) {
-                String extensionPoint = getBinaryName(extensionPointElement);
-                Set<String> extensionPoints = extensions.computeIfAbsent(extensionPoint, k -> new TreeSet<>());
-                extensionPoints.add(extension);
+        // process nested extension annotations
+        for (TypeElement te : extensionAnnotations) {
+            info("Processing @%s", te);
+            for (Element element : roundEnv.getElementsAnnotatedWith(te)) {
+                processExtensionElement(element);
             }
         }
 
@@ -247,6 +239,34 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         if (storage == null) {
             // default storage
             storage = new LegacyExtensionStorage(this);
+        }
+    }
+
+    private void processExtensionElement(Element element) {
+        // check if @Extension is put on class and not on method or constructor
+        if (!(element instanceof TypeElement)) {
+            error(element, "Put annotation only on classes (no methods, no fields)");
+            return;
+        }
+
+        // check if class extends/implements an extension point
+        if (!isExtension(element.asType())) {
+            error(element, "%s is not an extension (it doesn't implement ExtensionPoint)", element);
+            return;
+        }
+
+        TypeElement extensionElement = (TypeElement) element;
+        List<TypeElement> extensionPointElements = findExtensionPoints(extensionElement);
+        if (extensionPointElements.isEmpty()) {
+            error(element, "No extension points found for extension %s", extensionElement);
+            return;
+        }
+
+        String extension = getBinaryName(extensionElement);
+        for (TypeElement extensionPointElement : extensionPointElements) {
+            String extensionPoint = getBinaryName(extensionPointElement);
+            Set<String> extensionPoints = extensions.computeIfAbsent(extensionPoint, k -> new TreeSet<>());
+            extensionPoints.add(extension);
         }
     }
 

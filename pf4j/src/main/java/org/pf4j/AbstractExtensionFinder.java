@@ -20,6 +20,7 @@ import org.pf4j.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -340,13 +341,28 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
     }
 
     private ExtensionWrapper createExtensionWrapper(Class<?> extensionClass) {
-        int ordinal = 0;
-        if (extensionClass.isAnnotationPresent(Extension.class)) {
-            ordinal = extensionClass.getAnnotation(Extension.class).ordinal();
-        }
+        Extension extensionAnnotation = findExtensionAnnotation(extensionClass);
+        int ordinal = extensionAnnotation != null ? extensionAnnotation.ordinal() : 0;
         ExtensionDescriptor descriptor = new ExtensionDescriptor(ordinal, extensionClass);
 
         return new ExtensionWrapper<>(descriptor, pluginManager.getExtensionFactory());
+    }
+
+    private Extension findExtensionAnnotation(Class<?> clazz) {
+        if (clazz.isAnnotationPresent(Extension.class)) {
+            return clazz.getAnnotation(Extension.class);
+        }
+
+        // search recursively through all annotations
+        for (Annotation annotation : clazz.getAnnotations()) {
+            Class<? extends Annotation> annotationClass = annotation.annotationType();
+            Extension extensionAnnotation = findExtensionAnnotation(annotationClass);
+            if (extensionAnnotation != null) {
+                return extensionAnnotation;
+            }
+        }
+
+        return null;
     }
 
     private void checkDifferentClassLoaders(Class<?> type, Class<?> extensionClass) {

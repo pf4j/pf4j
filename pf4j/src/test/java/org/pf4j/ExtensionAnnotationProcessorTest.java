@@ -60,7 +60,7 @@ public class ExtensionAnnotationProcessorTest {
         "    }",
         "}");
 
-    private static final JavaFileObject WhazzupGreeting_No_ExtensionPoint = JavaFileObjects.forSourceLines(
+    private static final JavaFileObject WhazzupGreeting_NoExtensionPoint = JavaFileObjects.forSourceLines(
         "WhazzupGreeting",
         "package test;",
         "import org.pf4j.Extension;",
@@ -73,12 +73,42 @@ public class ExtensionAnnotationProcessorTest {
         "    }",
         "}");
 
+    private static final JavaFileObject SpinnakerExtension = JavaFileObjects.forSourceLines(
+        "SpinnakerExtension",
+        "package test;",
+        "",
+        "import org.pf4j.Extension;",
+        "import java.lang.annotation.Documented;",
+        "import java.lang.annotation.ElementType;",
+        "import java.lang.annotation.Retention;",
+        "import java.lang.annotation.RetentionPolicy;",
+        "import java.lang.annotation.Target;",
+        "",
+        "@Extension",
+        "@Retention(RetentionPolicy.RUNTIME)",
+        "@Target(ElementType.TYPE)",
+        "@Documented",
+        "public @interface SpinnakerExtension {",
+        "}");
+
+    private static final JavaFileObject WhazzupGreeting_SpinnakerExtension = JavaFileObjects.forSourceLines(
+        "WhazzupGreeting",
+        "package test;",
+        "",
+        "@SpinnakerExtension",
+        "public class WhazzupGreeting implements Greeting {",
+        "   @Override",
+        "    public String getGreeting() {",
+        "       return \"Whazzup\";",
+        "    }",
+        "}");
+
     @Test
     public void getSupportedAnnotationTypes() {
         ExtensionAnnotationProcessor instance = new ExtensionAnnotationProcessor();
         Set<String> result = instance.getSupportedAnnotationTypes();
         assertEquals(1, result.size());
-        assertEquals(Extension.class.getName(), result.iterator().next());
+        assertEquals("*", result.iterator().next());
     }
 
     @Test
@@ -118,10 +148,10 @@ public class ExtensionAnnotationProcessorTest {
     @Test
     public void compileWithError() {
         ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
-        Compilation compilation = javac().withProcessors(processor).compile(Greeting, WhazzupGreeting_No_ExtensionPoint);
+        Compilation compilation = javac().withProcessors(processor).compile(Greeting, WhazzupGreeting_NoExtensionPoint);
         assertThat(compilation).failed();
         assertThat(compilation).hadErrorContaining("it doesn't implement ExtensionPoint")
-            .inFile(WhazzupGreeting_No_ExtensionPoint)
+            .inFile(WhazzupGreeting_NoExtensionPoint)
             .onLine(5)
             .atColumn(8);
     }
@@ -130,6 +160,16 @@ public class ExtensionAnnotationProcessorTest {
     public void getExtensions() {
         ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
         Compilation compilation = javac().withProcessors(processor).compile(Greeting, WhazzupGreeting);
+        assertThat(compilation).succeededWithoutWarnings();
+        Map<String, Set<String>> extensions = new HashMap<>();
+        extensions.put("test.Greeting", new HashSet<>(Collections.singletonList("test.WhazzupGreeting")));
+        assertEquals(extensions, processor.getExtensions());
+    }
+
+    @Test
+    public void compileNestedExtensionAnnotation() {
+        ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
+        Compilation compilation = javac().withProcessors(processor).compile(Greeting, SpinnakerExtension, WhazzupGreeting_SpinnakerExtension);
         assertThat(compilation).succeededWithoutWarnings();
         Map<String, Set<String>> extensions = new HashMap<>();
         extensions.put("test.Greeting", new HashSet<>(Collections.singletonList("test.WhazzupGreeting")));

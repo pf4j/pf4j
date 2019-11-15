@@ -19,7 +19,6 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -93,8 +92,16 @@ public class ClassUtils {
                 return m;
             }
         }
+
         return null;
     }
+
+    /*
+    public static Element getAnnotationMirrorElement(TypeElement typeElement, Class<?> annotationClass) {
+        AnnotationMirror annotationMirror = getAnnotationMirror(typeElement, annotationClass);
+        return annotationMirror != null ? annotationMirror.getAnnotationType().asElement() : null;
+    }
+    */
 
     /**
      * Get a certain parameter of an {@link AnnotationMirror}.
@@ -111,6 +118,7 @@ public class ClassUtils {
                 return entry.getValue();
             }
         }
+
         return null;
     }
 
@@ -126,9 +134,7 @@ public class ClassUtils {
      */
     public static AnnotationValue getAnnotationValue(TypeElement typeElement, Class<?> annotationClass, String annotationParameter) {
         AnnotationMirror annotationMirror = getAnnotationMirror(typeElement, annotationClass);
-        return (annotationMirror != null) ?
-            getAnnotationValue(annotationMirror, annotationParameter) :
-            null;
+        return annotationMirror != null ? getAnnotationValue(annotationMirror, annotationParameter) : null;
     }
 
     /**
