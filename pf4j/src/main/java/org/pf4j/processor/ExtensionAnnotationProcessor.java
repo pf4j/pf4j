@@ -52,19 +52,23 @@ import java.util.TreeSet;
 public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
     private static final String STORAGE_CLASS_NAME = "pf4j.storageClassName";
+    private static final String IGNORE_EXTENSION_POINT = "pf4j.ignoreExtensionPoint";
 
     private Map<String, Set<String>> extensions = new HashMap<>(); // the key is the extension point
     private Map<String, Set<String>> oldExtensions = new HashMap<>(); // the key is the extension point
 
     private ExtensionStorage storage;
+    private boolean ignoreExtensionPoint;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
         info("%s init", ExtensionAnnotationProcessor.class.getName());
+        info("Options %s", processingEnv.getOptions());
 
         initStorage();
+        initIgnoreExtensionPoint();
     }
 
     @Override
@@ -81,6 +85,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     public Set<String> getSupportedOptions() {
         Set<String> options = new HashSet<>();
         options.add(STORAGE_CLASS_NAME);
+        options.add(IGNORE_EXTENSION_POINT);
 
         return options;
     }
@@ -186,11 +191,11 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         // detect extension points automatically, if they are not explicitly configured (default behaviour)
         else {
             // search in interfaces
-            for (TypeMirror item : extensionElement.getInterfaces()) {
+            List<? extends TypeMirror> interfaces = extensionElement.getInterfaces();
+            for (TypeMirror item : interfaces) {
                 boolean isExtensionPoint = processingEnv.getTypeUtils().isSubtype(item, getExtensionPointType());
                 if (isExtensionPoint) {
-                    TypeElement extensionPointElement = (TypeElement) ((DeclaredType) item).asElement();
-                    extensionPointElements.add(extensionPointElement);
+                    extensionPointElements.add(getElement(item));
                 }
             }
 
@@ -199,8 +204,18 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             if (superclass.getKind() != TypeKind.NONE) {
                 boolean isExtensionPoint = processingEnv.getTypeUtils().isSubtype(superclass, getExtensionPointType());
                 if (isExtensionPoint) {
-                    TypeElement extensionPointElement = (TypeElement) ((DeclaredType) superclass).asElement();
-                    extensionPointElements.add(extensionPointElement);
+                    extensionPointElements.add(getElement(superclass));
+                }
+            }
+
+            // pickup the first interface
+            if (extensionPointElements.isEmpty() && ignoreExtensionPoint) {
+                if (interfaces.isEmpty()) {
+                    error(extensionElement, "%s is not an extension (it doesn't implement any interface)", extensionElement);
+                } else if (interfaces.size() == 1) {
+                    extensionPointElements.add(getElement(interfaces.get(0)));
+                } else {
+                    error(extensionElement, "%s is not an extension (it implements multiple interfaces)", extensionElement);
                 }
             }
         }
@@ -242,6 +257,12 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         }
     }
 
+    private void initIgnoreExtensionPoint() {
+        // search in processing options and system properties
+        ignoreExtensionPoint = getProcessingEnvironment().getOptions().containsKey(IGNORE_EXTENSION_POINT) ||
+            System.getProperty(IGNORE_EXTENSION_POINT) != null;
+    }
+
     private void processExtensionElement(Element element) {
         // check if @Extension is put on class and not on method or constructor
         if (!(element instanceof TypeElement)) {
@@ -250,7 +271,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         }
 
         // check if class extends/implements an extension point
-        if (!isExtension(element.asType())) {
+        if (!ignoreExtensionPoint && !isExtension(element.asType())) {
             error(element, "%s is not an extension (it doesn't implement ExtensionPoint)", element);
             return;
         }
@@ -268,6 +289,10 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             Set<String> extensionPoints = extensions.computeIfAbsent(extensionPoint, k -> new TreeSet<>());
             extensionPoints.add(extension);
         }
+    }
+
+    private TypeElement getElement(TypeMirror typeMirror) {
+        return (TypeElement) ((DeclaredType) typeMirror).asElement();
     }
 
 }
