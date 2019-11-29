@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [3.2.0] - 2019-11-29
+
+#### Fixed
 - Fix flaky test `DefaultPluginRepositoryTest.testGetPluginArchive`
 - [#349]: Fix Gradle demo
 
@@ -354,7 +364,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.1.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.2.0...HEAD
+[3.2.0]: https://github.com/decebals/pf4j/compare/release-3.1.0...release-3.2.0
 [3.1.0]: https://github.com/decebals/pf4j/compare/release-3.0.0...release-3.1.0
 [3.0.0]: https://github.com/decebals/pf4j/compare/release-2.6.0...release-3.0.0
 [2.6.0]: https://github.com/decebals/pf4j/compare/release-2.5.0...release-2.6.0
