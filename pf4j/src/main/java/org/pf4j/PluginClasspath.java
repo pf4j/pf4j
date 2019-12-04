@@ -18,6 +18,7 @@ package org.pf4j;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -60,4 +61,17 @@ public class PluginClasspath {
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PluginClasspath)) return false;
+        PluginClasspath that = (PluginClasspath) o;
+        return classesDirectories.equals(that.classesDirectories) &&
+            jarsDirectories.equals(that.jarsDirectories);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(classesDirectories, jarsDirectories);
+    }
 }

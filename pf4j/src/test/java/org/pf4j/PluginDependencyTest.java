@@ -33,32 +33,44 @@ public class PluginDependencyTest {
     @Test
     public void testPluginDependecy() {
         PluginDependency instance = new PluginDependency("test");
+        PluginDependency instance2 = new PluginDependency("test");
+        assertEquals(instance, instance2);
         assertEquals("test", instance.getPluginId());
         assertEquals("*", instance.getPluginVersionSupport());
         assertFalse(instance.isOptional());
 
         instance = new PluginDependency("test@");
+        instance2 = new PluginDependency("test@");
+        assertEquals(instance, instance2);
         assertEquals("test", instance.getPluginId());
         assertEquals("*", instance.getPluginVersionSupport());
         assertFalse(instance.isOptional());
 
         instance = new PluginDependency("test?");
+        instance2 = new PluginDependency("test?");
+        assertEquals(instance, instance2);
         assertEquals("test", instance.getPluginId());
         assertEquals("*", instance.getPluginVersionSupport());
         assertTrue(instance.isOptional());
 
         instance = new PluginDependency("test?@");
+        instance2 = new PluginDependency("test?@");
+        assertEquals(instance, instance2);
         assertEquals("test", instance.getPluginId());
         assertEquals("*", instance.getPluginVersionSupport());
         assertTrue(instance.isOptional());
 
         instance = new PluginDependency("test@1.0");
+        instance2 = new PluginDependency("test@1.0");
+        assertEquals(instance, instance2);
         assertEquals("test", instance.getPluginId());
         assertEquals("1.0", instance.getPluginVersionSupport());
         assertFalse(instance.isOptional());
         assertEquals("PluginDependency [pluginId=test, pluginVersionSupport=1.0, optional=false]", instance.toString());
 
         instance = new PluginDependency("test?@1.0");
+        instance2 = new PluginDependency("test?@1.0");
+        assertEquals(instance, instance2);
         assertEquals("test", instance.getPluginId());
         assertEquals("1.0", instance.getPluginVersionSupport());
         assertTrue(instance.isOptional());
