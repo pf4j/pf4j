@@ -15,6 +15,8 @@
  */
 package org.pf4j;
 
+import java.util.Objects;
+
 /**
  * @author Decebal Suiu
  */
@@ -61,4 +63,18 @@ public class PluginDependency {
             + optional + "]";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PluginDependency)) return false;
+        PluginDependency that = (PluginDependency) o;
+        return optional == that.optional &&
+            pluginId.equals(that.pluginId) &&
+            pluginVersionSupport.equals(that.pluginVersionSupport);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pluginId, pluginVersionSupport, optional);
+    }
 }

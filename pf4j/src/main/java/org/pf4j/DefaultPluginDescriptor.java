@@ -18,6 +18,7 @@ package org.pf4j;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Decebal Suiu
@@ -196,4 +197,23 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DefaultPluginDescriptor)) return false;
+        DefaultPluginDescriptor that = (DefaultPluginDescriptor) o;
+        return Objects.equals(pluginId, that.pluginId) &&
+            Objects.equals(pluginDescription, that.pluginDescription) &&
+            Objects.equals(pluginClass, that.pluginClass) &&
+            Objects.equals(version, that.version) &&
+            Objects.equals(requires, that.requires) &&
+            Objects.equals(provider, that.provider) &&
+            dependencies.equals(that.dependencies) &&
+            Objects.equals(license, that.license);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pluginId, pluginDescription, pluginClass, version, requires, provider, dependencies, license);
+    }
 }
