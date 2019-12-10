@@ -230,7 +230,9 @@ public class FileUtils {
     }
 
     public static Path getPath(URI uri, String first, String... more) throws IOException {
-        return getFileSystem(uri).getPath(first, more);
+        try (FileSystem fs = getFileSystem(uri)) {
+            return fs.getPath(first, more);
+        }
     }
 
     public static Path findFile(Path directoryPath, String fileName) {
