@@ -19,6 +19,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.plugin.PluginJar;
 import org.pf4j.plugin.PluginZip;
 
 import java.io.IOException;
@@ -153,6 +154,40 @@ public class DefaultPluginManagerTest {
 
         PluginWrapper plugin = pluginManager.getPlugin("myPlugin");
         assertSame(PluginState.DISABLED, plugin.getPluginState());
+    }
+
+    @Test
+    public void deleteZipPlugin() throws Exception {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        pluginManager.loadPlugin(pluginZip.path());
+        pluginManager.startPlugin(pluginZip.pluginId());
+
+        assertEquals(1, pluginManager.getPlugins().size());
+
+        boolean deleted = pluginManager.deletePlugin(pluginZip.pluginId());
+        assertTrue(deleted);
+
+        assertFalse(pluginZip.file().exists());
+    }
+
+    @Test
+    public void deleteJarPlugin() throws Exception {
+        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("my-plugin-1.2.3.jar"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        pluginManager.loadPlugin(pluginJar.path());
+        pluginManager.startPlugin(pluginJar.pluginId());
+
+        assertEquals(1, pluginManager.getPlugins().size());
+
+        boolean deleted = pluginManager.deletePlugin(pluginJar.pluginId());
+        assertTrue(deleted);
+
+        assertFalse(pluginJar.file().exists());
     }
 
 }
