@@ -230,7 +230,14 @@ public class FileUtils {
     }
 
     public static Path getPath(URI uri, String first, String... more) throws IOException {
-        return getFileSystem(uri).getPath(first, more);
+        FileSystem fileSystem = getFileSystem(uri);
+        Path path = fileSystem.getPath(first, more);
+        if ("jar".equals(uri.getScheme())) {
+            // it's a ZipFileSystem
+            fileSystem.close();
+        }
+
+        return path;
     }
 
     public static Path findFile(Path directoryPath, String fileName) {
