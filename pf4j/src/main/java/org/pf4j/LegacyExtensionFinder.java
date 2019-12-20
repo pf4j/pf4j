@@ -43,6 +43,8 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
 
     private static final Logger log = LoggerFactory.getLogger(LegacyExtensionFinder.class);
 
+    public static final String EXTENSIONS_RESOURCE = LegacyExtensionStorage.EXTENSIONS_RESOURCE;
+
     public LegacyExtensionFinder(PluginManager pluginManager) {
         super(pluginManager);
     }
@@ -54,11 +56,11 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
 
         Set<String> bucket = new HashSet<>();
         try {
-            Enumeration<URL> urls = getClass().getClassLoader().getResources(getExtensionsResource());
+            Enumeration<URL> urls = getClass().getClassLoader().getResources(EXTENSIONS_RESOURCE);
             if (urls.hasMoreElements()) {
                 collectExtensions(urls, bucket);
             } else {
-                log.debug("Cannot find '{}'", getExtensionsResource());
+                log.debug("Cannot find '{}'", EXTENSIONS_RESOURCE);
             }
 
             debugExtensions(bucket);
@@ -83,11 +85,11 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
             Set<String> bucket = new HashSet<>();
 
             try {
-                log.debug("Read '{}'", getExtensionsResource());
+                log.debug("Read '{}'", EXTENSIONS_RESOURCE);
                 ClassLoader pluginClassLoader = plugin.getPluginClassLoader();
-                try (InputStream resourceStream = pluginClassLoader.getResourceAsStream(getExtensionsResource())) {
+                try (InputStream resourceStream = pluginClassLoader.getResourceAsStream(EXTENSIONS_RESOURCE)) {
                     if (resourceStream == null) {
-                        log.debug("Cannot find '{}'", getExtensionsResource());
+                        log.debug("Cannot find '{}'", EXTENSIONS_RESOURCE);
                     } else {
                         collectExtensions(resourceStream, bucket);
                     }
@@ -116,10 +118,6 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
         try (Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
             ExtensionStorage.read(reader, bucket);
         }
-    }
-
-    private static String getExtensionsResource() {
-        return LegacyExtensionStorage.EXTENSIONS_RESOURCE;
     }
 
 }
