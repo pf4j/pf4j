@@ -45,7 +45,7 @@ public @interface Extension {
      *
      * @return classes of extension points, that are implemented by this extension
      */
-    Class<? extends ExtensionPoint>[] points() default {};
+    Class<?>[] points() default {};
 
     /**
      * An array of plugin IDs, that have to be available in order to load this extension.
