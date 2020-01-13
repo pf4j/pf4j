@@ -21,6 +21,7 @@ import org.pf4j.plugin.PluginZip;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,18 +32,34 @@ public class FileUtilsTest {
     Path pluginsPath;
 
     @Test
-    public void expandIfZip() throws Exception {
+    public void expandIfZipForZipWithOnlyModuleDescriptor() throws Exception {
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
-            .pluginVersion("1.2.3")
-            .build();
+                .pluginVersion("1.2.3")
+                .build();
 
         Path unzipped = FileUtils.expandIfZip(pluginZip.path());
         assertEquals(pluginZip.unzippedPath(), unzipped);
         assertTrue(Files.exists(unzipped.resolve("plugin.properties")));
+    }
 
+    @Test
+    public void expandIfZipForZipWithResourceFile() throws Exception {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-second-plugin-1.2.3.zip"), "myPlugin")
+                .pluginVersion("1.2.3")
+                .addFile(Paths.get("classes/META-INF/plugin-file"), "plugin")
+                .build();
+
+        Path unzipped = FileUtils.expandIfZip(pluginZip.path());
+        assertEquals(pluginZip.unzippedPath(), unzipped);
+        assertTrue(Files.exists(unzipped.resolve("classes/META-INF/plugin-file")));
+    }
+
+    @Test
+    public void expandIfZipNonZipFiles() throws Exception {
         // File without .suffix
         Path extra = pluginsPath.resolve("extra");
         assertEquals(extra, FileUtils.expandIfZip(extra));
+
         // Folder
         Path folder = pluginsPath.resolve("folder");
         assertEquals(folder, FileUtils.expandIfZip(folder));
