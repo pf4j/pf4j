@@ -78,28 +78,31 @@ public class Unzip {
         try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(source))) {
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                try {
-                    File file = new File(destination, zipEntry.getName());
+                File file = new File(destination, zipEntry.getName());
 
-                    // create intermediary directories - sometimes zip don't add them
-                    File dir = new File(file.getParent());
-                    dir.mkdirs();
+                // create intermediary directories - sometimes zip don't add them
+                File dir = new File(file.getParent());
 
-                    if (zipEntry.isDirectory()) {
-                        file.mkdirs();
-                    } else {
-                        byte[] buffer = new byte[1024];
-                        int length;
-                        try (FileOutputStream fos = new FileOutputStream(file)) {
-                            while ((length = zipInputStream.read(buffer)) >= 0) {
-                                fos.write(buffer, 0, length);
-                            }
+                mkdirsOrThrow(dir);
+
+                if (zipEntry.isDirectory()) {
+                    mkdirsOrThrow(file);
+                } else {
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        while ((length = zipInputStream.read(buffer)) >= 0) {
+                            fos.write(buffer, 0, length);
                         }
                     }
-                } catch (FileNotFoundException e) {
-                    log.error("File '{}' not found", zipEntry.getName());
                 }
             }
+        }
+    }
+
+    private static void mkdirsOrThrow(File dir) throws IOException {
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw new IOException("Failed to create directory " + dir);
         }
     }
 
