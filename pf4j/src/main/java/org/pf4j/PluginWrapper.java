@@ -141,6 +141,10 @@ public class PluginWrapper {
         this.pluginFactory = pluginFactory;
     }
 
+    /**
+     * Returns the exception with which the plugin fails to start.
+     * See @{link PluginStatus#FAILED}.
+     */
     public Exception getFailedException() {
         return failedException;
     }
@@ -148,4 +152,5 @@ public class PluginWrapper {
     public void setFailedException(Exception failedException) {
         this.failedException = failedException;
     }
+
 }
