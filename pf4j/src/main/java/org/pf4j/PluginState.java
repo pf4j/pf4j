@@ -24,12 +24,12 @@ public enum PluginState {
      * The runtime knows the plugin is there. It knows about the plugin path, the plugin descriptor.
      */
     CREATED("CREATED"),
-    
+
     /**
      * The plugin cannot be used.
      */
     DISABLED("DISABLED"),
-    
+
     /**
      * The plugin is created. All the dependencies are created and resolved.
      * The plugin is ready to be started.
@@ -44,7 +44,12 @@ public enum PluginState {
     /**
      * The {@link Plugin#stop()} has executed.
      */
-    STOPPED("STOPPED");
+    STOPPED("STOPPED"),
+
+    /**
+     * Plugin failed to start.
+     */
+    FAILED("FAILED");
 
     private String status;
 

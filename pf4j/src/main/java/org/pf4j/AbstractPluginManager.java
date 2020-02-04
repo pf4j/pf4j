@@ -331,10 +331,11 @@ public abstract class AbstractPluginManager implements PluginManager {
                     pluginWrapper.getPlugin().start();
                     pluginWrapper.setPluginState(PluginState.STARTED);
                     startedPlugins.add(pluginWrapper);
-
-                    firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
                 } catch (Exception e) {
+                    pluginWrapper.setPluginState(PluginState.FAILED);
                     log.error(e.getMessage(), e);
+                } finally {
+                    firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
                 }
             }
         }
