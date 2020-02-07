@@ -24,8 +24,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * One instance of this class should be created by plugin manager for every available plug-in.
@@ -175,8 +177,14 @@ public class PluginClassLoader extends URLClassLoader {
                 log.trace("Found resource '{}' in plugin classpath", name);
                 return url;
             }
+            
+            url = findResourceFromDependencies(name);
+            if (url != null) {
+                log.trace("Found resource '{}' in plugin dependencies", name);
+                return url;
+            }
 
-            log.trace("Couldn't find resource '{}' in plugin classpath. Delegating to parent", name);
+            log.trace("Couldn't find resource '{}' in plugin or dependencies classpath. Delegating to parent", name);
 
             return super.getResource(name);
         } else {
@@ -199,6 +207,8 @@ public class PluginClassLoader extends URLClassLoader {
 
             resources.addAll(Collections.list(findResources(name)));
 
+            resources.addAll(findResourcesFromDependencies(name));
+            
             if (getParent() != null) {
                 resources.addAll(Collections.list(getParent().getResources(name)));
             }
@@ -228,6 +238,47 @@ public class PluginClassLoader extends URLClassLoader {
         }
 
         return null;
+    }
+    
+    private URL findResourceFromDependencies(String name) {
+        log.trace("Search in dependencies for resource '{}'", name);
+        List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
+        for (PluginDependency dependency : dependencies) {
+            ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
+
+            // If the dependency is marked as optional, its class loader might not be available.
+            if (classLoader == null && dependency.isOptional()) {
+                continue;
+            }
+
+            URL url = classLoader.getResource(name);
+            if(Objects.nonNull(url)) {
+            	return url;
+            }
+        }
+
+        return null;
+    }
+    
+    private Collection<URL> findResourcesFromDependencies(String name) {
+        log.trace("Search in dependencies for resources '{}'", name);
+        List<URL> results = new ArrayList<>();
+        List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
+        for (PluginDependency dependency : dependencies) {
+            ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
+
+            // If the dependency is marked as optional, its class loader might not be available.
+            if (classLoader == null && dependency.isOptional()) {
+                continue;
+            }
+
+            URL url = classLoader.getResource(name);
+            if(Objects.nonNull(url)) {
+            	results.add(url);
+            }
+        }
+
+        return results;
     }
 
 }
