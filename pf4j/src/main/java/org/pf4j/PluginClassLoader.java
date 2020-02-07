@@ -226,7 +226,7 @@ public class PluginClassLoader extends URLClassLoader {
             ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null && dependency.isOptional()) {
+            if (classLoader == null || dependency.isOptional()) {
                 continue;
             }
 
@@ -247,7 +247,7 @@ public class PluginClassLoader extends URLClassLoader {
             ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null && dependency.isOptional()) {
+            if (classLoader == null || dependency.isOptional()) {
                 continue;
             }
 
@@ -268,7 +268,7 @@ public class PluginClassLoader extends URLClassLoader {
             ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null && dependency.isOptional()) {
+            if (classLoader == null || dependency.isOptional()) {
                 continue;
             }
 
