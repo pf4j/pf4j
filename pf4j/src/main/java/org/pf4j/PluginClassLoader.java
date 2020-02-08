@@ -252,7 +252,7 @@ public class PluginClassLoader extends URLClassLoader {
             }
 
             URL url = classLoader.getResource(name);
-            if(Objects.nonNull(url)) {
+            if (Objects.nonNull(url)) {
             	return url;
             }
         }
@@ -273,7 +273,7 @@ public class PluginClassLoader extends URLClassLoader {
             }
 
             URL url = classLoader.getResource(name);
-            if(Objects.nonNull(url)) {
+            if (Objects.nonNull(url)) {
             	results.add(url);
             }
         }
