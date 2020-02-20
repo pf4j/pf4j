@@ -42,11 +42,16 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class PluginClassLoaderTest {
 
-    private DefaultPluginManager pluginManager;
+    private TestPluginManager pluginManager;
+    private TestPluginManager pluginManagerParentFirst;
+    private DefaultPluginDescriptor pluginDependencyDescriptor;
     private DefaultPluginDescriptor pluginDescriptor;
 
     private PluginClassLoader parentLastPluginClassLoader;
     private PluginClassLoader parentFirstPluginClassLoader;
+    
+    private PluginClassLoader parentLastPluginDependencyClassLoader;
+    private PluginClassLoader parentFirstPluginDependencyClassLoader;
 
     @TempDir
     Path pluginsPath;
@@ -62,6 +67,8 @@ public class PluginClassLoaderTest {
         }
 
         createFile(parentClassPathBase.resolve("META-INF").resolve("file-only-in-parent"));
+        createFile(parentClassPathBase.resolve("META-INF").resolve("file-in-both-parent-and-dependency-and-plugin"));
+        createFile(parentClassPathBase.resolve("META-INF").resolve("file-in-both-parent-and-dependency"));
         createFile(parentClassPathBase.resolve("META-INF").resolve("file-in-both-parent-and-plugin"));
     }
 
@@ -69,7 +76,7 @@ public class PluginClassLoaderTest {
         File file = pathToFile.toFile();
 
         file.deleteOnExit();
-        assertTrue(file.createNewFile(), "failed to create '" + pathToFile + "'");
+        assertTrue(file.exists() || file.createNewFile(), "failed to create '" + pathToFile + "'");
         try (PrintWriter printWriter = new PrintWriter(file)) {
             printWriter.write("parent");
         }
@@ -77,13 +84,57 @@ public class PluginClassLoaderTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        pluginManager = new DefaultPluginManager(pluginsPath);
+        pluginManager = new TestPluginManager(pluginsPath);
+        pluginManagerParentFirst = new TestPluginManager(pluginsPath);
 
+        pluginDependencyDescriptor = new DefaultPluginDescriptor();
+        pluginDependencyDescriptor.setPluginId("myDependency");
+        pluginDependencyDescriptor.setPluginVersion("1.2.3");
+        pluginDependencyDescriptor.setPluginDescription("My plugin");
+        pluginDependencyDescriptor.setDependencies("");
+        pluginDependencyDescriptor.setProvider("Me");
+        pluginDependencyDescriptor.setRequires("5.0.0");
+
+        
+        Path pluginDependencyPath = pluginsPath.resolve(pluginDependencyDescriptor.getPluginId() + "-" + pluginDependencyDescriptor.getVersion() + ".zip");
+        PluginZip pluginDependencyZip = new PluginZip.Builder(pluginDependencyPath, pluginDependencyDescriptor.getPluginId())
+                .pluginVersion(pluginDependencyDescriptor.getVersion())
+                .addFile(Paths.get("classes/META-INF/dependency-file"), "dependency")
+                .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency-and-plugin"), "dependency")
+                .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency"), "dependency")
+                .build();
+
+        FileUtils.expandIfZip(pluginDependencyZip.path());
+
+        PluginClasspath pluginDependencyClasspath = new DefaultPluginClasspath();
+
+        parentLastPluginDependencyClassLoader = new PluginClassLoader(pluginManager, pluginDependencyDescriptor, PluginClassLoaderTest.class.getClassLoader());
+        parentFirstPluginDependencyClassLoader = new PluginClassLoader(pluginManagerParentFirst, pluginDependencyDescriptor, PluginClassLoaderTest.class.getClassLoader(), true);
+        
+        pluginManager.addClassLoader(pluginDependencyDescriptor.getPluginId(), parentLastPluginDependencyClassLoader);
+        pluginManagerParentFirst.addClassLoader(pluginDependencyDescriptor.getPluginId(), parentFirstPluginDependencyClassLoader);
+        
+        
+        for (String classesDirectory : pluginDependencyClasspath.getClassesDirectories()) {
+            File classesDirectoryFile = pluginDependencyZip.unzippedPath().resolve(classesDirectory).toFile();
+            parentLastPluginDependencyClassLoader.addFile(classesDirectoryFile);
+            parentFirstPluginDependencyClassLoader.addFile(classesDirectoryFile);
+        }
+
+        for (String jarsDirectory : pluginDependencyClasspath.getJarsDirectories()) {
+            Path jarsDirectoryPath = pluginDependencyZip.unzippedPath().resolve(jarsDirectory);
+            List<File> jars = FileUtils.getJars(jarsDirectoryPath);
+            for (File jar : jars) {
+            	parentLastPluginDependencyClassLoader.addFile(jar);
+            	parentFirstPluginDependencyClassLoader.addFile(jar);
+            }
+        }
+        
         pluginDescriptor = new DefaultPluginDescriptor();
         pluginDescriptor.setPluginId("myPlugin");
         pluginDescriptor.setPluginVersion("1.2.3");
         pluginDescriptor.setPluginDescription("My plugin");
-        pluginDescriptor.setDependencies("bar, baz");
+        pluginDescriptor.setDependencies("myDependency");
         pluginDescriptor.setProvider("Me");
         pluginDescriptor.setRequires("5.0.0");
 
@@ -91,6 +142,7 @@ public class PluginClassLoaderTest {
         PluginZip pluginZip = new PluginZip.Builder(pluginPath, pluginDescriptor.getPluginId())
                 .pluginVersion(pluginDescriptor.getVersion())
                 .addFile(Paths.get("classes/META-INF/plugin-file"), "plugin")
+                .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency-and-plugin"), "plugin")
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-plugin"), "plugin")
                 .build();
 
@@ -101,6 +153,9 @@ public class PluginClassLoaderTest {
         parentLastPluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, PluginClassLoaderTest.class.getClassLoader());
         parentFirstPluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, PluginClassLoaderTest.class.getClassLoader(), true);
 
+        pluginManager.addClassLoader(pluginDescriptor.getPluginId(), parentLastPluginClassLoader);
+        pluginManagerParentFirst.addClassLoader(pluginDescriptor.getPluginId(), parentFirstPluginClassLoader);
+        
         for (String classesDirectory : pluginClasspath.getClassesDirectories()) {
             File classesDirectoryFile = pluginZip.unzippedPath().resolve(classesDirectory).toFile();
             parentLastPluginClassLoader.addFile(classesDirectoryFile);
@@ -120,7 +175,10 @@ public class PluginClassLoaderTest {
     @AfterEach
     void tearDown() {
         pluginManager = null;
+        pluginDependencyDescriptor = null;
         pluginDescriptor = null;
+        parentLastPluginClassLoader =  null;
+        parentFirstPluginClassLoader = null;
     }
 
     @Test
@@ -138,7 +196,7 @@ public class PluginClassLoaderTest {
         URL resource = parentLastPluginClassLoader.getResource("META-INF/file-only-in-parent");
         assertFirstLine("parent", resource);
     }
-
+    
     @Test
     void parentFirstGetResourceExistsInParent() throws IOException, URISyntaxException {
         URL resource = parentFirstPluginClassLoader.getResource("META-INF/file-only-in-parent");
@@ -156,6 +214,18 @@ public class PluginClassLoaderTest {
         URL resource = parentFirstPluginClassLoader.getResource("META-INF/plugin-file");
         assertFirstLine("plugin", resource);
     }
+    
+    @Test
+    void parentLastGetResourceExistsOnlyInDependnecy() throws IOException, URISyntaxException {
+        URL resource = parentLastPluginClassLoader.getResource("META-INF/dependency-file");
+        assertFirstLine("dependency", resource);
+    }
+
+    @Test
+    void parentFirstGetResourceExistsOnlyInDependency() throws IOException, URISyntaxException {
+        URL resource = parentFirstPluginClassLoader.getResource("META-INF/dependency-file");
+        assertFirstLine("dependency", resource);
+    }
 
     @Test
     void parentLastGetResourceExistsInBothParentAndPlugin() throws URISyntaxException, IOException {
@@ -166,6 +236,18 @@ public class PluginClassLoaderTest {
     @Test
     void parentFirstGetResourceExistsInBothParentAndPlugin() throws URISyntaxException, IOException {
         URL resource = parentFirstPluginClassLoader.getResource("META-INF/file-in-both-parent-and-plugin");
+        assertFirstLine("parent", resource);
+    }
+    
+    @Test
+    void parentLastGetResourceExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
+        URL resource = parentLastPluginClassLoader.getResource("META-INF/file-in-both-parent-and-dependency-and-plugin");
+        assertFirstLine("plugin", resource);
+    }
+    
+    @Test
+    void parentFirstGetResourceExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
+        URL resource = parentFirstPluginClassLoader.getResource("META-INF/file-in-both-parent-and-dependency-and-plugin");
         assertFirstLine("parent", resource);
     }
 
@@ -192,6 +274,18 @@ public class PluginClassLoaderTest {
     }
 
     @Test
+    void parentLastGetResourcesExistsOnlyInDependency() throws IOException, URISyntaxException {
+        Enumeration<URL> resources = parentLastPluginClassLoader.getResources("META-INF/dependency-file");
+        assertNumberOfResourcesAndFirstLineOfFirstElement(1, "dependency", resources);
+    }
+
+    @Test
+    void parentFirstGetResourcesExistsOnlyInDependency() throws IOException, URISyntaxException {
+        Enumeration<URL> resources = parentFirstPluginClassLoader.getResources("META-INF/dependency-file");
+        assertNumberOfResourcesAndFirstLineOfFirstElement(1, "dependency", resources);
+    }
+    
+    @Test
     void parentLastGetResourcesExistsOnlyInPlugin() throws IOException, URISyntaxException {
         Enumeration<URL> resources = parentLastPluginClassLoader.getResources("META-INF/plugin-file");
         assertNumberOfResourcesAndFirstLineOfFirstElement(1, "plugin", resources);
@@ -214,6 +308,18 @@ public class PluginClassLoaderTest {
         Enumeration<URL> resources = parentFirstPluginClassLoader.getResources("META-INF/file-in-both-parent-and-plugin");
         assertNumberOfResourcesAndFirstLineOfFirstElement(2, "parent", resources);
     }
+    
+    @Test
+    void parentLastGetResourcesExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
+        Enumeration<URL> resources = parentLastPluginClassLoader.getResources("META-INF/file-in-both-parent-and-dependency-and-plugin");
+        assertNumberOfResourcesAndFirstLineOfFirstElement(3, "plugin", resources);
+    }
+
+    @Test
+    void parentFirstGetResourcesExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
+        Enumeration<URL> resources = parentFirstPluginClassLoader.getResources("META-INF/file-in-both-parent-and-dependency-and-plugin");
+        assertNumberOfResourcesAndFirstLineOfFirstElement(3, "parent", resources);
+    }
 
     private static void assertFirstLine(String expected, URL resource) throws URISyntaxException, IOException {
         assertNotNull(resource);
@@ -226,5 +332,16 @@ public class PluginClassLoaderTest {
 
         URL firstResource = list.get(0);
         assertEquals(expectedFirstLine, Files.readAllLines(Paths.get(firstResource.toURI())).get(0));
+    }
+    
+    class TestPluginManager extends DefaultPluginManager {
+    	
+    	public TestPluginManager(Path pluginsPath) {
+			super(pluginsPath);
+		}
+
+		void addClassLoader(String pluginId, PluginClassLoader classLoader) {
+    		getPluginClassLoaders().put(pluginId, classLoader);
+    	}
     }
 }
