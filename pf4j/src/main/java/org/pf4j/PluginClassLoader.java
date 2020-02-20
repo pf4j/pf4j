@@ -208,8 +208,7 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     @Override
-    public Enumeration<URL> getResources(String name) throws IOException {
-        
+    public Enumeration<URL> getResources(String name) throws IOException {  
     	List<URL> resources = new ArrayList<>();
 
     	if (!parentFirst) {
@@ -288,9 +287,7 @@ public class PluginClassLoader extends URLClassLoader {
             if (classLoader == null || dependency.isOptional()) {
                 continue;
             }
-
             results.addAll(Collections.list(classLoader.findResources(name)));
-            
         }
 
         return results;

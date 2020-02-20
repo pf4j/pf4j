@@ -190,20 +190,19 @@ public class PluginClassLoaderTest {
     void parentFirstGetResourceNonExisting() {
         assertNull(parentFirstPluginClassLoader.getResource("META-INF/non-existing-file"));
     }
-   
 
     @Test
     void parentLastGetResourceExistsInParent() throws IOException, URISyntaxException {
         URL resource = parentLastPluginClassLoader.getResource("META-INF/file-only-in-parent");
         assertFirstLine("parent", resource);
     }
-
+    
     @Test
     void parentFirstGetResourceExistsInParent() throws IOException, URISyntaxException {
         URL resource = parentFirstPluginClassLoader.getResource("META-INF/file-only-in-parent");
         assertFirstLine("parent", resource);
     }
-    
+
     @Test
     void parentLastGetResourceExistsOnlyInPlugin() throws IOException, URISyntaxException {
         URL resource = parentLastPluginClassLoader.getResource("META-INF/plugin-file");
