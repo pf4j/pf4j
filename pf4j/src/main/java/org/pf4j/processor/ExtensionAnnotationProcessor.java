@@ -239,11 +239,13 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             // pickup the first interface
             if (extensionPointElements.isEmpty() && ignoreExtensionPoint) {
                 if (interfaces.isEmpty()) {
-                    error(extensionElement, "%s is not an extension (it doesn't implement any interface)", extensionElement);
+                    error(extensionElement, "Cannot use %s as extension point with %s compiler arg (it doesn't implement any interface)",
+                        extensionElement, IGNORE_EXTENSION_POINT);
                 } else if (interfaces.size() == 1) {
                     extensionPointElements.add(getElement(interfaces.get(0)));
                 } else {
-                    error(extensionElement, "%s is not an extension (it implements multiple interfaces)", extensionElement);
+                    error(extensionElement, "Cannot use %s as extension point with %s compiler arg (it implements multiple interfaces)",
+                        extensionElement, IGNORE_EXTENSION_POINT);
                 }
             }
         }
