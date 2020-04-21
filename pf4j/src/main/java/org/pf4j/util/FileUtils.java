@@ -232,7 +232,8 @@ public class FileUtils {
     public static Path getPath(URI uri, String first, String... more) throws IOException {
         FileSystem fileSystem = getFileSystem(uri);
         Path path = fileSystem.getPath(first, more);
-        if ("jar".equals(uri.getScheme())) {
+        boolean isWindowsOS = System.getProperty("os.name").startsWith("Windows");
+        if (isWindowsOS && "jar".equals(uri.getScheme())) {
             // it's a ZipFileSystem
             fileSystem.close();
         }
