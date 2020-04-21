@@ -98,9 +98,8 @@ public class PluginClassLoaderTest {
 
         PluginClasspath pluginClasspath = new DefaultPluginClasspath();
 
-        ClassLoader parentClassLoader = PluginClassLoaderTest.class.getClassLoader();
-        parentLastPluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, parentClassLoader);
-        parentFirstPluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, parentClassLoader, true);
+        parentLastPluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, PluginClassLoaderTest.class.getClassLoader());
+        parentFirstPluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, PluginClassLoaderTest.class.getClassLoader(), true);
 
         for (String classesDirectory : pluginClasspath.getClassesDirectories()) {
             File classesDirectoryFile = pluginZip.unzippedPath().resolve(classesDirectory).toFile();
@@ -228,5 +227,4 @@ public class PluginClassLoaderTest {
         URL firstResource = list.get(0);
         assertEquals(expectedFirstLine, Files.readAllLines(Paths.get(firstResource.toURI())).get(0));
     }
-
 }
