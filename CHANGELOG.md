@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#371]: `ClosedFileSystemException` when I run demo
 
 #### Changed
 
@@ -405,6 +406,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#371]: https://github.com/pf4j/pf4j/issues/371
 [#370]: https://github.com/pf4j/pf4j/pull/370
 [#366]: https://github.com/pf4j/pf4j/pull/366
 [#365]: https://github.com/pf4j/pf4j/pull/365
