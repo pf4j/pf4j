@@ -348,7 +348,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         return new ExtensionWrapper<>(descriptor, pluginManager.getExtensionFactory());
     }
 
-    public static Extension findExtensionAnnotation(Class<?> clazz) {
+    private Extension findExtensionAnnotation(Class<?> clazz) {
         if (clazz.isAnnotationPresent(Extension.class)) {
             return clazz.getAnnotation(Extension.class);
         }

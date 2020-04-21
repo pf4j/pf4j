@@ -15,30 +15,20 @@
  */
 package org.pf4j;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.io.ByteStreams;
-import com.google.testing.compile.Compilation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.plugin.FailTestPlugin;
 import org.pf4j.plugin.TestExtensionPoint;
 
-import javax.tools.JavaFileObject;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -200,50 +190,6 @@ public class AbstractExtensionFinderTest {
 
         result = instance.findClassNames("plugin1");
         assertEquals(1, result.size());
-    }
-
-    @Test
-    public void findExtensionAnnotation() throws Exception {
-        Compilation compilation = javac().compile(ExtensionAnnotationProcessorTest.Greeting,
-            ExtensionAnnotationProcessorTest.WhazzupGreeting);
-        assertThat(compilation).succeededWithoutWarnings();
-        ImmutableList<JavaFileObject> generatedFiles = compilation.generatedFiles();
-        assertEquals(2, generatedFiles.size());
-
-        JavaFileObjectClassLoader classLoader = new JavaFileObjectClassLoader();
-        Map<String, Class<?>> loadedClasses = classLoader.loadClasses(new ArrayList<>(generatedFiles));
-        Class<?> clazz = loadedClasses.get("test.WhazzupGreeting");
-        Extension extension = AbstractExtensionFinder.findExtensionAnnotation(clazz);
-        assertNotNull(extension);
-    }
-
-   static class JavaFileObjectClassLoader extends ClassLoader {
-
-        public Map<String, Class<?>> loadClasses(List<JavaFileObject> classes) throws IOException {
-            // Sort generated ".class" by lastModified field
-            classes.sort((c1, c2) -> (int) (c1.getLastModified() - c2.getLastModified()));
-
-            // Load classes
-            Map<String, Class<?>> loadedClasses = new HashMap<>(classes.size());
-            for (JavaFileObject clazz : classes) {
-                String className = getClassName(clazz);
-                byte[] data = ByteStreams.toByteArray(clazz.openInputStream());
-                Class<?> loadedClass = defineClass(className, data,0, data.length);
-                loadedClasses.put(className, loadedClass);
-            }
-
-            return loadedClasses;
-        }
-
-        private static String getClassName(JavaFileObject object) {
-            String name = object.getName();
-            // Remove "/CLASS_OUT/" from head and ".class" from tail
-            name = name.substring(14, name.length() - 6);
-            name = name.replace('/', '.');
-
-            return name;
-        }
-
     }
 
 }

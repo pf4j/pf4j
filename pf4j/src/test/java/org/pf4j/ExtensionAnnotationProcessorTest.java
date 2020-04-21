@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class ExtensionAnnotationProcessorTest {
 
-    public static final JavaFileObject Greeting = JavaFileObjects.forSourceLines(
+    private static final JavaFileObject Greeting = JavaFileObjects.forSourceLines(
         "Greeting",
         "package test;",
         "import org.pf4j.ExtensionPoint;",
@@ -47,7 +47,7 @@ public class ExtensionAnnotationProcessorTest {
         "   String getGreeting();",
         "}");
 
-    public static final JavaFileObject WhazzupGreeting = JavaFileObjects.forSourceLines(
+    private static final JavaFileObject WhazzupGreeting = JavaFileObjects.forSourceLines(
         "WhazzupGreeting",
         "package test;",
         "import org.pf4j.Extension;",
@@ -60,7 +60,7 @@ public class ExtensionAnnotationProcessorTest {
         "    }",
         "}");
 
-    public static final JavaFileObject WhazzupGreeting_NoExtensionPoint = JavaFileObjects.forSourceLines(
+    private static final JavaFileObject WhazzupGreeting_NoExtensionPoint = JavaFileObjects.forSourceLines(
         "WhazzupGreeting",
         "package test;",
         "import org.pf4j.Extension;",
@@ -73,7 +73,7 @@ public class ExtensionAnnotationProcessorTest {
         "    }",
         "}");
 
-    public static final JavaFileObject SpinnakerExtension = JavaFileObjects.forSourceLines(
+    private static final JavaFileObject SpinnakerExtension = JavaFileObjects.forSourceLines(
         "SpinnakerExtension",
         "package test;",
         "",
@@ -91,7 +91,7 @@ public class ExtensionAnnotationProcessorTest {
         "public @interface SpinnakerExtension {",
         "}");
 
-    public static final JavaFileObject WhazzupGreeting_SpinnakerExtension = JavaFileObjects.forSourceLines(
+    private static final JavaFileObject WhazzupGreeting_SpinnakerExtension = JavaFileObjects.forSourceLines(
         "WhazzupGreeting",
         "package test;",
         "",
