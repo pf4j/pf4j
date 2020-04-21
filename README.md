@@ -70,7 +70,7 @@ public class WelcomeGreeting implements Greeting {
 }
 ```
 
-Create (it's optional) a `Plugin` class if you are interested for plugin's lifecycle events (start, stop, ...):
+Create (it's __optional__) a `Plugin` class if you are interested for plugin's lifecycle events (start, stop, ...):
 
 ```java
 public class WelcomePlugin extends Plugin {
