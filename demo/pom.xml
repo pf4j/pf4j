@@ -4,13 +4,13 @@
     <parent>
         <groupId>org.pf4j</groupId>
         <artifactId>pf4j-parent</artifactId>
-        <version>3.3.0</version>
+        <version>3.4.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.pf4j.demo</groupId>
     <artifactId>pf4j-demo-parent</artifactId>
-    <version>3.3.0</version>
+    <version>3.4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Demo Parent</name>
 
