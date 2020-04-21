@@ -5,10 +5,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#355]: Cannot remove plugin jar file after unloading
+- [#359]: Calls to `File.mkdirs` in unzip logic may silently fail
+- [#363]: StackOverflow in `AbstractExtensionFinder.findExtensionAnnotation`
+- [#366]: Check proper list for debug logging
 
 #### Changed
+- [#364]: Failed plugin state added. When plugin failed to start previous state was kept
+- [#370]: Improve annotation processor error messages
 
 #### Added
+- [#352]: Add `equals`/`hashCode` to some data classes
+- [#365]: `PluginClassLoader` does not resolve classpath resources from plugin dependencies
 
 #### Removed
 
@@ -386,6 +394,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#370]: https://github.com/pf4j/pf4j/pull/370
+[#366]: https://github.com/pf4j/pf4j/pull/366
+[#365]: https://github.com/pf4j/pf4j/pull/365
+[#364]: https://github.com/pf4j/pf4j/pull/364
+[#363]: https://github.com/pf4j/pf4j/issues/363
+[#359]: https://github.com/pf4j/pf4j/issues/359
+[#355]: https://github.com/pf4j/pf4j/issues/355
+[#352]: https://github.com/pf4j/pf4j/pull/352
 [#350]: https://github.com/pf4j/pf4j/pull/350
 [#349]: https://github.com/pf4j/pf4j/pull/349
 [#348]: https://github.com/pf4j/pf4j/pull/348
