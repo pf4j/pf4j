@@ -37,6 +37,7 @@ import java.util.Set;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.eq;
@@ -215,6 +216,22 @@ public class AbstractExtensionFinderTest {
         Class<?> clazz = loadedClasses.get("test.WhazzupGreeting");
         Extension extension = AbstractExtensionFinder.findExtensionAnnotation(clazz);
         assertNotNull(extension);
+    }
+
+    @Test
+    public void findExtensionAnnotationThatMissing() throws Exception {
+        Compilation compilation = javac().compile(ExtensionAnnotationProcessorTest.Greeting,
+            ExtensionAnnotationProcessorTest.SpinnakerExtension_NoExtension,
+            ExtensionAnnotationProcessorTest.WhazzupGreeting_SpinnakerExtension);
+        assertThat(compilation).succeededWithoutWarnings();
+        ImmutableList<JavaFileObject> generatedFiles = compilation.generatedFiles();
+        assertEquals(3, generatedFiles.size());
+
+        JavaFileObjectClassLoader classLoader = new JavaFileObjectClassLoader();
+        Map<String, Class<?>> loadedClasses = classLoader.loadClasses(new ArrayList<>(generatedFiles));
+        Class<?> clazz = loadedClasses.get("test.WhazzupGreeting");
+        Extension extension = AbstractExtensionFinder.findExtensionAnnotation(clazz);
+        assertNull(extension);
     }
 
    static class JavaFileObjectClassLoader extends ClassLoader {

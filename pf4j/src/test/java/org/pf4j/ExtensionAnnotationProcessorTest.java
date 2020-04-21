@@ -103,6 +103,27 @@ public class ExtensionAnnotationProcessorTest {
         "    }",
         "}");
 
+    /**
+     * The same like {@link #SpinnakerExtension} but without {@code Extension} annotation.
+     */
+    public static final JavaFileObject SpinnakerExtension_NoExtension = JavaFileObjects.forSourceLines(
+        "SpinnakerExtension",
+        "package test;",
+        "",
+        "import org.pf4j.Extension;",
+        "import java.lang.annotation.Documented;",
+        "import java.lang.annotation.ElementType;",
+        "import java.lang.annotation.Retention;",
+        "import java.lang.annotation.RetentionPolicy;",
+        "import java.lang.annotation.Target;",
+        "",
+//        "@Extension",
+        "@Retention(RetentionPolicy.RUNTIME)",
+        "@Target(ElementType.TYPE)",
+        "@Documented",
+        "public @interface SpinnakerExtension {",
+        "}");
+
     @Test
     public void getSupportedAnnotationTypes() {
         ExtensionAnnotationProcessor instance = new ExtensionAnnotationProcessor();

@@ -356,9 +356,11 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         // search recursively through all annotations
         for (Annotation annotation : clazz.getAnnotations()) {
             Class<? extends Annotation> annotationClass = annotation.annotationType();
-            Extension extensionAnnotation = findExtensionAnnotation(annotationClass);
-            if (extensionAnnotation != null) {
-                return extensionAnnotation;
+            if (!annotationClass.getName().startsWith("java.lang.annotation")) {
+                Extension extensionAnnotation = findExtensionAnnotation(annotationClass);
+                if (extensionAnnotation != null) {
+                    return extensionAnnotation;
+                }
             }
         }
 
