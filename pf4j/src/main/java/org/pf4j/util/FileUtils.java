@@ -46,6 +46,8 @@ public class FileUtils {
 
     private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
+    private static final boolean IS_WINDOWS_OS = System.getProperty("os.name").startsWith("Windows");
+
     public static List<String> readLines(Path path, boolean ignoreComments) throws IOException {
         File file = path.toFile();
         if (!file.isFile()) {
@@ -232,8 +234,7 @@ public class FileUtils {
     public static Path getPath(URI uri, String first, String... more) throws IOException {
         FileSystem fileSystem = getFileSystem(uri);
         Path path = fileSystem.getPath(first, more);
-        boolean isWindowsOS = System.getProperty("os.name").startsWith("Windows");
-        if (isWindowsOS && "jar".equals(uri.getScheme())) {
+        if (IS_WINDOWS_OS && "jar".equals(uri.getScheme())) {
             // it's a ZipFileSystem
             fileSystem.close();
         }
