@@ -48,7 +48,7 @@ public class FileUtils {
 
     public static List<String> readLines(Path path, boolean ignoreComments) throws IOException {
         File file = path.toFile();
-        if (!file.exists() || !file.isFile()) {
+        if (!file.isFile()) {
             return new ArrayList<>();
         }
 
@@ -117,7 +117,7 @@ public class FileUtils {
         FileFilter jarFilter = new JarFileFilter();
         FileFilter directoryFilter = new DirectoryFileFilter();
 
-        if (Files.exists(folder) && Files.isDirectory(folder)) {
+        if (Files.isDirectory(folder)) {
             File[] jars = folder.toFile().listFiles(jarFilter);
             for (int i = 0; (jars != null) && (i < jars.length); ++i) {
                 bucket.add(jars[i]);
