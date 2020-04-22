@@ -26,7 +26,7 @@
         <maven.compiler.release>8</maven.compiler.release>
 
         <pf4j.version>{{project.version}}</pf4j.version>
-        <slf4j.version>1.7.7</slf4j.version>
+        <slf4j.version>1.7.25</slf4j.version>
         <log4j.version>2.13.1</log4j.version>
     </properties>
 
