@@ -18,6 +18,7 @@ package org.pf4j;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import com.google.testing.compile.Compilation;
+import java.util.Comparator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -238,7 +239,7 @@ public class AbstractExtensionFinderTest {
 
         public Map<String, Class<?>> loadClasses(List<JavaFileObject> classes) throws IOException {
             // Sort generated ".class" by lastModified field
-            classes.sort((c1, c2) -> (int) (c1.getLastModified() - c2.getLastModified()));
+            classes.sort(Comparator.comparingLong(JavaFileObject::getLastModified));
 
             // Load classes
             Map<String, Class<?>> loadedClasses = new HashMap<>(classes.size());
