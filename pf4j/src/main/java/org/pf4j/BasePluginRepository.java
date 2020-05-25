@@ -48,7 +48,7 @@ public class BasePluginRepository implements PluginRepository {
         this.filter = filter;
 
         // last modified file is first
-        this.comparator = (o1, o2) -> (int) (o2.lastModified() - o1.lastModified());
+        this.comparator = Comparator.comparingLong(File::lastModified);
     }
 
     public void setFilter(FileFilter filter) {
