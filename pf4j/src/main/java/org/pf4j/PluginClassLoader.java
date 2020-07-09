@@ -133,7 +133,7 @@ public class PluginClassLoader extends URLClassLoader {
                 // try to load from parent
                 try {
                     return super.loadClass(className);
-                } catch (ClassCastException e) {
+                } catch (ClassNotFoundException e) {
                     // try next step
                 }
 
@@ -177,7 +177,7 @@ public class PluginClassLoader extends URLClassLoader {
                 log.trace("Found resource '{}' in plugin classpath", name);
                 return url;
             }
-            
+
             url = findResourceFromDependencies(name);
             if (url != null) {
                 log.trace("Found resource '{}' in plugin dependencies", name);
@@ -197,41 +197,41 @@ public class PluginClassLoader extends URLClassLoader {
             log.trace("Couldn't find resource '{}' in parent", name);
 
             url = findResourceFromDependencies(name);
-           
+
             if (url != null) {
                log.trace("Found resource '{}' in dependencies", name);
                return url;
-            }  
-            
+            }
+
             return findResource(name);
         }
     }
 
     @Override
-    public Enumeration<URL> getResources(String name) throws IOException {  
+    public Enumeration<URL> getResources(String name) throws IOException {
     	List<URL> resources = new ArrayList<>();
 
     	if (!parentFirst) {
-            
+
             resources.addAll(Collections.list(findResources(name)));
 
             resources.addAll(findResourcesFromDependencies(name));
-            
+
             if (getParent() != null) {
                 resources.addAll(Collections.list(getParent().getResources(name)));
             }
 
         } else {
-        	
+
         	if (getParent() != null) {
                 resources.addAll(Collections.list(getParent().getResources(name)));
             }
-        	
+
         	resources.addAll(findResourcesFromDependencies(name));
-        	
+
         	resources.addAll(Collections.list(super.findResources(name)));
         }
-    	
+
     	return Collections.enumeration(resources);
     }
 
@@ -255,7 +255,7 @@ public class PluginClassLoader extends URLClassLoader {
 
         return null;
     }
-    
+
     private URL findResourceFromDependencies(String name) {
         log.trace("Search in dependencies for resource '{}'", name);
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
@@ -275,7 +275,7 @@ public class PluginClassLoader extends URLClassLoader {
 
         return null;
     }
-    
+
     private Collection<URL> findResourcesFromDependencies(String name) throws IOException {
         log.trace("Search in dependencies for resources '{}'", name);
         List<URL> results = new ArrayList<>();
