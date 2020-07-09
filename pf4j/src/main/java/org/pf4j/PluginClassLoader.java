@@ -133,7 +133,7 @@ public class PluginClassLoader extends URLClassLoader {
                 // try to load from parent
                 try {
                     return super.loadClass(className);
-                } catch (ClassCastException e) {
+                } catch (ClassNotFoundException e) {
                     // try next step
                 }
 
