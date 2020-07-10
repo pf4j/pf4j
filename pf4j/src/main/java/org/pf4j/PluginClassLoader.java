@@ -15,38 +15,35 @@
  */
 package org.pf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 /**
  * One instance of this class should be created by plugin manager for every available plug-in.
  * By default, this class loader is a Parent Last ClassLoader - it loads the classes from the plugin's jars
  * before delegating to the parent class loader.
- * Use {@link #parentFirst} to change the loading strategy.
+ * Use {@link #classLoadingOrder} to change the loading strategy.
  *
  * @author Decebal Suiu
  */
 public class PluginClassLoader extends URLClassLoader {
 
     private static final Logger log = LoggerFactory.getLogger(PluginClassLoader.class);
+    private static final SortedSet<ClassLoadingSource> DEFAULT_ORDER = new TreeSet<>(Arrays.asList(ClassLoadingSource.PLUGIN, ClassLoadingSource.DEPENDENCIES, ClassLoadingSource.PARENT));
+    private static final SortedSet<ClassLoadingSource> PARENT_FIRST = new TreeSet<>(Arrays.asList(ClassLoadingSource.PARENT, ClassLoadingSource.PLUGIN, ClassLoadingSource.DEPENDENCIES));
 
     private static final String JAVA_PACKAGE_PREFIX = "java.";
     private static final String PLUGIN_PACKAGE_PREFIX = "org.pf4j.";
 
     private PluginManager pluginManager;
     private PluginDescriptor pluginDescriptor;
-    private boolean parentFirst;
+    private SortedSet<ClassLoadingSource> classLoadingOrder;
 
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
         this(pluginManager, pluginDescriptor, parent, false);
@@ -57,11 +54,19 @@ public class PluginClassLoader extends URLClassLoader {
      * before trying to load the a class through this loader.
      */
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, boolean parentFirst) {
+        this(pluginManager, pluginDescriptor, parent, parentFirst ?PARENT_FIRST: DEFAULT_ORDER);
+    }
+
+
+    /**
+     * classloading according to {@code classLoadingOrder}
+     */
+    public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, SortedSet<ClassLoadingSource> classLoadingOrder) {
         super(new URL[0], parent);
 
         this.pluginManager = pluginManager;
         this.pluginDescriptor = pluginDescriptor;
-        this.parentFirst = parentFirst;
+        this.classLoadingOrder = classLoadingOrder;
     }
 
     @Override
@@ -83,7 +88,7 @@ public class PluginClassLoader extends URLClassLoader {
      * By default, it uses a child first delegation model rather than the standard parent first.
      * If the requested class cannot be found in this class loader, the parent class loader will be consulted
      * via the standard {@link ClassLoader#loadClass(String)} mechanism.
-     * Use {@link #parentFirst} to change the loading strategy.
+     * Use {@link #classLoadingOrder} to change the loading strategy.
      */
     @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
@@ -107,63 +112,39 @@ public class PluginClassLoader extends URLClassLoader {
                 log.trace("Found loaded class '{}'", className);
                 return loadedClass;
             }
-
-            if (!parentFirst) {
-                // nope, try to load locally
+            for (ClassLoadingSource classLoadingSource : classLoadingOrder) {
+                Class<?> c = null;
                 try {
-                    loadedClass = findClass(className);
-                    log.trace("Found class '{}' in plugin classpath", className);
-                    return loadedClass;
-                } catch (ClassNotFoundException e) {
-                    // try next step
+                    switch (classLoadingSource) {
+                        case PARENT:
+                            c = super.loadClass(className);
+                            break;
+                        case PLUGIN:
+                            c = findClass(className);
+                            break;
+                        case DEPENDENCIES:
+                            c = loadClassFromDependencies(className);
+                            break;
+                    }
+                } catch (ClassNotFoundException ignored) {
+
+                }
+                if (c != null) {
+                    log.trace("Found class '{}' in " + classLoadingSource + " classpath", className);
+                    return c;
+                } else {
+                    log.trace("Couldn't find class '{}' in " + classLoadingSource + " classpath", className);
                 }
 
-                // look in dependencies
-                loadedClass = loadClassFromDependencies(className);
-                if (loadedClass != null) {
-                    log.trace("Found class '{}' in dependencies", className);
-                    return loadedClass;
-                }
-
-                log.trace("Couldn't find class '{}' in plugin classpath. Delegating to parent", className);
-
-                // use the standard ClassLoader (which follows normal parent delegation)
-                return super.loadClass(className);
-            } else {
-                // try to load from parent
-                try {
-                    return super.loadClass(className);
-                } catch (ClassNotFoundException e) {
-                    // try next step
-                }
-
-                log.trace("Couldn't find class '{}' in parent. Delegating to plugin classpath", className);
-
-                // nope, try to load locally
-                try {
-                    loadedClass = findClass(className);
-                    log.trace("Found class '{}' in plugin classpath", className);
-                    return loadedClass;
-                } catch (ClassNotFoundException e) {
-                    // try next step
-                }
-
-                // look in dependencies
-                loadedClass = loadClassFromDependencies(className);
-                if (loadedClass != null) {
-                    log.trace("Found class '{}' in dependencies", className);
-                    return loadedClass;
-                }
-
-                throw new ClassNotFoundException(className);
             }
+            throw new ClassNotFoundException(className);
         }
     }
 
     /**
      * Load the named resource from this plugin.
      * By default, this implementation checks the plugin's classpath first then delegates to the parent.
-     * Use {@link #parentFirst} to change the loading strategy.
+     * Use {@link #classLoadingOrder} to change the loading strategy.
      *
      * @param name the name of the resource.
      * @return the URL to the resource, {@code null} if the resource was not found.
@@ -171,71 +152,55 @@ public class PluginClassLoader extends URLClassLoader {
     @Override
     public URL getResource(String name) {
         log.trace("Received request to load resource '{}'", name);
-        if (!parentFirst) {
-            URL url = findResource(name);
-            if (url != null) {
-                log.trace("Found resource '{}' in plugin classpath", name);
-                return url;
+        for (ClassLoadingSource classLoadingSource : classLoadingOrder) {
+            URL url = null;
+            switch (classLoadingSource) {
+                case PARENT:
+                    url = super.getResource(name);
+                    break;
+                case PLUGIN:
+                    url = findResource(name);
+                    break;
+                case DEPENDENCIES:
+                    url = findResourceFromDependencies(name);
+                    break;
             }
-            
-            url = findResourceFromDependencies(name);
             if (url != null) {
-                log.trace("Found resource '{}' in plugin dependencies", name);
+                log.trace("Found resource '{}' in " + classLoadingSource + " classpath", name);
                 return url;
+            } else {
+                log.trace("Couldn't find resource '{}' in " + classLoadingSource + ".", name);
             }
-
-            log.trace("Couldn't find resource '{}' in plugin or dependencies classpath. Delegating to parent", name);
-
-            return super.getResource(name);
-        } else {
-            URL url = super.getResource(name);
-            if (url != null) {
-                log.trace("Found resource '{}' in parent", name);
-                return url;
-            }
-
-            log.trace("Couldn't find resource '{}' in parent", name);
-
-            url = findResourceFromDependencies(name);
-           
-            if (url != null) {
-               log.trace("Found resource '{}' in dependencies", name);
-               return url;
-            }  
-            
-            return findResource(name);
         }
+        return null;
+
     }
 
     @Override
-    public Enumeration<URL> getResources(String name) throws IOException {  
-    	List<URL> resources = new ArrayList<>();
+    public Enumeration<URL> getResources(String name) throws IOException {
+        List<URL> resources = new ArrayList<>();
 
-    	if (!parentFirst) {
-            
-            resources.addAll(Collections.list(findResources(name)));
-
-            resources.addAll(findResourcesFromDependencies(name));
-            
-            if (getParent() != null) {
-                resources.addAll(Collections.list(getParent().getResources(name)));
+        log.trace("Received request to load resources '{}'", name);
+        for (ClassLoadingSource classLoadingSource : classLoadingOrder) {
+            switch (classLoadingSource) {
+                case PARENT:
+                    if (getParent() != null) {
+                        resources.addAll(Collections.list(getParent().getResources(name)));
+                    }
+                    break;
+                case PLUGIN:
+                    resources.addAll(Collections.list(findResources(name)));
+                    break;
+                case DEPENDENCIES:
+                    resources.addAll(findResourcesFromDependencies(name));
+                    break;
             }
-
-        } else {
-        	
-        	if (getParent() != null) {
-                resources.addAll(Collections.list(getParent().getResources(name)));
-            }
-        	
-        	resources.addAll(findResourcesFromDependencies(name));
-        	
-        	resources.addAll(Collections.list(super.findResources(name)));
         }
-    	
-    	return Collections.enumeration(resources);
+        return Collections.enumeration(resources);
+
     }
 
-    private Class<?> loadClassFromDependencies(String className) {
+    protected Class<?> loadClassFromDependencies(String className) {
         log.trace("Search in dependencies for class '{}'", className);
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
         for (PluginDependency dependency : dependencies) {
@@ -255,8 +220,8 @@ public class PluginClassLoader extends URLClassLoader {
 
         return null;
     }
-    
-    private URL findResourceFromDependencies(String name) {
+
+    protected URL findResourceFromDependencies(String name) {
         log.trace("Search in dependencies for resource '{}'", name);
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
         for (PluginDependency dependency : dependencies) {
@@ -269,14 +234,14 @@ public class PluginClassLoader extends URLClassLoader {
 
             URL url = classLoader.findResource(name);
             if (Objects.nonNull(url)) {
-            	return url;
+                return url;
             }
         }
 
         return null;
     }
-    
-    private Collection<URL> findResourcesFromDependencies(String name) throws IOException {
+
+    protected Collection<URL> findResourcesFromDependencies(String name) throws IOException {
         log.trace("Search in dependencies for resources '{}'", name);
         List<URL> results = new ArrayList<>();
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
