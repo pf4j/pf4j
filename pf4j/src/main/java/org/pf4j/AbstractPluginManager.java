@@ -365,7 +365,10 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         for (PluginDependency dependency : pluginDescriptor.getDependencies()) {
-            startPlugin(dependency.getPluginId());
+            // start dependency only if it marked as required (non optional) or if it optional and loaded
+            if (!dependency.isOptional() || plugins.containsKey(dependency.getPluginId())) {
+                startPlugin(dependency.getPluginId());
+            }
         }
 
         log.info("Start plugin '{}'", getPluginLabel(pluginDescriptor));
