@@ -32,7 +32,7 @@ public class PluginWrapper {
     private PluginState pluginState;
     private RuntimeMode runtimeMode;
 
-    private Exception failedException;
+    private Throwable failedException;
 
     Plugin plugin; // cache
 
@@ -145,11 +145,11 @@ public class PluginWrapper {
      * Returns the exception with which the plugin fails to start.
      * See @{link PluginStatus#FAILED}.
      */
-    public Exception getFailedException() {
+    public Throwable getFailedException() {
         return failedException;
     }
 
-    public void setFailedException(Exception failedException) {
+    public void setFailedException(Throwable failedException) {
         this.failedException = failedException;
     }
 
