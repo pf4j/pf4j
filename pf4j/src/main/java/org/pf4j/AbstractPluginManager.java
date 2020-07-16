@@ -15,22 +15,16 @@
  */
 package org.pf4j;
 
+import org.pf4j.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.pf4j.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 /**
  * This class implements the boilerplate plugin code that any {@link PluginManager}
@@ -243,7 +237,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         return unloadPlugin(pluginId, true);
     }
 
-    private boolean unloadPlugin(String pluginId, boolean unloadDependents) {
+    protected boolean unloadPlugin(String pluginId, boolean unloadDependents) {
         try {
             if (unloadDependents) {
                 List<String> dependents = dependencyResolver.getDependents(pluginId);
@@ -418,7 +412,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         return stopPlugin(pluginId, true);
     }
 
-    private PluginState stopPlugin(String pluginId, boolean stopDependents) {
+    protected PluginState stopPlugin(String pluginId, boolean stopDependents) {
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
@@ -454,7 +448,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         return pluginWrapper.getPluginState();
     }
 
-    private void checkPluginId(String pluginId) {
+    protected void checkPluginId(String pluginId) {
         if (!plugins.containsKey(pluginId)) {
             throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
         }
@@ -913,7 +907,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> List<Class<? extends T>> getExtensionClasses(List<ExtensionWrapper<T>> extensionsWrapper) {
+    protected <T> List<Class<? extends T>> getExtensionClasses(List<ExtensionWrapper<T>> extensionsWrapper) {
         List<Class<? extends T>> extensionClasses = new ArrayList<>(extensionsWrapper.size());
         for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
             Class<T> c = (Class<T>) extensionWrapper.getDescriptor().extensionClass;
@@ -923,7 +917,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         return extensionClasses;
     }
 
-    private <T> List<T> getExtensions(List<ExtensionWrapper<T>> extensionsWrapper) {
+    protected <T> List<T> getExtensions(List<ExtensionWrapper<T>> extensionsWrapper) {
         List<T> extensions = new ArrayList<>(extensionsWrapper.size());
         for (ExtensionWrapper<T> extensionWrapper : extensionsWrapper) {
             try {
