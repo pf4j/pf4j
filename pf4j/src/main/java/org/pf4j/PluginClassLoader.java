@@ -28,13 +28,12 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * One instance of this class should be created by plugin manager for every available plug-in.
  * By default, this class loader is a Parent Last ClassLoader - it loads the classes from the plugin's jars
  * before delegating to the parent class loader.
- * Use {@link #classLoadingOrder} to change the loading strategy.
+ * Use {@link #classLoadingStrategy} to change the loading strategy.
  *
  * @author Decebal Suiu
  */
@@ -47,7 +46,7 @@ public class PluginClassLoader extends URLClassLoader {
 
     private PluginManager pluginManager;
     private PluginDescriptor pluginDescriptor;
-    private Set<ClassLoadingSource> classLoadingOrder;
+    private ClassLoadingStrategy classLoadingStrategy;
 
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
         this(pluginManager, pluginDescriptor, parent, false);
@@ -58,19 +57,19 @@ public class PluginClassLoader extends URLClassLoader {
      * before trying to load the a class through this loader.
      */
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, boolean parentFirst) {
-        this(pluginManager, pluginDescriptor, parent, parentFirst ? DefaultClassLoadingStrategy.PARENT_FIRST: DefaultClassLoadingStrategy.DEFAULT_ORDER);
+        this(pluginManager, pluginDescriptor, parent, parentFirst ? ClassLoadingStrategy.APD : ClassLoadingStrategy.PDA);
     }
 
 
     /**
-     * classloading according to {@code classLoadingOrder}
+     * classloading according to {@code classLoadingStrategy}
      */
-    public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, Set<ClassLoadingSource> classLoadingOrder) {
+    public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, ClassLoadingStrategy classLoadingStrategy) {
         super(new URL[0], parent);
 
         this.pluginManager = pluginManager;
         this.pluginDescriptor = pluginDescriptor;
-        this.classLoadingOrder = classLoadingOrder;
+        this.classLoadingStrategy = classLoadingStrategy;
     }
 
     @Override
@@ -92,7 +91,7 @@ public class PluginClassLoader extends URLClassLoader {
      * By default, it uses a child first delegation model rather than the standard parent first.
      * If the requested class cannot be found in this class loader, the parent class loader will be consulted
      * via the standard {@link ClassLoader#loadClass(String)} mechanism.
-     * Use {@link #classLoadingOrder} to change the loading strategy.
+     * Use {@link #classLoadingStrategy} to change the loading strategy.
      */
     @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
@@ -116,7 +115,7 @@ public class PluginClassLoader extends URLClassLoader {
                 log.trace("Found loaded class '{}'", className);
                 return loadedClass;
             }
-            for (ClassLoadingSource classLoadingSource : classLoadingOrder) {
+            for (ClassLoadingStrategy.Source classLoadingSource : classLoadingStrategy.getSources()) {
                 Class<?> c = null;
                 try {
                     switch (classLoadingSource) {
@@ -148,7 +147,7 @@ public class PluginClassLoader extends URLClassLoader {
     /**
      * Load the named resource from this plugin.
      * By default, this implementation checks the plugin's classpath first then delegates to the parent.
-     * Use {@link #classLoadingOrder} to change the loading strategy.
+     * Use {@link #classLoadingStrategy} to change the loading strategy.
      *
      * @param name the name of the resource.
      * @return the URL to the resource, {@code null} if the resource was not found.
@@ -156,7 +155,7 @@ public class PluginClassLoader extends URLClassLoader {
     @Override
     public URL getResource(String name) {
         log.trace("Received request to load resource '{}'", name);
-        for (ClassLoadingSource classLoadingSource : classLoadingOrder) {
+        for (ClassLoadingStrategy.Source classLoadingSource : classLoadingStrategy.getSources()) {
             URL url = null;
             switch (classLoadingSource) {
                 case PARENT:
@@ -185,7 +184,7 @@ public class PluginClassLoader extends URLClassLoader {
         List<URL> resources = new ArrayList<>();
 
         log.trace("Received request to load resources '{}'", name);
-        for (ClassLoadingSource classLoadingSource : classLoadingOrder) {
+        for (ClassLoadingStrategy.Source classLoadingSource : classLoadingStrategy.getSources()) {
             switch (classLoadingSource) {
                 case PARENT:
                     if (getParent() != null) {
