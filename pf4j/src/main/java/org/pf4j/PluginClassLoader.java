@@ -49,13 +49,15 @@ public class PluginClassLoader extends URLClassLoader {
     private ClassLoadingStrategy classLoadingStrategy;
 
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
-        this(pluginManager, pluginDescriptor, parent, false);
+        this(pluginManager, pluginDescriptor, parent, ClassLoadingStrategy.PDA);
     }
 
     /**
+     * @deprecated Replaced by {@link #PluginClassLoader(PluginManager, PluginDescriptor, ClassLoader, ClassLoadingStrategy)}.
      * If {@code parentFirst} is {@code true}, indicates that the parent {@link ClassLoader} should be consulted
      * before trying to load the a class through this loader.
      */
+    @Deprecated
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, boolean parentFirst) {
         this(pluginManager, pluginDescriptor, parent, parentFirst ? ClassLoadingStrategy.APD : ClassLoadingStrategy.PDA);
     }
