@@ -15,6 +15,9 @@
  */
 package org.pf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -25,9 +28,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * One instance of this class should be created by plugin manager for every available plug-in.
@@ -177,7 +177,7 @@ public class PluginClassLoader extends URLClassLoader {
                 log.trace("Found resource '{}' in plugin classpath", name);
                 return url;
             }
-            
+
             url = findResourceFromDependencies(name);
             if (url != null) {
                 log.trace("Found resource '{}' in plugin dependencies", name);
@@ -197,41 +197,36 @@ public class PluginClassLoader extends URLClassLoader {
             log.trace("Couldn't find resource '{}' in parent", name);
 
             url = findResourceFromDependencies(name);
-           
+
             if (url != null) {
                log.trace("Found resource '{}' in dependencies", name);
                return url;
-            }  
-            
+            }
+
             return findResource(name);
         }
     }
 
     @Override
-    public Enumeration<URL> getResources(String name) throws IOException {  
+    public Enumeration<URL> getResources(String name) throws IOException {
     	List<URL> resources = new ArrayList<>();
 
     	if (!parentFirst) {
-            
             resources.addAll(Collections.list(findResources(name)));
-
             resources.addAll(findResourcesFromDependencies(name));
-            
+
             if (getParent() != null) {
                 resources.addAll(Collections.list(getParent().getResources(name)));
             }
-
         } else {
-        	
         	if (getParent() != null) {
                 resources.addAll(Collections.list(getParent().getResources(name)));
             }
-        	
+
         	resources.addAll(findResourcesFromDependencies(name));
-        	
         	resources.addAll(Collections.list(super.findResources(name)));
         }
-    	
+
     	return Collections.enumeration(resources);
     }
 
@@ -242,7 +237,7 @@ public class PluginClassLoader extends URLClassLoader {
             ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null || dependency.isOptional()) {
+            if (classLoader == null && dependency.isOptional()) {
                 continue;
             }
 
@@ -255,7 +250,7 @@ public class PluginClassLoader extends URLClassLoader {
 
         return null;
     }
-    
+
     private URL findResourceFromDependencies(String name) {
         log.trace("Search in dependencies for resource '{}'", name);
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
@@ -263,7 +258,7 @@ public class PluginClassLoader extends URLClassLoader {
             PluginClassLoader classLoader = (PluginClassLoader) pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null || dependency.isOptional()) {
+            if (classLoader == null && dependency.isOptional()) {
                 continue;
             }
 
@@ -275,7 +270,7 @@ public class PluginClassLoader extends URLClassLoader {
 
         return null;
     }
-    
+
     private Collection<URL> findResourcesFromDependencies(String name) throws IOException {
         log.trace("Search in dependencies for resources '{}'", name);
         List<URL> results = new ArrayList<>();
@@ -284,9 +279,10 @@ public class PluginClassLoader extends URLClassLoader {
             PluginClassLoader classLoader = (PluginClassLoader) pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null || dependency.isOptional()) {
+            if (classLoader == null && dependency.isOptional()) {
                 continue;
             }
+
             results.addAll(Collections.list(classLoader.findResources(name)));
         }
 
