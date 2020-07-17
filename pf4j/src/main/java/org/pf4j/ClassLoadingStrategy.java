@@ -30,27 +30,27 @@ public class ClassLoadingStrategy {
     /**
      * application(parent)->plugin->dependencies
      */
-    public static final ClassLoadingStrategy APD = new ClassLoadingStrategy(Arrays.asList(Source.PARENT, Source.PLUGIN, Source.DEPENDENCIES));
+    public static final ClassLoadingStrategy APD = new ClassLoadingStrategy(Arrays.asList(Source.APPLICATION, Source.PLUGIN, Source.DEPENDENCIES));
     /**
      * application(parent)->dependencies->plugin
      */
-    public static final ClassLoadingStrategy ADP=new ClassLoadingStrategy(Arrays.asList(Source.PARENT,Source.DEPENDENCIES,Source.PARENT));
+    public static final ClassLoadingStrategy ADP=new ClassLoadingStrategy(Arrays.asList(Source.APPLICATION,Source.DEPENDENCIES,Source.APPLICATION));
     /**
      * plugin->application(parent)->dependencies
      */
-    public static final ClassLoadingStrategy PAD=new ClassLoadingStrategy(Arrays.asList(Source.PLUGIN,Source.PARENT,Source.DEPENDENCIES));
+    public static final ClassLoadingStrategy PAD=new ClassLoadingStrategy(Arrays.asList(Source.PLUGIN,Source.APPLICATION,Source.DEPENDENCIES));
     /**
      * dependencies->application(parent)->plugin
      */
-    public static final ClassLoadingStrategy DAP=new ClassLoadingStrategy(Arrays.asList(Source.DEPENDENCIES,Source.PARENT,Source.PLUGIN));
+    public static final ClassLoadingStrategy DAP=new ClassLoadingStrategy(Arrays.asList(Source.DEPENDENCIES,Source.APPLICATION,Source.PLUGIN));
     /**
      * dependencies->plugin->application(parent)
      */
-    public static final ClassLoadingStrategy DPA=new ClassLoadingStrategy(Arrays.asList(Source.DEPENDENCIES,Source.PLUGIN,Source.PARENT));
+    public static final ClassLoadingStrategy DPA=new ClassLoadingStrategy(Arrays.asList(Source.DEPENDENCIES,Source.PLUGIN,Source.APPLICATION));
     /**
      * plugin->dependencies->application(parent)
      */
-    public static final ClassLoadingStrategy PDA =new ClassLoadingStrategy(Arrays.asList(Source.PLUGIN, Source.DEPENDENCIES, Source.PARENT));
+    public static final ClassLoadingStrategy PDA =new ClassLoadingStrategy(Arrays.asList(Source.PLUGIN, Source.DEPENDENCIES, Source.APPLICATION));
 
 
     private final List<Source> sources;
@@ -64,6 +64,6 @@ public class ClassLoadingStrategy {
     }
 
     public enum Source {
-        PLUGIN,PARENT,DEPENDENCIES;
+        PLUGIN, APPLICATION,DEPENDENCIES;
     }
 }

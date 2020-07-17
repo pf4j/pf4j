@@ -119,7 +119,7 @@ public class PluginClassLoader extends URLClassLoader {
                 Class<?> c = null;
                 try {
                     switch (classLoadingSource) {
-                        case PARENT:
+                        case APPLICATION:
                             c = super.loadClass(className);
                             break;
                         case PLUGIN:
@@ -158,7 +158,7 @@ public class PluginClassLoader extends URLClassLoader {
         for (ClassLoadingStrategy.Source classLoadingSource : classLoadingStrategy.getSources()) {
             URL url = null;
             switch (classLoadingSource) {
-                case PARENT:
+                case APPLICATION:
                     url = super.getResource(name);
                     break;
                 case PLUGIN:
@@ -186,7 +186,7 @@ public class PluginClassLoader extends URLClassLoader {
         log.trace("Received request to load resources '{}'", name);
         for (ClassLoadingStrategy.Source classLoadingSource : classLoadingStrategy.getSources()) {
             switch (classLoadingSource) {
-                case PARENT:
+                case APPLICATION:
                     if (getParent() != null) {
                         resources.addAll(Collections.list(getParent().getResources(name)));
                     }
@@ -245,8 +245,6 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     protected Collection<URL> findResourcesFromDependencies(String name) throws IOException {
-
-    private Collection<URL> findResourcesFromDependencies(String name) throws IOException {
         log.trace("Search in dependencies for resources '{}'", name);
         List<URL> results = new ArrayList<>();
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
