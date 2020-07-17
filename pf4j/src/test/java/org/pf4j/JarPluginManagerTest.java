@@ -59,14 +59,18 @@ public class JarPluginManagerTest {
 
     @Test
     public void getExtensions() {
-        pluginManager.loadPlugins();
-        pluginManager.startPlugins();
+        try {
+            pluginManager.loadPlugins();
+            pluginManager.startPlugins();
 
-        List<TestExtensionPoint> extensions = pluginManager.getExtensions(TestExtensionPoint.class);
-        assertEquals(1, extensions.size());
+            List<TestExtensionPoint> extensions = pluginManager.getExtensions(TestExtensionPoint.class);
+            assertEquals(1, extensions.size());
 
-        String something = extensions.get(0).saySomething();
-        assertEquals(new TestExtension().saySomething(), something);
+            String something = extensions.get(0).saySomething();
+            assertEquals(new TestExtension().saySomething(), something);
+        } finally {
+            pluginManager.unloadPlugins();
+        }
     }
 
     @Test
