@@ -15,14 +15,6 @@
  */
 package org.pf4j;
 
-import java.util.*;
-
-/**
- *
- */
-public class DefaultClassLoadingStrategy {
-
-    public static final Set<ClassLoadingSource> DEFAULT_ORDER = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(ClassLoadingSource.PLUGIN, ClassLoadingSource.DEPENDENCIES, ClassLoadingSource.PARENT)));
-    public static final Set<ClassLoadingSource> PARENT_FIRST = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(ClassLoadingSource.PARENT, ClassLoadingSource.PLUGIN, ClassLoadingSource.DEPENDENCIES)));
-
+public enum ClassLoadingSource {
+    PLUGIN,PARENT,DEPENDENCIES;
 }

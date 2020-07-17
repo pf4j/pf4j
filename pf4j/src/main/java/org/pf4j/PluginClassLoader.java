@@ -22,13 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
-import java.util.SortedSet;
+import java.util.*;
 
 /**
  * One instance of this class should be created by plugin manager for every available plug-in.
@@ -47,7 +41,7 @@ public class PluginClassLoader extends URLClassLoader {
 
     private PluginManager pluginManager;
     private PluginDescriptor pluginDescriptor;
-    private SortedSet<DefaultClassLoadingStrategy.ClassLoadingSource> classLoadingOrder;
+    private Set<ClassLoadingSource> classLoadingOrder;
 
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
         this(pluginManager, pluginDescriptor, parent, false);
@@ -65,7 +59,7 @@ public class PluginClassLoader extends URLClassLoader {
     /**
      * classloading according to {@code classLoadingOrder}
      */
-    public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, SortedSet<DefaultClassLoadingStrategy.ClassLoadingSource> classLoadingOrder) {
+    public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent, Set<ClassLoadingSource> classLoadingOrder) {
         super(new URL[0], parent);
 
         this.pluginManager = pluginManager;
@@ -116,7 +110,7 @@ public class PluginClassLoader extends URLClassLoader {
                 log.trace("Found loaded class '{}'", className);
                 return loadedClass;
             }
-            for (DefaultClassLoadingStrategy.ClassLoadingSource classLoadingSource : classLoadingOrder) {
+            for (ClassLoadingSource classLoadingSource : classLoadingOrder) {
                 Class<?> c = null;
                 try {
                     switch (classLoadingSource) {
@@ -156,7 +150,7 @@ public class PluginClassLoader extends URLClassLoader {
     @Override
     public URL getResource(String name) {
         log.trace("Received request to load resource '{}'", name);
-        for (DefaultClassLoadingStrategy.ClassLoadingSource classLoadingSource : classLoadingOrder) {
+        for (ClassLoadingSource classLoadingSource : classLoadingOrder) {
             URL url = null;
             switch (classLoadingSource) {
                 case PARENT:
@@ -185,7 +179,7 @@ public class PluginClassLoader extends URLClassLoader {
         List<URL> resources = new ArrayList<>();
 
         log.trace("Received request to load resources '{}'", name);
-        for (DefaultClassLoadingStrategy.ClassLoadingSource classLoadingSource : classLoadingOrder) {
+        for (ClassLoadingSource classLoadingSource : classLoadingOrder) {
             switch (classLoadingSource) {
                 case PARENT:
                     if (getParent() != null) {
