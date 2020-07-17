@@ -210,7 +210,7 @@ public class PluginClassLoader extends URLClassLoader {
             ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null || dependency.isOptional()) {
+            if (classLoader == null && dependency.isOptional()) {
                 continue;
             }
 
@@ -231,7 +231,7 @@ public class PluginClassLoader extends URLClassLoader {
             PluginClassLoader classLoader = (PluginClassLoader) pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null || dependency.isOptional()) {
+            if (classLoader == null && dependency.isOptional()) {
                 continue;
             }
 
@@ -245,6 +245,8 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     protected Collection<URL> findResourcesFromDependencies(String name) throws IOException {
+
+    private Collection<URL> findResourcesFromDependencies(String name) throws IOException {
         log.trace("Search in dependencies for resources '{}'", name);
         List<URL> results = new ArrayList<>();
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
@@ -252,9 +254,10 @@ public class PluginClassLoader extends URLClassLoader {
             PluginClassLoader classLoader = (PluginClassLoader) pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null || dependency.isOptional()) {
+            if (classLoader == null && dependency.isOptional()) {
                 continue;
             }
+
             results.addAll(Collections.list(classLoader.findResources(name)));
         }
 
