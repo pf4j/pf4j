@@ -53,6 +53,8 @@ public class JarPluginManagerTest {
 
     @AfterEach
     public void tearDown() {
+        pluginManager.unloadPlugins();
+
         pluginJar = null;
         pluginManager = null;
     }
