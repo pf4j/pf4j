@@ -20,38 +20,44 @@ import java.util.List;
 
 /**
  * {@link ClassLoadingStrategy} will be used to configure {@link PluginClassLoader} loading order
- * and contains all possible options supported by {@link PluginClassLoader} where
- * A=Application Source ( load classes from parent classLoader)
- * P=Plugin Source ( load classes from this classloader)
- * D=Dependencies ( load classes from dependencies)
+ * and contains all possible options supported by {@link PluginClassLoader} where:
+ * {@code
+ * A = Application Source (load classes from parent classLoader)
+ * P = Plugin Source (load classes from this classloader)
+ * D = Dependencies (load classes from dependencies)
+ * }
  */
 public class ClassLoadingStrategy {
 
     /**
-     * application(parent)->plugin->dependencies
+     * application(parent) -> plugin -> dependencies
      */
     public static final ClassLoadingStrategy APD = new ClassLoadingStrategy(Arrays.asList(Source.APPLICATION, Source.PLUGIN, Source.DEPENDENCIES));
-    /**
-     * application(parent)->dependencies->plugin
-     */
-    public static final ClassLoadingStrategy ADP=new ClassLoadingStrategy(Arrays.asList(Source.APPLICATION,Source.DEPENDENCIES,Source.APPLICATION));
-    /**
-     * plugin->application(parent)->dependencies
-     */
-    public static final ClassLoadingStrategy PAD=new ClassLoadingStrategy(Arrays.asList(Source.PLUGIN,Source.APPLICATION,Source.DEPENDENCIES));
-    /**
-     * dependencies->application(parent)->plugin
-     */
-    public static final ClassLoadingStrategy DAP=new ClassLoadingStrategy(Arrays.asList(Source.DEPENDENCIES,Source.APPLICATION,Source.PLUGIN));
-    /**
-     * dependencies->plugin->application(parent)
-     */
-    public static final ClassLoadingStrategy DPA=new ClassLoadingStrategy(Arrays.asList(Source.DEPENDENCIES,Source.PLUGIN,Source.APPLICATION));
-    /**
-     * plugin->dependencies->application(parent)
-     */
-    public static final ClassLoadingStrategy PDA =new ClassLoadingStrategy(Arrays.asList(Source.PLUGIN, Source.DEPENDENCIES, Source.APPLICATION));
 
+    /**
+     * application(parent) -> dependencies -> plugin
+     */
+    public static final ClassLoadingStrategy ADP = new ClassLoadingStrategy(Arrays.asList(Source.APPLICATION, Source.DEPENDENCIES, Source.APPLICATION));
+
+    /**
+     * plugin -> application(parent) -> dependencies
+     */
+    public static final ClassLoadingStrategy PAD = new ClassLoadingStrategy(Arrays.asList(Source.PLUGIN, Source.APPLICATION, Source.DEPENDENCIES));
+
+    /**
+     * dependencies -> application(parent) -> plugin
+     */
+    public static final ClassLoadingStrategy DAP = new ClassLoadingStrategy(Arrays.asList(Source.DEPENDENCIES, Source.APPLICATION, Source.PLUGIN));
+
+    /**
+     * dependencies -> plugin -> application(parent)
+     */
+    public static final ClassLoadingStrategy DPA = new ClassLoadingStrategy(Arrays.asList(Source.DEPENDENCIES, Source.PLUGIN, Source.APPLICATION));
+
+    /**
+     * plugin -> dependencies -> application(parent)
+     */
+    public static final ClassLoadingStrategy PDA = new ClassLoadingStrategy(Arrays.asList(Source.PLUGIN, Source.DEPENDENCIES, Source.APPLICATION));
 
     private final List<Source> sources;
 
@@ -64,6 +70,7 @@ public class ClassLoadingStrategy {
     }
 
     public enum Source {
-        PLUGIN, APPLICATION,DEPENDENCIES;
+        PLUGIN, APPLICATION, DEPENDENCIES;
     }
+
 }

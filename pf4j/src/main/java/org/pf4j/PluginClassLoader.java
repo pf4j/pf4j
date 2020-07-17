@@ -62,7 +62,6 @@ public class PluginClassLoader extends URLClassLoader {
         this(pluginManager, pluginDescriptor, parent, parentFirst ? ClassLoadingStrategy.APD : ClassLoadingStrategy.PDA);
     }
 
-
     /**
      * classloading according to {@code classLoadingStrategy}
      */
@@ -117,6 +116,7 @@ public class PluginClassLoader extends URLClassLoader {
                 log.trace("Found loaded class '{}'", className);
                 return loadedClass;
             }
+
             for (ClassLoadingStrategy.Source classLoadingSource : classLoadingStrategy.getSources()) {
                 Class<?> c = null;
                 try {
@@ -131,17 +131,16 @@ public class PluginClassLoader extends URLClassLoader {
                             c = loadClassFromDependencies(className);
                             break;
                     }
-                } catch (ClassNotFoundException ignored) {
+                } catch (ClassNotFoundException ignored) {}
 
-                }
                 if (c != null) {
-                    log.trace("Found class '{}' in {} classpath", className,classLoadingSource);
+                    log.trace("Found class '{}' in {} classpath", className, classLoadingSource);
                     return c;
                 } else {
-                    log.trace("Couldn't find class '{}' in {} classpath", className,classLoadingSource);
+                    log.trace("Couldn't find class '{}' in {} classpath", className, classLoadingSource);
                 }
-
             }
+
             throw new ClassNotFoundException(className);
         }
     }
@@ -170,15 +169,16 @@ public class PluginClassLoader extends URLClassLoader {
                     url = findResourceFromDependencies(name);
                     break;
             }
+
             if (url != null) {
-                log.trace("Found resource '{}' in {} classpath", name,classLoadingSource);
+                log.trace("Found resource '{}' in {} classpath", name, classLoadingSource);
                 return url;
             } else {
-                log.trace("Couldn't find resource '{}' in {}.", name,classLoadingSource);
+                log.trace("Couldn't find resource '{}' in {}", name, classLoadingSource);
             }
         }
-        return null;
 
+        return null;
     }
 
     @Override
@@ -201,8 +201,8 @@ public class PluginClassLoader extends URLClassLoader {
                     break;
             }
         }
-        return Collections.enumeration(resources);
 
+        return Collections.enumeration(resources);
     }
 
     protected Class<?> loadClassFromDependencies(String className) {
