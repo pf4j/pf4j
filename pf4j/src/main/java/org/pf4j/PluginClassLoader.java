@@ -212,23 +212,18 @@ public class PluginClassLoader extends URLClassLoader {
     	List<URL> resources = new ArrayList<>();
 
     	if (!parentFirst) {
-
             resources.addAll(Collections.list(findResources(name)));
-
             resources.addAll(findResourcesFromDependencies(name));
 
             if (getParent() != null) {
                 resources.addAll(Collections.list(getParent().getResources(name)));
             }
-
         } else {
-
         	if (getParent() != null) {
                 resources.addAll(Collections.list(getParent().getResources(name)));
             }
 
         	resources.addAll(findResourcesFromDependencies(name));
-
         	resources.addAll(Collections.list(super.findResources(name)));
         }
 
