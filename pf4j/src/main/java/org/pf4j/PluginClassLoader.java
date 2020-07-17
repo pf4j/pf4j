@@ -22,7 +22,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * One instance of this class should be created by plugin manager for every available plug-in.
@@ -237,14 +242,8 @@ public class PluginClassLoader extends URLClassLoader {
             ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null) {
-                if (dependency.isOptional()) {
-                    continue;
-                } else {
-                    throw new PluginRuntimeException(
-                        String.format("Unable to load class '%s'. Required dependency '%s' not loaded.",
-                            className, dependency.getPluginId()));
-                }
+            if (classLoader == null && dependency.isOptional()) {
+                continue;
             }
 
             try {
@@ -264,14 +263,8 @@ public class PluginClassLoader extends URLClassLoader {
             PluginClassLoader classLoader = (PluginClassLoader) pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null) {
-                if (dependency.isOptional()) {
-                    continue;
-                } else {
-                    throw new PluginRuntimeException(
-                        String.format("Unable to find resource '%s'. Required dependency '%s' not loaded.",
-                            name, dependency.getPluginId()));
-                }
+            if (classLoader == null && dependency.isOptional()) {
+                continue;
             }
 
             URL url = classLoader.findResource(name);
@@ -291,14 +284,8 @@ public class PluginClassLoader extends URLClassLoader {
             PluginClassLoader classLoader = (PluginClassLoader) pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null) {
-                if (dependency.isOptional()) {
-                    continue;
-                } else {
-                    throw new PluginRuntimeException(
-                        String.format("Unable to find resource '%s'. Required dependency '%s' not loaded.",
-                            name, dependency.getPluginId()));
-                }
+            if (classLoader == null && dependency.isOptional()) {
+                continue;
             }
 
             results.addAll(Collections.list(classLoader.findResources(name)));
