@@ -53,24 +53,22 @@ public class JarPluginManagerTest {
 
     @AfterEach
     public void tearDown() {
+        pluginManager.unloadPlugins();
+
         pluginJar = null;
         pluginManager = null;
     }
 
     @Test
     public void getExtensions() {
-        try {
-            pluginManager.loadPlugins();
-            pluginManager.startPlugins();
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
 
-            List<TestExtensionPoint> extensions = pluginManager.getExtensions(TestExtensionPoint.class);
-            assertEquals(1, extensions.size());
+        List<TestExtensionPoint> extensions = pluginManager.getExtensions(TestExtensionPoint.class);
+        assertEquals(1, extensions.size());
 
-            String something = extensions.get(0).saySomething();
-            assertEquals(new TestExtension().saySomething(), something);
-        } finally {
-            pluginManager.unloadPlugins();
-        }
+        String something = extensions.get(0).saySomething();
+        assertEquals(new TestExtension().saySomething(), something);
     }
 
     @Test
