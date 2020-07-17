@@ -101,6 +101,11 @@ public interface PluginManager {
     PluginState stopPlugin(String pluginId);
 
     /**
+     * Unload all plugins
+     */
+    void unloadPlugins();
+
+    /**
      * Unload a plugin.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata

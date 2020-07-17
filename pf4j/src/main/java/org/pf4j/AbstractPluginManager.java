@@ -238,6 +238,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     /**
      * Unload all plugins
      */
+    @Override
     public void unloadPlugins() {
         // wrap resolvedPlugins in new list because of concurrent modification
         for (PluginWrapper pluginWrapper : new ArrayList<>(resolvedPlugins)) {
