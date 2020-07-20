@@ -42,11 +42,9 @@ import java.util.List;
 /**
  * @author Decebal Suiu
  */
-public class FileUtils {
+public final class FileUtils {
 
     private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
-
-    private static final boolean IS_WINDOWS_OS = System.getProperty("os.name").startsWith("Windows");
 
     public static List<String> readLines(Path path, boolean ignoreComments) throws IOException {
         File file = path.toFile();
@@ -163,7 +161,9 @@ public class FileUtils {
 
         try {
             Files.delete(path);
-        } catch (IOException ignored) { }
+        } catch (IOException ignored) {
+            // ignored
+        }
     }
 
     /**
@@ -224,7 +224,7 @@ public class FileUtils {
             // transformation for Windows OS
             pathString = StringUtils.addStart(pathString.replace("\\", "/"), "/");
             // space is replaced with %20
-            pathString = pathString.replaceAll(" ","%20");
+            pathString = pathString.replace(" ","%20");
             uri = URI.create("jar:file:" + pathString);
         }
 
@@ -273,4 +273,6 @@ public class FileUtils {
         }
     }
 
+    private FileUtils() {
+    }
 }
