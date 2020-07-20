@@ -121,13 +121,18 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
 
     private void collectExtensions(URL url, Set<String> bucket) throws URISyntaxException, IOException {
         Path extensionPath;
+
         if (url.toURI().getScheme().equals("jar")) {
             extensionPath = FileUtils.getPath(url.toURI(), EXTENSIONS_RESOURCE);
         } else {
             extensionPath = Paths.get(url.toURI());
         }
 
-        bucket.addAll(readExtensions(extensionPath));
+        try {
+            bucket.addAll(readExtensions(extensionPath));
+        } finally {
+            FileUtils.closePath(extensionPath);
+        }
     }
 
     private Set<String> readExtensions(Path extensionPath) throws IOException {

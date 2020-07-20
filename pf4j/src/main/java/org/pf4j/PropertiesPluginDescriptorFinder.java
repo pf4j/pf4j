@@ -75,16 +75,20 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
             throw new PluginRuntimeException("Cannot find the properties path");
         }
 
-        log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
-        if (Files.notExists(propertiesPath)) {
-            throw new PluginRuntimeException("Cannot find '{}' path", propertiesPath);
-        }
-
         Properties properties = new Properties();
-        try (InputStream input = Files.newInputStream(propertiesPath)) {
-            properties.load(input);
-        } catch (IOException e) {
-            throw new PluginRuntimeException(e);
+        try {
+            log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
+            if (Files.notExists(propertiesPath)) {
+                throw new PluginRuntimeException("Cannot find '{}' path", propertiesPath);
+            }
+
+            try (InputStream input = Files.newInputStream(propertiesPath)) {
+                properties.load(input);
+            } catch (IOException e) {
+                throw new PluginRuntimeException(e);
+            }
+        } finally {
+            FileUtils.closePath(propertiesPath);
         }
 
         return properties;

@@ -232,14 +232,17 @@ public class FileUtils {
     }
 
     public static Path getPath(URI uri, String first, String... more) throws IOException {
-        FileSystem fileSystem = getFileSystem(uri);
-        Path path = fileSystem.getPath(first, more);
-        if (IS_WINDOWS_OS && "jar".equals(uri.getScheme())) {
-            // it's a ZipFileSystem
-            fileSystem.close();
-        }
+        return getFileSystem(uri).getPath(first, more);
+    }
 
-        return path;
+    public static void closePath(Path path) {
+        if (path != null) {
+            try {
+                path.getFileSystem().close();
+            } catch (Exception e) {
+                // close silently
+            }
+        }
     }
 
     public static Path findFile(Path directoryPath, String fileName) {
