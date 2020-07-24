@@ -42,11 +42,9 @@ import java.util.List;
 /**
  * @author Decebal Suiu
  */
-public class FileUtils {
+public final class FileUtils {
 
     private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
-
-    private static final boolean IS_WINDOWS_OS = System.getProperty("os.name").startsWith("Windows");
 
     public static List<String> readLines(Path path, boolean ignoreComments) throws IOException {
         File file = path.toFile();
@@ -163,7 +161,9 @@ public class FileUtils {
 
         try {
             Files.delete(path);
-        } catch (IOException ignored) { }
+        } catch (IOException ignored) {
+            // ignored
+        }
     }
 
     /**
@@ -224,7 +224,7 @@ public class FileUtils {
             // transformation for Windows OS
             pathString = StringUtils.addStart(pathString.replace("\\", "/"), "/");
             // space is replaced with %20
-            pathString = pathString.replaceAll(" ","%20");
+            pathString = pathString.replace(" ","%20");
             uri = URI.create("jar:file:" + pathString);
         }
 
@@ -232,14 +232,17 @@ public class FileUtils {
     }
 
     public static Path getPath(URI uri, String first, String... more) throws IOException {
-        FileSystem fileSystem = getFileSystem(uri);
-        Path path = fileSystem.getPath(first, more);
-        if (IS_WINDOWS_OS && "jar".equals(uri.getScheme())) {
-            // it's a ZipFileSystem
-            fileSystem.close();
-        }
+        return getFileSystem(uri).getPath(first, more);
+    }
 
-        return path;
+    public static void closePath(Path path) {
+        if (path != null) {
+            try {
+                path.getFileSystem().close();
+            } catch (Exception e) {
+                // close silently
+            }
+        }
     }
 
     public static Path findFile(Path directoryPath, String fileName) {
@@ -270,4 +273,6 @@ public class FileUtils {
         }
     }
 
+    private FileUtils() {
+    }
 }

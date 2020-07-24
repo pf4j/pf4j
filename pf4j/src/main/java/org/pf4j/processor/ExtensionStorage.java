@@ -82,18 +82,16 @@ public abstract class ExtensionStorage {
     }
 
     public static void read(Reader reader, Set<String> entries) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(reader);
-
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            line = COMMENT.matcher(line).replaceFirst("");
-            line = WHITESPACE.matcher(line).replaceAll("");
-            if (line.length() > 0) {
-                entries.add(line);
+        try (BufferedReader bufferedReader = new BufferedReader(reader)) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                line = COMMENT.matcher(line).replaceFirst("");
+                line = WHITESPACE.matcher(line).replaceAll("");
+                if (line.length() > 0) {
+                    entries.add(line);
+                }
             }
         }
-
-        bufferedReader.close();
     }
 
 }

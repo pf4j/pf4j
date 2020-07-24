@@ -146,8 +146,8 @@ public class PluginJar {
 
         public PluginJar build() throws IOException {
             Manifest manifest = createManifest();
-            try (OutputStream outputStream = new FileOutputStream(path.toFile())) {
-                JarOutputStream jarOutputStream = new JarOutputStream(outputStream, manifest);
+            try (OutputStream outputStream = new FileOutputStream(path.toFile());
+                 JarOutputStream jarOutputStream = new JarOutputStream(outputStream, manifest)) {
                 if (!extensions.isEmpty()) {
                     // add extensions.idx
                     JarEntry jarEntry = new JarEntry("META-INF/extensions.idx");
@@ -163,7 +163,6 @@ public class PluginJar {
                         jarOutputStream.closeEntry();
                     }
                 }
-                jarOutputStream.close();
             }
 
             return new PluginJar(this);
