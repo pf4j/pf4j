@@ -37,7 +37,7 @@ public class ClassLoadingStrategy {
     /**
      * application(parent) -> dependencies -> plugin
      */
-    public static final ClassLoadingStrategy ADP = new ClassLoadingStrategy(Arrays.asList(Source.APPLICATION, Source.DEPENDENCIES, Source.APPLICATION));
+    public static final ClassLoadingStrategy ADP = new ClassLoadingStrategy(Arrays.asList(Source.APPLICATION, Source.DEPENDENCIES, Source.PLUGIN));
 
     /**
      * plugin -> application(parent) -> dependencies
