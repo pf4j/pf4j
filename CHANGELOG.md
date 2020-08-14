@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [3.4.1] - 2020-08-14
+
+#### Fixed
 - [#371]: `ClosedFileSystemException` when I run demo (Windows)
 - [#391]: Incorrect enum selection in `ClassLoadingStrategy.ADP`
 
@@ -384,7 +394,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.3.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.4.1...HEAD
+[3.4.1]: https://github.com/decebals/pf4j/compare/release-3.4.0...release-3.4.1
+[3.4.1]: https://github.com/decebals/pf4j/compare/release-3.3.0...release-3.4.0
 [3.3.0]: https://github.com/decebals/pf4j/compare/release-3.2.0...release-3.3.0
 [3.2.0]: https://github.com/decebals/pf4j/compare/release-3.1.0...release-3.2.0
 [3.1.0]: https://github.com/decebals/pf4j/compare/release-3.0.0...release-3.1.0
