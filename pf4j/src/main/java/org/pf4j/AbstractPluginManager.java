@@ -739,7 +739,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         log.warn("Plugin '{}' requires a minimum system version of {}, and you have {}",
             getPluginLabel(pluginDescriptor),
-            pluginWrapper.getDescriptor().getRequires(),
+            requires,
             getSystemVersion());
 
         return false;
