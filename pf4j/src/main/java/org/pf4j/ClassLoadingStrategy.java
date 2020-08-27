@@ -61,7 +61,7 @@ public class ClassLoadingStrategy {
 
     private final List<Source> sources;
 
-    private ClassLoadingStrategy(List<Source> sources) {
+    public ClassLoadingStrategy(List<Source> sources) {
         this.sources = sources;
     }
 
