@@ -267,6 +267,15 @@ public class DependencyResolver {
             return requiredVersion;
         }
 
+        @Override
+        public String toString() {
+            return "WrongDependencyVersion{" +
+                "dependencyId='" + dependencyId + '\'' +
+                ", dependentId='" + dependentId + '\'' +
+                ", existingVersion='" + existingVersion + '\'' +
+                ", requiredVersion='" + requiredVersion + '\'' +
+                '}';
+        }
     }
 
     /**
