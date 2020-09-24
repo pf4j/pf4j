@@ -16,7 +16,6 @@
 package org.pf4j;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -167,12 +166,11 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
     }
 
     protected PluginDescriptor setDependencies(String dependencies) {
+        this.dependencies = new ArrayList<>();
+
         if (dependencies != null) {
             dependencies = dependencies.trim();
-            if (dependencies.isEmpty()) {
-                this.dependencies = Collections.emptyList();
-            } else {
-                this.dependencies = new ArrayList<>();
+            if (!dependencies.isEmpty()) {
                 String[] tokens = dependencies.split(",");
                 for (String dependency : tokens) {
                     dependency = dependency.trim();
@@ -180,12 +178,7 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
                         this.dependencies.add(new PluginDependency(dependency));
                     }
                 }
-                if (this.dependencies.isEmpty()) {
-                    this.dependencies = Collections.emptyList();
-                }
             }
-        } else {
-            this.dependencies = Collections.emptyList();
         }
 
         return this;
