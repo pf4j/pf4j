@@ -92,6 +92,8 @@
                     <skip>${javadoc.disabled}</skip>
                     <doclint>none</doclint>
                     <failOnWarnings>false</failOnWarnings>
+                    <!-- Needed when run inside Intellij IDEA -->
+                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                 </configuration>
                 <executions>
                     <execution>
