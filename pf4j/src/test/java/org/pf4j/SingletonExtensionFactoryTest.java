@@ -19,11 +19,17 @@ import org.junit.jupiter.api.Test;
 import org.pf4j.plugin.FailTestExtension;
 import org.pf4j.plugin.TestExtension;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Decebal Suiu
+ * @author Ajith Kumar
  */
 public class SingletonExtensionFactoryTest {
 
@@ -41,6 +47,40 @@ public class SingletonExtensionFactoryTest {
         Object extensionOne = extensionFactory.create(TestExtension.class);
         Object extensionTwo = extensionFactory.create(TestExtension.class);
         assertNotSame(extensionOne, extensionTwo);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createNewEachTimeFromDifferentClassLoaders() throws Exception {
+        ExtensionFactory extensionFactory = new SingletonExtensionFactory();
+
+        // Get classpath locations
+        URL[] classpathReferences = getClasspathReferences();
+
+        // Create different classloaders for the classpath references and load classes respectively
+        ClassLoader klassLoaderOne = new URLClassLoader(classpathReferences, null);
+        Class klassOne = klassLoaderOne.loadClass(TestExtension.class.getName());
+        ClassLoader klassLoaderTwo = new URLClassLoader(classpathReferences, null);
+        Class klassTwo = klassLoaderTwo.loadClass(TestExtension.class.getName());
+
+        // create instances
+        Object instanceOne = extensionFactory.create(klassOne);
+        Object instanceTwo = extensionFactory.create(klassTwo);
+
+        // assert that instances not same
+        assertNotSame(instanceOne, instanceTwo);
+    }
+
+    private URL[] getClasspathReferences() throws MalformedURLException {
+        String classpathProperty = System.getProperty("java.class.path");
+
+        String[] classpaths = classpathProperty.split(":");
+        URL[] uris = new URL[classpaths.length];
+
+        for (int index = 0; index < classpaths.length; index++) {
+            uris[index] = new File(classpaths[index]).toURI().toURL();
+        }
+        return uris;
     }
 
 }

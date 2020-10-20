@@ -19,36 +19,46 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * An {@link ExtensionFactory} that always returns a specific instance.
  * Optional, you can specify the extension classes for which you want singletons.
  *
  * @author Decebal Suiu
+ * @author Ajith Kumar
  */
 public class SingletonExtensionFactory extends DefaultExtensionFactory {
 
     private final List<String> extensionClassNames;
 
-    private Map<String, Object> cache;
+    private Map<ClassLoader, Map<String, Object>> cache;
 
     public SingletonExtensionFactory(String... extensionClassNames) {
         this.extensionClassNames = Arrays.asList(extensionClassNames);
 
-        cache = new HashMap<>(); // simple cache implementation
+        cache = new WeakHashMap<>(); // simple cache implementation
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> extensionClass) {
         String extensionClassName = extensionClass.getName();
-        if (cache.containsKey(extensionClassName)) {
-            return (T) cache.get(extensionClassName);
+        ClassLoader extensionClassLoader = extensionClass.getClassLoader();
+
+        if (!cache.containsKey(extensionClassLoader)) {
+            cache.put(extensionClassLoader, new HashMap<>());
+        }
+
+        Map<String, Object> classLoaderBucket = cache.get(extensionClassLoader);
+
+        if (classLoaderBucket.containsKey(extensionClassName)) {
+            return (T) classLoaderBucket.get(extensionClassName);
         }
 
         T extension = super.create(extensionClass);
         if (extensionClassNames.isEmpty() || extensionClassNames.contains(extensionClassName)) {
-            cache.put(extensionClassName, extension);
+            classLoaderBucket.put(extensionClassName, extension);
         }
 
         return extension;
