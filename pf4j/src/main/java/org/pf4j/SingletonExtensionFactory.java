@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * An {@link ExtensionFactory} that always returns a specific instance.
@@ -36,13 +37,12 @@ public class SingletonExtensionFactory extends DefaultExtensionFactory {
     public SingletonExtensionFactory(String... extensionClassNames) {
         this.extensionClassNames = Arrays.asList(extensionClassNames);
 
-        cache = new HashMap<>(); // simple cache implementation
+        cache = new WeakHashMap<>(); // simple cache implementation
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> extensionClass) {
-
         String extensionClassName = extensionClass.getName();
         ClassLoader extensionClassLoader = extensionClass.getClassLoader();
 

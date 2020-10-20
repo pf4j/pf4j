@@ -52,7 +52,6 @@ public class SingletonExtensionFactoryTest {
     @Test
     @SuppressWarnings("unchecked")
     public void createNewEachTimeFromDifferentClassLoaders() throws Exception {
-
         ExtensionFactory extensionFactory = new SingletonExtensionFactory();
 
         // Get classpath locations
@@ -70,11 +69,9 @@ public class SingletonExtensionFactoryTest {
 
         // assert that instances not same
         assertNotSame(instanceOne, instanceTwo);
-
     }
 
     private URL[] getClasspathReferences() throws MalformedURLException {
-
         String classpathProperty = System.getProperty("java.class.path");
 
         String[] classpaths = classpathProperty.split(":");
