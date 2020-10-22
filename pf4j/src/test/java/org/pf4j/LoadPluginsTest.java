@@ -23,6 +23,7 @@ import org.pf4j.plugin.PluginZip;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -198,6 +199,11 @@ public class LoadPluginsTest {
     @Test
     public void getRoot() {
         assertEquals(pluginsPath, pluginManager.getPluginsRoot());
+    }
+
+    @Test
+    public void getRoots() {
+        assertEquals(Collections.singletonList(pluginsPath), pluginManager.getPluginsRoots());
     }
 
     @Test

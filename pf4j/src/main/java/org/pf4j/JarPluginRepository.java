@@ -18,14 +18,20 @@ package org.pf4j;
 import org.pf4j.util.JarFileFilter;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Decebal Suiu
  */
 public class JarPluginRepository extends BasePluginRepository {
 
-    public JarPluginRepository(Path pluginsRoot) {
-        super(pluginsRoot, new JarFileFilter());
+    public JarPluginRepository(Path... pluginsRoots) {
+        this(Arrays.asList(pluginsRoots));
+    }
+
+    public JarPluginRepository(List<Path> pluginsRoots) {
+        super(pluginsRoots, new JarFileFilter());
     }
 
 }

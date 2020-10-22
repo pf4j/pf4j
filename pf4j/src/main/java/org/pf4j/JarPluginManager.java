@@ -30,8 +30,8 @@ public class JarPluginManager extends DefaultPluginManager {
         super();
     }
 
-    public JarPluginManager(Path pluginsRoot) {
-        super(pluginsRoot);
+    public JarPluginManager(Path... pluginsRoots) {
+        super(pluginsRoots);
     }
 
     @Override
@@ -49,8 +49,8 @@ public class JarPluginManager extends DefaultPluginManager {
     @Override
     protected PluginRepository createPluginRepository() {
         return new CompoundPluginRepository()
-            .add(new DevelopmentPluginRepository(getPluginsRoot()), this::isDevelopment)
-            .add(new JarPluginRepository(getPluginsRoot()), this::isNotDevelopment);
+            .add(new DevelopmentPluginRepository(getPluginsRoots()), this::isDevelopment)
+            .add(new JarPluginRepository(getPluginsRoots()), this::isNotDevelopment);
     }
 
 }

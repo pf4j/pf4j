@@ -25,12 +25,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class implements the boilerplate plugin code that any {@link PluginManager}
@@ -51,7 +53,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     public static final String DEFAULT_PLUGINS_DIR = "plugins";
     public static final String DEVELOPMENT_PLUGINS_DIR = "../plugins";
 
-    protected Path pluginsRoot;
+    protected final List<Path> pluginsRoots = new ArrayList<>();
 
     protected ExtensionFinder extensionFinder;
 
@@ -109,19 +111,19 @@ public abstract class AbstractPluginManager implements PluginManager {
     protected VersionManager versionManager;
 
     /**
-     * The plugins root is supplied by {@code System.getProperty("pf4j.pluginsDir", "plugins")}.
+     * The plugins roots are supplied as comma-separated list by {@code System.getProperty("pf4j.pluginsDir", "plugins")}.
      */
     public AbstractPluginManager() {
         initialize();
     }
 
     /**
-     * Constructs {@code AbstractPluginManager} with the given plugins root.
+     * Constructs {@code AbstractPluginManager} with the given plugins roots.
      *
-     * @param pluginsRoot the root to search for plugins
+     * @param pluginsRoots the roots to search for plugins
      */
-    public AbstractPluginManager(Path pluginsRoot) {
-        this.pluginsRoot = pluginsRoot;
+    public AbstractPluginManager(Path... pluginsRoots) {
+        this.pluginsRoots.addAll(Arrays.asList(pluginsRoots));
 
         initialize();
     }
@@ -200,12 +202,17 @@ public abstract class AbstractPluginManager implements PluginManager {
      */
     @Override
     public void loadPlugins() {
-        log.debug("Lookup plugins in '{}'", pluginsRoot);
-        // check for plugins root
-        if (Files.notExists(pluginsRoot) || !Files.isDirectory(pluginsRoot)) {
-            log.warn("No '{}' root", pluginsRoot);
+        log.debug("Lookup plugins in '{}'", pluginsRoots);
+        // check for plugins roots
+        if (pluginsRoots.isEmpty()) {
+            log.warn("No plugins roots configured");
             return;
         }
+        pluginsRoots.forEach(path -> {
+            if (Files.notExists(path) || !Files.isDirectory(path)) {
+                log.warn("No '{}' root", path);
+            }
+        });
 
         // get all plugin paths from repository
         List<Path> pluginPaths = pluginRepository.getPluginPaths();
@@ -599,8 +606,15 @@ public abstract class AbstractPluginManager implements PluginManager {
         return pluginLoader;
     }
 
+    @Override
     public Path getPluginsRoot() {
-        return pluginsRoot;
+        return pluginsRoots.stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("pluginsRoots have not been initialized, yet."));
+    }
+
+    public List<Path> getPluginsRoots() {
+        return Collections.unmodifiableList(pluginsRoots);
     }
 
     @Override
@@ -687,8 +701,8 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         pluginStateListeners = new ArrayList<>();
 
-        if (pluginsRoot == null) {
-            pluginsRoot = createPluginsRoot();
+        if (pluginsRoots.isEmpty()) {
+            pluginsRoots.addAll(createPluginsRoot());
         }
 
         pluginRepository = createPluginRepository();
@@ -704,20 +718,24 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * Add the possibility to override the plugins root.
-     * If a {@link #PLUGINS_DIR_PROPERTY_NAME} system property is defined than this method returns that root.
+     * Add the possibility to override the plugins roots.
+     * If a {@link #PLUGINS_DIR_PROPERTY_NAME} system property is defined than this method returns that roots.
      * If {@link #getRuntimeMode()} returns {@link RuntimeMode#DEVELOPMENT} than {@link #DEVELOPMENT_PLUGINS_DIR}
      * is returned else this method returns {@link #DEFAULT_PLUGINS_DIR}.
      *
      * @return the plugins root
      */
-    protected Path createPluginsRoot() {
+    protected List<Path> createPluginsRoot() {
         String pluginsDir = System.getProperty(PLUGINS_DIR_PROPERTY_NAME);
-        if (pluginsDir == null) {
-            pluginsDir = isDevelopment() ? DEVELOPMENT_PLUGINS_DIR : DEFAULT_PLUGINS_DIR;
+        if (pluginsDir != null && !pluginsDir.isEmpty()) {
+            return Arrays.stream(pluginsDir.split(","))
+                .map(String::trim)
+                .map(Paths::get)
+                .collect(Collectors.toList());
         }
 
-        return Paths.get(pluginsDir);
+        pluginsDir = isDevelopment() ? DEVELOPMENT_PLUGINS_DIR : DEFAULT_PLUGINS_DIR;
+        return Collections.singletonList(Paths.get(pluginsDir));
     }
 
     /**

@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,8 +39,12 @@ public class DefaultPluginRepository extends BasePluginRepository {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultPluginRepository.class);
 
-    public DefaultPluginRepository(Path pluginsRoot) {
-        super(pluginsRoot);
+    public DefaultPluginRepository(Path... pluginsRoots) {
+        this(Arrays.asList(pluginsRoots));
+    }
+
+    public DefaultPluginRepository(List<Path> pluginsRoots) {
+        super(pluginsRoots);
 
         AndFileFilter pluginsFilter = new AndFileFilter(new DirectoryFileFilter());
         pluginsFilter.addFileFilter(new NotFileFilter(createHiddenPluginFilter()));
@@ -64,16 +69,18 @@ public class DefaultPluginRepository extends BasePluginRepository {
 
     private void extractZipFiles() {
         // expand plugins zip files
-        File[] zipFiles = pluginsRoot.toFile().listFiles(new ZipFileFilter());
-        if ((zipFiles != null) && zipFiles.length > 0) {
-            for (File pluginZip : zipFiles) {
-                try {
-                    FileUtils.expandIfZip(pluginZip.toPath());
-                } catch (IOException e) {
-                    log.error("Cannot expand plugin zip '{}'", pluginZip);
-                    log.error(e.getMessage(), e);
-                }
-            }
+        pluginsRoots.stream()
+            .flatMap(path -> streamFiles(path, new ZipFileFilter()))
+            .map(File::toPath)
+            .forEach(this::expandIfZip);
+    }
+
+    private void expandIfZip(Path filePath) {
+        try {
+            FileUtils.expandIfZip(filePath);
+        } catch (IOException e) {
+            log.error("Cannot expand plugin zip '{}'", filePath);
+            log.error(e.getMessage(), e);
         }
     }
 

@@ -205,11 +205,21 @@ public interface PluginManager {
     String getSystemVersion();
 
     /**
-     * Gets the path of the folder where plugins are installed.
+     * Gets the first path of the folders where plugins are installed.
+     *
+     * @deprecated Use {@link #getPluginsRoots()} instead to get all paths where plugins are could be installed.
      *
      * @return Path of plugins root
      */
+    @Deprecated
     Path getPluginsRoot();
+
+    /**
+     * Gets the a read-only list of all paths of the folders where plugins are installed.
+     *
+     * @return Paths of plugins roots
+     */
+    List<Path> getPluginsRoots();
 
     VersionManager getVersionManager();
 
