@@ -650,7 +650,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         return (version != null) ? version : "0.0.0";
     }
 
-    protected abstract PluginRepository createPluginRepository();
+    protected abstract PluginRepository createPluginRepository(PluginDescriptorFinder pluginDescriptorFinder);
 
     protected abstract PluginFactory createPluginFactory();
 
@@ -691,10 +691,10 @@ public abstract class AbstractPluginManager implements PluginManager {
             pluginsRoot = createPluginsRoot();
         }
 
-        pluginRepository = createPluginRepository();
+        pluginDescriptorFinder = createPluginDescriptorFinder();
+        pluginRepository = createPluginRepository(pluginDescriptorFinder);
         pluginFactory = createPluginFactory();
         extensionFactory = createExtensionFactory();
-        pluginDescriptorFinder = createPluginDescriptorFinder();
         extensionFinder = createExtensionFinder();
         pluginStatusProvider = createPluginStatusProvider();
         pluginLoader = createPluginLoader();

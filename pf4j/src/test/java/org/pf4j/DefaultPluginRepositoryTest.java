@@ -20,10 +20,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.plugin.PluginZip;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,11 +43,16 @@ public class DefaultPluginRepositoryTest {
     @BeforeEach
     public void setUp() throws IOException {
         Path plugin1Path = Files.createDirectory(pluginsPath.resolve("plugin-1"));
+
         // Prove that we can delete a folder with a file inside
-        Files.createFile(plugin1Path.resolve("myfile"));
+        Properties plugin1Properties = new Properties();
+        plugin1Properties.setProperty("id", "plugin-1");
+        plugin1Properties.setProperty("version", "1.0");
+        plugin1Properties.store(new FileOutputStream(plugin1Path.resolve("plugin.properties").toFile()), null);
+
         // Create a zip file for plugin-1 to test that it is deleted when plugin is deleted
         new PluginZip.Builder(pluginsPath.resolve("plugin-1.zip"), "plugin-1").pluginVersion("1.0").build();
-        Files.createDirectory(pluginsPath.resolve("plugin-2"));
+        new PluginZip.Builder(pluginsPath.resolve("plugin-2.zip"), "plugin-2").pluginVersion("1.0").build();
         Files.createDirectory(pluginsPath.resolve("plugin-3"));
     }
 
@@ -62,6 +69,45 @@ public class DefaultPluginRepositoryTest {
         assertPathExists(pluginPaths, pluginsPath.resolve("plugin-1"));
         assertPathExists(pluginPaths, pluginsPath.resolve("plugin-2"));
         assertPathExists(pluginPaths, pluginsPath.resolve("plugin-3"));
+    }
+
+    /**
+     * Test of {@link DefaultPluginRepository#getPluginPaths()} method with subdirectory plugins.
+     * <p>
+     * This test uses a PropertiesPluginDescriptorFinder, so plugin-3 will not be recognized as plugins.
+     * </p>
+     * <p>
+     * Structure of the pluginsRoot folder for this test:
+     * </p>
+     * <code><pre>
+     * pluginsPath
+     * ├── subdirectory
+     * │    ├── subsub
+     * │    │    └── plugin-5.zip
+     * │    └── plugin-4.zip
+     * ├── plugin-1
+     * │     └── plugin.properties
+     * ├── plugin-1.zip
+     * ├── plugin-2.zip
+     * └── plugin-3
+     * </pre></code>
+     */
+    @Test
+    public void testGetSubdirectoryPluginArchives() throws IOException {
+        PluginRepository repository = new DefaultPluginRepository(pluginsPath, new PropertiesPluginDescriptorFinder());
+
+        Path subdirectory = Files.createDirectory(pluginsPath.resolve("subdirectory"));
+        new PluginZip.Builder(subdirectory.resolve("plugin-4.zip"), "plugin-4").pluginVersion("1.0").build();
+        Path subsub = Files.createDirectory(subdirectory.resolve("subsub"));
+        new PluginZip.Builder(subsub.resolve("plugin-5.zip"), "plugin-5").pluginVersion("1.0").build();
+
+        List<Path> pluginPaths = repository.getPluginPaths();
+
+        assertEquals(4, pluginPaths.size());
+        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-1"));
+        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-2"));
+        assertPathExists(pluginPaths, subdirectory.resolve("plugin-4"));
+        assertPathExists(pluginPaths, subsub.resolve("plugin-5"));
     }
 
     /**

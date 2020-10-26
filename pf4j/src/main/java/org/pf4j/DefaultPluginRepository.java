@@ -28,18 +28,36 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
+ * A PluginRepository that extracts zip files in the {@code pluginsRoot} before computing the plugin paths.
+ * <p>
+ * Can optionally take a {@link PluginDescriptorFinder} to enable finding plugins subdirectories of {@code pluginsRoot}.
+ * </p>
+ *
  * @author Decebal Suiu
  */
 public class DefaultPluginRepository extends BasePluginRepository {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultPluginRepository.class);
 
+    protected final PluginDescriptorFinder pluginDescriptorFinder;
+
     public DefaultPluginRepository(Path pluginsRoot) {
+        this(pluginsRoot, null);
+    }
+
+    public DefaultPluginRepository(Path pluginsRoot, PluginDescriptorFinder pluginDescriptorFinder) {
         super(pluginsRoot);
+        this.pluginDescriptorFinder = pluginDescriptorFinder;
 
         AndFileFilter pluginsFilter = new AndFileFilter(new DirectoryFileFilter());
         pluginsFilter.addFileFilter(new NotFileFilter(createHiddenPluginFilter()));
@@ -48,8 +66,28 @@ public class DefaultPluginRepository extends BasePluginRepository {
 
     @Override
     public List<Path> getPluginPaths() {
-        extractZipFiles();
-        return super.getPluginPaths();
+        List<Path> paths = new ArrayList<>();
+
+        List<Path> nextRoots = Collections.singletonList(pluginsRoot);
+        do {
+            nextRoots.forEach(this::extractZipFiles);
+
+            List<Path> nextPaths = nextRoots.stream()
+                .flatMap(path -> streamFiles(path, filter))
+                .sorted(comparator)
+                .map(File::toPath)
+                .collect(Collectors.toList());
+
+            nextRoots = nextPaths.stream()
+                .filter(Files::isDirectory)
+                .filter(path -> !isPluginPath(path))
+                .collect(Collectors.toList());
+
+            nextPaths.removeAll(nextRoots);
+            paths.addAll(nextPaths);
+        } while (!nextRoots.isEmpty());
+
+        return paths;
     }
 
     @Override
@@ -62,9 +100,9 @@ public class DefaultPluginRepository extends BasePluginRepository {
         return new OrFileFilter(new HiddenFilter());
     }
 
-    private void extractZipFiles() {
+    private void extractZipFiles(Path directory) {
         // expand plugins zip files
-        File[] zipFiles = pluginsRoot.toFile().listFiles(new ZipFileFilter());
+        File[] zipFiles = directory.toFile().listFiles(new ZipFileFilter());
         if ((zipFiles != null) && zipFiles.length > 0) {
             for (File pluginZip : zipFiles) {
                 try {
@@ -77,4 +115,24 @@ public class DefaultPluginRepository extends BasePluginRepository {
         }
     }
 
+    protected Stream<File> streamFiles(Path directory, FileFilter filter) {
+        File[] files = directory.toFile().listFiles(filter);
+        return files != null
+            ? Arrays.stream(files)
+            : Stream.empty();
+    }
+
+    protected boolean isPluginPath(Path path) {
+        if (pluginDescriptorFinder == null) {
+            return true;
+        }
+
+        try {
+            pluginDescriptorFinder.find(path);
+            return true;
+        } catch (Exception e) {
+            log.debug("No pluginDescriptor found for path '{}'.", path, e);
+            return false;
+        }
+    }
 }

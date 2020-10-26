@@ -47,7 +47,7 @@ public class JarPluginManager extends DefaultPluginManager {
     }
 
     @Override
-    protected PluginRepository createPluginRepository() {
+    protected PluginRepository createPluginRepository(PluginDescriptorFinder pluginDescriptorFinder) {
         return new CompoundPluginRepository()
             .add(new DevelopmentPluginRepository(getPluginsRoot()), this::isDevelopment)
             .add(new JarPluginRepository(getPluginsRoot()), this::isNotDevelopment);
