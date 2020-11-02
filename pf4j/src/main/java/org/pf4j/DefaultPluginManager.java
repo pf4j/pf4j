@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Default implementation of the {@link PluginManager} interface.
@@ -42,6 +43,10 @@ public class DefaultPluginManager extends AbstractPluginManager {
     }
 
     public DefaultPluginManager(Path... pluginsRoots) {
+        super(pluginsRoots);
+    }
+
+    public DefaultPluginManager(List<Path> pluginsRoots) {
         super(pluginsRoots);
     }
 

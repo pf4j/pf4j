@@ -123,7 +123,16 @@ public abstract class AbstractPluginManager implements PluginManager {
      * @param pluginsRoots the roots to search for plugins
      */
     public AbstractPluginManager(Path... pluginsRoots) {
-        this.pluginsRoots.addAll(Arrays.asList(pluginsRoots));
+        this(Arrays.asList(pluginsRoots));
+    }
+
+    /**
+     * Constructs {@code AbstractPluginManager} with the given plugins roots.
+     *
+     * @param pluginsRoots the roots to search for plugins
+     */
+    public AbstractPluginManager(List<Path> pluginsRoots) {
+        this.pluginsRoots.addAll(pluginsRoots);
 
         initialize();
     }
