@@ -15,11 +15,13 @@
  */
 package org.pf4j;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.plugin.PluginZip;
+import org.pf4j.util.FileUtils;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -30,14 +32,20 @@ public class LoadPluginsFromMultipleRootsTest {
 
     private DefaultPluginManager pluginManager;
 
-    @TempDir
     Path pluginsPath1;
-    @TempDir
     Path pluginsPath2;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
+        pluginsPath1 = Files.createTempDirectory("junit-pf4j-");
+        pluginsPath2 = Files.createTempDirectory("junit-pf4j-");
         pluginManager = new DefaultPluginManager(pluginsPath1, pluginsPath2);
+    }
+
+    @AfterEach
+    public void tearDown() throws IOException {
+        FileUtils.delete(pluginsPath1);
+        FileUtils.delete(pluginsPath2);
     }
 
     @Test
