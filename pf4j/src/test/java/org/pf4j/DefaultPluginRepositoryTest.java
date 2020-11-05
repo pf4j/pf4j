@@ -15,10 +15,11 @@
  */
 package org.pf4j;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.plugin.PluginZip;
+import org.pf4j.util.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,18 +36,40 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class DefaultPluginRepositoryTest {
 
-    @TempDir
-    Path pluginsPath;
+    Path pluginsPath1;
+    Path pluginsPath2;
 
     @BeforeEach
     public void setUp() throws IOException {
-        Path plugin1Path = Files.createDirectory(pluginsPath.resolve("plugin-1"));
+        pluginsPath1 = Files.createTempDirectory("junit-pf4j-");
+        pluginsPath2 = Files.createTempDirectory("junit-pf4j-");
+        Path plugin1Path = Files.createDirectory(pluginsPath1.resolve("plugin-1"));
         // Prove that we can delete a folder with a file inside
         Files.createFile(plugin1Path.resolve("myfile"));
         // Create a zip file for plugin-1 to test that it is deleted when plugin is deleted
-        new PluginZip.Builder(pluginsPath.resolve("plugin-1.zip"), "plugin-1").pluginVersion("1.0").build();
-        Files.createDirectory(pluginsPath.resolve("plugin-2"));
-        Files.createDirectory(pluginsPath.resolve("plugin-3"));
+        new PluginZip.Builder(pluginsPath1.resolve("plugin-1.zip"), "plugin-1").pluginVersion("1.0").build();
+        Files.createDirectory(pluginsPath2.resolve("plugin-2"));
+        Files.createDirectory(pluginsPath2.resolve("plugin-3"));
+    }
+
+    @AfterEach
+    public void tearDown() throws IOException {
+        FileUtils.delete(pluginsPath1);
+        FileUtils.delete(pluginsPath2);
+    }
+
+    /**
+     * Test of {@link DefaultPluginRepository#getPluginPaths()} method.
+     */
+    @Test
+    public void testGetPluginArchivesFromSinglePath() {
+        PluginRepository repository = new DefaultPluginRepository(pluginsPath2);
+
+        List<Path> pluginPaths = repository.getPluginPaths();
+
+        assertEquals(2, pluginPaths.size());
+        assertPathExists(pluginPaths, pluginsPath2.resolve("plugin-2"));
+        assertPathExists(pluginPaths, pluginsPath2.resolve("plugin-3"));
     }
 
     /**
@@ -54,14 +77,14 @@ public class DefaultPluginRepositoryTest {
      */
     @Test
     public void testGetPluginArchives() {
-        PluginRepository repository = new DefaultPluginRepository(pluginsPath);
+        PluginRepository repository = new DefaultPluginRepository(pluginsPath1, pluginsPath2);
 
         List<Path> pluginPaths = repository.getPluginPaths();
 
         assertEquals(3, pluginPaths.size());
-        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-1"));
-        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-2"));
-        assertPathExists(pluginPaths, pluginsPath.resolve("plugin-3"));
+        assertPathExists(pluginPaths, pluginsPath1.resolve("plugin-1"));
+        assertPathExists(pluginPaths, pluginsPath2.resolve("plugin-2"));
+        assertPathExists(pluginPaths, pluginsPath2.resolve("plugin-3"));
     }
 
     /**
@@ -69,18 +92,18 @@ public class DefaultPluginRepositoryTest {
      */
     @Test
     public void testDeletePluginPath() {
-        PluginRepository repository = new DefaultPluginRepository(pluginsPath);
+        PluginRepository repository = new DefaultPluginRepository(pluginsPath1, pluginsPath2);
 
-        assertTrue(Files.exists(pluginsPath.resolve("plugin-1.zip")));
-        assertTrue(repository.deletePluginPath(pluginsPath.resolve("plugin-1")));
-        assertFalse(Files.exists(pluginsPath.resolve("plugin-1.zip")));
-        assertTrue(repository.deletePluginPath(pluginsPath.resolve("plugin-3")));
-        assertFalse(repository.deletePluginPath(pluginsPath.resolve("plugin-4")));
+        assertTrue(Files.exists(pluginsPath1.resolve("plugin-1.zip")));
+        assertTrue(repository.deletePluginPath(pluginsPath1.resolve("plugin-1")));
+        assertFalse(Files.exists(pluginsPath1.resolve("plugin-1.zip")));
+        assertTrue(repository.deletePluginPath(pluginsPath2.resolve("plugin-3")));
+        assertFalse(repository.deletePluginPath(pluginsPath2.resolve("plugin-4")));
 
         List<Path> pluginPaths = repository.getPluginPaths();
 
         assertEquals(1, pluginPaths.size());
-        assertEquals(pluginsPath.relativize(pluginPaths.get(0)).toString(), "plugin-2");
+        assertEquals(pluginsPath2.relativize(pluginPaths.get(0)).toString(), "plugin-2");
     }
 
     private void assertPathExists(List<Path> paths, Path path) {

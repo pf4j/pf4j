@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Default implementation of the {@link PluginManager} interface.
@@ -41,8 +42,12 @@ public class DefaultPluginManager extends AbstractPluginManager {
         super();
     }
 
-    public DefaultPluginManager(Path pluginsRoot) {
-        super(pluginsRoot);
+    public DefaultPluginManager(Path... pluginsRoots) {
+        super(pluginsRoots);
+    }
+
+    public DefaultPluginManager(List<Path> pluginsRoots) {
+        super(pluginsRoots);
     }
 
     @Override
@@ -73,7 +78,11 @@ public class DefaultPluginManager extends AbstractPluginManager {
     @Override
     protected PluginStatusProvider createPluginStatusProvider() {
         String configDir = System.getProperty(PLUGINS_DIR_CONFIG_PROPERTY_NAME);
-        Path configPath = configDir != null ? Paths.get(configDir) : getPluginsRoot();
+        Path configPath = configDir != null
+            ? Paths.get(configDir)
+            : getPluginsRoots().stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No pluginsRoot configured"));
 
         return new DefaultPluginStatusProvider(configPath);
     }
@@ -81,9 +90,9 @@ public class DefaultPluginManager extends AbstractPluginManager {
     @Override
     protected PluginRepository createPluginRepository() {
         return new CompoundPluginRepository()
-            .add(new DevelopmentPluginRepository(getPluginsRoot()), this::isDevelopment)
-            .add(new JarPluginRepository(getPluginsRoot()), this::isNotDevelopment)
-            .add(new DefaultPluginRepository(getPluginsRoot()), this::isNotDevelopment);
+            .add(new DevelopmentPluginRepository(getPluginsRoots()), this::isDevelopment)
+            .add(new JarPluginRepository(getPluginsRoots()), this::isNotDevelopment)
+            .add(new DefaultPluginRepository(getPluginsRoots()), this::isNotDevelopment);
     }
 
     @Override

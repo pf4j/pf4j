@@ -42,8 +42,8 @@ public class ZipPluginManager extends DefaultPluginManager {
     @Override
     protected PluginRepository createPluginRepository() {
         return new CompoundPluginRepository()
-            .add(new DevelopmentPluginRepository(getPluginsRoot()), this::isDevelopment)
-            .add(new DefaultPluginRepository(getPluginsRoot()), this::isNotDevelopment);
+            .add(new DevelopmentPluginRepository(getPluginsRoots()), this::isDevelopment)
+            .add(new DefaultPluginRepository(getPluginsRoots()), this::isNotDevelopment);
     }
 
 }

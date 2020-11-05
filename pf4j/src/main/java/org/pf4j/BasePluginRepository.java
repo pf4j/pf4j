@@ -22,11 +22,11 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Decebal Suiu
@@ -34,17 +34,21 @@ import java.util.List;
  */
 public class BasePluginRepository implements PluginRepository {
 
-    protected final Path pluginsRoot;
+    protected final List<Path> pluginsRoots;
 
     protected FileFilter filter;
     protected Comparator<File> comparator;
 
-    public BasePluginRepository(Path pluginsRoot) {
-        this(pluginsRoot, null);
+    public BasePluginRepository(Path... pluginsRoots) {
+        this(Arrays.asList(pluginsRoots));
     }
 
-    public BasePluginRepository(Path pluginsRoot, FileFilter filter) {
-        this.pluginsRoot = pluginsRoot;
+    public BasePluginRepository(List<Path> pluginsRoots) {
+        this(pluginsRoots, null);
+    }
+
+    public BasePluginRepository(List<Path> pluginsRoots, FileFilter filter) {
+        this.pluginsRoots = pluginsRoots;
         this.filter = filter;
 
         // last modified file is first
@@ -67,22 +71,11 @@ public class BasePluginRepository implements PluginRepository {
 
     @Override
     public List<Path> getPluginPaths() {
-        File[] files = pluginsRoot.toFile().listFiles(filter);
-
-        if ((files == null) || files.length == 0) {
-            return Collections.emptyList();
-        }
-
-        if (comparator != null) {
-            Arrays.sort(files, comparator);
-        }
-
-        List<Path> paths = new ArrayList<>(files.length);
-        for (File file : files) {
-            paths.add(file.toPath());
-        }
-
-        return paths;
+        return pluginsRoots.stream()
+            .flatMap(path -> streamFiles(path, filter))
+            .sorted(comparator)
+            .map(File::toPath)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -99,6 +92,13 @@ public class BasePluginRepository implements PluginRepository {
         } catch (IOException e) {
             throw new PluginRuntimeException(e);
         }
+    }
+
+    protected Stream<File> streamFiles(Path directory, FileFilter filter) {
+        File[] files = directory.toFile().listFiles(filter);
+        return files != null
+            ? Arrays.stream(files)
+            : Stream.empty();
     }
 
 }

@@ -24,6 +24,8 @@ import org.pf4j.util.OrFileFilter;
 
 import java.io.FileFilter;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Decebal Suiu
@@ -33,8 +35,12 @@ public class DevelopmentPluginRepository extends BasePluginRepository {
     public static final String MAVEN_BUILD_DIR = "target";
     public static final String GRADLE_BUILD_DIR = "build";
 
-    public DevelopmentPluginRepository(Path pluginsRoot) {
-        super(pluginsRoot);
+    public DevelopmentPluginRepository(Path... pluginsRoots) {
+        this(Arrays.asList(pluginsRoots));
+    }
+
+    public DevelopmentPluginRepository(List<Path> pluginsRoots) {
+        super(pluginsRoots);
 
         AndFileFilter pluginsFilter = new AndFileFilter(new DirectoryFileFilter());
         pluginsFilter.addFileFilter(new NotFileFilter(createHiddenPluginFilter()));
