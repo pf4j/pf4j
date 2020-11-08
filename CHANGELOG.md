@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [3.5.0] - 2020-11-08
+
+#### Fixed
 - [#378]: Wrong log message
 - [#396]: `WrongDependencyVersionException` logs do not contain any info
 
@@ -401,7 +411,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.4.1...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.5.0...HEAD
+[3.5.0]: https://github.com/decebals/pf4j/compare/release-3.4.1...release-3.5.0
 [3.4.1]: https://github.com/decebals/pf4j/compare/release-3.4.0...release-3.4.1
 [3.4.1]: https://github.com/decebals/pf4j/compare/release-3.3.0...release-3.4.0
 [3.3.0]: https://github.com/decebals/pf4j/compare/release-3.2.0...release-3.3.0
