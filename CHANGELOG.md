@@ -5,10 +5,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#378]: Wrong log message
+- [#396]: `WrongDependencyVersionException` logs do not contain any info
 
 #### Changed
+- [#395]: Make ClassLoadingStrategy's constructor public
+- [#398]: Make `DefaultPluginDescriptor#addDependency` usable
+- [#402]: Bucketed caching in `SingletonExtensionFactory`
 
 #### Added
+- [#400]: Add support for JPMS (`module-info.java`) 
+- [#404]: Support multiple plugin root directories 
 
 #### Removed
 
@@ -419,6 +426,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#404]: https://github.com/pf4j/pf4j/pull/404
+[#402]: https://github.com/pf4j/pf4j/pull/402
+[#400]: https://github.com/pf4j/pf4j/issues/400
+[#398]: https://github.com/pf4j/pf4j/pull/398
+[#396]: https://github.com/pf4j/pf4j/issues/396
+[#395]: https://github.com/pf4j/pf4j/issues/395
+[#378]: https://github.com/pf4j/pf4j/issues/378
 [#391]: https://github.com/pf4j/pf4j/issues/391
 [#371]: https://github.com/pf4j/pf4j/issues/371
 [#370]: https://github.com/pf4j/pf4j/pull/370
