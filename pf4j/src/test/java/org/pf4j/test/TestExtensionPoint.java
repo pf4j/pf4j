@@ -13,22 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.plugin;
+package org.pf4j.test;
 
-import org.pf4j.Extension;
+import org.pf4j.ExtensionPoint;
 
 /**
  * @author Mario Franco
  */
-@Extension
-public class FailTestExtension implements TestExtensionPoint {
+public interface TestExtensionPoint extends ExtensionPoint {
 
-    public FailTestExtension(String name) {
-    }
-
-    @Override
-    public String saySomething() {
-        return "I am a fail test extension";
-    }
+    String saySomething();
 
 }

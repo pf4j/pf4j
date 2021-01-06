@@ -73,7 +73,7 @@
                         </goals>
                         <configuration>
                             <includes>
-                                <inculde>org/pf4j/plugin/*</inculde>
+                                <inculde>org/pf4j/test/*</inculde>
                             </includes>
                         </configuration>
                     </execution>

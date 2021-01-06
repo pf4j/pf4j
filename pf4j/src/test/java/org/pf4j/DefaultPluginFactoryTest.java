@@ -16,9 +16,9 @@
 package org.pf4j;
 
 import org.junit.jupiter.api.Test;
-import org.pf4j.plugin.AnotherFailTestPlugin;
-import org.pf4j.plugin.FailTestPlugin;
-import org.pf4j.plugin.TestPlugin;
+import org.pf4j.test.AnotherFailTestPlugin;
+import org.pf4j.test.FailTestPlugin;
+import org.pf4j.test.TestPlugin;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;

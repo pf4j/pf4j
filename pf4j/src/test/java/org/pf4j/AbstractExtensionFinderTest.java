@@ -22,8 +22,8 @@ import java.util.Comparator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pf4j.plugin.FailTestPlugin;
-import org.pf4j.plugin.TestExtensionPoint;
+import org.pf4j.test.FailTestPlugin;
+import org.pf4j.test.TestExtensionPoint;
 
 import javax.tools.JavaFileObject;
 import java.io.IOException;

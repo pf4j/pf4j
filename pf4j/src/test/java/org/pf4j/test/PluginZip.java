@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.plugin;
+package org.pf4j.test;
 
 import org.pf4j.PropertiesPluginDescriptorFinder;
 

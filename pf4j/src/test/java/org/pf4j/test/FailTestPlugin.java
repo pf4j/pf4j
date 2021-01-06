@@ -13,18 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.plugin;
-
-import org.pf4j.Plugin;
-import org.pf4j.PluginWrapper;
+package org.pf4j.test;
 
 /**
  * @author Mario Franco
  */
-public class TestPlugin extends Plugin {
-
-    public TestPlugin(PluginWrapper wrapper) {
-        super(wrapper);
-    }
+public class FailTestPlugin {
 
 }

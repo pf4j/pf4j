@@ -18,9 +18,9 @@ package org.pf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
-import org.pf4j.plugin.PluginJar;
-import org.pf4j.plugin.TestExtension;
-import org.pf4j.plugin.TestPlugin;
+import org.pf4j.test.PluginJar;
+import org.pf4j.test.TestExtension;
+import org.pf4j.test.TestPlugin;
 
 import java.nio.file.Path;
 import java.util.Map;
