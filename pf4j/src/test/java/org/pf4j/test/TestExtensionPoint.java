@@ -18,6 +18,8 @@ package org.pf4j.test;
 import org.pf4j.ExtensionPoint;
 
 /**
+ * A simple {@link ExtensionPoint} that contains one method ({@link #saySomething()}).
+ *
  * @author Mario Franco
  */
 public interface TestExtensionPoint extends ExtensionPoint {

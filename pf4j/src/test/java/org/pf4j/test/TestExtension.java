@@ -18,6 +18,8 @@ package org.pf4j.test;
 import org.pf4j.Extension;
 
 /**
+ * A simple {@link Extension}. It implements {@link TestExtensionPoint}.
+ *
  * @author Mario Franco
  */
 @Extension

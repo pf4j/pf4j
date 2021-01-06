@@ -18,6 +18,9 @@ package org.pf4j.test;
 import org.pf4j.Extension;
 
 /**
+ * A wrong {@link org.pf4j.Extension}.
+ * It's wrong because it doesn't contain a constructor with empty parameters (or only the default constructor).
+ *
  * @author Mario Franco
  */
 @Extension

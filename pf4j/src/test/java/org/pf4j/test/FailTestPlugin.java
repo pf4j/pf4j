@@ -16,6 +16,9 @@
 package org.pf4j.test;
 
 /**
+ * A wrong {@link org.pf4j.Plugin}.
+ * It's wrong because it doesn't extends {@link org.pf4j.Plugin}.
+ *
  * @author Mario Franco
  */
 public class FailTestPlugin {

@@ -19,6 +19,11 @@ import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
 
 /**
+ * A simple {@link Plugin}.
+ *
+ * In real applications you don't need to create a plugin like this if you are not interested in lifecycle events.
+ * {@codes PF4J} will automatically create a plugin similar to this (empty / dummy) if no class plugin is specified.
+ *
  * @author Mario Franco
  */
 public class TestPlugin extends Plugin {
