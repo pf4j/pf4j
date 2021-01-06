@@ -113,8 +113,8 @@ public class AbstractExtensionFinderTest {
                 Map<String, Set<String>> entries = new LinkedHashMap<>();
 
                 Set<String> bucket = new HashSet<>();
-                bucket.add("org.pf4j.plugin.TestExtension");
-                bucket.add("org.pf4j.plugin.FailTestExtension");
+                bucket.add("org.pf4j.test.TestExtension");
+                bucket.add("org.pf4j.test.FailTestExtension");
                 entries.put(null, bucket);
 
                 return entries;
@@ -138,11 +138,11 @@ public class AbstractExtensionFinderTest {
                 Map<String, Set<String>> entries = new LinkedHashMap<>();
 
                 Set<String> bucket = new HashSet<>();
-                bucket.add("org.pf4j.plugin.TestExtension");
-                bucket.add("org.pf4j.plugin.FailTestExtension");
+                bucket.add("org.pf4j.test.TestExtension");
+                bucket.add("org.pf4j.test.FailTestExtension");
                 entries.put("plugin1", bucket);
                 bucket = new HashSet<>();
-                bucket.add("org.pf4j.plugin.TestExtension");
+                bucket.add("org.pf4j.test.TestExtension");
                 entries.put("plugin2", bucket);
 
                 return entries;
