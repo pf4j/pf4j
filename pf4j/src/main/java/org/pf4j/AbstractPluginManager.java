@@ -275,7 +275,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             if (unloadDependents) {
                 List<String> dependents = dependencyResolver.getDependents(pluginId);
                 while (!dependents.isEmpty()) {
-                    String dependent = dependents.remove(0);
+                    String dependent = dependents.get(0);
                     unloadPlugin(dependent, false);
                     dependents.addAll(0, dependencyResolver.getDependents(dependent));
                 }
