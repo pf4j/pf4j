@@ -88,7 +88,7 @@ public class DependencyResolver {
             String pluginId = plugin.getPluginId();
             String existingVersion = plugin.getVersion();
 
-            List<String> dependents = new ArrayList<>(getDependents(pluginId));
+            List<String> dependents = getDependents(pluginId);
             while (!dependents.isEmpty()) {
                 String dependentId = dependents.remove(0);
                 PluginDescriptor dependent = pluginByIds.get(dependentId);
@@ -107,22 +107,22 @@ public class DependencyResolver {
      * Retrieves the plugins ids that the given plugin id directly depends on.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
-     * @return
+     * @return an immutable list of dependencies (new list for each call)
      */
     public List<String> getDependencies(String pluginId) {
         checkResolved();
-        return dependenciesGraph.getNeighbors(pluginId);
+        return new ArrayList<>(dependenciesGraph.getNeighbors(pluginId));
     }
 
     /**
      * Retrieves the plugins ids that the given content is a direct dependency of.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
-     * @return
+     * @return an immutable list of dependents (new list for each call)
      */
     public List<String> getDependents(String pluginId) {
         checkResolved();
-        return dependentsGraph.getNeighbors(pluginId);
+        return new ArrayList<>(dependentsGraph.getNeighbors(pluginId));
     }
 
     /**
