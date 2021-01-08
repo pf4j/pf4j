@@ -120,4 +120,30 @@ public class PluginDependencyTest {
         assertEquals(0, pluginManager.getStartedPlugins().size());
     }
 
+    @Test
+    public void dependentUnload() throws Exception {
+        // B depends on A
+        PluginZip pluginA = new PluginZip.Builder(pluginsPath.resolve("A-plugin-1.2.3.zip"), "plugin.a")
+            .pluginVersion("1.2.3").build();
+
+        PluginZip pluginB = new PluginZip.Builder(pluginsPath.resolve("B-plugin-1.2.3.zip"), "plugin.b")
+            .pluginDependencies("plugin.a")
+            .pluginVersion("1.2.3").build();
+
+        pluginManager.loadPlugins();
+        assertEquals(2, pluginManager.getPlugins().size());
+
+        pluginManager.startPlugins();
+        assertEquals(2, pluginManager.getStartedPlugins().size());
+
+        // stop A, both A and B should be stopped
+        pluginManager.stopPlugin("plugin.a");
+        assertEquals(0, pluginManager.getStartedPlugins().size());
+
+        // unload A, both A and B should be unloaded
+        pluginManager.unloadPlugin("plugin.a");
+        assertEquals(0, pluginManager.getResolvedPlugins().size());
+        assertEquals(0, pluginManager.getPlugins().size());
+    }
+
 }
