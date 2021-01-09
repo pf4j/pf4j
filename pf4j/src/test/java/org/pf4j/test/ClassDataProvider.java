@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.plugin;
-
-import org.pf4j.Plugin;
-import org.pf4j.PluginWrapper;
+package org.pf4j.test;
 
 /**
- * @author Mario Franco
+ * Defines the interface for classes that know to supply class data for a class name.
+ * The idea is to have the possibility to retrieve the data for a class from different sources:
+ * <ul>
+ * <li>Class path - the class is already loaded by the class loader</li>
+ * <li>String - the string (the source code) is compiled dynamically via {@link javax.tools.JavaCompiler}</>
+ * <li>Generate the source code programmatically using something like {@code https://github.com/square/javapoet}</li>
+ * </ul>
+ *
+ * @author Decebal Suiu
  */
-public class TestPlugin extends Plugin {
+public interface ClassDataProvider {
 
-    public TestPlugin(PluginWrapper wrapper) {
-        super(wrapper);
-    }
+    byte[] getClassData(String className);
 
 }

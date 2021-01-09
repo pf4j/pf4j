@@ -16,8 +16,8 @@
 package org.pf4j;
 
 import org.junit.jupiter.api.Test;
-import org.pf4j.plugin.TestExtension;
-import org.pf4j.plugin.TestExtensionPoint;
+import org.pf4j.test.TestExtension;
+import org.pf4j.test.TestExtensionPoint;
 
 import java.util.ArrayList;
 import java.util.List;

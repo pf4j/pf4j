@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.plugin;
+package org.pf4j.test;
 
-import org.pf4j.Extension;
+import org.pf4j.ExtensionPoint;
 
 /**
+ * A simple {@link ExtensionPoint} that contains one method ({@link #saySomething()}).
+ *
  * @author Mario Franco
  */
-@Extension
-public class TestExtension implements TestExtensionPoint {
+public interface TestExtensionPoint extends ExtensionPoint {
 
-    @Override
-    public String saySomething() {
-        return "I am a test extension";
-    }
+    String saySomething();
 
 }

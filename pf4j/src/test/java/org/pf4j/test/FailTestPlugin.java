@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.plugin;
-
-import org.pf4j.Plugin;
+package org.pf4j.test;
 
 /**
+ * A wrong {@link org.pf4j.Plugin}.
+ * It's wrong because it doesn't extends {@link org.pf4j.Plugin}.
+ *
  * @author Mario Franco
  */
-public class AnotherFailTestPlugin extends Plugin {
-
-    public AnotherFailTestPlugin() {
-        super(null);
-    }
+public class FailTestPlugin {
 
 }

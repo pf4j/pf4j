@@ -18,8 +18,8 @@ package org.pf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pf4j.plugin.FailTestExtension;
-import org.pf4j.plugin.TestExtension;
+import org.pf4j.test.FailTestExtension;
+import org.pf4j.test.TestExtension;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;

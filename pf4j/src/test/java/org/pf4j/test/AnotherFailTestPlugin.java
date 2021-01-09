@@ -13,11 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.plugin;
+package org.pf4j.test;
+
+import org.pf4j.Plugin;
 
 /**
+ * A wrong {@link org.pf4j.Plugin}.
+ * It's wrong because it doesn't contain a constructor with one parameter ({@link org.pf4j.PluginWrapper} as parameter type).
+ *
  * @author Mario Franco
  */
-public class FailTestPlugin {
+public class AnotherFailTestPlugin extends Plugin {
+
+    public AnotherFailTestPlugin() {
+        super(null);
+    }
 
 }
