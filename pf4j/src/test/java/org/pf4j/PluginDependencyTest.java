@@ -18,7 +18,7 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.pf4j.plugin.PluginZip;
+import org.pf4j.test.PluginZip;
 
 import java.nio.file.Path;
 
