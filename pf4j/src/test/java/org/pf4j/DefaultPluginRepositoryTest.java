@@ -18,7 +18,7 @@ package org.pf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pf4j.plugin.PluginZip;
+import org.pf4j.test.PluginZip;
 import org.pf4j.util.FileUtils;
 
 import java.io.IOException;

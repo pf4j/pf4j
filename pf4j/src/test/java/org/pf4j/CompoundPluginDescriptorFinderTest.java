@@ -17,9 +17,9 @@ package org.pf4j;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.pf4j.plugin.PluginJar;
-import org.pf4j.plugin.PluginZip;
-import org.pf4j.plugin.TestPlugin;
+import org.pf4j.test.PluginJar;
+import org.pf4j.test.PluginZip;
+import org.pf4j.test.TestPlugin;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

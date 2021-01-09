@@ -19,10 +19,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.pf4j.plugin.PluginJar;
-import org.pf4j.plugin.TestExtension;
-import org.pf4j.plugin.TestExtensionPoint;
-import org.pf4j.plugin.TestPlugin;
+import org.pf4j.test.PluginJar;
+import org.pf4j.test.TestExtension;
+import org.pf4j.test.TestExtensionPoint;
+import org.pf4j.test.TestPlugin;
 
 import java.io.IOException;
 import java.nio.file.Path;

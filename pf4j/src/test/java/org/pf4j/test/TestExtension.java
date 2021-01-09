@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.plugin;
+package org.pf4j.test;
+
+import org.pf4j.Extension;
 
 /**
- * Defines the interface for classes that know to supply class data for a class name.
- * The idea is to have the possibility to retrieve the data for a class from different sources:
- * <ul>
- * <li>Class path - the class is already loaded by the class loader</li>
- * <li>String - the string (the source code) is compiled dynamically via {@link javax.tools.JavaCompiler}</>
- * <li>Generate the source code programmatically using something like {@code https://github.com/square/javapoet}</li>
- * </ul>
+ * A simple {@link Extension}. It implements {@link TestExtensionPoint}.
  *
- * @author Decebal Suiu
+ * @author Mario Franco
  */
-public interface ClassDataProvider {
+@Extension
+public class TestExtension implements TestExtensionPoint {
 
-    byte[] getClassData(String className);
+    @Override
+    public String saySomething() {
+        return "I am a test extension";
+    }
 
 }

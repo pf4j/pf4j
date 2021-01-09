@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.plugin;
+package org.pf4j.test;
 
 import org.pf4j.Extension;
 
 /**
+ * A wrong {@link org.pf4j.Extension}.
+ * It's wrong because it doesn't contain a constructor with empty parameters (or only the default constructor).
+ *
  * @author Mario Franco
  */
 @Extension
