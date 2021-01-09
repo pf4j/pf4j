@@ -39,12 +39,14 @@ public class PluginZip {
     private final String pluginId;
     private final String pluginClass;
     private final String pluginVersion;
+    private final String pluginDependencies;
 
     protected PluginZip(Builder builder) {
         this.path = builder.path;
         this.pluginId = builder.pluginId;
         this.pluginClass = builder.pluginClass;
         this.pluginVersion = builder.pluginVersion;
+        this.pluginDependencies = builder.pluginDependencies;
     }
 
     public Path path() {
@@ -67,6 +69,8 @@ public class PluginZip {
         return pluginVersion;
     }
 
+    public String pluginDependencies() { return pluginDependencies; }
+
     public Path unzippedPath() {
         Path path = path();
         String fileName = path.getFileName().toString();
@@ -88,6 +92,7 @@ public class PluginZip {
 
         private String pluginClass;
         private String pluginVersion;
+        private String pluginDependencies;
         private Map<String, String> properties = new LinkedHashMap<>();
         private Map<Path, byte[]> files = new LinkedHashMap<>();
 
@@ -104,6 +109,12 @@ public class PluginZip {
 
         public Builder pluginVersion(String pluginVersion) {
             this.pluginVersion = pluginVersion;
+
+            return this;
+        }
+
+        public Builder pluginDependencies(String pluginDependencies) {
+            this.pluginDependencies = pluginDependencies;
 
             return this;
         }
@@ -162,6 +173,9 @@ public class PluginZip {
             Map<String, String> map = new LinkedHashMap<>();
             map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, pluginId);
             map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, pluginVersion);
+            if (pluginDependencies != null) {
+                map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, pluginDependencies);
+            }
             if (pluginClass != null) {
                 map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, pluginClass);
             }
