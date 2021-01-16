@@ -5,10 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#394]: `DependencyResolver` lost dependent info after plugin stop
 
 #### Changed
 
 #### Added
+- [#415]: Externalize some useful classes from testing
 
 #### Removed
 
@@ -437,12 +439,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#415]: https://github.com/pf4j/pf4j/pull/415
 [#404]: https://github.com/pf4j/pf4j/pull/404
 [#402]: https://github.com/pf4j/pf4j/pull/402
 [#400]: https://github.com/pf4j/pf4j/issues/400
 [#398]: https://github.com/pf4j/pf4j/pull/398
 [#396]: https://github.com/pf4j/pf4j/issues/396
 [#395]: https://github.com/pf4j/pf4j/issues/395
+[#394]: https://github.com/pf4j/pf4j/issues/394
 [#378]: https://github.com/pf4j/pf4j/issues/378
 [#391]: https://github.com/pf4j/pf4j/issues/391
 [#371]: https://github.com/pf4j/pf4j/issues/371
