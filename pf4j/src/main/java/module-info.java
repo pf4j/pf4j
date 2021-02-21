@@ -19,6 +19,7 @@
  *
  * @author Decebal Suiu
  * @author Andreas Rudolph
+ * @author RationalityFrontline
  */
 module org.pf4j {
     requires java.base;
@@ -26,14 +27,17 @@ module org.pf4j {
     // provides javax.annotation
     requires java.compiler;
 
-    // provided by the ASM library
-    requires org.objectweb.asm;
+    // provided by the ASM library, use "requires static" since it's optional
+    requires static org.objectweb.asm;
 
     // The SLF4J library currently does not provide a module.
     // Version 1.8 provides a module called "org.slf4j". But this version is
     // currently in beta stage. Therefore I'm not sure, if we already like to
     // use it.
-    requires slf4j.api;
+    // Starting from version 1.7.27, they provided an Automatic-Module-Name of
+    // "org.slf4j" in the jar manifest, so should use "org.slf4j" instead
+    // of "slf4j.api"
+    requires org.slf4j;
 
     // The java-semver library currently does not provide a module.
     // Maybe we should send them a pull request, that at least they provide an
