@@ -33,7 +33,7 @@ module org.pf4j {
     // Version 1.8 provides a module called "org.slf4j". But this version is
     // currently in beta stage. Therefore I'm not sure, if we already like to
     // use it.
-    requires slf4j.api;
+    requires org.slf4j;
 
     // The java-semver library currently does not provide a module.
     // Maybe we should send them a pull request, that at least they provide an
