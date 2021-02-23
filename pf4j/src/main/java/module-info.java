@@ -26,8 +26,8 @@ module org.pf4j {
     // provides javax.annotation
     requires java.compiler;
 
-    // provided by the ASM library
-    requires org.objectweb.asm;
+    // provided by the ASM library, use "requires static" since it's optional
+    requires static org.objectweb.asm;
 
     // The SLF4J library currently does not provide a module.
     // Version 1.8 provides a module called "org.slf4j". But this version is
