@@ -174,7 +174,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         List<ExtensionWrapper> result = new ArrayList<>();
 
         Set<String> classNames = findClassNames(pluginId);
-        if (classNames.isEmpty()) {
+        if (classNames == null || classNames.isEmpty()) {
             return result;
         }
 
