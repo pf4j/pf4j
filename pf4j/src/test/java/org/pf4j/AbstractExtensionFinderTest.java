@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import com.google.testing.compile.Compilation;
 import java.util.Comparator;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -202,6 +203,45 @@ public class AbstractExtensionFinderTest {
 
         result = instance.findClassNames("plugin1");
         assertEquals(1, result.size());
+    }
+
+    /**
+     * Test of {@link org.pf4j.AbstractExtensionFinder#find(java.lang.String)}.
+     */
+    @Test
+    public void testFindExtensionWrappersFromPluginId() {
+        ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
+
+            @Override
+            public Map<String, Set<String>> readPluginsStorages() {
+                Map<String, Set<String>> entries = new LinkedHashMap<>();
+
+                Set<String> bucket = new HashSet<>();
+                bucket.add("org.pf4j.test.TestExtension");
+                bucket.add("org.pf4j.test.FailTestExtension");
+                entries.put("plugin1", bucket);
+                bucket = new HashSet<>();
+                bucket.add("org.pf4j.test.TestExtension");
+                entries.put("plugin2", bucket);
+
+                return entries;
+            }
+
+            @Override
+            public Map<String, Set<String>> readClasspathStorages() {
+                return Collections.emptyMap();
+            }
+
+        };
+
+        List<ExtensionWrapper> plugin1Result = instance.find("plugin1");
+        assertEquals(2, plugin1Result.size());
+
+        List<ExtensionWrapper> plugin2Result = instance.find("plugin2");
+        assertEquals(0, plugin2Result.size());
+
+        List<ExtensionWrapper> plugin3Result = instance.find(UUID.randomUUID().toString());
+        assertEquals(0, plugin3Result.size());
     }
 
     @Test
