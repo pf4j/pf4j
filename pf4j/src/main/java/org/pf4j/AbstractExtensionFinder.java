@@ -21,13 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Decebal Suiu
@@ -218,7 +212,12 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
     @Override
     public Set<String> findClassNames(String pluginId) {
-        return getEntries().get(pluginId);
+        Set<String> classNames = getEntries().get(pluginId);
+        if (classNames == null) {
+            return Collections.emptySet();
+        }
+
+        return classNames;
     }
 
     @Override
