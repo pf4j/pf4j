@@ -83,7 +83,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
         // classpath's extensions <=> pluginId = null
         Set<String> classNames = findClassNames(pluginId);
-        if (classNames == null || classNames.isEmpty()) {
+        if (classNames.isEmpty()) {
             return result;
         }
 
@@ -218,7 +218,12 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
     @Override
     public Set<String> findClassNames(String pluginId) {
-        return getEntries().get(pluginId);
+        Set<String> classNames = getEntries().get(pluginId);
+        if (classNames == null) {
+            return Collections.emptySet();
+        }
+
+        return classNames;
     }
 
     @Override
