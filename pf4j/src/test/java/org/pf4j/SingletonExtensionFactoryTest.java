@@ -74,7 +74,7 @@ public class SingletonExtensionFactoryTest {
     private URL[] getClasspathReferences() throws MalformedURLException {
         String classpathProperty = System.getProperty("java.class.path");
 
-        String[] classpaths = classpathProperty.split(":");
+        String[] classpaths = classpathProperty.split(File.pathSeparator);
         URL[] uris = new URL[classpaths.length];
 
         for (int index = 0; index < classpaths.length; index++) {
