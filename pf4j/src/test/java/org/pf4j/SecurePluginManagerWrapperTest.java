@@ -245,6 +245,6 @@ public class SecurePluginManagerWrapperTest {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
     	assertEquals(null, wrappedPluginManager.whichPlugin(pluginManager.getExtensionClasses(OTHER_PLUGIN_ID).get(0)));
-    	assertEquals(THIS_PLUGIN_ID, wrappedPluginManager.whichPlugin(pluginManager.getExtensionClasses(THIS_PLUGIN_ID).get(0)));
+    	assertEquals(THIS_PLUGIN_ID, wrappedPluginManager.whichPlugin(pluginManager.getExtensionClasses(THIS_PLUGIN_ID).get(0)).getPluginId());
     }
 }
