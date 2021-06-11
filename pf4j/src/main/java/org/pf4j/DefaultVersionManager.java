@@ -39,7 +39,7 @@ public class DefaultVersionManager implements VersionManager {
      */
     @Override
     public boolean checkVersionConstraint(String version, String constraint) {
-        return StringUtils.isNullOrEmpty(constraint) || Version.valueOf(version).satisfies(constraint);
+        return StringUtils.isNullOrEmpty(constraint) || "*".equals(constraint) || Version.valueOf(version).satisfies(constraint);
     }
 
     @Override
