@@ -894,7 +894,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      * @return
      */
     protected PluginWrapper createPluginWrapper(PluginDescriptor pluginDescriptor, Path pluginPath, ClassLoader pluginClassLoader) {
-    	// create the plugin wrapper
+        // create the plugin wrapper
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
         PluginWrapper pluginWrapper = new PluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
         pluginWrapper.setPluginFactory(getPluginFactory());
