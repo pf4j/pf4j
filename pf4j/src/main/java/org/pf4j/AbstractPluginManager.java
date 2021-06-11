@@ -755,21 +755,27 @@ public abstract class AbstractPluginManager implements PluginManager {
      */
     protected boolean isPluginValid(PluginWrapper pluginWrapper) {
         String requires = pluginWrapper.getDescriptor().getRequires().trim();
+        boolean valid = true;
         if (!isExactVersionAllowed() && requires.matches("^\\d+\\.\\d+\\.\\d+$")) {
             // If exact versions are not allowed in requires, rewrite to >= expression
             requires = ">=" + requires;
         }
-        if (systemVersion.equals("0.0.0") || versionManager.checkVersionConstraint(systemVersion, requires)) {
-            return true;
+        if (!systemVersion.equals("0.0.0") && !versionManager.checkVersionConstraint(systemVersion, requires)) {
+            PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
+            log.warn("Plugin '{}' requires a minimum system version of {}, and you have {}",
+                getPluginLabel(pluginDescriptor),
+                requires,
+                getSystemVersion());
+            valid = false;
         }
 
-        PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
-        log.warn("Plugin '{}' requires a minimum system version of {}, and you have {}",
-            getPluginLabel(pluginDescriptor),
-            requires,
-            getSystemVersion());
+        //if a plugin implementation exists call the plugins validation method too
+        if (pluginWrapper.getPlugin() != null && !pluginWrapper.getPlugin().validate()) {
+            log.warn("Plugin '{}' failed the validation", getPluginLabel(pluginWrapper.getDescriptor()));
+            valid = false;
+        }
 
-        return false;
+        return valid;
     }
 
     protected boolean isPluginDisabled(String pluginId) {

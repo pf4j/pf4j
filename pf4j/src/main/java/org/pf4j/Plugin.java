@@ -55,6 +55,16 @@ public class Plugin {
     public final PluginWrapper getWrapper() {
         return wrapper;
     }
+    
+    /**
+     * This  method is called by the application when the plugin is loaded and when enable() is called for this plugin.
+     * When this method returns false it cannot be enabled. This can be used to disable a plugin on certain OS, ...
+     * See {@link PluginManager#isPluginValid(PluginWrapper)}.
+     * @return
+     */
+    public boolean validate() {
+        return true;
+    }
 
     /**
      * This method is called by the application when the plugin is started.

@@ -19,8 +19,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.test.InvalidPlugin;
 import org.pf4j.test.PluginJar;
 import org.pf4j.test.PluginZip;
+import org.pf4j.test.TestExtension;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,6 +58,7 @@ public class DefaultPluginManagerTest {
         pluginDescriptor.setRequires("5.0.0");
 
         pluginWrapper = new PluginWrapper(pluginManager, pluginDescriptor, Files.createTempDirectory("test"), getClass().getClassLoader());
+        pluginWrapper.setPluginFactory(new DefaultPluginFactory());
     }
 
     @AfterEach
@@ -118,6 +121,15 @@ public class DefaultPluginManagerTest {
 
         pluginManager.setSystemVersion("6.0.0");
         assertFalse(pluginManager.isPluginValid(pluginWrapper));
+    }
+
+    @Test
+    public void isPluginValidCustomPluginValidation() throws IOException {
+        new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), "invalid-test-plugin")
+                .pluginClass(InvalidPlugin.class.getName()).pluginVersion("1.2.3").extension(TestExtension.class.getName()).build();
+        pluginManager = new JarPluginManager(pluginsPath);
+        pluginManager.loadPlugins();
+        assertFalse(pluginManager.isPluginValid(pluginManager.getPlugin("invalid-test-plugin")));
     }
 
     @Test
