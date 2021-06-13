@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,6 +45,11 @@ public class AbstractPluginManagerTest {
         pluginManager.extensionFinder = extensionFinder;
         List<TestExtensionPoint> extensions = pluginManager.getExtensions(TestExtensionPoint.class);
         assertEquals(1, extensions.size());
+    }
+    @Test
+    public void getVersion() {
+        AbstractPluginManager pluginManager = mock(AbstractPluginManager.class, CALLS_REAL_METHODS);
+        assertNotEquals("0.0.0", pluginManager.getVersion());
     }
 
 }
