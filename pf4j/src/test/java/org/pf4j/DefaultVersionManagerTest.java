@@ -39,6 +39,7 @@ public class DefaultVersionManagerTest {
     public void checkVersionConstraint() {
         assertFalse(versionManager.checkVersionConstraint("1.4.3", ">2.0.0")); // simple
         assertTrue(versionManager.checkVersionConstraint("1.4.3", ">=1.4.0 & <1.6.0")); // range
+        assertTrue(versionManager.checkVersionConstraint("undefined", "*"));
     }
 
     @Test
