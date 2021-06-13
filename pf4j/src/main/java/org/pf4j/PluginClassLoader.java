@@ -103,7 +103,7 @@ public class PluginClassLoader extends URLClassLoader {
             }
 
             // if the class is part of the plugin engine use parent class loader
-            if (className.startsWith(PLUGIN_PACKAGE_PREFIX) && !className.startsWith("org.pf4j.demo")) {
+            if (className.startsWith(PLUGIN_PACKAGE_PREFIX) && !className.startsWith("org.pf4j.demo") && !className.startsWith("org.pf4j.test")) {
 //                log.trace("Delegate the loading of PF4J class '{}' to parent", className);
                 return getParent().loadClass(className);
             }

@@ -860,10 +860,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         ClassLoader pluginClassLoader = getPluginLoader().loadPlugin(pluginPath, pluginDescriptor);
         log.debug("Loaded plugin '{}' with class loader '{}'", pluginPath, pluginClassLoader);
 
-        // create the plugin wrapper
-        log.debug("Creating wrapper for plugin '{}'", pluginPath);
-        PluginWrapper pluginWrapper = new PluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
-        pluginWrapper.setPluginFactory(getPluginFactory());
+        PluginWrapper pluginWrapper = createPluginWrapper(pluginDescriptor, pluginPath, pluginClassLoader);
 
         // test for disabled plugin
         if (isPluginDisabled(pluginDescriptor.getPluginId())) {
@@ -888,6 +885,19 @@ public abstract class AbstractPluginManager implements PluginManager {
         // add plugin class loader to the list with class loaders
         getPluginClassLoaders().put(pluginId, pluginClassLoader);
 
+        return pluginWrapper;
+    }
+    
+    /**
+     * creates the plugin wrapper. override this if you want to prevent plugins having full access to the plugin manager
+     * 
+     * @return
+     */
+    protected PluginWrapper createPluginWrapper(PluginDescriptor pluginDescriptor, Path pluginPath, ClassLoader pluginClassLoader) {
+        // create the plugin wrapper
+        log.debug("Creating wrapper for plugin '{}'", pluginPath);
+        PluginWrapper pluginWrapper = new PluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
+        pluginWrapper.setPluginFactory(getPluginFactory());
         return pluginWrapper;
     }
 
