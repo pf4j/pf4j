@@ -46,6 +46,7 @@ public class AbstractPluginManagerTest {
         List<TestExtensionPoint> extensions = pluginManager.getExtensions(TestExtensionPoint.class);
         assertEquals(1, extensions.size());
     }
+    
     @Test
     public void getVersion() {
         AbstractPluginManager pluginManager = mock(AbstractPluginManager.class, CALLS_REAL_METHODS);
