@@ -12,10 +12,12 @@ import com.vdurmont.semver4j.Semver.SemverType;
  * @author Wolfram Haussig
  */
 public class SemverJVersionManager implements VersionManager {
+
     /**
      * the parser type of the version - see https://github.com/vdurmont/semver4j#the-semver-object for details
      */
     private SemverType type;
+
     /**
      * creates a version manager with the given parser type
      * @param type
@@ -23,20 +25,24 @@ public class SemverJVersionManager implements VersionManager {
     public SemverJVersionManager(SemverType type) {
         this.type = type;
     }
+
     /**
      * creates a version manager with the NPM parser type which supports ranges
      */
     public SemverJVersionManager() {
         this(SemverType.NPM);
     }
+
     /**
      * parses a version with the current parser type
      * @param version
      */
     protected Semver parseVersion(String version) {
-        if (version == null) return new Semver("", type);
+        if (version == null)
+            return new Semver("", type);
         return new Semver(version, type);
     }
+
     /**
      * Checks if a version satisfies the specified SemVer {@link Expression} string.
      * If the constraint is empty or null then the method returns true.
@@ -56,7 +62,7 @@ public class SemverJVersionManager implements VersionManager {
     public int compareVersions(String v1, String v2) {
         return parseVersion(v1).compareTo(parseVersion(v2));
     }
-    
+
     @Override
     public boolean isStable(String version) {
         return parseVersion(version).isStable();

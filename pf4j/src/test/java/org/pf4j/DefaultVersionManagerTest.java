@@ -58,6 +58,7 @@ public class DefaultVersionManagerTest {
     public void compareVersions() {
         assertTrue(versionManager.compareVersions("1.1.0", "1.0.0") > 0);
     }
+    
     @Test
     public void unsupportedConstraint() {
         assertTrue(versionManager.compareVersions("1.0.0-SNAPSHOT", "1.0.0-SNAPSHOT") >= 0);
