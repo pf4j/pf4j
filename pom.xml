@@ -58,6 +58,9 @@
         <javadoc.disabled>false</javadoc.disabled>
         <deploy.disabled>false</deploy.disabled>
         <source.disabled>false</source.disabled>
+
+        <sonar.organization>pf4j</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <build>
