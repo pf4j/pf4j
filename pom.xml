@@ -59,7 +59,6 @@
         <deploy.disabled>false</deploy.disabled>
         <source.disabled>false</source.disabled>
 
-        <sonar.projectKey>pf4j_pf4j</sonar.projectKey>
         <sonar.organization>pf4j</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>

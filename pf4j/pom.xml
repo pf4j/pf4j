@@ -14,6 +14,10 @@
     <name>PF4J</name>
     <description>Plugin Framework for Java</description>
 
+    <properties>
+        <sonar.projectKey>pf4j</sonar.projectKey>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
