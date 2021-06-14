@@ -15,7 +15,7 @@
     <description>Plugin Framework for Java</description>
 
     <properties>
-        <sonar.projectKey>pf4j</sonar.projectKey>
+        <sonar.projectKey>pf4j_pf4j</sonar.projectKey>
     </properties>
 
     <build>
