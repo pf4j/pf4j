@@ -27,13 +27,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Wolfram Haussig
  */
-public class SemverJVersionManagerTest {
+public class Semver4jVersionManagerTest {
 
     private VersionManager versionManager;
 
     @BeforeEach
     public void init() {
-        versionManager = new SemverJVersionManager();
+        versionManager = new Semver4jVersionManager();
     }
 
     @Test

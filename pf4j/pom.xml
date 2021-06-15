@@ -101,6 +101,7 @@
 			<groupId>com.vdurmont</groupId>
 			<artifactId>semver4j</artifactId>
 			<version>3.1.0</version>
+			<optional>true</optional>
 		</dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>

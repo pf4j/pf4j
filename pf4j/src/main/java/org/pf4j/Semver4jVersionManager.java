@@ -7,11 +7,12 @@ import com.vdurmont.semver4j.Semver.SemverType;
 
 /**
  * Implementation for {@link VersionManager}.
- * This implementation uses semverJ (a Java implementation of the SemVer Specification).
+ * This implementation uses semver4j (a Java implementation of the SemVer Specification). Before using it you have to include the optional
+ * dependency semver4j
  *
  * @author Wolfram Haussig
  */
-public class SemverJVersionManager implements VersionManager {
+public class Semver4jVersionManager implements VersionManager {
 
     /**
      * the parser type of the version - see https://github.com/vdurmont/semver4j#the-semver-object for details
@@ -22,14 +23,14 @@ public class SemverJVersionManager implements VersionManager {
      * creates a version manager with the given parser type
      * @param type
      */
-    public SemverJVersionManager(SemverType type) {
+    public Semver4jVersionManager(SemverType type) {
         this.type = type;
     }
 
     /**
      * creates a version manager with the NPM parser type which supports ranges
      */
-    public SemverJVersionManager() {
+    public Semver4jVersionManager() {
         this(SemverType.NPM);
     }
 
