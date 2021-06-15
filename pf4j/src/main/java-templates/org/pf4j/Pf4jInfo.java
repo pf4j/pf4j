@@ -16,10 +16,11 @@
 package org.pf4j;
 
 /**
- * class provides access to the current Pf4j version which might otherwise not be possible(e.g. in Uber-Jars where the Manifest wass overridden)
+ * This class provides access to the current Pf4j version which might otherwise not be possible:
+ * e.g. in Uber-Jars where the Manifest was merged and the Pf4j info was overridden
  * @author Wolfram Haussig
  */
-public class Pf4jVersion {
+public class Pf4jInfo {
     /**
      * the current Pf4j version
      */

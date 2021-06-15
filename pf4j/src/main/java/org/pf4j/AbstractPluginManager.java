@@ -660,7 +660,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     public String getVersion() {
-        return Pf4jVersion.VERSION;
+        return Pf4jInfo.VERSION;
     }
 
     protected abstract PluginRepository createPluginRepository();
