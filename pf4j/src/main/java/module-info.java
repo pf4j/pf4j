@@ -43,7 +43,12 @@ module org.pf4j {
     // The semver4j library currently does not provide a module.
     // Maybe we should send them a pull request, that at least they provide an
     // automatic module name in their MANIFEST file.
-    requires semver4j;
+    requires static semver4j;
+    
+    // The maven-artifact library currently does not provide a module.
+    // Maybe we should send them a pull request, that at least they provide an
+    // automatic module name in their MANIFEST file.
+    requires static maven.artifact;
 
     // Maybe we should reconsider the package hierarchy, that only classes are
     // exported, which are required by 3rd party developers.
