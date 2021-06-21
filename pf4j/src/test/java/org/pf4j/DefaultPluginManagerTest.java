@@ -28,6 +28,8 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -190,4 +192,20 @@ public class DefaultPluginManagerTest {
         assertFalse(pluginJar.file().exists());
     }
 
+    @Test
+    public void loadedPluginWithMissingDependencyCanBeUnloaded() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.1.1.zip"), "myPlugin")
+            .pluginVersion("1.1.1")
+            .pluginDependencies("myBasePlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        PluginWrapper myPlugin = pluginManager.getPlugin(pluginZip.pluginId());
+        assertNotNull(myPlugin);
+        assertNotEquals(PluginState.STARTED, myPlugin.getPluginState());
+
+        assertTrue(pluginManager.unloadPlugin(pluginZip.pluginId()));
+    }
 }

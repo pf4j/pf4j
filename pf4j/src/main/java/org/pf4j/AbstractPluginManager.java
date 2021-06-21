@@ -280,6 +280,9 @@ public abstract class AbstractPluginManager implements PluginManager {
                     dependents.addAll(0, dependencyResolver.getDependents(dependent));
                 }
             }
+
+            checkPluginId(pluginId);
+
             PluginWrapper pluginWrapper = getPlugin(pluginId);
             PluginState pluginState;
             try {
@@ -466,8 +469,10 @@ public abstract class AbstractPluginManager implements PluginManager {
             return PluginState.STOPPED;
         }
 
-        // test for disabled plugin
-        if (PluginState.DISABLED == pluginState) {
+        if (PluginState.DISABLED == pluginState ||
+            PluginState.CREATED == pluginState ||
+            PluginState.RESOLVED == pluginState) {
+
             // do nothing
             return pluginState;
         }
