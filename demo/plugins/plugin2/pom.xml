@@ -4,12 +4,12 @@
     <parent>
         <groupId>org.pf4j.demo</groupId>
         <artifactId>pf4j-demo-plugins</artifactId>
-        <version>3.7.0-SNAPSHOT</version>
+        <version>3.7.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>pf4j-demo-plugin2</artifactId>
-    <version>3.7.0-SNAPSHOT</version>
+    <version>3.7.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Demo Plugin #2</name>
 
