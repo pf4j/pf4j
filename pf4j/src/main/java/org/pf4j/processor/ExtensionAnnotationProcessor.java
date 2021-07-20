@@ -55,7 +55,6 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
     private static final String IGNORE_EXTENSION_POINT = "pf4j.ignoreExtensionPoint";
 
     private Map<String, Set<String>> extensions = new HashMap<>(); // the key is the extension point
-    private Map<String, Set<String>> oldExtensions = new HashMap<>(); // the key is the extension point
 
     private ExtensionStorage storage;
     private boolean ignoreExtensionPoint;
@@ -120,15 +119,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         }
 
         // read old extensions
-        oldExtensions = storage.read();
-        for (Map.Entry<String, Set<String>> entry : oldExtensions.entrySet()) {
-            String extensionPoint = entry.getKey();
-            if (extensions.containsKey(extensionPoint)) {
-                extensions.get(extensionPoint).addAll(entry.getValue());
-            } else {
-                extensions.put(extensionPoint, entry.getValue());
-            }
-        }
+        //we dont need to read old ones, because the annotation processor works in rounds, and everytime a class with annotation @Extension is found, the "extensions" Map will be filled with old ones already and new one
 
         // write extensions
         storage.write(extensions);
@@ -162,10 +153,6 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
     public Map<String, Set<String>> getExtensions() {
         return extensions;
-    }
-
-    public Map<String, Set<String>> getOldExtensions() {
-        return oldExtensions;
     }
 
     public ExtensionStorage getStorage() {
