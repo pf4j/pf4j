@@ -77,9 +77,6 @@ public class ServiceProviderExtensionStorage extends ExtensionStorage {
                     // write extensions
                     for (String extension : entry.getValue()) {
                         writer.write(extension);
-                        if (!isExtensionOld(extensionPoint, extension)) {
-                            writer.write(" # pf4j extension");
-                        }
                         writer.newLine();
                     }
                 }
@@ -93,9 +90,5 @@ public class ServiceProviderExtensionStorage extends ExtensionStorage {
         }
     }
 
-    private boolean isExtensionOld(String extensionPoint, String extension) {
-        return processor.getOldExtensions().containsKey(extensionPoint)
-            && processor.getOldExtensions().get(extensionPoint).contains(extension);
-    }
 
 }

@@ -91,6 +91,7 @@ public abstract class ExtensionStorage {
                     entries.add(line);
                 }
             }
+            reader.close();
         }
     }
 
