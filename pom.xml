@@ -61,6 +61,7 @@
 
         <sonar.organization>pf4j</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    	<closeTestReports>true</closeTestReports>
     </properties>
 
     <build>
@@ -77,6 +78,9 @@
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.22.1</version>
+                    <configuration>
+                    	<disableXmlReport>${closeTestReports}</disableXmlReport>
+                    </configuration>
                 </plugin>
 
                 <plugin>
