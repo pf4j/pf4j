@@ -27,6 +27,8 @@ import java.nio.file.Path;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Read the plugin descriptor from the manifest file.
@@ -48,7 +50,7 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
     @Override
     public boolean isApplicable(Path pluginPath) {
-        return Files.exists(pluginPath) && (Files.isDirectory(pluginPath) || FileUtils.isJarFile(pluginPath));
+        return Files.exists(pluginPath) && (Files.isDirectory(pluginPath) || FileUtils.isZipOrJarFile(pluginPath));
     }
 
     @Override
@@ -60,40 +62,14 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
     protected Manifest readManifest(Path pluginPath) {
         if (FileUtils.isJarFile(pluginPath)) {
-            try (JarFile jar = new JarFile(pluginPath.toFile())) {
-                Manifest manifest = jar.getManifest();
-                if (manifest != null) {
-                    return manifest;
-                }
-            } catch (IOException e) {
-                throw new PluginRuntimeException(e);
-            }
+            return readManifestFromJar(pluginPath);
         }
 
-        Path manifestPath = getManifestPath(pluginPath);
-        if (manifestPath == null) {
-            throw new PluginRuntimeException("Cannot find the manifest path");
+        if (FileUtils.isZipFile(pluginPath)) {
+            return readManifestFromZip(pluginPath);
         }
 
-        log.debug("Lookup plugin descriptor in '{}'", manifestPath);
-        if (Files.notExists(manifestPath)) {
-            throw new PluginRuntimeException("Cannot find '{}' path", manifestPath);
-        }
-
-        try (InputStream input = Files.newInputStream(manifestPath)) {
-            return new Manifest(input);
-        } catch (IOException e) {
-            throw new PluginRuntimeException(e);
-        }
-    }
-
-    protected Path getManifestPath(Path pluginPath) {
-        if (Files.isDirectory(pluginPath)) {
-            // legacy (the path is something like "classes/META-INF/MANIFEST.MF")
-            return FileUtils.findFile(pluginPath,"MANIFEST.MF");
-        }
-
-        return null;
+        return readManifestFromDirectory(pluginPath);
     }
 
     protected PluginDescriptor createPluginDescriptor(Manifest manifest) {
@@ -138,6 +114,44 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
     protected DefaultPluginDescriptor createPluginDescriptorInstance() {
         return new DefaultPluginDescriptor();
+    }
+
+    protected Manifest readManifestFromJar(Path jarPath) {
+        try (JarFile jar = new JarFile(jarPath.toFile())) {
+            return jar.getManifest();
+        } catch (IOException e) {
+            throw new PluginRuntimeException(e, "Cannot read manifest from {}", jarPath);
+        }
+    }
+
+    protected Manifest readManifestFromZip(Path zipPath) {
+        try (ZipFile zip = new ZipFile(zipPath.toFile())) {
+            ZipEntry manifestEntry = zip.getEntry("classes/META-INF/MANIFEST.MF");
+            try (InputStream manifestInput = zip.getInputStream(manifestEntry)) {
+                return new Manifest(manifestInput);
+            }
+        } catch (IOException e) {
+            throw new PluginRuntimeException(e, "Cannot read manifest from {}", zipPath);
+        }
+    }
+
+    protected Manifest readManifestFromDirectory(Path pluginPath) {
+        // legacy (the path is something like "classes/META-INF/MANIFEST.MF")
+        Path manifestPath = FileUtils.findFile(pluginPath,"MANIFEST.MF");
+        if (manifestPath == null) {
+            throw new PluginRuntimeException("Cannot find the manifest path");
+        }
+
+        log.debug("Lookup plugin descriptor in '{}'", manifestPath);
+        if (Files.notExists(manifestPath)) {
+            throw new PluginRuntimeException("Cannot find '{}' path", manifestPath);
+        }
+
+        try (InputStream input = Files.newInputStream(manifestPath)) {
+            return new Manifest(input);
+        } catch (IOException e) {
+            throw new PluginRuntimeException(e, "Cannot read manifest from {}", pluginPath);
+        }
     }
 
 }

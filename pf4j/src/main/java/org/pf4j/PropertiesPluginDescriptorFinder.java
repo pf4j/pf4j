@@ -59,7 +59,7 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
 
     @Override
     public boolean isApplicable(Path pluginPath) {
-        return Files.exists(pluginPath) && (Files.isDirectory(pluginPath) || FileUtils.isJarFile(pluginPath));
+        return Files.exists(pluginPath) && (Files.isDirectory(pluginPath) || FileUtils.isZipOrJarFile(pluginPath));
     }
 
     @Override
@@ -97,13 +97,13 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
     protected Path getPropertiesPath(Path pluginPath, String propertiesFileName) {
         if (Files.isDirectory(pluginPath)) {
             return pluginPath.resolve(Paths.get(propertiesFileName));
-        } else {
-            // it's a jar file
-            try {
-                return FileUtils.getPath(pluginPath, propertiesFileName);
-            } catch (IOException e) {
-                throw new PluginRuntimeException(e);
-            }
+        }
+
+        // it's a zip or jar file
+        try {
+            return FileUtils.getPath(pluginPath, propertiesFileName);
+        } catch (IOException e) {
+            throw new PluginRuntimeException(e);
         }
     }
 

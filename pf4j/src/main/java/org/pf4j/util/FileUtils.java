@@ -217,9 +217,19 @@ public final class FileUtils {
         return Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".jar");
     }
 
+    /**
+     * Return true only if path is a jar or zip file.
+     *
+     * @param path to a file/dir
+     * @return true if file ending in {@code .zip} or {@code .jar}
+     */
+    public static boolean isZipOrJarFile(Path path) {
+        return isZipFile(path) || isJarFile(path);
+    }
+
     public static Path getPath(Path path, String first, String... more) throws IOException {
         URI uri = path.toUri();
-        if (isJarFile(path)) {
+        if (isZipOrJarFile(path)) {
             String pathString = path.toAbsolutePath().toString();
             // transformation for Windows OS
             pathString = StringUtils.addStart(pathString.replace("\\", "/"), "/");
