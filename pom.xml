@@ -14,6 +14,7 @@
     <packaging>pom</packaging>
     <name>PF4J Parent</name>
     <description>Plugin Framework for Java</description>
+    <url>https://pf4j.org</url>
 
     <licenses>
         <license>
