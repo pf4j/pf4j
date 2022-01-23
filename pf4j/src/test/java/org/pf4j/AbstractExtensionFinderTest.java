@@ -79,7 +79,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#find(Class)}.
      */
     @Test
-    public void testFindFailType() {
+    void testFindFailType() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -101,7 +101,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#find(Class)}.
      */
     @Test
-    public void testFindFromClasspath() {
+    void testFindFromClasspath() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -131,7 +131,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#find(Class, String)}.
      */
     @Test
-    public void testFindFromPlugin() {
+    void testFindFromPlugin() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -170,7 +170,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#findClassNames(String)}.
      */
     @Test
-    public void testFindClassNames() {
+    void testFindClassNames() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -209,7 +209,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link org.pf4j.AbstractExtensionFinder#find(java.lang.String)}.
      */
     @Test
-    public void testFindExtensionWrappersFromPluginId() {
+    void testFindExtensionWrappersFromPluginId() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -245,7 +245,7 @@ public class AbstractExtensionFinderTest {
     }
 
     @Test
-    public void findExtensionAnnotation() throws Exception {
+    void findExtensionAnnotation() throws Exception {
         Compilation compilation = javac().compile(ExtensionAnnotationProcessorTest.Greeting,
             ExtensionAnnotationProcessorTest.WhazzupGreeting);
         assertThat(compilation).succeededWithoutWarnings();
@@ -260,7 +260,7 @@ public class AbstractExtensionFinderTest {
     }
 
     @Test
-    public void findExtensionAnnotationThatMissing() throws Exception {
+    void findExtensionAnnotationThatMissing() throws Exception {
         Compilation compilation = javac().compile(ExtensionAnnotationProcessorTest.Greeting,
             ExtensionAnnotationProcessorTest.SpinnakerExtension_NoExtension,
             ExtensionAnnotationProcessorTest.WhazzupGreeting_SpinnakerExtension);

@@ -42,7 +42,7 @@ public class JarPluginManagerTest {
     Path pluginsPath;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), "test-plugin")
             .pluginClass(TestPlugin.class.getName())
             .pluginVersion("1.2.3")
@@ -53,7 +53,7 @@ public class JarPluginManagerTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         pluginManager.unloadPlugins();
 
         pluginJar = null;
@@ -61,7 +61,7 @@ public class JarPluginManagerTest {
     }
 
     @Test
-    public void getExtensions() {
+    void getExtensions() {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
 
@@ -73,7 +73,7 @@ public class JarPluginManagerTest {
     }
 
     @Test
-    public void unloadPlugin() throws Exception {
+    void unloadPlugin() throws Exception {
         pluginManager.loadPlugins();
 
         assertEquals(1, pluginManager.getPlugins().size());
@@ -85,7 +85,7 @@ public class JarPluginManagerTest {
     }
 
     @Test
-    public void deletePlugin() {
+    void deletePlugin() {
         pluginManager.loadPlugins();
 
         assertEquals(1, pluginManager.getPlugins().size());

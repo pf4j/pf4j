@@ -45,7 +45,7 @@ public class DefaultExtensionFactoryTest {
      * Test of create method, of class DefaultExtensionFactory.
      */
     @Test
-    public void testCreate() {
+    void testCreate() {
         assertNotNull(extensionFactory.create(TestExtension.class));
     }
 
@@ -53,7 +53,7 @@ public class DefaultExtensionFactoryTest {
      * Test of create method, of class DefaultExtensionFactory.
      */
     @Test
-    public void testCreateFailConstructor() {
+    void testCreateFailConstructor() {
         assertThrows(PluginRuntimeException.class, () -> extensionFactory.create(FailTestExtension.class));
     }
 

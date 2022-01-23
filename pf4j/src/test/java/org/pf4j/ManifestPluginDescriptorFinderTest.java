@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -37,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mario Franco
  * @author Decebal Suiu
  */
-public class ManifestPluginDescriptorFinderTest {
+class ManifestPluginDescriptorFinderTest {
 
     private VersionManager versionManager;
 
@@ -45,7 +44,7 @@ public class ManifestPluginDescriptorFinderTest {
     Path pluginsPath;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         Path pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-1"));
         storeManifestToPath(getPlugin1Manifest(), pluginPath);
 
@@ -74,7 +73,7 @@ public class ManifestPluginDescriptorFinderTest {
      * Test of {@link ManifestPluginDescriptorFinder#find(Path)} method.
      */
     @Test
-    public void testFind() throws Exception {
+    void find() throws Exception {
         PluginDescriptorFinder descriptorFinder = new ManifestPluginDescriptorFinder();
 
         PluginDescriptor plugin1 = descriptorFinder.find(pluginsPath.resolve("test-plugin-1"));
@@ -105,7 +104,7 @@ public class ManifestPluginDescriptorFinderTest {
      * Test of {@link ManifestPluginDescriptorFinder#find(Path)} method.
      */
     @Test
-    public void testFindNotFound() {
+    void findNotFound() {
         PluginDescriptorFinder descriptorFinder = new ManifestPluginDescriptorFinder();
         assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
     }

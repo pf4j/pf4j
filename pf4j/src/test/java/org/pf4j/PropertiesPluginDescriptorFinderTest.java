@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PropertiesPluginDescriptorFinderTest {
+class PropertiesPluginDescriptorFinderTest {
 
     private VersionManager versionManager;
 
@@ -43,7 +43,7 @@ public class PropertiesPluginDescriptorFinderTest {
     Path pluginsPath;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         Path pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-1"));
         storePropertiesToPath(getPlugin1Properties(), pluginPath);
 
@@ -69,7 +69,7 @@ public class PropertiesPluginDescriptorFinderTest {
     }
 
     @Test
-    public void testFind() throws Exception {
+    void find() throws Exception {
         PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
 
         PluginDescriptor plugin1 = descriptorFinder.find(pluginsPath.resolve("test-plugin-1"));
@@ -100,7 +100,7 @@ public class PropertiesPluginDescriptorFinderTest {
     }
 
     @Test
-    public void testNotFound() {
+    void notFound() {
         PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
         assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
     }

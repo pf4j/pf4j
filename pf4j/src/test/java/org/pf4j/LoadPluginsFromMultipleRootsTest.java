@@ -28,7 +28,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LoadPluginsFromMultipleRootsTest {
+class LoadPluginsFromMultipleRootsTest {
 
     private DefaultPluginManager pluginManager;
 
@@ -36,20 +36,20 @@ public class LoadPluginsFromMultipleRootsTest {
     Path pluginsPath2;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         pluginsPath1 = Files.createTempDirectory("junit-pf4j-");
         pluginsPath2 = Files.createTempDirectory("junit-pf4j-");
         pluginManager = new DefaultPluginManager(pluginsPath1, pluginsPath2);
     }
 
     @AfterEach
-    public void tearDown() throws IOException {
+    void tearDown() throws IOException {
         FileUtils.delete(pluginsPath1);
         FileUtils.delete(pluginsPath2);
     }
 
     @Test
-    public void load() throws Exception {
+    void load() throws Exception {
         PluginZip pluginZip1 = new PluginZip.Builder(pluginsPath1.resolve("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();

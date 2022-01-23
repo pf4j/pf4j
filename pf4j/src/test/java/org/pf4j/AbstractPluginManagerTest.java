@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 public class AbstractPluginManagerTest {
 
     @Test
-    public void getExtensionsByType() {
+    void getExtensionsByType() {
         AbstractPluginManager pluginManager = mock(AbstractPluginManager.class, CALLS_REAL_METHODS);
 
         ExtensionFinder extensionFinder = mock(ExtensionFinder.class);
@@ -46,9 +46,9 @@ public class AbstractPluginManagerTest {
         List<TestExtensionPoint> extensions = pluginManager.getExtensions(TestExtensionPoint.class);
         assertEquals(1, extensions.size());
     }
-    
+
     @Test
-    public void getVersion() {
+    void getVersion() {
         AbstractPluginManager pluginManager = mock(AbstractPluginManager.class, CALLS_REAL_METHODS);
         assertNotEquals("0.0.0", pluginManager.getVersion());
     }

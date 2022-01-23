@@ -30,13 +30,13 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FileUtilsTest {
+class FileUtilsTest {
 
     @TempDir
     Path pluginsPath;
 
     @Test
-    public void expandIfZipForZipWithOnlyModuleDescriptor() throws IOException {
+    void expandIfZipForZipWithOnlyModuleDescriptor() throws IOException {
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
                 .pluginVersion("1.2.3")
                 .build();
@@ -47,7 +47,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void expandIfZipForZipWithResourceFile() throws IOException {
+    void expandIfZipForZipWithResourceFile() throws IOException {
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-second-plugin-1.2.3.zip"), "myPlugin")
                 .pluginVersion("1.2.3")
                 .addFile(Paths.get("classes/META-INF/plugin-file"), "plugin")
@@ -59,7 +59,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void expandIfZipNonZipFiles() throws IOException {
+    void expandIfZipNonZipFiles() throws IOException {
         // File without .suffix
         Path extra = pluginsPath.resolve("extra");
         assertEquals(extra, FileUtils.expandIfZip(extra));
@@ -70,7 +70,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void findPaths() throws IOException {
+    void findPaths() throws IOException {
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();

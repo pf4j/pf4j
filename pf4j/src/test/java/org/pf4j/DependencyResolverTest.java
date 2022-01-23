@@ -29,18 +29,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Decebal Suiu
  */
-public class DependencyResolverTest {
+class DependencyResolverTest {
 
     private DependencyResolver resolver;
 
     @BeforeEach
-    public void init() {
+    void init() {
         VersionManager versionManager = new DefaultVersionManager();
         resolver = new DependencyResolver(versionManager);
     }
 
     @Test
-    public void sortedPlugins() {
+    void sortedPlugins() {
         // create incomplete plugin descriptor (ignore some attributes)
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
@@ -61,7 +61,7 @@ public class DependencyResolverTest {
     }
 
     @Test
-    public void notFoundDependencies() {
+    void notFoundDependencies() {
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setDependencies("p2, p3");
@@ -76,7 +76,7 @@ public class DependencyResolverTest {
     }
 
     @Test
-    public void cyclicDependencies() {
+    void cyclicDependencies() {
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setPluginVersion("0.0.0")
@@ -103,7 +103,7 @@ public class DependencyResolverTest {
     }
 
     @Test
-    public void wrongDependencyVersion() {
+    void wrongDependencyVersion() {
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
 //            .setDependencies("p2@2.0.0"); // simple version
@@ -123,7 +123,7 @@ public class DependencyResolverTest {
     }
 
     @Test
-    public void goodDependencyVersion() {
+    void goodDependencyVersion() {
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setDependencies("p2@2.0.0");

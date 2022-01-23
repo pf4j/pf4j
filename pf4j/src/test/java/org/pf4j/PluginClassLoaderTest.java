@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Sebastian Lövdahl
  */
-public class PluginClassLoaderTest {
+class PluginClassLoaderTest {
 
     private TestPluginManager pluginManager;
     private TestPluginManager pluginManagerParentFirst;

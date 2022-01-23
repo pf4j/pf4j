@@ -35,14 +35,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
-public class LegacyExtensionFinderTest {
+class LegacyExtensionFinderTest {
 
     @TempDir
     Path pluginsPath;
 
     @Test
     @EnabledOnOs(WINDOWS)
-    public void shouldUnlockFileAfterReadingExtensionsFromPlugin() throws Exception {
+    void shouldUnlockFileAfterReadingExtensionsFromPlugin() throws Exception {
         PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), "test-plugin")
                 .pluginClass(TestPlugin.class.getName())
                 .pluginVersion("1.2.3")

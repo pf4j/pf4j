@@ -34,13 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mario Franco
  * @author Decebal Suiu
  */
-public class DefaultPluginRepositoryTest {
+class DefaultPluginRepositoryTest {
 
     Path pluginsPath1;
     Path pluginsPath2;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         pluginsPath1 = Files.createTempDirectory("junit-pf4j-");
         pluginsPath2 = Files.createTempDirectory("junit-pf4j-");
         Path plugin1Path = Files.createDirectory(pluginsPath1.resolve("plugin-1"));
@@ -53,7 +53,7 @@ public class DefaultPluginRepositoryTest {
     }
 
     @AfterEach
-    public void tearDown() throws IOException {
+    void tearDown() throws IOException {
         FileUtils.delete(pluginsPath1);
         FileUtils.delete(pluginsPath2);
     }
@@ -62,7 +62,7 @@ public class DefaultPluginRepositoryTest {
      * Test of {@link DefaultPluginRepository#getPluginPaths()} method.
      */
     @Test
-    public void testGetPluginArchivesFromSinglePath() {
+    void testGetPluginArchivesFromSinglePath() {
         PluginRepository repository = new DefaultPluginRepository(pluginsPath2);
 
         List<Path> pluginPaths = repository.getPluginPaths();
@@ -76,7 +76,7 @@ public class DefaultPluginRepositoryTest {
      * Test of {@link DefaultPluginRepository#getPluginPaths()} method.
      */
     @Test
-    public void testGetPluginArchives() {
+    void testGetPluginArchives() {
         PluginRepository repository = new DefaultPluginRepository(pluginsPath1, pluginsPath2);
 
         List<Path> pluginPaths = repository.getPluginPaths();
@@ -91,7 +91,7 @@ public class DefaultPluginRepositoryTest {
      * Test of {@link DefaultPluginRepository#deletePluginPath(Path)} method.
      */
     @Test
-    public void testDeletePluginPath() {
+    void testDeletePluginPath() {
         PluginRepository repository = new DefaultPluginRepository(pluginsPath1, pluginsPath2);
 
         assertTrue(Files.exists(pluginsPath1.resolve("plugin-1.zip")));

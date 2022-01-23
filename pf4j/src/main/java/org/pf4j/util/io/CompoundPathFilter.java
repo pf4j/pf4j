@@ -13,15 +13,15 @@ public abstract class CompoundPathFilter implements PathFilter {
     /** The list of path filters. */
     protected List<PathFilter> pathFilters;
 
-    public CompoundPathFilter() {
+    protected CompoundPathFilter() {
         this(new ArrayList<>());
     }
 
-    public CompoundPathFilter(PathFilter... pathFilters) {
+    protected CompoundPathFilter(PathFilter... pathFilters) {
         this(Arrays.asList(pathFilters));
     }
 
-    public CompoundPathFilter(List<PathFilter> pathFilters) {
+    protected CompoundPathFilter(List<PathFilter> pathFilters) {
         this.pathFilters = new ArrayList<>(pathFilters);
     }
 

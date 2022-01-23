@@ -43,7 +43,7 @@ public class CompoundPluginDescriptorFinderTest {
     Path pluginsPath;
 
     @Test
-    public void add() {
+    void add() {
         CompoundPluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder();
         assertEquals(0, descriptorFinder.size());
 
@@ -52,7 +52,7 @@ public class CompoundPluginDescriptorFinderTest {
     }
 
     @Test
-    public void find() throws Exception {
+    void find() throws Exception {
         Path pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-1"));
         storePropertiesToPath(getPlugin1Properties(), pluginPath);
 
@@ -66,7 +66,7 @@ public class CompoundPluginDescriptorFinderTest {
     }
 
     @Test
-    public void findInJar() throws Exception {
+    void findInJar() throws Exception {
         PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder()
             .add(new ManifestPluginDescriptorFinder());
 
@@ -83,13 +83,13 @@ public class CompoundPluginDescriptorFinderTest {
     }
 
     @Test
-    public void testNotFound() {
+    void testNotFound() {
         PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder();
         assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
     }
 
     @Test
-    public void testSpaceCharacterInFileName() throws Exception {
+    void testSpaceCharacterInFileName() throws Exception {
         PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder()
             .add(new ManifestPluginDescriptorFinder());
 

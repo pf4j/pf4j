@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class LoadPluginsTest {
+class LoadPluginsTest {
 
     private DefaultPluginManager pluginManager;
 
@@ -45,12 +45,12 @@ public class LoadPluginsTest {
     Path pluginsPath;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         pluginManager = new DefaultPluginManager(pluginsPath);
     }
 
     @Test
-    public void load() throws Exception {
+    void load() throws Exception {
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
@@ -66,12 +66,12 @@ public class LoadPluginsTest {
     }
 
     @Test
-    public void loadNonExisting() {
+    void loadNonExisting() {
         assertThrows(IllegalArgumentException.class, () -> pluginManager.loadPlugin(Paths.get("nonexisting")));
     }
 
     @Test
-    public void loadTwiceFails() throws Exception {
+    void loadTwiceFails() throws Exception {
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
@@ -82,7 +82,7 @@ public class LoadPluginsTest {
     }
 
     @Test
-    public void loadPluginWithSameIdDifferentPathFails() throws Exception {
+    void loadPluginWithSameIdDifferentPathFails() throws Exception {
         String pluginId = "myPlugin";
         String pluginVersion = "1.2.3";
         Path plugin1Path = pluginsPath.resolve("my-plugin-1.2.3.zip");
@@ -121,7 +121,7 @@ public class LoadPluginsTest {
      * uses pluginId as the unique identifier of the loaded plugin.
      */
     @Test
-    public void loadPluginWithSameIdDifferentVersionsFails() throws Exception {
+    void loadPluginWithSameIdDifferentVersionsFails() throws Exception {
         String pluginId = "myPlugin";
         String plugin1Version = "1.2.3";
         Path plugin1Path = pluginsPath.resolve("my-plugin-1.2.3.zip");
@@ -151,7 +151,7 @@ public class LoadPluginsTest {
     }
 
     @Test
-    public void loadUnloadLoad() throws Exception {
+    void loadUnloadLoad() throws Exception {
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();
@@ -168,7 +168,7 @@ public class LoadPluginsTest {
     }
 
     @Test
-    public void upgrade() throws Exception {
+    void upgrade() throws Exception {
         String pluginId = "myPlugin";
 
         new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), pluginId)
@@ -197,17 +197,17 @@ public class LoadPluginsTest {
     }
 
     @Test
-    public void getRoot() {
+    void getRoot() {
         assertEquals(pluginsPath, pluginManager.getPluginsRoot());
     }
 
     @Test
-    public void getRoots() {
+    void getRoots() {
         assertEquals(Collections.singletonList(pluginsPath), pluginManager.getPluginsRoots());
     }
 
     @Test
-    public void notAPlugin() {
+    void notAPlugin() {
         pluginsPath.resolve("not-a-zip");
 
         pluginManager.loadPlugins();
@@ -216,7 +216,7 @@ public class LoadPluginsTest {
     }
 
     @Test
-    public void deletePlugin() throws Exception {
+    void deletePlugin() throws Exception {
         PluginZip pluginZip1 = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();

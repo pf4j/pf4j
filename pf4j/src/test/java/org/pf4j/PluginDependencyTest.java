@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Mario Franco
  */
-public class PluginDependencyTest {
+class PluginDependencyTest {
 
     private DefaultPluginManager pluginManager;
 
@@ -37,15 +37,15 @@ public class PluginDependencyTest {
     Path pluginsPath;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         pluginManager = new DefaultPluginManager(pluginsPath);
     }
 
     /**
-     * Test of getPluginId method, of class PluginDependency.
+     * Test of {@code getPluginId} method, of class {@link PluginDependency}.
      */
     @Test
-    public void testPluginDependecy() {
+    void pluginDependency() {
         PluginDependency instance = new PluginDependency("test");
         PluginDependency instance2 = new PluginDependency("test");
         assertEquals(instance, instance2);
@@ -92,7 +92,7 @@ public class PluginDependencyTest {
     }
 
     @Test
-    public void dependentStop() throws Exception {
+    void dependentStop() throws Exception {
         // B depends on A
         PluginZip pluginA = new PluginZip.Builder(pluginsPath.resolve("A-plugin-1.2.3.zip"), "plugin.a")
             .pluginVersion("1.2.3").build();
@@ -121,7 +121,7 @@ public class PluginDependencyTest {
     }
 
     @Test
-    public void dependentUnload() throws Exception {
+    void dependentUnload() throws Exception {
         // B depends on A
         PluginZip pluginA = new PluginZip.Builder(pluginsPath.resolve("A-plugin-1.2.3.zip"), "plugin.a")
             .pluginVersion("1.2.3").build();

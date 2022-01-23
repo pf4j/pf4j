@@ -30,20 +30,20 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /**
  * @author Decebal Suiu
  */
-public class DevelopmentPluginRepositoryTest {
+class DevelopmentPluginRepositoryTest {
 
     @TempDir
     Path pluginsPath;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         // standard maven/gradle bin folder - these should be skipped in development mode because the cause errors
         Files.createDirectory(pluginsPath.resolve(DevelopmentPluginRepository.MAVEN_BUILD_DIR));
         Files.createDirectory(pluginsPath.resolve(DevelopmentPluginRepository.GRADLE_BUILD_DIR));
     }
 
     @Test
-    public void testGetPluginArchivesInDevelopmentMode() {
+    void testGetPluginArchivesInDevelopmentMode() {
         PluginRepository repository = new DevelopmentPluginRepository(pluginsPath);
 
         List<Path> pluginPaths = repository.getPluginPaths();
