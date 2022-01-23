@@ -170,7 +170,7 @@ public class DefaultPluginManagerTest {
         boolean deleted = pluginManager.deletePlugin(pluginZip.pluginId());
         assertTrue(deleted);
 
-        assertFalse(pluginZip.file().exists());
+        assertFalse(Files.exists(pluginZip.path()));
     }
 
     @Test
@@ -187,7 +187,7 @@ public class DefaultPluginManagerTest {
         boolean deleted = pluginManager.deletePlugin(pluginJar.pluginId());
         assertTrue(deleted);
 
-        assertFalse(pluginJar.file().exists());
+        assertFalse(Files.exists(pluginJar.path()));
     }
 
 }

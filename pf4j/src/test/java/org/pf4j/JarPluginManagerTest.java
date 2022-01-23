@@ -25,6 +25,7 @@ import org.pf4j.test.TestExtensionPoint;
 import org.pf4j.test.TestPlugin;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -80,11 +81,11 @@ public class JarPluginManagerTest {
         boolean unloaded = pluginManager.unloadPlugin(pluginJar.pluginId());
         assertTrue(unloaded);
 
-        assertTrue(pluginJar.file().exists());
+        assertTrue(Files.exists(pluginJar.path()));
     }
 
     @Test
-    public void deletePlugin() throws Exception {
+    public void deletePlugin() {
         pluginManager.loadPlugins();
 
         assertEquals(1, pluginManager.getPlugins().size());
@@ -92,7 +93,7 @@ public class JarPluginManagerTest {
         boolean deleted = pluginManager.deletePlugin(pluginJar.pluginId());
         assertTrue(deleted);
 
-        assertFalse(pluginJar.file().exists());
+        assertFalse(Files.exists(pluginJar.path()));
     }
 
 }

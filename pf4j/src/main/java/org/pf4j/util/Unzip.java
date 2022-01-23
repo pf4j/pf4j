@@ -15,16 +15,15 @@
  */
 package org.pf4j.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * This class extracts the content of the plugin zip into a directory.
@@ -40,26 +39,26 @@ public class Unzip {
      * Holds the destination directory.
      * File will be unzipped into the destination directory.
      */
-    private File destination;
+    private Path destination;
 
     /**
      * Holds path to zip file.
      */
-    private File source;
+    private Path source;
 
     public Unzip() {
     }
 
-    public Unzip(File source, File destination) {
+    public Unzip(Path source, Path destination) {
         this.source = source;
         this.destination = destination;
     }
 
-    public void setSource(File source) {
+    public void setSource(Path source) {
         this.source = source;
     }
 
-    public void setDestination(File destination) {
+    public void setDestination(Path destination) {
         this.destination = destination;
     }
 
@@ -71,17 +70,17 @@ public class Unzip {
         log.debug("Extract content of '{}' to '{}'", source, destination);
 
         // delete destination directory if exists
-        if (destination.exists() && destination.isDirectory()) {
-            FileUtils.delete(destination.toPath());
+        if (Files.isDirectory(destination)) {
+            FileUtils.delete(destination);
         }
 
-        try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(source))) {
+        try (ZipInputStream zipInputStream = new ZipInputStream(Files.newInputStream(source))) {
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                File file = new File(destination, zipEntry.getName());
+                Path file = destination.resolve(zipEntry.getName());
 
                 // create intermediary directories - sometimes zip don't add them
-                File dir = new File(file.getParent());
+                Path dir = file.getParent();
 
                 mkdirsOrThrow(dir);
 
@@ -90,7 +89,7 @@ public class Unzip {
                 } else {
                     byte[] buffer = new byte[1024];
                     int length;
-                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                    try (OutputStream fos = Files.newOutputStream(file)) {
                         while ((length = zipInputStream.read(buffer)) >= 0) {
                             fos.write(buffer, 0, length);
                         }
@@ -100,10 +99,12 @@ public class Unzip {
         }
     }
 
-    private static void mkdirsOrThrow(File dir) throws IOException {
-        if (!dir.exists() && !dir.mkdirs()) {
-            throw new IOException("Failed to create directory " + dir);
+    private static void mkdirsOrThrow(Path dir) throws IOException {
+        if (Files.isDirectory(dir)) {
+            return;
         }
+
+        Files.createDirectories(dir);
     }
 
 }

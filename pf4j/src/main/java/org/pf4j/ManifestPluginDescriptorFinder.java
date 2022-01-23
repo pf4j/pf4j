@@ -17,6 +17,8 @@ package org.pf4j;
 
 import org.pf4j.util.FileUtils;
 import org.pf4j.util.StringUtils;
+import org.pf4j.util.io.NamePathFilter;
+import org.pf4j.util.io.PathFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +49,8 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
     public static final String PLUGIN_DEPENDENCIES = "Plugin-Dependencies";
     public static final String PLUGIN_REQUIRES = "Plugin-Requires";
     public static final String PLUGIN_LICENSE = "Plugin-License";
+
+    private static final PathFilter MANIFEST_PATH = new NamePathFilter("MANIFEST.MF", true);
 
     @Override
     public boolean isApplicable(Path pluginPath) {
@@ -137,10 +141,9 @@ public class ManifestPluginDescriptorFinder implements PluginDescriptorFinder {
 
     protected Manifest readManifestFromDirectory(Path pluginPath) {
         // legacy (the path is something like "classes/META-INF/MANIFEST.MF")
-        Path manifestPath = FileUtils.findFile(pluginPath,"MANIFEST.MF");
-        if (manifestPath == null) {
-            throw new PluginRuntimeException("Cannot find the manifest path");
-        }
+        Path manifestPath = FileUtils.findPaths(pluginPath,MANIFEST_PATH)
+            .findAny()
+            .orElseThrow(() -> new PluginRuntimeException("Cannot find the manifest path"));
 
         log.debug("Lookup plugin descriptor in '{}'", manifestPath);
         if (Files.notExists(manifestPath)) {

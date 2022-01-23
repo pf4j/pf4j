@@ -17,9 +17,8 @@ package org.pf4j.test;
 
 import org.pf4j.PropertiesPluginDescriptorFinder;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -51,10 +50,6 @@ public class PluginZip {
 
     public Path path() {
         return path;
-    }
-
-    public File file() {
-        return path.toFile();
     }
 
     public String pluginId() {
@@ -183,7 +178,7 @@ public class PluginZip {
                 map.putAll(properties);
             }
 
-            try (ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(path.toFile()))) {
+            try (ZipOutputStream outputStream = new ZipOutputStream(Files.newOutputStream(path))) {
                 ZipEntry propertiesFile = new ZipEntry(PropertiesPluginDescriptorFinder.DEFAULT_PROPERTIES_FILE_NAME);
                 outputStream.putNextEntry(propertiesFile);
                 createProperties(map).store(outputStream, "");

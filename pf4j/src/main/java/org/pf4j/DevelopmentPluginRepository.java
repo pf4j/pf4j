@@ -15,14 +15,14 @@
  */
 package org.pf4j;
 
-import org.pf4j.util.AndFileFilter;
-import org.pf4j.util.DirectoryFileFilter;
-import org.pf4j.util.HiddenFilter;
-import org.pf4j.util.NameFileFilter;
-import org.pf4j.util.NotFileFilter;
-import org.pf4j.util.OrFileFilter;
+import org.pf4j.util.io.AndPathFilter;
+import org.pf4j.util.io.DirectoryPathFilter;
+import org.pf4j.util.io.HiddenPathFilter;
+import org.pf4j.util.io.NamePathFilter;
+import org.pf4j.util.io.NotPathFilter;
+import org.pf4j.util.io.OrPathFilter;
+import org.pf4j.util.io.PathFilter;
 
-import java.io.FileFilter;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -42,18 +42,18 @@ public class DevelopmentPluginRepository extends BasePluginRepository {
     public DevelopmentPluginRepository(List<Path> pluginsRoots) {
         super(pluginsRoots);
 
-        AndFileFilter pluginsFilter = new AndFileFilter(new DirectoryFileFilter());
-        pluginsFilter.addFileFilter(new NotFileFilter(createHiddenPluginFilter()));
+        AndPathFilter pluginsFilter = new AndPathFilter(new DirectoryPathFilter());
+        pluginsFilter.addPathFilter(new NotPathFilter(createHiddenPluginFilter()));
         setFilter(pluginsFilter);
     }
 
-    protected FileFilter createHiddenPluginFilter() {
-        OrFileFilter hiddenPluginFilter = new OrFileFilter(new HiddenFilter());
+    protected PathFilter createHiddenPluginFilter() {
+        OrPathFilter hiddenPluginFilter = new OrPathFilter(new HiddenPathFilter());
 
         // skip default build output folders since these will cause errors in the logs
         hiddenPluginFilter
-            .addFileFilter(new NameFileFilter(MAVEN_BUILD_DIR))
-            .addFileFilter(new NameFileFilter(GRADLE_BUILD_DIR));
+            .addPathFilter(new NamePathFilter(MAVEN_BUILD_DIR))
+            .addPathFilter(new NamePathFilter(GRADLE_BUILD_DIR));
 
         return hiddenPluginFilter;
     }

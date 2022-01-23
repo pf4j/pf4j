@@ -163,7 +163,7 @@ public class ManifestPluginDescriptorFinderTest {
 
     private void storeManifestToPath(Manifest manifest, Path pluginPath) throws IOException {
         Path path = Files.createDirectory(pluginPath.resolve("META-INF"));
-        try (OutputStream output = new FileOutputStream(path.resolve("MANIFEST.MF").toFile())) {
+        try (OutputStream output = Files.newOutputStream(path.resolve("MANIFEST.MF"))) {
             manifest.write(output);
         }
     }

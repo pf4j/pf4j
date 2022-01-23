@@ -15,14 +15,14 @@
  */
 package org.pf4j.util;
 
+import org.pf4j.util.io.JarPathFilter;
+import org.pf4j.util.io.PathFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Decebal Suiu
@@ -46,15 +48,18 @@ public final class FileUtils {
 
     private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
+    private FileUtils() {
+        // prevent instantiation
+    }
+
     public static List<String> readLines(Path path, boolean ignoreComments) throws IOException {
-        File file = path.toFile();
-        if (!file.isFile()) {
+        if (!Files.isRegularFile(path)) {
             return new ArrayList<>();
         }
 
         List<String> lines = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (ignoreComments && !line.startsWith("#") && !lines.contains(line)) {
@@ -64,14 +69,6 @@ public final class FileUtils {
         }
 
         return lines;
-    }
-
-    /**
-     * Use {@link #writeLines(Collection, Path)} instead.
-     */
-    @Deprecated
-    public static void writeLines(Collection<String> lines, File file) throws IOException {
-        writeLines(lines, file.toPath());
     }
 
     public static void writeLines(Collection<String> lines, Path path) throws IOException {
@@ -106,29 +103,8 @@ public final class FileUtils {
         });
     }
 
-    public static List<File> getJars(Path folder) {
-        List<File> bucket = new ArrayList<>();
-        getJars(bucket, folder);
-
-        return bucket;
-    }
-
-    private static void getJars(final List<File> bucket, Path folder) {
-        FileFilter jarFilter = new JarFileFilter();
-        FileFilter directoryFilter = new DirectoryFileFilter();
-
-        if (Files.isDirectory(folder)) {
-            File[] jars = folder.toFile().listFiles(jarFilter);
-            for (int i = 0; (jars != null) && (i < jars.length); ++i) {
-                bucket.add(jars[i]);
-            }
-
-            File[] directories = folder.toFile().listFiles(directoryFilter);
-            for (int i = 0; (directories != null) && (i < directories.length); ++i) {
-                File directory = directories[i];
-                getJars(bucket, directory.toPath());
-            }
-        }
+    public static List<Path> getJars(Path folder) {
+        return findPaths(folder, Integer.MAX_VALUE, new JarPathFilter()).collect(Collectors.toList());
     }
 
     /**
@@ -188,8 +164,8 @@ public final class FileUtils {
         if (!Files.exists(pluginDirectory) || pluginZipDate.compareTo(Files.getLastModifiedTime(pluginDirectory)) > 0) {
             // expand '.zip' file
             Unzip unzip = new Unzip();
-            unzip.setSource(filePath.toFile());
-            unzip.setDestination(pluginDirectory.toFile());
+            unzip.setSource(filePath);
+            unzip.setDestination(pluginDirectory);
             unzip.extract();
             log.info("Expanded plugin zip '{}' in '{}'", filePath.getFileName(), pluginDirectory.getFileName());
         }
@@ -245,6 +221,9 @@ public final class FileUtils {
         return getFileSystem(uri).getPath(first, more);
     }
 
+    /**
+     * Quietly close a path.
+     */
     public static void closePath(Path path) {
         if (path != null) {
             try {
@@ -255,24 +234,22 @@ public final class FileUtils {
         }
     }
 
-    public static Path findFile(Path directoryPath, String fileName) {
-        File[] files = directoryPath.toFile().listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isFile()) {
-                    if (file.getName().equals(fileName)) {
-                        return file.toPath();
-                    }
-                } else if (file.isDirectory()) {
-                    Path foundFile = findFile(file.toPath(), fileName);
-                    if (foundFile != null) {
-                        return foundFile;
-                    }
-                }
-            }
+    public static Stream<Path> findPaths(Path path, PathFilter filter) {
+        return findPaths(path, Integer.MAX_VALUE, filter);
+    }
+
+    public static Stream<Path> findPaths(Path path, int maxDepth, PathFilter filter) {
+        if (Files.notExists(path)) {
+            return Stream.empty();
         }
 
-        return null;
+        try {
+            return Files.walk(path, maxDepth)
+                .filter(p -> !p.equals(path))
+                .filter(filter::accept);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     private static FileSystem getFileSystem(URI uri) throws IOException {
@@ -283,6 +260,4 @@ public final class FileUtils {
         }
     }
 
-    private FileUtils() {
-    }
 }

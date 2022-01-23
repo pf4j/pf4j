@@ -17,7 +17,6 @@ package org.pf4j;
 
 import org.pf4j.util.FileUtils;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -64,9 +63,9 @@ public class BasePluginLoader implements PluginLoader {
      */
     protected void loadClasses(Path pluginPath, PluginClassLoader pluginClassLoader) {
         for (String directory : pluginClasspath.getClassesDirectories()) {
-            File file = pluginPath.resolve(directory).toFile();
-            if (file.exists() && file.isDirectory()) {
-                pluginClassLoader.addFile(file);
+            Path path = pluginPath.resolve(directory);
+            if (Files.isDirectory(path)) {
+                pluginClassLoader.addPath(path);
             }
         }
     }
@@ -77,10 +76,10 @@ public class BasePluginLoader implements PluginLoader {
      */
     protected void loadJars(Path pluginPath, PluginClassLoader pluginClassLoader) {
         for (String jarsDirectory : pluginClasspath.getJarsDirectories()) {
-            Path file = pluginPath.resolve(jarsDirectory);
-            List<File> jars = FileUtils.getJars(file);
-            for (File jar : jars) {
-                pluginClassLoader.addFile(jar);
+            Path path = pluginPath.resolve(jarsDirectory);
+            List<Path> jars = FileUtils.getJars(path);
+            for (Path jar : jars) {
+                pluginClassLoader.addPath(jar);
             }
         }
     }

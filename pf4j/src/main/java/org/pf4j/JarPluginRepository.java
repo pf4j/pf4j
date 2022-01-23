@@ -15,7 +15,7 @@
  */
 package org.pf4j;
 
-import org.pf4j.util.JarFileFilter;
+import org.pf4j.util.io.JarPathFilter;
 
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public class JarPluginRepository extends BasePluginRepository {
     }
 
     public JarPluginRepository(List<Path> pluginsRoots) {
-        super(pluginsRoots, new JarFileFilter());
+        super(pluginsRoots, new JarPathFilter());
     }
 
 }

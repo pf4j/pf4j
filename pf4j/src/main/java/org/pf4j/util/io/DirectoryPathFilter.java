@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.util;
+package org.pf4j.util.io;
 
-import java.io.File;
-import java.io.FileFilter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
- * This filter produces a logical NOT of the filters specified.
+ * Filter accepts paths that are directories.
  *
  * @author Decebal Suiu
  */
-public class NotFileFilter implements FileFilter {
-
-    private FileFilter filter;
-
-    public NotFileFilter(FileFilter filter) {
-        this.filter = filter;
-    }
+public class DirectoryPathFilter implements PathFilter {
 
     @Override
-    public boolean accept(File file) {
-        return !filter.accept(file);
+    public boolean accept(Path path) {
+        return Files.isDirectory(path);
     }
 
 }

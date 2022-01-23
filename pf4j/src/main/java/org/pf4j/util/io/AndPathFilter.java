@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.util;
+package org.pf4j.util.io;
 
-import java.io.File;
-import java.io.FileFilter;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,53 +24,53 @@ import java.util.List;
 /**
  * This filter providing conditional AND logic across a list of file filters.
  * This filter returns {@code true} if all filters in the list return {@code true}. Otherwise, it returns {@code false}.
- * Checking of the file filter list stops when the first filter returns {@code false}.
+ * Checking of the path filter list stops when the first filter returns {@code false}.
  *
  * @author Decebal Suiu
  */
-public class AndFileFilter implements FileFilter {
+public class AndPathFilter implements PathFilter {
 
-    /** The list of file filters. */
-    private List<FileFilter> fileFilters;
+    /** The list of path filters. */
+    private List<PathFilter> pathFilters;
 
-    public AndFileFilter() {
+    public AndPathFilter() {
         this(new ArrayList<>());
     }
 
-    public AndFileFilter(FileFilter... fileFilters) {
-        this(Arrays.asList(fileFilters));
+    public AndPathFilter(PathFilter... pathFilters) {
+        this(Arrays.asList(pathFilters));
     }
 
-    public AndFileFilter(List<FileFilter> fileFilters) {
-        this.fileFilters = new ArrayList<>(fileFilters);
+    public AndPathFilter(List<PathFilter> pathFilters) {
+        this.pathFilters = new ArrayList<>(pathFilters);
     }
 
-    public AndFileFilter addFileFilter(FileFilter fileFilter) {
-        fileFilters.add(fileFilter);
+    public AndPathFilter addPathFilter(PathFilter fileFilter) {
+        pathFilters.add(fileFilter);
 
         return this;
     }
 
-    public List<FileFilter> getFileFilters() {
-        return Collections.unmodifiableList(fileFilters);
+    public List<PathFilter> getPathFilters() {
+        return Collections.unmodifiableList(pathFilters);
     }
 
-    public boolean removeFileFilter(FileFilter fileFilter) {
-        return fileFilters.remove(fileFilter);
+    public boolean removePathFilter(PathFilter pathFilter) {
+        return pathFilters.remove(pathFilter);
     }
 
-    public void setFileFilters(List<FileFilter> fileFilters) {
-        this.fileFilters = new ArrayList<>(fileFilters);
+    public void setPathFilters(List<PathFilter> pathFilters) {
+        this.pathFilters = new ArrayList<>(pathFilters);
     }
 
     @Override
-    public boolean accept(File file) {
-        if (this.fileFilters.isEmpty()) {
+    public boolean accept(Path path) {
+        if (this.pathFilters.isEmpty()) {
             return false;
         }
 
-        for (FileFilter fileFilter : this.fileFilters) {
-            if (!fileFilter.accept(file)) {
+        for (PathFilter pathFilter : this.pathFilters) {
+            if (!pathFilter.accept(path)) {
                 return false;
             }
         }

@@ -76,7 +76,7 @@ public class CompoundPluginLoader implements PluginLoader {
     public ClassLoader loadPlugin(Path pluginPath, PluginDescriptor pluginDescriptor) {
         for (PluginLoader loader : loaders) {
             if (loader.isApplicable(pluginPath)) {
-                log.debug("'{}' is applicable for plugin '{}'", loader, pluginPath);
+                log.debug("'{}' is applicable for plugin '{}'", loader.getName(), pluginPath);
                 try {
                     ClassLoader classLoader = loader.loadPlugin(pluginPath, pluginDescriptor);
                     if (classLoader != null) {
@@ -87,7 +87,7 @@ public class CompoundPluginLoader implements PluginLoader {
                     log.error(e.getMessage()); // ?!
                 }
             } else {
-                log.debug("'{}' is not applicable for plugin '{}'", loader, pluginPath);
+                log.debug("'{}' is not applicable for plugin '{}'", loader.getName(), pluginPath);
             }
         }
 

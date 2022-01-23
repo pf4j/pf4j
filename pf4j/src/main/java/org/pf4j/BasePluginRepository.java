@@ -16,17 +16,18 @@
 package org.pf4j;
 
 import org.pf4j.util.FileUtils;
+import org.pf4j.util.io.PathFilter;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Decebal Suiu
@@ -36,8 +37,8 @@ public class BasePluginRepository implements PluginRepository {
 
     protected final List<Path> pluginsRoots;
 
-    protected FileFilter filter;
-    protected Comparator<File> comparator;
+    protected PathFilter filter;
+    protected Comparator<Path> comparator;
 
     public BasePluginRepository(Path... pluginsRoots) {
         this(Arrays.asList(pluginsRoots));
@@ -47,40 +48,45 @@ public class BasePluginRepository implements PluginRepository {
         this(pluginsRoots, null);
     }
 
-    public BasePluginRepository(List<Path> pluginsRoots, FileFilter filter) {
+    public BasePluginRepository(List<Path> pluginsRoots, PathFilter filter) {
         this.pluginsRoots = pluginsRoots;
         this.filter = filter;
 
         // last modified file is first
-        this.comparator = Comparator.comparingLong(File::lastModified);
+        this.comparator = Comparator.comparingLong(path -> {
+            try {
+                return Files.getLastModifiedTime(path).toMillis();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        });
     }
 
-    public void setFilter(FileFilter filter) {
+    public void setFilter(PathFilter filter) {
         this.filter = filter;
     }
 
     /**
      * Set a {@link File} {@link Comparator} used to sort the listed files from {@code pluginsRoot}.
      * This comparator is used in {@link #getPluginPaths()} method.
-     * By default is used a file comparator that returns the last modified files first.
+     * By default, it's used a file comparator that returns the last modified files first.
      * If you don't want a file comparator, then call this method with {@code null}.
      */
-    public void setComparator(Comparator<File> comparator) {
+    public void setComparator(Comparator<Path> comparator) {
         this.comparator = comparator;
     }
 
     @Override
     public List<Path> getPluginPaths() {
         return pluginsRoots.stream()
-            .flatMap(path -> streamFiles(path, filter))
+            .flatMap(path -> FileUtils.findPaths(path, 1, filter))
             .sorted(comparator)
-            .map(File::toPath)
             .collect(Collectors.toList());
     }
 
     @Override
     public boolean deletePluginPath(Path pluginPath) {
-        if (!filter.accept(pluginPath.toFile())) {
+        if (!filter.accept(pluginPath)) {
             return false;
         }
 
@@ -90,15 +96,8 @@ public class BasePluginRepository implements PluginRepository {
         } catch (NoSuchFileException e) {
             return false; // Return false on not found to be compatible with previous API (#135)
         } catch (IOException e) {
-            throw new PluginRuntimeException(e);
+            throw new UncheckedIOException(e);
         }
-    }
-
-    protected Stream<File> streamFiles(Path directory, FileFilter filter) {
-        File[] files = directory.toFile().listFiles(filter);
-        return files != null
-            ? Arrays.stream(files)
-            : Stream.empty();
     }
 
 }

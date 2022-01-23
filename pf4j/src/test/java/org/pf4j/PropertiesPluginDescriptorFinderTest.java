@@ -21,9 +21,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginZip;
 import org.pf4j.test.TestPlugin;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -167,7 +165,7 @@ public class PropertiesPluginDescriptorFinderTest {
 
     private void storePropertiesToPath(Properties properties, Path pluginPath) throws IOException {
         Path path = pluginPath.resolve(PropertiesPluginDescriptorFinder.DEFAULT_PROPERTIES_FILE_NAME);
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), StandardCharsets.UTF_8)) {
+        try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             properties.store(writer, "");
         }
     }

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -79,12 +80,21 @@ public class PluginClassLoader extends URLClassLoader {
         super.addURL(url);
     }
 
+    public void addPath(Path path) {
+        try {
+            addURL(path.toUri().toURL());
+        } catch (IOException e) {
+//            throw new UncheckedIOException("Cannot add path '" + path + "'", e);
+            log.warn("Cannot add path '" + path  + "'", e);
+        }
+    }
+
     public void addFile(File file) {
         try {
             addURL(file.getCanonicalFile().toURI().toURL());
         } catch (IOException e) {
-//            throw new RuntimeException(e);
-            log.error(e.getMessage(), e);
+//            throw new UncheckedIOException("Cannot add file '" + file + "'", e);
+            log.warn("Cannot add file '" + file  + "'", e);
         }
     }
 

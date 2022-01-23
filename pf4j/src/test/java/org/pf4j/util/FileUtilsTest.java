@@ -18,10 +18,14 @@ package org.pf4j.util;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginZip;
+import org.pf4j.util.io.ZipPathFilter;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,7 +36,7 @@ public class FileUtilsTest {
     Path pluginsPath;
 
     @Test
-    public void expandIfZipForZipWithOnlyModuleDescriptor() throws Exception {
+    public void expandIfZipForZipWithOnlyModuleDescriptor() throws IOException {
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
                 .pluginVersion("1.2.3")
                 .build();
@@ -43,7 +47,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void expandIfZipForZipWithResourceFile() throws Exception {
+    public void expandIfZipForZipWithResourceFile() throws IOException {
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-second-plugin-1.2.3.zip"), "myPlugin")
                 .pluginVersion("1.2.3")
                 .addFile(Paths.get("classes/META-INF/plugin-file"), "plugin")
@@ -55,7 +59,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void expandIfZipNonZipFiles() throws Exception {
+    public void expandIfZipNonZipFiles() throws IOException {
         // File without .suffix
         Path extra = pluginsPath.resolve("extra");
         assertEquals(extra, FileUtils.expandIfZip(extra));
@@ -63,6 +67,20 @@ public class FileUtilsTest {
         // Folder
         Path folder = pluginsPath.resolve("folder");
         assertEquals(folder, FileUtils.expandIfZip(folder));
+    }
+
+    @Test
+    public void findPaths() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        Path unzipped = FileUtils.expandIfZip(pluginZip.path());
+        assertEquals(pluginZip.unzippedPath(), unzipped);
+
+        List<Path> zipPaths = FileUtils.findPaths(pluginsPath, new ZipPathFilter()).collect(Collectors.toList());
+        System.out.println("zipPaths = " + zipPaths);
+        assertEquals(1, zipPaths.size());
     }
 
 }

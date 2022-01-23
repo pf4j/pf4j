@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.util;
-
-import java.io.File;
-import java.io.FileFilter;
+package org.pf4j.util.io;
 
 /**
- * Filter that only accepts hidden files.
+ * Path filter that accepts all files ending with .ZIP.
+ * This filter is case-insensitive.
  *
- * @author decebal.suiu
+ * @author Decebal Suiu
  */
-public class HiddenFilter implements FileFilter {
+public class ZipPathFilter extends ExtensionPathFilter {
 
-    @Override
-    public boolean accept(File file) {
-        return file.isHidden();
+    /**
+     * The extension that this filter will search for.
+     */
+    private static final String ZIP_EXTENSION = ".ZIP";
+
+    public ZipPathFilter() {
+        super(ZIP_EXTENSION);
     }
 
 }

@@ -23,9 +23,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginZip;
 import org.pf4j.util.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -35,7 +34,11 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Sebastian Lövdahl
@@ -60,11 +63,9 @@ public class PluginClassLoaderTest {
     static void setUpGlobal() throws IOException, URISyntaxException {
         Path parentClassPathBase = Paths.get(PluginClassLoaderTest.class.getClassLoader().getResource(".").toURI());
 
-        File metaInfFile = parentClassPathBase.resolve("META-INF").toFile();
-        if (metaInfFile.mkdir()) {
-            // Only delete the directory if this test created it, guarding for any future usages of the directory.
-            metaInfFile.deleteOnExit();
-        }
+        Path metaInfPath = parentClassPathBase.resolve("META-INF");
+        FileUtils.delete(metaInfPath);
+        Files.createDirectory(metaInfPath);
 
         createFile(parentClassPathBase.resolve("META-INF").resolve("file-only-in-parent"));
         createFile(parentClassPathBase.resolve("META-INF").resolve("file-in-both-parent-and-dependency-and-plugin"));
@@ -73,11 +74,18 @@ public class PluginClassLoaderTest {
     }
 
     private static void createFile(Path pathToFile) throws IOException {
-        File file = pathToFile.toFile();
+        boolean exists = Files.exists(pathToFile);
+        if (!exists) {
+            try {
+                Files.createFile(pathToFile);
+                exists = true;
+            } catch (IOException e) {
+                exists = false;
+            }
+        }
+        assertTrue(exists, "failed to create '" + pathToFile + "'");
 
-        file.deleteOnExit();
-        assertTrue(file.exists() || file.createNewFile(), "failed to create '" + pathToFile + "'");
-        try (PrintWriter printWriter = new PrintWriter(file)) {
+        try (Writer printWriter = Files.newBufferedWriter(pathToFile)) {
             printWriter.write("parent");
         }
     }
@@ -116,17 +124,17 @@ public class PluginClassLoaderTest {
 
 
         for (String classesDirectory : pluginDependencyClasspath.getClassesDirectories()) {
-            File classesDirectoryFile = pluginDependencyZip.unzippedPath().resolve(classesDirectory).toFile();
-            parentLastPluginDependencyClassLoader.addFile(classesDirectoryFile);
-            parentFirstPluginDependencyClassLoader.addFile(classesDirectoryFile);
+            Path classesDirectoryPath = pluginDependencyZip.unzippedPath().resolve(classesDirectory);
+            parentLastPluginDependencyClassLoader.addPath(classesDirectoryPath);
+            parentFirstPluginDependencyClassLoader.addPath(classesDirectoryPath);
         }
 
         for (String jarsDirectory : pluginDependencyClasspath.getJarsDirectories()) {
             Path jarsDirectoryPath = pluginDependencyZip.unzippedPath().resolve(jarsDirectory);
-            List<File> jars = FileUtils.getJars(jarsDirectoryPath);
-            for (File jar : jars) {
-            	parentLastPluginDependencyClassLoader.addFile(jar);
-            	parentFirstPluginDependencyClassLoader.addFile(jar);
+            List<Path> jars = FileUtils.getJars(jarsDirectoryPath);
+            for (Path jar : jars) {
+                parentLastPluginDependencyClassLoader.addPath(jar);
+                parentFirstPluginDependencyClassLoader.addPath(jar);
             }
         }
 
@@ -157,17 +165,17 @@ public class PluginClassLoaderTest {
         pluginManagerParentFirst.addClassLoader(pluginDescriptor.getPluginId(), parentFirstPluginClassLoader);
 
         for (String classesDirectory : pluginClasspath.getClassesDirectories()) {
-            File classesDirectoryFile = pluginZip.unzippedPath().resolve(classesDirectory).toFile();
-            parentLastPluginClassLoader.addFile(classesDirectoryFile);
-            parentFirstPluginClassLoader.addFile(classesDirectoryFile);
+            Path classesDirectoryPath = pluginZip.unzippedPath().resolve(classesDirectory);
+            parentLastPluginClassLoader.addPath(classesDirectoryPath);
+            parentFirstPluginClassLoader.addPath(classesDirectoryPath);
         }
 
         for (String jarsDirectory : pluginClasspath.getJarsDirectories()) {
             Path jarsDirectoryPath = pluginZip.unzippedPath().resolve(jarsDirectory);
-            List<File> jars = FileUtils.getJars(jarsDirectoryPath);
-            for (File jar : jars) {
-                parentLastPluginClassLoader.addFile(jar);
-                parentFirstPluginClassLoader.addFile(jar);
+            List<Path> jars = FileUtils.getJars(jarsDirectoryPath);
+            for (Path jar : jars) {
+                parentLastPluginClassLoader.addPath(jar);
+                parentFirstPluginClassLoader.addPath(jar);
             }
         }
     }
@@ -334,14 +342,16 @@ public class PluginClassLoaderTest {
         assertEquals(expectedFirstLine, Files.readAllLines(Paths.get(firstResource.toURI())).get(0));
     }
 
-    class TestPluginManager extends DefaultPluginManager {
+    static class TestPluginManager extends DefaultPluginManager {
 
-    	public TestPluginManager(Path pluginsPath) {
-			super(pluginsPath);
-		}
+        public TestPluginManager(Path pluginsPath) {
+            super(pluginsPath);
+        }
 
-		void addClassLoader(String pluginId, PluginClassLoader classLoader) {
-    		getPluginClassLoaders().put(pluginId, classLoader);
-    	}
+        void addClassLoader(String pluginId, PluginClassLoader classLoader) {
+            getPluginClassLoaders().put(pluginId, classLoader);
+        }
+
     }
+
 }

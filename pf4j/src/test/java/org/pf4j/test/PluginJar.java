@@ -18,11 +18,10 @@ package org.pf4j.test;
 import org.pf4j.ManifestPluginDescriptorFinder;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -55,10 +54,6 @@ public class PluginJar {
 
     public Path path() {
         return path;
-    }
-
-    public File file() {
-        return path.toFile();
     }
 
     public String pluginClass() {
@@ -146,7 +141,7 @@ public class PluginJar {
 
         public PluginJar build() throws IOException {
             Manifest manifest = createManifest();
-            try (OutputStream outputStream = new FileOutputStream(path.toFile());
+            try (OutputStream outputStream = Files.newOutputStream(path);
                  JarOutputStream jarOutputStream = new JarOutputStream(outputStream, manifest)) {
                 if (!extensions.isEmpty()) {
                     // add extensions.idx

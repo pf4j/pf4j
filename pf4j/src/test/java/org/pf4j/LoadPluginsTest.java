@@ -104,7 +104,7 @@ public class LoadPluginsTest {
             pluginManager.loadPluginFromPath(plugin2.path());
             fail("Expected loadPluginFromPath to fail");
         } catch (PluginRuntimeException e) {
-            // Check the path of the loaded plugin remains the same
+            // Check the io of the loaded plugin remains the same
             PluginWrapper loadedPlugin = pluginManager.getPlugin(pluginId);
             assertThat(loadedPlugin.getPluginPath(), equalTo(loadedPlugin1Path));
             // Check the message includes relevant information
@@ -143,7 +143,7 @@ public class LoadPluginsTest {
             pluginManager.loadPluginFromPath(plugin2.path());
             fail("Expected loadPluginFromPath to fail");
         } catch (PluginRuntimeException e) {
-            // Check the path and version of the loaded plugin remain the same
+            // Check the io and version of the loaded plugin remain the same
             PluginWrapper loadedPlugin = pluginManager.getPlugin(pluginId);
             assertThat(loadedPlugin.getPluginPath(), equalTo(loadedPlugin1Path));
             assertThat(loadedPlugin.getDescriptor().getVersion(), equalTo(plugin1Version));

@@ -22,6 +22,7 @@ import org.pf4j.test.PluginJar;
 import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestPlugin;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +49,7 @@ public class LegacyExtensionFinderTest {
                 .extension(TestExtension.class.getName())
                 .build();
 
-        assertTrue(pluginJar.file().exists());
+        assertTrue(Files.exists(pluginJar.path()));
 
         PluginManager pluginManager = new JarPluginManager(pluginsPath);
         pluginManager.loadPlugins();
@@ -60,14 +61,14 @@ public class LegacyExtensionFinderTest {
         assertNotNull(pluginsStorages);
 
         pluginManager.unloadPlugin(pluginJar.pluginId());
-        boolean fileDeleted = pluginJar.file().delete();
+        boolean fileDeleted = Files.deleteIfExists(pluginJar.path());
 
         Set<String> pluginStorages = pluginsStorages.get(pluginJar.pluginId());
         assertNotNull(pluginStorages);
         assertEquals(1, pluginStorages.size());
         assertThat(pluginStorages, contains(TestExtension.class.getName()));
         assertTrue(fileDeleted);
-        assertFalse(pluginJar.file().exists());
+        assertFalse(Files.exists(pluginJar.path()));
     }
 
 }
