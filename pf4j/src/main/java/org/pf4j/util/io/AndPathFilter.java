@@ -16,9 +16,6 @@
 package org.pf4j.util.io;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,39 +25,18 @@ import java.util.List;
  *
  * @author Decebal Suiu
  */
-public class AndPathFilter implements PathFilter {
-
-    /** The list of path filters. */
-    private List<PathFilter> pathFilters;
+public class AndPathFilter extends CompoundPathFilter {
 
     public AndPathFilter() {
-        this(new ArrayList<>());
+        super();
     }
 
     public AndPathFilter(PathFilter... pathFilters) {
-        this(Arrays.asList(pathFilters));
+        super(pathFilters);
     }
 
     public AndPathFilter(List<PathFilter> pathFilters) {
-        this.pathFilters = new ArrayList<>(pathFilters);
-    }
-
-    public AndPathFilter addPathFilter(PathFilter fileFilter) {
-        pathFilters.add(fileFilter);
-
-        return this;
-    }
-
-    public List<PathFilter> getPathFilters() {
-        return Collections.unmodifiableList(pathFilters);
-    }
-
-    public boolean removePathFilter(PathFilter pathFilter) {
-        return pathFilters.remove(pathFilter);
-    }
-
-    public void setPathFilters(List<PathFilter> pathFilters) {
-        this.pathFilters = new ArrayList<>(pathFilters);
+        super(pathFilters);
     }
 
     @Override
