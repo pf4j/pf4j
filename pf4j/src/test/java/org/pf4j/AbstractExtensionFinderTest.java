@@ -233,7 +233,7 @@ class AbstractExtensionFinderTest {
 
         };
 
-        List<ExtensionWrapper<?>> plugin1Result = instance.find("plugin1");
+        List<ExtensionWrapper> plugin1Result = instance.find("plugin1");
         assertEquals(2, plugin1Result.size());
 
         List<ExtensionWrapper> plugin2Result = instance.find("plugin2");
