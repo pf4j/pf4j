@@ -156,7 +156,7 @@ PF4J is very customizable and comes with a lot of goodies. Please read the docum
 
 Documentation
 ---------------
-Documentation is available on [pf4j.org](http://www.pf4j.org)
+Documentation is available on [pf4j.org](http://pf4j.org)
 
 Demo
 ---------------
