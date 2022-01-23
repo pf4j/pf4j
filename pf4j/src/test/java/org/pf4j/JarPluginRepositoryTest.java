@@ -38,7 +38,7 @@ class JarPluginRepositoryTest {
      * Test of {@link JarPluginRepository#deletePluginPath(Path)} method.
      */
     @Test
-    void testDeletePluginPath() throws Exception {
+    void deletePluginPath() throws Exception {
         PluginRepository repository = new JarPluginRepository(pluginsPath);
 
         Path plugin1Path = Files.createDirectory(pluginsPath.resolve("plugin-1"));

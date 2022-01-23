@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Decebal Suiu
  */
-public class CompoundPluginDescriptorFinderTest {
+class CompoundPluginDescriptorFinderTest {
 
     @TempDir
     Path pluginsPath;
@@ -83,13 +83,14 @@ public class CompoundPluginDescriptorFinderTest {
     }
 
     @Test
-    void testNotFound() {
+    void notFound() {
         PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder();
-        assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
+        Path pluginPath = pluginsPath.resolve("test-plugin-3");
+        assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginPath));
     }
 
     @Test
-    void testSpaceCharacterInFileName() throws Exception {
+    void spaceCharacterInFileName() throws Exception {
         PluginDescriptorFinder descriptorFinder = new CompoundPluginDescriptorFinder()
             .add(new ManifestPluginDescriptorFinder());
 

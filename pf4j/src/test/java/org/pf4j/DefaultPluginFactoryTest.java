@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 class DefaultPluginFactoryTest {
 
     @Test
-    void testCreate() {
+    void create() {
         PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         when(pluginDescriptor.getPluginClass()).thenReturn(TestPlugin.class.getName());
 
@@ -49,7 +49,7 @@ class DefaultPluginFactoryTest {
     }
 
     @Test
-    void testCreateFail() {
+    void createFail() {
         PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         when(pluginDescriptor.getPluginClass()).thenReturn(FailTestPlugin.class.getName());
 
@@ -64,7 +64,7 @@ class DefaultPluginFactoryTest {
     }
 
     @Test
-    void testCreateFailNotFound() {
+    void createFailNotFound() {
         PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         when(pluginDescriptor.getPluginClass()).thenReturn("org.pf4j.plugin.NotFoundTestPlugin");
 
@@ -79,7 +79,7 @@ class DefaultPluginFactoryTest {
     }
 
     @Test
-    void testCreateFailConstructor() {
+    void createFailConstructor() {
         PluginDescriptor pluginDescriptor = mock(PluginDescriptor.class);
         when(pluginDescriptor.getPluginClass()).thenReturn(AnotherFailTestPlugin.class.getName());
 

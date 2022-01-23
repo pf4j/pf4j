@@ -121,7 +121,7 @@ class DefaultPluginManagerTest {
     }
 
     @Test
-    void testDefaultExactVersionAllowed() {
+    void defaultExactVersionAllowed() {
         assertFalse(pluginManager.isExactVersionAllowed());
     }
 
@@ -130,7 +130,7 @@ class DefaultPluginManagerTest {
      * See https://github.com/pf4j/pf4j/issues/223.
      */
     @Test
-    void testPluginDisabledNoStart() throws IOException {
+    void pluginDisabledNoStart() throws IOException {
         new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")
             .build();

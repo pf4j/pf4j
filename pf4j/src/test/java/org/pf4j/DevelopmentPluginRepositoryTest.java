@@ -43,7 +43,7 @@ class DevelopmentPluginRepositoryTest {
     }
 
     @Test
-    void testGetPluginArchivesInDevelopmentMode() {
+    void getPluginArchivesInDevelopmentMode() {
         PluginRepository repository = new DevelopmentPluginRepository(pluginsPath);
 
         List<Path> pluginPaths = repository.getPluginPaths();

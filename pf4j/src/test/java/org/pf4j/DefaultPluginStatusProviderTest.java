@@ -38,7 +38,7 @@ class DefaultPluginStatusProviderTest {
     Path pluginsPath;
 
     @Test
-    void testIsPluginDisabled() throws IOException {
+    void isPluginDisabled() throws IOException {
         createEnabledFile();
         createDisabledFile();
 
@@ -50,7 +50,7 @@ class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    void testIsPluginDisabledWithEnableEmpty() throws IOException {
+    void isPluginDisabledWithEnableEmpty() throws IOException {
         createDisabledFile();
 
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
@@ -61,7 +61,7 @@ class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    void testDisablePlugin() throws Exception {
+    void disablePlugin() throws Exception {
         createEnabledFile();
         createDisabledFile();
 
@@ -74,7 +74,7 @@ class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    void testDisablePluginWithEnableEmpty() throws Exception {
+    void disablePluginWithEnableEmpty() throws Exception {
         // scenario with "disabled.txt"
         createDisabledFile();
 
@@ -107,7 +107,7 @@ class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    void testEnablePlugin() throws Exception {
+    void enablePlugin() throws Exception {
         // scenario with "enabled.txt"
         createEnabledFile();
 
@@ -140,7 +140,7 @@ class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    void testEnablePluginWithEnableEmpty() {
+    void enablePluginWithEnableEmpty() {
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
         statusProvider.enablePlugin("plugin-2");
 
@@ -150,7 +150,7 @@ class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    void testDisablePluginWithoutDisabledFile() {
+    void disablePluginWithoutDisabledFile() {
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
 
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));

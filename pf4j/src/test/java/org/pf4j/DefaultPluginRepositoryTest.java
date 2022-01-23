@@ -62,7 +62,7 @@ class DefaultPluginRepositoryTest {
      * Test of {@link DefaultPluginRepository#getPluginPaths()} method.
      */
     @Test
-    void testGetPluginArchivesFromSinglePath() {
+    void getPluginArchivesFromSinglePath() {
         PluginRepository repository = new DefaultPluginRepository(pluginsPath2);
 
         List<Path> pluginPaths = repository.getPluginPaths();
@@ -76,7 +76,7 @@ class DefaultPluginRepositoryTest {
      * Test of {@link DefaultPluginRepository#getPluginPaths()} method.
      */
     @Test
-    void testGetPluginArchives() {
+    void getPluginArchives() {
         PluginRepository repository = new DefaultPluginRepository(pluginsPath1, pluginsPath2);
 
         List<Path> pluginPaths = repository.getPluginPaths();
@@ -91,7 +91,7 @@ class DefaultPluginRepositoryTest {
      * Test of {@link DefaultPluginRepository#deletePluginPath(Path)} method.
      */
     @Test
-    void testDeletePluginPath() {
+    void deletePluginPath() {
         PluginRepository repository = new DefaultPluginRepository(pluginsPath1, pluginsPath2);
 
         assertTrue(Files.exists(pluginsPath1.resolve("plugin-1.zip")));
@@ -103,7 +103,7 @@ class DefaultPluginRepositoryTest {
         List<Path> pluginPaths = repository.getPluginPaths();
 
         assertEquals(1, pluginPaths.size());
-        assertEquals(pluginsPath2.relativize(pluginPaths.get(0)).toString(), "plugin-2");
+        assertEquals("plugin-2", pluginsPath2.relativize(pluginPaths.get(0)).toString());
     }
 
     private void assertPathExists(List<Path> paths, Path path) {
