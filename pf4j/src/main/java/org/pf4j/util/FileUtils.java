@@ -82,6 +82,10 @@ public final class FileUtils {
      * @throws IOException if something goes wrong
      */
     public static void delete(Path path) throws IOException {
+        if (Files.notExists(path)) {
+            return;
+        }
+
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
 
            @Override
