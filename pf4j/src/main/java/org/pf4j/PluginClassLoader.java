@@ -20,8 +20,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -79,12 +81,51 @@ public class PluginClassLoader extends URLClassLoader {
         super.addURL(url);
     }
 
+    /**
+     * Shortcut for {@code addPath(path, true)}.
+     */
+    public void addPath(Path path) {
+        addPath(path, true);
+    }
+
+    /**
+     * Add a path.
+     * If {@code optional} is {@code true} then if something is wrong a warning message is added to the log.
+     * Otherwise, {@link UncheckedIOException} is thrown.
+     */
+    public void addPath(Path path, boolean optional) {
+        try {
+            addURL(path.toUri().toURL());
+        } catch (IOException e) {
+            if (optional) {
+                log.warn("Cannot add path '" + path  + "'", e);
+            } else {
+                throw new UncheckedIOException("Cannot add path '" + path + "'", e);
+            }
+        }
+    }
+
+    /**
+     * Shortcut for {@code addFile(file, true)}.
+     */
     public void addFile(File file) {
+        addFile(file, true);
+    }
+
+    /**
+     * Add a file.
+     * If {@code optional} is {@code true} then if something is wrong a warning message is added to the log.
+     * Otherwise, {@link UncheckedIOException} is thrown.
+     */
+    public void addFile(File file, boolean optional) {
         try {
             addURL(file.getCanonicalFile().toURI().toURL());
         } catch (IOException e) {
-//            throw new RuntimeException(e);
-            log.error(e.getMessage(), e);
+            if (optional) {
+                log.warn("Cannot add file '" + file  + "'", e);
+            } else {
+                throw new UncheckedIOException("Cannot add file '" + file + "'", e);
+            }
         }
     }
 

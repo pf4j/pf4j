@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Decebal Suiu
  */
-public class JarPluginRepositoryTest {
+class JarPluginRepositoryTest {
 
     @TempDir
     Path pluginsPath;
@@ -38,7 +38,7 @@ public class JarPluginRepositoryTest {
      * Test of {@link JarPluginRepository#deletePluginPath(Path)} method.
      */
     @Test
-    public void testDeletePluginPath() throws Exception {
+    void deletePluginPath() throws Exception {
         PluginRepository repository = new JarPluginRepository(pluginsPath);
 
         Path plugin1Path = Files.createDirectory(pluginsPath.resolve("plugin-1"));

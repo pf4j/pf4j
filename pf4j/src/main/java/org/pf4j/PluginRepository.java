@@ -42,4 +42,8 @@ public interface PluginRepository {
      */
     boolean deletePluginPath(Path pluginPath);
 
+    default String getName() {
+        return getClass().getSimpleName();
+    }
+
 }

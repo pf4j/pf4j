@@ -218,7 +218,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             return;
         }
         pluginsRoots.forEach(path -> {
-            if (Files.notExists(path) || !Files.isDirectory(path)) {
+            if (!Files.isDirectory(path)) {
                 log.warn("No '{}' root", path);
             }
         });
@@ -734,7 +734,9 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         pluginsDir = isDevelopment() ? DEVELOPMENT_PLUGINS_DIR : DEFAULT_PLUGINS_DIR;
-        return Collections.singletonList(Paths.get(pluginsDir));
+        Path pluginsPath = getFileSystem().getPath(pluginsDir);
+
+        return Collections.singletonList(pluginsPath);
     }
 
     /**
@@ -877,10 +879,10 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         return pluginWrapper;
     }
-    
+
     /**
      * creates the plugin wrapper. override this if you want to prevent plugins having full access to the plugin manager
-     * 
+     *
      * @return
      */
     protected PluginWrapper createPluginWrapper(PluginDescriptor pluginDescriptor, Path pluginPath, ClassLoader pluginClassLoader) {
@@ -947,7 +949,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * The plugin label is used in logging and it's a string in format {@code pluginId@pluginVersion}.
+     * The plugin label is used in logging, and it's a string in format {@code pluginId@pluginVersion}.
      */
     protected String getPluginLabel(PluginDescriptor pluginDescriptor) {
         return pluginDescriptor.getPluginId() + "@" + pluginDescriptor.getVersion();

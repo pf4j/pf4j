@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -75,36 +74,24 @@ public class PropertiesPluginDescriptorFinder implements PluginDescriptorFinder 
             throw new PluginRuntimeException("Cannot find the properties path");
         }
 
-        Properties properties = new Properties();
-        try {
-            log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
-            if (Files.notExists(propertiesPath)) {
-                throw new PluginRuntimeException("Cannot find '{}' path", propertiesPath);
-            }
+        log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
+        if (Files.notExists(propertiesPath)) {
+            throw new PluginRuntimeException("Cannot find '{}' path", propertiesPath);
+        }
 
-            try (InputStream input = Files.newInputStream(propertiesPath)) {
-                properties.load(input);
-            } catch (IOException e) {
-                throw new PluginRuntimeException(e);
-            }
-        } finally {
-            FileUtils.closePath(propertiesPath);
+        Properties properties = new Properties();
+
+        try (InputStream input = Files.newInputStream(propertiesPath)) {
+            properties.load(input);
+        } catch (IOException e) {
+            throw new PluginRuntimeException(e);
         }
 
         return properties;
     }
 
     protected Path getPropertiesPath(Path pluginPath, String propertiesFileName) {
-        if (Files.isDirectory(pluginPath)) {
-            return pluginPath.resolve(Paths.get(propertiesFileName));
-        }
-
-        // it's a zip or jar file
-        try {
-            return FileUtils.getPath(pluginPath, propertiesFileName);
-        } catch (IOException e) {
-            throw new PluginRuntimeException(e);
-        }
+        return pluginPath.resolve(propertiesFileName);
     }
 
     protected PluginDescriptor createPluginDescriptor(Properties properties) {

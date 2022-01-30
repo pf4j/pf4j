@@ -13,21 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.util;
+package org.pf4j.util.io;
 
-import java.io.File;
-import java.io.FileFilter;
+import java.nio.file.Path;
 
 /**
- * Filter accepts files that are directories.
+ * Filter accepts any path ending in extension. The case of the filename is ignored.
  *
  * @author Decebal Suiu
  */
-public class DirectoryFileFilter implements FileFilter {
+public class ExtensionPathFilter implements PathFilter {
+
+    private final String extension;
+
+    public ExtensionPathFilter(String extension) {
+        this.extension = extension;
+    }
 
     @Override
-    public boolean accept(File file) {
-        return file.isDirectory();
+    public boolean accept(Path path) {
+        // perform a case-insensitive check
+        return path.getFileName().toString().toUpperCase().endsWith(extension.toUpperCase());
     }
 
 }

@@ -15,19 +15,17 @@
  */
 package org.pf4j;
 
-import org.pf4j.util.AndFileFilter;
-import org.pf4j.util.DirectoryFileFilter;
 import org.pf4j.util.FileUtils;
-import org.pf4j.util.HiddenFilter;
-import org.pf4j.util.NotFileFilter;
-import org.pf4j.util.OrFileFilter;
-import org.pf4j.util.ZipFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.pf4j.util.io.AndPathFilter;
+import org.pf4j.util.io.DirectoryPathFilter;
+import org.pf4j.util.io.HiddenPathFilter;
+import org.pf4j.util.io.NotPathFilter;
+import org.pf4j.util.io.OrPathFilter;
+import org.pf4j.util.io.PathFilter;
+import org.pf4j.util.io.ZipPathFilter;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -37,8 +35,6 @@ import java.util.List;
  */
 public class DefaultPluginRepository extends BasePluginRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultPluginRepository.class);
-
     public DefaultPluginRepository(Path... pluginsRoots) {
         this(Arrays.asList(pluginsRoots));
     }
@@ -46,8 +42,8 @@ public class DefaultPluginRepository extends BasePluginRepository {
     public DefaultPluginRepository(List<Path> pluginsRoots) {
         super(pluginsRoots);
 
-        AndFileFilter pluginsFilter = new AndFileFilter(new DirectoryFileFilter());
-        pluginsFilter.addFileFilter(new NotFileFilter(createHiddenPluginFilter()));
+        AndPathFilter pluginsFilter = new AndPathFilter(new DirectoryPathFilter());
+        pluginsFilter.addPathFilter(new NotPathFilter(createHiddenPluginFilter()));
         setFilter(pluginsFilter);
     }
 
@@ -63,15 +59,14 @@ public class DefaultPluginRepository extends BasePluginRepository {
         return super.deletePluginPath(pluginPath);
     }
 
-    protected FileFilter createHiddenPluginFilter() {
-        return new OrFileFilter(new HiddenFilter());
+    protected PathFilter createHiddenPluginFilter() {
+        return new OrPathFilter(new HiddenPathFilter());
     }
 
     private void extractZipFiles() {
         // expand plugins zip files
         pluginsRoots.stream()
-            .flatMap(path -> streamFiles(path, new ZipFileFilter()))
-            .map(File::toPath)
+            .flatMap(path -> FileUtils.findPaths(path, new ZipPathFilter()))
             .forEach(this::expandIfZip);
     }
 
@@ -79,8 +74,7 @@ public class DefaultPluginRepository extends BasePluginRepository {
         try {
             FileUtils.expandIfZip(filePath);
         } catch (IOException e) {
-            log.error("Cannot expand plugin zip '{}'", filePath);
-            log.error(e.getMessage(), e);
+            throw new UncheckedIOException("Cannot expand plugin zip '" + filePath + "'", e);
         }
     }
 

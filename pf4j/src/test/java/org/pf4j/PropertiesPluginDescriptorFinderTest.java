@@ -18,18 +18,15 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.pf4j.test.PluginZip;
+import org.pf4j.test.PluginProperties;
 import org.pf4j.test.TestPlugin;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Arrays;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PropertiesPluginDescriptorFinderTest {
+class PropertiesPluginDescriptorFinderTest {
 
     private VersionManager versionManager;
 
@@ -45,33 +42,33 @@ public class PropertiesPluginDescriptorFinderTest {
     Path pluginsPath;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         Path pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-1"));
-        storePropertiesToPath(getPlugin1Properties(), pluginPath);
+        storePropertiesToPath(createPropertiesPlugin1(), pluginPath);
 
         pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-2"));
-        storePropertiesToPath(getPlugin2Properties(), pluginPath);
+        storePropertiesToPath(createPropertiesPlugin2(), pluginPath);
 
         // empty plugin
         Files.createDirectories(pluginsPath.resolve("test-plugin-3"));
 
         // no plugin class
         pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-4"));
-        storePropertiesToPath(getPlugin4Properties(), pluginPath);
+        storePropertiesToPath(createPropertiesPlugin4(), pluginPath);
 
         // no plugin version
         pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-5"));
-        storePropertiesToPath(getPlugin5Properties(), pluginPath);
+        storePropertiesToPath(createPropertiesPlugin5(), pluginPath);
 
         // no plugin id
         pluginPath = Files.createDirectory(pluginsPath.resolve("test-plugin-6"));
-        storePropertiesToPath(getPlugin6Properties(), pluginPath);
+        storePropertiesToPath(createPropertiesPlugin6(), pluginPath);
 
         versionManager = new DefaultVersionManager();
     }
 
     @Test
-    public void testFind() throws Exception {
+    void find() {
         PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
 
         PluginDescriptor plugin1 = descriptorFinder.find(pluginsPath.resolve("test-plugin-1"));
@@ -102,72 +99,66 @@ public class PropertiesPluginDescriptorFinderTest {
     }
 
     @Test
-    public void testNotFound() {
+    void notFound() {
         PluginDescriptorFinder descriptorFinder = new PropertiesPluginDescriptorFinder();
-        assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
+        Path pluginPath = pluginsPath.resolve("test-plugin-3");
+        assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginPath));
     }
 
-    private Properties getPlugin1Properties() {
-        Map<String, String> map = new LinkedHashMap<>(8);
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-1");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, TestPlugin.class.getName());
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DESCRIPTION, "Test Plugin 1");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "test-plugin-2,test-plugin-3@~1.0");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, ">=1");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
-
-        return PluginZip.createProperties(map);
+    private Properties createPropertiesPlugin1() {
+        return new PluginProperties.Builder("test-plugin-1")
+            .pluginClass(TestPlugin.class.getName())
+            .pluginVersion("0.0.1")
+            .pluginDescription("Test Plugin 1")
+            .pluginProvider("Decebal Suiu")
+            .pluginDependencies(Arrays.asList("test-plugin-2", "test-plugin-3@~1.0"))
+            .pluginRequires(">=1")
+            .pluginLicense("Apache-2.0")
+            .build()
+            .properties();
     }
 
-    private Properties getPlugin2Properties() {
-        Map<String, String> map = new LinkedHashMap<>(5);
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, TestPlugin.class.getName());
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
-
-        return PluginZip.createProperties(map);
+    private Properties createPropertiesPlugin2() {
+        return new PluginProperties.Builder("test-plugin-2")
+            .pluginClass(TestPlugin.class.getName())
+            .pluginVersion("0.0.1")
+            .pluginProvider("Decebal Suiu")
+            .build()
+            .properties();
     }
 
-    private Properties getPlugin4Properties() {
-        Map<String, String> map = new LinkedHashMap<>(5);
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
-
-        return PluginZip.createProperties(map);
+    private Properties createPropertiesPlugin4() {
+        return new PluginProperties.Builder("test-plugin-4")
+            .pluginClass("org.pf4j.plugin.TestPlugin")
+            .pluginVersion("0.0.1")
+            .pluginProvider("Decebal Suiu")
+            .pluginRequires("*")
+            .build()
+            .properties();
     }
 
-    private Properties getPlugin5Properties() {
-        Map<String, String> map = new LinkedHashMap<>(5);
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, TestPlugin.class.getName());
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
-
-        return PluginZip.createProperties(map);
+    private Properties createPropertiesPlugin5() {
+        return new PluginProperties.Builder("test-plugin-5")
+            .pluginClass(TestPlugin.class.getName())
+            .pluginProvider("Decebal Suiu")
+            .pluginRequires("*")
+            .build()
+            .properties();
     }
 
-    private Properties getPlugin6Properties() {
-        Map<String, String> map = new LinkedHashMap<>(5);
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, TestPlugin.class.getName());
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
-        map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
-
-        return PluginZip.createProperties(map);
+    private Properties createPropertiesPlugin6() {
+        return new PluginProperties.Builder("test-plugin-6")
+            .pluginClass(TestPlugin.class.getName())
+            .pluginVersion("0.0.1")
+            .pluginProvider("Decebal Suiu")
+            .pluginRequires("*")
+            .build()
+            .properties();
     }
 
     private void storePropertiesToPath(Properties properties, Path pluginPath) throws IOException {
         Path path = pluginPath.resolve(PropertiesPluginDescriptorFinder.DEFAULT_PROPERTIES_FILE_NAME);
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), StandardCharsets.UTF_8)) {
+        try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             properties.store(writer, "");
         }
     }

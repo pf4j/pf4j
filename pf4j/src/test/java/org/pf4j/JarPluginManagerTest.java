@@ -20,11 +20,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
+import org.pf4j.test.PluginManifest;
 import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestExtensionPoint;
 import org.pf4j.test.TestPlugin;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -32,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JarPluginManagerTest {
+class JarPluginManagerTest {
 
     private PluginJar pluginJar;
     private JarPluginManager pluginManager;
@@ -41,10 +43,12 @@ public class JarPluginManagerTest {
     Path pluginsPath;
 
     @BeforeEach
-    public void setUp() throws IOException {
-        pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), "test-plugin")
+    void setUp() throws IOException {
+        PluginManifest pluginManifest = new PluginManifest.Builder("test-plugin")
             .pluginClass(TestPlugin.class.getName())
             .pluginVersion("1.2.3")
+            .build();
+        pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), pluginManifest)
             .extension(TestExtension.class.getName())
             .build();
 
@@ -52,7 +56,7 @@ public class JarPluginManagerTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         pluginManager.unloadPlugins();
 
         pluginJar = null;
@@ -60,7 +64,7 @@ public class JarPluginManagerTest {
     }
 
     @Test
-    public void getExtensions() {
+    void getExtensions() {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
 
@@ -72,7 +76,7 @@ public class JarPluginManagerTest {
     }
 
     @Test
-    public void unloadPlugin() throws Exception {
+    void unloadPlugin() {
         pluginManager.loadPlugins();
 
         assertEquals(1, pluginManager.getPlugins().size());
@@ -80,11 +84,11 @@ public class JarPluginManagerTest {
         boolean unloaded = pluginManager.unloadPlugin(pluginJar.pluginId());
         assertTrue(unloaded);
 
-        assertTrue(pluginJar.file().exists());
+        assertTrue(Files.exists(pluginJar.path()));
     }
 
     @Test
-    public void deletePlugin() throws Exception {
+    void deletePlugin() {
         pluginManager.loadPlugins();
 
         assertEquals(1, pluginManager.getPlugins().size());
@@ -92,7 +96,7 @@ public class JarPluginManagerTest {
         boolean deleted = pluginManager.deletePlugin(pluginJar.pluginId());
         assertTrue(deleted);
 
-        assertFalse(pluginJar.file().exists());
+        assertFalse(Files.exists(pluginJar.path()));
     }
 
 }

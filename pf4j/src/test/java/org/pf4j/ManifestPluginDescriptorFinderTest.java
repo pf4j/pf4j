@@ -18,15 +18,13 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.pf4j.test.PluginJar;
+import org.pf4j.test.PluginManifest;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Arrays;
 import java.util.jar.Manifest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mario Franco
  * @author Decebal Suiu
  */
-public class ManifestPluginDescriptorFinderTest {
+class ManifestPluginDescriptorFinderTest {
 
     private VersionManager versionManager;
 
@@ -45,27 +43,27 @@ public class ManifestPluginDescriptorFinderTest {
     Path pluginsPath;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         Path pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-1"));
-        storeManifestToPath(getPlugin1Manifest(), pluginPath);
+        storeManifestToPath(createManifestPlugin1(), pluginPath);
 
         pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-2"));
-        storeManifestToPath(getPlugin2Manifest(), pluginPath);
+        storeManifestToPath(createManifestPlugin2(), pluginPath);
 
         // empty plugin
         Files.createDirectories(pluginsPath.resolve("test-plugin-3"));
 
         // no plugin class
         pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-4"));
-        storeManifestToPath(getPlugin4Manifest(), pluginPath);
+        storeManifestToPath(createManifestPlugin4(), pluginPath);
 
         // no plugin version
         pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-5"));
-        storeManifestToPath(getPlugin5Manifest(), pluginPath);
+        storeManifestToPath(createManifestPlugin5(), pluginPath);
 
         // no plugin id
         pluginPath = Files.createDirectories(pluginsPath.resolve("test-plugin-6"));
-        storeManifestToPath(getPlugin6Manifest(), pluginPath);
+        storeManifestToPath(createManifestPlugin6(), pluginPath);
 
         versionManager = new DefaultVersionManager();
     }
@@ -74,7 +72,7 @@ public class ManifestPluginDescriptorFinderTest {
      * Test of {@link ManifestPluginDescriptorFinder#find(Path)} method.
      */
     @Test
-    public void testFind() throws Exception {
+    void find() {
         PluginDescriptorFinder descriptorFinder = new ManifestPluginDescriptorFinder();
 
         PluginDescriptor plugin1 = descriptorFinder.find(pluginsPath.resolve("test-plugin-1"));
@@ -105,65 +103,61 @@ public class ManifestPluginDescriptorFinderTest {
      * Test of {@link ManifestPluginDescriptorFinder#find(Path)} method.
      */
     @Test
-    public void testFindNotFound() {
+    void findNotFound() {
         PluginDescriptorFinder descriptorFinder = new ManifestPluginDescriptorFinder();
-        assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginsPath.resolve("test-plugin-3")));
+        Path pluginPath = pluginsPath.resolve("test-plugin-3");
+        assertThrows(PluginRuntimeException.class, () -> descriptorFinder.find(pluginPath));
     }
 
-    private Manifest getPlugin1Manifest() {
-        Map<String, String> map = new LinkedHashMap<>(8);
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, "test-plugin-1");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_DESCRIPTION, "Test Plugin 1");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "test-plugin-2,test-plugin-3@~1.0");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
-
-        return PluginJar.createManifest(map);
+    private Manifest createManifestPlugin1() {
+        return new PluginManifest.Builder("test-plugin-1")
+            .pluginClass("org.pf4j.plugin.TestPlugin")
+            .pluginVersion("0.0.1")
+            .pluginDescription("Test Plugin 1")
+            .pluginProvider("Decebal Suiu")
+            .pluginDependencies(Arrays.asList("test-plugin-2", "test-plugin-3@~1.0"))
+            .pluginRequires("*")
+            .pluginLicense("Apache-2.0")
+            .build()
+            .manifest();
     }
 
-    private Manifest getPlugin2Manifest() {
-        Map<String, String> map = new LinkedHashMap<>(5);
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
-
-        return PluginJar.createManifest(map);
+    private Manifest createManifestPlugin2() {
+        return new PluginManifest.Builder("test-plugin-2")
+            .pluginClass("org.pf4j.plugin.TestPlugin")
+            .pluginVersion("0.0.1")
+            .pluginProvider("Decebal Suiu")
+            .build()
+            .manifest();
     }
 
-    private Manifest getPlugin4Manifest() {
-        Map<String, String> map = new LinkedHashMap<>(3);
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, "test-plugin-1");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-
-        return PluginJar.createManifest(map);
+    private Manifest createManifestPlugin4() {
+        return new PluginManifest.Builder("test-plugin-4")
+            .pluginVersion("0.0.1")
+            .pluginProvider("Decebal Suiu")
+            .build()
+            .manifest();
     }
 
-    private Manifest getPlugin5Manifest() {
-        Map<String, String> map = new LinkedHashMap<>(3);
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_ID, "test-plugin-2");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-
-        return PluginJar.createManifest(map);
+    private Manifest createManifestPlugin5() {
+        return new PluginManifest.Builder("test-plugin-5")
+            .pluginClass("org.pf4j.plugin.TestPlugin")
+            .pluginProvider("Decebal Suiu")
+            .build()
+            .manifest();
     }
 
-    private Manifest getPlugin6Manifest() {
-        Map<String, String> map = new LinkedHashMap<>(2);
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
-        map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
-
-        return PluginJar.createManifest(map);
+    private Manifest createManifestPlugin6() {
+        return new PluginManifest.Builder("test-plugin-6")
+            .pluginClass("org.pf4j.plugin.TestPlugin")
+            .pluginProvider("Decebal Suiu")
+            .build()
+            .manifest();
     }
 
     private void storeManifestToPath(Manifest manifest, Path pluginPath) throws IOException {
         Path path = Files.createDirectory(pluginPath.resolve("META-INF"));
-        try (OutputStream output = new FileOutputStream(path.resolve("MANIFEST.MF").toFile())) {
+        try (OutputStream output = Files.newOutputStream(path.resolve("MANIFEST.MF"))) {
             manifest.write(output);
         }
     }

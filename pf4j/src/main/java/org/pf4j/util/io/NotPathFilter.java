@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.util;
+package org.pf4j.util.io;
+
+import java.nio.file.Path;
 
 /**
- * File filter that accepts all files ending with .ZIP.
- * This filter is case insensitive.
+ * This filter produces a logical NOT of the filters specified.
  *
  * @author Decebal Suiu
  */
-public class ZipFileFilter extends ExtensionFileFilter {
+public class NotPathFilter implements PathFilter {
 
-    /**
-     * The extension that this filter will search for.
-     */
-    private static final String ZIP_EXTENSION = ".ZIP";
+    private final PathFilter filter;
 
-    public ZipFileFilter() {
-        super(ZIP_EXTENSION);
+    public NotPathFilter(PathFilter filter) {
+        this.filter = filter;
+    }
+
+    @Override
+    public boolean accept(Path path) {
+        return !filter.accept(path);
     }
 
 }

@@ -15,6 +15,9 @@
  */
 package org.pf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -27,6 +30,8 @@ import java.util.function.BooleanSupplier;
  * @author Mário Franco
  */
 public class CompoundPluginRepository implements PluginRepository {
+
+    private static final Logger log = LoggerFactory.getLogger(CompoundPluginRepository.class);
 
     private List<PluginRepository> repositories = new ArrayList<>();
 
@@ -59,7 +64,9 @@ public class CompoundPluginRepository implements PluginRepository {
     public List<Path> getPluginPaths() {
         Set<Path> paths = new LinkedHashSet<>();
         for (PluginRepository repository : repositories) {
-            paths.addAll(repository.getPluginPaths());
+            List<Path> pluginPaths = repository.getPluginPaths();
+            log.debug("{} -> {}", repository.getName(), pluginPaths);
+            paths.addAll(pluginPaths);
         }
 
         return new ArrayList<>(paths);
@@ -69,6 +76,7 @@ public class CompoundPluginRepository implements PluginRepository {
     public boolean deletePluginPath(Path pluginPath) {
         for (PluginRepository repository : repositories) {
             if (repository.deletePluginPath(pluginPath)) {
+                log.debug("Delete plugin '{}' from '{}'", pluginPath, repository.getName());
                 return true;
             }
         }

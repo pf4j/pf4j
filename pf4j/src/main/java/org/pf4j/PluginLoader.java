@@ -34,4 +34,8 @@ public interface PluginLoader {
 
     ClassLoader loadPlugin(Path pluginPath, PluginDescriptor pluginDescriptor);
 
+    default String getName() {
+        return getClass().getSimpleName();
+    }
+
 }

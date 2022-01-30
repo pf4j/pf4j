@@ -38,10 +38,10 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Josiah Haswell
  */
-public class ServiceProviderExtensionStorageTest {
+class ServiceProviderExtensionStorageTest {
 
     @Test
-    public void ensureServiceProviderExtensionStorageReadWorks() throws IOException {
+    void ensureServiceProviderExtensionStorageReadWorks() throws IOException {
         final StringReader file = new StringReader("#hello\n    World");
         final Set<String> entries = new HashSet<>();
         ServiceProviderExtensionStorage.read(file, entries);
@@ -51,7 +51,7 @@ public class ServiceProviderExtensionStorageTest {
     }
 
     @Test
-    public void ensureReadingExtensionsProducesCorrectListOfExtensions() {
+    void ensureReadingExtensionsProducesCorrectListOfExtensions() {
         final StringReader file = new StringReader("#hello\n    World");
         final ExtensionAnnotationProcessor processor = mock(ExtensionAnnotationProcessor.class);
         final Map<String, Set<String>> extensions = new HashMap<>();

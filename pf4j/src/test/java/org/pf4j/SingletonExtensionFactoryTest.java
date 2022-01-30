@@ -31,10 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * @author Decebal Suiu
  * @author Ajith Kumar
  */
-public class SingletonExtensionFactoryTest {
+class SingletonExtensionFactoryTest {
 
     @Test
-    public void create() {
+    void create() {
         ExtensionFactory extensionFactory = new SingletonExtensionFactory();
         Object extensionOne = extensionFactory.create(TestExtension.class);
         Object extensionTwo = extensionFactory.create(TestExtension.class);
@@ -42,7 +42,7 @@ public class SingletonExtensionFactoryTest {
     }
 
     @Test
-    public void createNewEachTime() {
+    void createNewEachTime() {
         ExtensionFactory extensionFactory = new SingletonExtensionFactory(FailTestExtension.class.getName());
         Object extensionOne = extensionFactory.create(TestExtension.class);
         Object extensionTwo = extensionFactory.create(TestExtension.class);
@@ -50,8 +50,7 @@ public class SingletonExtensionFactoryTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void createNewEachTimeFromDifferentClassLoaders() throws Exception {
+    void createNewEachTimeFromDifferentClassLoaders() throws Exception {
         ExtensionFactory extensionFactory = new SingletonExtensionFactory();
 
         // Get classpath locations
@@ -59,9 +58,9 @@ public class SingletonExtensionFactoryTest {
 
         // Create different classloaders for the classpath references and load classes respectively
         ClassLoader klassLoaderOne = new URLClassLoader(classpathReferences, null);
-        Class klassOne = klassLoaderOne.loadClass(TestExtension.class.getName());
+        Class<?> klassOne = klassLoaderOne.loadClass(TestExtension.class.getName());
         ClassLoader klassLoaderTwo = new URLClassLoader(classpathReferences, null);
-        Class klassTwo = klassLoaderTwo.loadClass(TestExtension.class.getName());
+        Class<?> klassTwo = klassLoaderTwo.loadClass(TestExtension.class.getName());
 
         // create instances
         Object instanceOne = extensionFactory.create(klassOne);
@@ -80,6 +79,7 @@ public class SingletonExtensionFactoryTest {
         for (int index = 0; index < classpaths.length; index++) {
             uris[index] = new File(classpaths[index]).toURI().toURL();
         }
+
         return uris;
     }
 

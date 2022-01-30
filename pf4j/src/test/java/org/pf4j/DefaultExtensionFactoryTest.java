@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Mario Franco
  */
-public class DefaultExtensionFactoryTest {
+class DefaultExtensionFactoryTest {
 
     private ExtensionFactory extensionFactory;
 
@@ -45,7 +45,7 @@ public class DefaultExtensionFactoryTest {
      * Test of create method, of class DefaultExtensionFactory.
      */
     @Test
-    public void testCreate() {
+    void create() {
         assertNotNull(extensionFactory.create(TestExtension.class));
     }
 
@@ -53,7 +53,7 @@ public class DefaultExtensionFactoryTest {
      * Test of create method, of class DefaultExtensionFactory.
      */
     @Test
-    public void testCreateFailConstructor() {
+    void createFailConstructor() {
         assertThrows(PluginRuntimeException.class, () -> extensionFactory.create(FailTestExtension.class));
     }
 

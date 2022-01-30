@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.util;
+package org.pf4j.util.io;
 
-import java.io.File;
-import java.io.FileFilter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
- * Filter accepts any file with this name. The case of the filename is ignored.
+ * Filter that only accepts hidden files.
  *
- * @author Decebal Suiu
+ * @author decebal.suiu
  */
-public class NameFileFilter implements FileFilter {
-
-    private String name;
-
-    public NameFileFilter(String name) {
-        this.name = name;
-    }
+public class HiddenPathFilter implements PathFilter {
 
     @Override
-    public boolean accept(File file) {
-        // perform a case insensitive check.
-        return file.getName().equalsIgnoreCase(name);
+    public boolean accept(Path path) {
+        try {
+            return Files.isHidden(path);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
 }

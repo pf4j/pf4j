@@ -20,6 +20,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
+import org.pf4j.test.PluginManifest;
+import org.pf4j.test.PluginProperties;
 import org.pf4j.test.PluginZip;
 
 import java.io.IOException;
@@ -34,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DefaultPluginManagerTest {
+class DefaultPluginManagerTest {
 
     private DefaultPluginManager pluginManager;
     private DefaultPluginDescriptor pluginDescriptor;
@@ -44,7 +46,7 @@ public class DefaultPluginManagerTest {
     Path pluginsPath;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         pluginManager = new DefaultPluginManager(pluginsPath);
 
         pluginDescriptor = new DefaultPluginDescriptor();
@@ -59,37 +61,37 @@ public class DefaultPluginManagerTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         pluginManager = null;
         pluginDescriptor = null;
         pluginWrapper = null;
     }
 
     @Test
-    public void validateOK() {
+    void validateOK() {
         pluginManager.validatePluginDescriptor(pluginDescriptor);
     }
 
     @Test
-    public void validateFailsOnId() {
+    void validateFailsOnId() {
         pluginDescriptor.setPluginId("");
         assertThrows(PluginRuntimeException.class, () -> pluginManager.validatePluginDescriptor(pluginDescriptor));
     }
 
     @Test
-    public void validateFailsOnVersion() {
+    void validateFailsOnVersion() {
         pluginDescriptor.setPluginVersion(null);
         assertThrows(PluginRuntimeException.class, () -> pluginManager.validatePluginDescriptor(pluginDescriptor));
     }
 
     @Test
-    public void validateNoPluginClass() {
+    void validateNoPluginClass() {
         pluginManager.validatePluginDescriptor(pluginDescriptor);
         assertEquals(Plugin.class.getName(), pluginDescriptor.getPluginClass());
     }
 
     @Test
-    public void isPluginValid() {
+    void isPluginValid() {
         // By default accept all since system version not given
         assertTrue(pluginManager.isPluginValid(pluginWrapper));
 
@@ -104,7 +106,7 @@ public class DefaultPluginManagerTest {
     }
 
     @Test
-    public void isPluginValidAllowExact() {
+    void isPluginValidAllowExact() {
         pluginManager.setExactVersionAllowed(true);
 
         // By default accept all since system version not given
@@ -121,7 +123,7 @@ public class DefaultPluginManagerTest {
     }
 
     @Test
-    public void testDefaultExactVersionAllowed() {
+    void defaultExactVersionAllowed() {
         assertFalse(pluginManager.isExactVersionAllowed());
     }
 
@@ -130,9 +132,9 @@ public class DefaultPluginManagerTest {
      * See https://github.com/pf4j/pf4j/issues/223.
      */
     @Test
-    public void testPluginDisabledNoStart() throws IOException {
-        new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
-            .pluginVersion("1.2.3")
+    void pluginDisabledNoStart() throws IOException {
+        PluginProperties pluginProperties = createPluginProperties();
+        new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), pluginProperties)
             .build();
 
         final PluginStatusProvider statusProvider = mock(PluginStatusProvider.class);
@@ -157,9 +159,9 @@ public class DefaultPluginManagerTest {
     }
 
     @Test
-    public void deleteZipPlugin() throws Exception {
-        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
-            .pluginVersion("1.2.3")
+    void deleteZipPlugin() throws IOException {
+        PluginProperties pluginProperties = createPluginProperties();
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), pluginProperties)
             .build();
 
         pluginManager.loadPlugin(pluginZip.path());
@@ -170,13 +172,13 @@ public class DefaultPluginManagerTest {
         boolean deleted = pluginManager.deletePlugin(pluginZip.pluginId());
         assertTrue(deleted);
 
-        assertFalse(pluginZip.file().exists());
+        assertFalse(Files.exists(pluginZip.path()));
     }
 
     @Test
-    public void deleteJarPlugin() throws Exception {
-        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("my-plugin-1.2.3.jar"), "myPlugin")
-            .pluginVersion("1.2.3")
+    void deleteJarPlugin() throws IOException {
+        PluginManifest pluginManifest = createPluginManifest();
+        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("my-plugin-1.2.3.jar"), pluginManifest)
             .build();
 
         pluginManager.loadPlugin(pluginJar.path());
@@ -187,7 +189,19 @@ public class DefaultPluginManagerTest {
         boolean deleted = pluginManager.deletePlugin(pluginJar.pluginId());
         assertTrue(deleted);
 
-        assertFalse(pluginJar.file().exists());
+        assertFalse(Files.exists(pluginJar.path()));
+    }
+
+    private PluginProperties createPluginProperties() {
+        return new PluginProperties.Builder("myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+    }
+
+    private PluginManifest createPluginManifest() {
+        return new PluginManifest.Builder("myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
     }
 
 }

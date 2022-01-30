@@ -18,8 +18,6 @@ package org.pf4j;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import com.google.testing.compile.Compilation;
-import java.util.Comparator;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,26 +28,27 @@ import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Mario Franco
  */
-public class AbstractExtensionFinderTest {
+class AbstractExtensionFinderTest {
 
     private PluginManager pluginManager;
 
@@ -64,9 +63,9 @@ public class AbstractExtensionFinderTest {
         when(pluginStopped.getPluginState()).thenReturn(PluginState.STOPPED);
 
         pluginManager = mock(PluginManager.class);
-        when(pluginManager.getPlugin(eq("plugin1"))).thenReturn(pluginStarted);
-        when(pluginManager.getPlugin(eq("plugin2"))).thenReturn(pluginStopped);
-        when(pluginManager.getPluginClassLoader(eq("plugin1"))).thenReturn(getClass().getClassLoader());
+        when(pluginManager.getPlugin("plugin1")).thenReturn(pluginStarted);
+        when(pluginManager.getPlugin("plugin2")).thenReturn(pluginStopped);
+        when(pluginManager.getPluginClassLoader("plugin1")).thenReturn(getClass().getClassLoader());
         when(pluginManager.getExtensionFactory()).thenReturn(new DefaultExtensionFactory());
     }
 
@@ -79,7 +78,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#find(Class)}.
      */
     @Test
-    public void testFindFailType() {
+    void findFailType() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -101,7 +100,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#find(Class)}.
      */
     @Test
-    public void testFindFromClasspath() {
+    void findFromClasspath() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -131,7 +130,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#find(Class, String)}.
      */
     @Test
-    public void testFindFromPlugin() {
+    void findFromPlugin() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -170,7 +169,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#findClassNames(String)}.
      */
     @Test
-    public void testFindClassNames() {
+    void findClassNames() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -209,7 +208,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link org.pf4j.AbstractExtensionFinder#find(java.lang.String)}.
      */
     @Test
-    public void testFindExtensionWrappersFromPluginId() {
+    void findExtensionWrappersFromPluginId() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -245,7 +244,7 @@ public class AbstractExtensionFinderTest {
     }
 
     @Test
-    public void findExtensionAnnotation() throws Exception {
+    void findExtensionAnnotation() throws Exception {
         Compilation compilation = javac().compile(ExtensionAnnotationProcessorTest.Greeting,
             ExtensionAnnotationProcessorTest.WhazzupGreeting);
         assertThat(compilation).succeededWithoutWarnings();
@@ -260,7 +259,7 @@ public class AbstractExtensionFinderTest {
     }
 
     @Test
-    public void findExtensionAnnotationThatMissing() throws Exception {
+    void findExtensionAnnotationThatMissing() throws Exception {
         Compilation compilation = javac().compile(ExtensionAnnotationProcessorTest.Greeting,
             ExtensionAnnotationProcessorTest.SpinnakerExtension_NoExtension,
             ExtensionAnnotationProcessorTest.WhazzupGreeting_SpinnakerExtension);

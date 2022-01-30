@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.util;
+package org.pf4j.util.io;
 
 /**
  * File filter that accepts all files ending with .JAR.
- * This filter is case insensitive.
+ * This filter is case-insensitive.
  *
  * @author Decebal Suiu
  */
-public class JarFileFilter extends ExtensionFileFilter {
+public class JarPathFilter extends ExtensionPathFilter {
 
     /**
      * The extension that this filter will search for.
      */
     private static final String JAR_EXTENSION = ".JAR";
 
-    public JarFileFilter() {
+    public JarPathFilter() {
         super(JAR_EXTENSION);
     }
 

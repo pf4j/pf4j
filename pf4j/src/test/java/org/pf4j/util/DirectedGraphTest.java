@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Decebal Suiu
  */
-public class DirectedGraphTest {
+class DirectedGraphTest {
 
     private static DirectedGraph<Character> graph;
 
@@ -54,21 +54,21 @@ public class DirectedGraphTest {
     }
 
     @Test
-    public void reverseTopologicalSort() {
+    void reverseTopologicalSort() {
         List<Character> result = graph.reverseTopologicalSort();
         List<Character> expected = Arrays.asList('C', 'G', 'F', 'B', 'A', 'E', 'D');
         assertEquals(expected, result);
     }
 
     @Test
-    public void topologicalSort() {
+    void topologicalSort() {
         List<Character> result = graph.topologicalSort();
         List<Character> expected = Arrays.asList('D', 'E', 'A', 'B', 'F', 'G', 'C');
         assertEquals(expected, result);
     }
 
     @Test
-    public void inDegree() {
+    void inDegree() {
         Map<Character, Integer> result = graph.inDegree();
         Map<Character, Integer> expected = new HashMap<>(7);
         expected.put('A', 0);
@@ -82,7 +82,7 @@ public class DirectedGraphTest {
     }
 
     @Test
-    public void outDegree() {
+    void outDegree() {
         Map<Character, Integer> result = graph.outDegree();
         Map<Character, Integer> expected = new HashMap<>(7);
         expected.put('A', 1);

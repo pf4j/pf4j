@@ -15,6 +15,8 @@
  */
 package org.pf4j;
 
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -222,5 +224,13 @@ public interface PluginManager {
     List<Path> getPluginsRoots();
 
     VersionManager getVersionManager();
+
+    /**
+     * Returns the {@link FileSystem} used to deal with {@link Path}.
+     * By default, it's used {@link FileSystems#getDefault()}.
+     */
+    default FileSystem getFileSystem() {
+        return FileSystems.getDefault();
+    }
 
 }

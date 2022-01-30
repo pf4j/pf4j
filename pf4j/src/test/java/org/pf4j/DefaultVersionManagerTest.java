@@ -26,34 +26,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Decebal Suiu
  */
-public class DefaultVersionManagerTest {
+class DefaultVersionManagerTest {
 
     private VersionManager versionManager;
 
     @BeforeEach
-    public void init() {
+    void init() {
         versionManager = new DefaultVersionManager();
     }
 
     @Test
-    public void checkVersionConstraint() {
+    void checkVersionConstraint() {
         assertFalse(versionManager.checkVersionConstraint("1.4.3", ">2.0.0")); // simple
         assertTrue(versionManager.checkVersionConstraint("1.4.3", ">=1.4.0 & <1.6.0")); // range
         assertTrue(versionManager.checkVersionConstraint("undefined", "*"));
     }
 
     @Test
-    public void nullOrEmptyVersion() {
+    void nullOrEmptyVersion() {
         assertThrows(IllegalArgumentException.class, () -> versionManager.checkVersionConstraint(null, ">2.0.0"));
     }
 
     @Test
-    public void invalidVersion() {
+    void invalidVersion() {
         assertThrows(ParseException.class, () -> versionManager.checkVersionConstraint("1.0", ">2.0.0"));
     }
 
     @Test
-    public void compareVersions() {
+    void compareVersions() {
         assertTrue(versionManager.compareVersions("1.1.0", "1.0.0") > 0);
     }
 

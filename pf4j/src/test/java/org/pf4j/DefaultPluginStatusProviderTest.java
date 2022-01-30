@@ -32,13 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Mario Franco
  * @author Decebal Suiu
  */
-public class DefaultPluginStatusProviderTest {
+class DefaultPluginStatusProviderTest {
 
     @TempDir
     Path pluginsPath;
 
     @Test
-    public void testIsPluginDisabled() throws IOException {
+    void isPluginDisabled() throws IOException {
         createEnabledFile();
         createDisabledFile();
 
@@ -50,7 +50,7 @@ public class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    public void testIsPluginDisabledWithEnableEmpty() throws IOException {
+    void isPluginDisabledWithEnableEmpty() throws IOException {
         createDisabledFile();
 
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
@@ -61,7 +61,7 @@ public class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    public void testDisablePlugin() throws Exception {
+    void disablePlugin() throws Exception {
         createEnabledFile();
         createDisabledFile();
 
@@ -74,7 +74,7 @@ public class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    public void testDisablePluginWithEnableEmpty() throws Exception {
+    void disablePluginWithEnableEmpty() throws Exception {
         // scenario with "disabled.txt"
         createDisabledFile();
 
@@ -107,7 +107,7 @@ public class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    public void testEnablePlugin() throws Exception {
+    void enablePlugin() throws Exception {
         // scenario with "enabled.txt"
         createEnabledFile();
 
@@ -140,7 +140,7 @@ public class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    public void testEnablePluginWithEnableEmpty() {
+    void enablePluginWithEnableEmpty() {
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
         statusProvider.enablePlugin("plugin-2");
 
@@ -150,7 +150,7 @@ public class DefaultPluginStatusProviderTest {
     }
 
     @Test
-    public void testDisablePluginWithoutDisabledFile() {
+    void disablePluginWithoutDisabledFile() {
         PluginStatusProvider statusProvider = new DefaultPluginStatusProvider(pluginsPath);
 
         assertFalse(statusProvider.isPluginDisabled("plugin-1"));

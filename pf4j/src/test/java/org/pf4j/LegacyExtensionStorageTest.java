@@ -29,13 +29,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Decebal Suiu
  */
-public class LegacyExtensionStorageTest {
+class LegacyExtensionStorageTest {
 
     /**
      * Test of {@link LegacyExtensionStorage#read(Reader, Set)}.
      */
     @Test
-    public void testRead() throws IOException {
+    void read() throws IOException {
         Reader reader = new StringReader(
             "# comment\n"
                 + "org.pf4j.demo.hello.HelloPlugin$HelloGreeting\n"

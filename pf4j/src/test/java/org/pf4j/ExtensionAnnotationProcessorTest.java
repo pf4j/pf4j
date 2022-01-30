@@ -36,9 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Mario Franco
  * @author Decebal Suiu
  */
-public class ExtensionAnnotationProcessorTest {
+class ExtensionAnnotationProcessorTest {
 
-    public static final JavaFileObject Greeting = JavaFileObjects.forSourceLines(
+    static final JavaFileObject Greeting = JavaFileObjects.forSourceLines(
         "Greeting",
         "package test;",
         "import org.pf4j.ExtensionPoint;",
@@ -47,7 +47,7 @@ public class ExtensionAnnotationProcessorTest {
         "   String getGreeting();",
         "}");
 
-    public static final JavaFileObject WhazzupGreeting = JavaFileObjects.forSourceLines(
+    static final JavaFileObject WhazzupGreeting = JavaFileObjects.forSourceLines(
         "WhazzupGreeting",
         "package test;",
         "import org.pf4j.Extension;",
@@ -60,7 +60,7 @@ public class ExtensionAnnotationProcessorTest {
         "    }",
         "}");
 
-    public static final JavaFileObject WhazzupGreeting_NoExtensionPoint = JavaFileObjects.forSourceLines(
+    static final JavaFileObject WhazzupGreeting_NoExtensionPoint = JavaFileObjects.forSourceLines(
         "WhazzupGreeting",
         "package test;",
         "import org.pf4j.Extension;",
@@ -73,7 +73,7 @@ public class ExtensionAnnotationProcessorTest {
         "    }",
         "}");
 
-    public static final JavaFileObject SpinnakerExtension = JavaFileObjects.forSourceLines(
+    static final JavaFileObject SpinnakerExtension = JavaFileObjects.forSourceLines(
         "SpinnakerExtension",
         "package test;",
         "",
@@ -91,7 +91,7 @@ public class ExtensionAnnotationProcessorTest {
         "public @interface SpinnakerExtension {",
         "}");
 
-    public static final JavaFileObject WhazzupGreeting_SpinnakerExtension = JavaFileObjects.forSourceLines(
+    static final JavaFileObject WhazzupGreeting_SpinnakerExtension = JavaFileObjects.forSourceLines(
         "WhazzupGreeting",
         "package test;",
         "",
@@ -106,7 +106,7 @@ public class ExtensionAnnotationProcessorTest {
     /**
      * The same like {@link #SpinnakerExtension} but without {@code Extension} annotation.
      */
-    public static final JavaFileObject SpinnakerExtension_NoExtension = JavaFileObjects.forSourceLines(
+    static final JavaFileObject SpinnakerExtension_NoExtension = JavaFileObjects.forSourceLines(
         "SpinnakerExtension",
         "package test;",
         "",
@@ -125,7 +125,7 @@ public class ExtensionAnnotationProcessorTest {
         "}");
 
     @Test
-    public void getSupportedAnnotationTypes() {
+    void getSupportedAnnotationTypes() {
         ExtensionAnnotationProcessor instance = new ExtensionAnnotationProcessor();
         Set<String> result = instance.getSupportedAnnotationTypes();
         assertEquals(1, result.size());
@@ -133,14 +133,14 @@ public class ExtensionAnnotationProcessorTest {
     }
 
     @Test
-    public void getSupportedOptions() {
+    void getSupportedOptions() {
         ExtensionAnnotationProcessor instance = new ExtensionAnnotationProcessor();
         Set<String> result = instance.getSupportedOptions();
         assertEquals(2, result.size());
     }
 
     @Test
-    public void options() {
+    void options() {
         ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
         Compilation compilation = javac().withProcessors(processor).withOptions("-Ab=2", "-Ac=3")
             .compile(Greeting, WhazzupGreeting);
@@ -152,7 +152,7 @@ public class ExtensionAnnotationProcessorTest {
     }
 
     @Test
-    public void storage() {
+    void storage() {
         ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
         Compilation compilation = javac().withProcessors(processor).compile(Greeting, WhazzupGreeting);
         assertEquals(compilation.status(), Compilation.Status.SUCCESS);
@@ -160,14 +160,14 @@ public class ExtensionAnnotationProcessorTest {
     }
 
     @Test
-    public void compileWithoutError() {
+    void compileWithoutError() {
         ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
          Compilation compilation = javac().withProcessors(processor).compile(Greeting, WhazzupGreeting);
          assertThat(compilation).succeededWithoutWarnings();
     }
 
     @Test
-    public void compileWithError() {
+    void compileWithError() {
         ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
         Compilation compilation = javac().withProcessors(processor).compile(Greeting, WhazzupGreeting_NoExtensionPoint);
         assertThat(compilation).failed();
@@ -178,7 +178,7 @@ public class ExtensionAnnotationProcessorTest {
     }
 
     @Test
-    public void getExtensions() {
+    void getExtensions() {
         ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
         Compilation compilation = javac().withProcessors(processor).compile(Greeting, WhazzupGreeting);
         assertThat(compilation).succeededWithoutWarnings();
@@ -188,7 +188,7 @@ public class ExtensionAnnotationProcessorTest {
     }
 
     @Test
-    public void compileNestedExtensionAnnotation() {
+    void compileNestedExtensionAnnotation() {
         ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
         Compilation compilation = javac().withProcessors(processor).compile(Greeting, SpinnakerExtension, WhazzupGreeting_SpinnakerExtension);
         assertThat(compilation).succeededWithoutWarnings();

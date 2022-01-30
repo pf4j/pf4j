@@ -19,9 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
+import org.pf4j.test.PluginManifest;
 import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestPlugin;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
@@ -34,21 +36,23 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
-public class LegacyExtensionFinderTest {
+class LegacyExtensionFinderTest {
 
     @TempDir
     Path pluginsPath;
 
     @Test
     @EnabledOnOs(WINDOWS)
-    public void shouldUnlockFileAfterReadingExtensionsFromPlugin() throws Exception {
-        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), "test-plugin")
-                .pluginClass(TestPlugin.class.getName())
-                .pluginVersion("1.2.3")
+    void shouldUnlockFileAfterReadingExtensionsFromPlugin() throws Exception {
+        PluginManifest pluginManifest = new PluginManifest.Builder("test-plugin")
+            .pluginClass(TestPlugin.class.getName())
+            .pluginVersion("1.2.3")
+            .build();
+        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), pluginManifest)
                 .extension(TestExtension.class.getName())
                 .build();
 
-        assertTrue(pluginJar.file().exists());
+        assertTrue(Files.exists(pluginJar.path()));
 
         PluginManager pluginManager = new JarPluginManager(pluginsPath);
         pluginManager.loadPlugins();
@@ -60,14 +64,14 @@ public class LegacyExtensionFinderTest {
         assertNotNull(pluginsStorages);
 
         pluginManager.unloadPlugin(pluginJar.pluginId());
-        boolean fileDeleted = pluginJar.file().delete();
+        boolean fileDeleted = Files.deleteIfExists(pluginJar.path());
 
         Set<String> pluginStorages = pluginsStorages.get(pluginJar.pluginId());
         assertNotNull(pluginStorages);
         assertEquals(1, pluginStorages.size());
         assertThat(pluginStorages, contains(TestExtension.class.getName()));
         assertTrue(fileDeleted);
-        assertFalse(pluginJar.file().exists());
+        assertFalse(Files.exists(pluginJar.path()));
     }
 
 }
