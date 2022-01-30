@@ -20,6 +20,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
+import org.pf4j.test.PluginManifest;
+import org.pf4j.test.PluginProperties;
 import org.pf4j.test.PluginZip;
 
 import java.io.IOException;
@@ -131,8 +133,8 @@ class DefaultPluginManagerTest {
      */
     @Test
     void pluginDisabledNoStart() throws IOException {
-        new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
-            .pluginVersion("1.2.3")
+        PluginProperties pluginProperties = createPluginProperties();
+        new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), pluginProperties)
             .build();
 
         final PluginStatusProvider statusProvider = mock(PluginStatusProvider.class);
@@ -157,9 +159,9 @@ class DefaultPluginManagerTest {
     }
 
     @Test
-    void deleteZipPlugin() throws Exception {
-        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
-            .pluginVersion("1.2.3")
+    void deleteZipPlugin() throws IOException {
+        PluginProperties pluginProperties = createPluginProperties();
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), pluginProperties)
             .build();
 
         pluginManager.loadPlugin(pluginZip.path());
@@ -174,9 +176,9 @@ class DefaultPluginManagerTest {
     }
 
     @Test
-    void deleteJarPlugin() throws Exception {
-        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("my-plugin-1.2.3.jar"), "myPlugin")
-            .pluginVersion("1.2.3")
+    void deleteJarPlugin() throws IOException {
+        PluginManifest pluginManifest = createPluginManifest();
+        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("my-plugin-1.2.3.jar"), pluginManifest)
             .build();
 
         pluginManager.loadPlugin(pluginJar.path());
@@ -188,6 +190,18 @@ class DefaultPluginManagerTest {
         assertTrue(deleted);
 
         assertFalse(Files.exists(pluginJar.path()));
+    }
+
+    private PluginProperties createPluginProperties() {
+        return new PluginProperties.Builder("myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+    }
+
+    private PluginManifest createPluginManifest() {
+        return new PluginManifest.Builder("myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
     }
 
 }

@@ -18,6 +18,7 @@ package org.pf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.pf4j.test.PluginProperties;
 import org.pf4j.test.PluginZip;
 import org.pf4j.util.FileUtils;
 
@@ -50,12 +51,16 @@ class LoadPluginsFromMultipleRootsTest {
 
     @Test
     void load() throws Exception {
-        PluginZip pluginZip1 = new PluginZip.Builder(pluginsPath1.resolve("my-plugin-1.2.3.zip"), "myPlugin")
+        PluginProperties plugin1Properties = new PluginProperties.Builder("myPlugin")
             .pluginVersion("1.2.3")
             .build();
+        PluginZip pluginZip1 = new PluginZip.Builder(pluginsPath1.resolve("my-plugin-1.2.3.zip"), plugin1Properties)
+            .build();
 
-        PluginZip pluginZip2 = new PluginZip.Builder(pluginsPath2.resolve("my-other-plugin-4.5.6.zip"), "myOtherPlugin")
+        PluginProperties plugin2Properties = new PluginProperties.Builder("myOtherPlugin")
             .pluginVersion("4.5.6")
+            .build();
+        PluginZip plugin2Zip = new PluginZip.Builder(pluginsPath2.resolve("my-other-plugin-4.5.6.zip"), plugin2Properties)
             .build();
 
         assertTrue(Files.exists(pluginZip1.path()));
@@ -65,11 +70,11 @@ class LoadPluginsFromMultipleRootsTest {
 
         assertTrue(Files.exists(pluginZip1.path()));
         assertTrue(Files.exists(pluginZip1.unzippedPath()));
-        assertTrue(Files.exists(pluginZip2.path()));
-        assertTrue(Files.exists(pluginZip2.unzippedPath()));
+        assertTrue(Files.exists(plugin2Zip.path()));
+        assertTrue(Files.exists(plugin2Zip.unzippedPath()));
         assertEquals(2, pluginManager.getPlugins().size());
         assertEquals(pluginZip1.pluginId(), pluginManager.idForPath(pluginZip1.unzippedPath()));
-        assertEquals(pluginZip2.pluginId(), pluginManager.idForPath(pluginZip2.unzippedPath()));
+        assertEquals(plugin2Zip.pluginId(), pluginManager.idForPath(plugin2Zip.unzippedPath()));
     }
 
 }

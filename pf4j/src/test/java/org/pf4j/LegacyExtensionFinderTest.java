@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
+import org.pf4j.test.PluginManifest;
 import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestPlugin;
 
@@ -43,9 +44,11 @@ class LegacyExtensionFinderTest {
     @Test
     @EnabledOnOs(WINDOWS)
     void shouldUnlockFileAfterReadingExtensionsFromPlugin() throws Exception {
-        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), "test-plugin")
-                .pluginClass(TestPlugin.class.getName())
-                .pluginVersion("1.2.3")
+        PluginManifest pluginManifest = new PluginManifest.Builder("test-plugin")
+            .pluginClass(TestPlugin.class.getName())
+            .pluginVersion("1.2.3")
+            .build();
+        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), pluginManifest)
                 .extension(TestExtension.class.getName())
                 .build();
 

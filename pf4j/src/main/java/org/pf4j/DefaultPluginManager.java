@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -79,7 +78,7 @@ public class DefaultPluginManager extends AbstractPluginManager {
     protected PluginStatusProvider createPluginStatusProvider() {
         String configDir = System.getProperty(PLUGINS_DIR_CONFIG_PROPERTY_NAME);
         Path configPath = configDir != null
-            ? Paths.get(configDir)
+            ? getFileSystem().getPath(configDir)
             : getPluginsRoots().stream()
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No pluginsRoot configured"));

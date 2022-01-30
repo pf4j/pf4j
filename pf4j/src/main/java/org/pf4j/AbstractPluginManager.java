@@ -734,7 +734,9 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         pluginsDir = isDevelopment() ? DEVELOPMENT_PLUGINS_DIR : DEFAULT_PLUGINS_DIR;
-        return Collections.singletonList(Paths.get(pluginsDir));
+        Path pluginsPath = getFileSystem().getPath(pluginsDir);
+
+        return Collections.singletonList(pluginsPath);
     }
 
     /**

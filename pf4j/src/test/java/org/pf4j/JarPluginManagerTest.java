@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
+import org.pf4j.test.PluginManifest;
 import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestExtensionPoint;
 import org.pf4j.test.TestPlugin;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JarPluginManagerTest {
+class JarPluginManagerTest {
 
     private PluginJar pluginJar;
     private JarPluginManager pluginManager;
@@ -43,9 +44,11 @@ public class JarPluginManagerTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), "test-plugin")
+        PluginManifest pluginManifest = new PluginManifest.Builder("test-plugin")
             .pluginClass(TestPlugin.class.getName())
             .pluginVersion("1.2.3")
+            .build();
+        pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), pluginManifest)
             .extension(TestExtension.class.getName())
             .build();
 
@@ -73,7 +76,7 @@ public class JarPluginManagerTest {
     }
 
     @Test
-    void unloadPlugin() throws Exception {
+    void unloadPlugin() {
         pluginManager.loadPlugins();
 
         assertEquals(1, pluginManager.getPlugins().size());

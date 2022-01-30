@@ -27,16 +27,15 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -165,7 +164,7 @@ public final class FileUtils {
         String directoryName = fileName.substring(0, fileName.lastIndexOf("."));
         Path pluginDirectory = filePath.resolveSibling(directoryName);
 
-        if (!Files.exists(pluginDirectory) || pluginZipDate.compareTo(Files.getLastModifiedTime(pluginDirectory)) > 0) {
+        if (Files.notExists(pluginDirectory) || pluginZipDate.compareTo(Files.getLastModifiedTime(pluginDirectory)) > 0) {
             // expand '.zip' file
             Unzip unzip = new Unzip();
             unzip.setSource(filePath);
@@ -207,37 +206,6 @@ public final class FileUtils {
         return isZipFile(path) || isJarFile(path);
     }
 
-    public static Path getPath(Path path, String first, String... more) throws IOException {
-        URI uri = path.toUri();
-        if (isZipOrJarFile(path)) {
-            String pathString = path.toAbsolutePath().toString();
-            // transformation for Windows OS
-            pathString = StringUtils.addStart(pathString.replace("\\", "/"), "/");
-            // space is replaced with %20
-            pathString = pathString.replace(" ","%20");
-            uri = URI.create("jar:file:" + pathString);
-        }
-
-        return getPath(uri, first, more);
-    }
-
-    public static Path getPath(URI uri, String first, String... more) throws IOException {
-        return getFileSystem(uri).getPath(first, more);
-    }
-
-    /**
-     * Quietly close a path.
-     */
-    public static void closePath(Path path) {
-        if (path != null) {
-            try {
-                path.getFileSystem().close();
-            } catch (Exception e) {
-                // close silently
-            }
-        }
-    }
-
     public static Stream<Path> findPaths(Path path, PathFilter filter) {
         return findPaths(path, Integer.MAX_VALUE, filter);
     }
@@ -256,12 +224,25 @@ public final class FileUtils {
         }
     }
 
-    private static FileSystem getFileSystem(URI uri) throws IOException {
-        try {
-            return FileSystems.getFileSystem(uri);
-        } catch (FileSystemNotFoundException e) {
-            return FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
+    public static Path getPath(URI uri, FileSystem fileSystem) {
+        String scheme =  uri.getScheme();
+        if (scheme == null) {
+            throw new IllegalArgumentException("Missing scheme");
         }
+
+        // check for default provider to avoid loading of installed providers
+        if (scheme.equalsIgnoreCase("file")) {
+            return fileSystem.provider().getPath(uri);
+        }
+
+        // try to find provider
+        for (FileSystemProvider provider: FileSystemProvider.installedProviders()) {
+            if (provider.getScheme().equalsIgnoreCase(scheme)) {
+                return provider.getPath(uri);
+            }
+        }
+
+        throw new FileSystemNotFoundException("Provider '" + scheme + "' not installed");
     }
 
 }

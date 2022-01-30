@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.test.PluginProperties;
 import org.pf4j.test.PluginZip;
 import org.pf4j.util.FileUtils;
 
@@ -103,10 +104,12 @@ class PluginClassLoaderTest {
         pluginDependencyDescriptor.setProvider("Me");
         pluginDependencyDescriptor.setRequires("5.0.0");
 
+        PluginProperties pluginProperties = new PluginProperties.Builder(pluginDependencyDescriptor.getPluginId())
+            .pluginVersion(pluginDependencyDescriptor.getVersion())
+            .build();
 
         Path pluginDependencyPath = pluginsPath.resolve(pluginDependencyDescriptor.getPluginId() + "-" + pluginDependencyDescriptor.getVersion() + ".zip");
-        PluginZip pluginDependencyZip = new PluginZip.Builder(pluginDependencyPath, pluginDependencyDescriptor.getPluginId())
-                .pluginVersion(pluginDependencyDescriptor.getVersion())
+        PluginZip pluginDependencyZip = new PluginZip.Builder(pluginDependencyPath, pluginProperties)
                 .addFile(Paths.get("classes/META-INF/dependency-file"), "dependency")
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency-and-plugin"), "dependency")
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency"), "dependency")
@@ -147,8 +150,7 @@ class PluginClassLoaderTest {
         pluginDescriptor.setRequires("5.0.0");
 
         Path pluginPath = pluginsPath.resolve(pluginDescriptor.getPluginId() + "-" + pluginDescriptor.getVersion() + ".zip");
-        PluginZip pluginZip = new PluginZip.Builder(pluginPath, pluginDescriptor.getPluginId())
-                .pluginVersion(pluginDescriptor.getVersion())
+        PluginZip pluginZip = new PluginZip.Builder(pluginPath, pluginProperties)
                 .addFile(Paths.get("classes/META-INF/plugin-file"), "plugin")
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency-and-plugin"), "plugin")
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-plugin"), "plugin")

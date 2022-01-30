@@ -18,6 +18,7 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.test.PluginProperties;
 import org.pf4j.test.PluginZip;
 
 import java.nio.file.Path;
@@ -94,12 +95,18 @@ class PluginDependencyTest {
     @Test
     void dependentStop() throws Exception {
         // B depends on A
-        PluginZip pluginA = new PluginZip.Builder(pluginsPath.resolve("A-plugin-1.2.3.zip"), "plugin.a")
-            .pluginVersion("1.2.3").build();
+        PluginProperties pluginAProperties = new PluginProperties.Builder("plugin.a")
+            .pluginVersion("1.2.3")
+            .build();
+        PluginZip pluginA = new PluginZip.Builder(pluginsPath.resolve("A-plugin-1.2.3.zip"), pluginAProperties)
+            .build();
 
-        PluginZip pluginB = new PluginZip.Builder(pluginsPath.resolve("B-plugin-1.2.3.zip"), "plugin.b")
-            .pluginDependencies("plugin.a")
-            .pluginVersion("1.2.3").build();
+        PluginProperties pluginBProperties = new PluginProperties.Builder("plugin.b")
+            .pluginVersion("1.2.3")
+            .pluginDependency("plugin.a")
+            .build();
+        PluginZip pluginB = new PluginZip.Builder(pluginsPath.resolve("B-plugin-1.2.3.zip"), pluginBProperties)
+            .build();
 
         pluginManager.loadPlugins();
         assertEquals(2, pluginManager.getPlugins().size());
@@ -123,12 +130,18 @@ class PluginDependencyTest {
     @Test
     void dependentUnload() throws Exception {
         // B depends on A
-        PluginZip pluginA = new PluginZip.Builder(pluginsPath.resolve("A-plugin-1.2.3.zip"), "plugin.a")
-            .pluginVersion("1.2.3").build();
+        PluginProperties pluginAProperties = new PluginProperties.Builder("plugin.a")
+            .pluginVersion("1.2.3")
+            .build();
+        PluginZip pluginA = new PluginZip.Builder(pluginsPath.resolve("A-plugin-1.2.3.zip"), pluginAProperties)
+            .build();
 
-        PluginZip pluginB = new PluginZip.Builder(pluginsPath.resolve("B-plugin-1.2.3.zip"), "plugin.b")
-            .pluginDependencies("plugin.a")
-            .pluginVersion("1.2.3").build();
+        PluginProperties pluginBProperties = new PluginProperties.Builder("plugin.b")
+            .pluginVersion("1.2.3")
+            .pluginDependency("plugin.a")
+            .build();
+        PluginZip pluginB = new PluginZip.Builder(pluginsPath.resolve("B-plugin-1.2.3.zip"), pluginBProperties)
+            .build();
 
         pluginManager.loadPlugins();
         assertEquals(2, pluginManager.getPlugins().size());

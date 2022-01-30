@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
+import org.pf4j.test.PluginManifest;
 import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestExtensionPoint;
 import org.pf4j.test.TestPlugin;
@@ -36,8 +37,21 @@ class SecurePluginManagerWrapperTest {
     void setUp() throws IOException {
         pluginManagerEvents = 0;
         wrappedPluginManagerEvents = 0;
-        thisPlugin = new PluginJar.Builder(pluginsPath.resolve("test-plugin1.jar"), THIS_PLUGIN_ID).pluginClass(TestPlugin.class.getName()).pluginVersion("1.2.3").extension(TestExtension.class.getName()).build();
-        otherPlugin = new PluginJar.Builder(pluginsPath.resolve("test-plugin2.jar"), OTHER_PLUGIN_ID).pluginClass(TestPlugin.class.getName()).pluginVersion("1.2.3").extension(TestExtension.class.getName()).build();
+        PluginManifest plugin1Manifest = new PluginManifest.Builder(THIS_PLUGIN_ID)
+            .pluginClass(TestPlugin.class.getName())
+            .pluginVersion("1.2.3")
+            .build();
+
+        PluginManifest plugin2Manifest = new PluginManifest.Builder(OTHER_PLUGIN_ID)
+            .pluginClass(TestPlugin.class.getName())
+            .pluginVersion("1.2.3")
+            .build();
+        thisPlugin = new PluginJar.Builder(pluginsPath.resolve("test-plugin1.jar"), plugin1Manifest)
+            .extension(TestExtension.class.getName())
+            .build();
+        otherPlugin = new PluginJar.Builder(pluginsPath.resolve("test-plugin2.jar"), plugin2Manifest)
+            .extension(TestExtension.class.getName())
+            .build();
 
         pluginManager = new JarPluginManager(pluginsPath);
         wrappedPluginManager = new SecurePluginManagerWrapper(pluginManager, THIS_PLUGIN_ID);

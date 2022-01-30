@@ -17,6 +17,7 @@ package org.pf4j.util;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.test.PluginProperties;
 import org.pf4j.test.PluginZip;
 import org.pf4j.util.io.ZipPathFilter;
 
@@ -37,8 +38,8 @@ class FileUtilsTest {
 
     @Test
     void expandIfZipForZipWithOnlyModuleDescriptor() throws IOException {
-        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
-                .pluginVersion("1.2.3")
+        PluginProperties pluginProperties = createPluginProperties();
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), pluginProperties)
                 .build();
 
         Path unzipped = FileUtils.expandIfZip(pluginZip.path());
@@ -48,8 +49,8 @@ class FileUtilsTest {
 
     @Test
     void expandIfZipForZipWithResourceFile() throws IOException {
-        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-second-plugin-1.2.3.zip"), "myPlugin")
-                .pluginVersion("1.2.3")
+        PluginProperties pluginProperties = createPluginProperties();
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-second-plugin-1.2.3.zip"), pluginProperties)
                 .addFile(Paths.get("classes/META-INF/plugin-file"), "plugin")
                 .build();
 
@@ -71,8 +72,8 @@ class FileUtilsTest {
 
     @Test
     void findPaths() throws IOException {
-        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
-            .pluginVersion("1.2.3")
+        PluginProperties pluginProperties = createPluginProperties();
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), pluginProperties)
             .build();
 
         Path unzipped = FileUtils.expandIfZip(pluginZip.path());
@@ -81,6 +82,12 @@ class FileUtilsTest {
         List<Path> zipPaths = FileUtils.findPaths(pluginsPath, new ZipPathFilter()).collect(Collectors.toList());
         System.out.println("zipPaths = " + zipPaths);
         assertEquals(1, zipPaths.size());
+    }
+
+    private PluginProperties createPluginProperties() {
+        return new PluginProperties.Builder("myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
     }
 
 }

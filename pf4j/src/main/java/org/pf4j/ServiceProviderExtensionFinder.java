@@ -30,7 +30,6 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
@@ -123,16 +122,12 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
         Path extensionPath;
 
         if (url.toURI().getScheme().equals("jar")) {
-            extensionPath = FileUtils.getPath(url.toURI(), EXTENSIONS_RESOURCE);
+            extensionPath = FileUtils.getPath(url.toURI(), pluginManager.getFileSystem()).resolve(EXTENSIONS_RESOURCE);
         } else {
-            extensionPath = Paths.get(url.toURI());
+            extensionPath = pluginManager.getFileSystem().getPath(url.getPath());
         }
 
-        try {
-            bucket.addAll(readExtensions(extensionPath));
-        } finally {
-            FileUtils.closePath(extensionPath);
-        }
+        bucket.addAll(readExtensions(extensionPath));
     }
 
     private Set<String> readExtensions(Path extensionPath) throws IOException {
