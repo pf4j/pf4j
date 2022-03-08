@@ -15,6 +15,8 @@
  */
 package org.pf4j;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.test.FailTestExtension;
 import org.pf4j.test.TestExtension;
@@ -33,9 +35,21 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  */
 public class SingletonExtensionFactoryTest {
 
+    private PluginManager pluginManager;
+
+    @BeforeEach
+    public void setUp() {
+        pluginManager = new DefaultPluginManager();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        pluginManager = null;
+    }
+
     @Test
     public void create() {
-        ExtensionFactory extensionFactory = new SingletonExtensionFactory();
+        ExtensionFactory extensionFactory = new SingletonExtensionFactory(pluginManager);
         Object extensionOne = extensionFactory.create(TestExtension.class);
         Object extensionTwo = extensionFactory.create(TestExtension.class);
         assertSame(extensionOne, extensionTwo);
@@ -43,7 +57,7 @@ public class SingletonExtensionFactoryTest {
 
     @Test
     public void createNewEachTime() {
-        ExtensionFactory extensionFactory = new SingletonExtensionFactory(FailTestExtension.class.getName());
+        ExtensionFactory extensionFactory = new SingletonExtensionFactory(pluginManager, FailTestExtension.class.getName());
         Object extensionOne = extensionFactory.create(TestExtension.class);
         Object extensionTwo = extensionFactory.create(TestExtension.class);
         assertNotSame(extensionOne, extensionTwo);
@@ -52,7 +66,7 @@ public class SingletonExtensionFactoryTest {
     @Test
     @SuppressWarnings("unchecked")
     public void createNewEachTimeFromDifferentClassLoaders() throws Exception {
-        ExtensionFactory extensionFactory = new SingletonExtensionFactory();
+        ExtensionFactory extensionFactory = new SingletonExtensionFactory(pluginManager);
 
         // Get classpath locations
         URL[] classpathReferences = getClasspathReferences();
