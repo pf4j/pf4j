@@ -5,10 +5,21 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#435]: Fix the path separator used in the SingletonExtensionFactoryTest.java
+- [#451]: Fix Dependency version check fails even if required is '*'
+- [#490]: Fix memory leak in SingletonExtensionFactory
 
 #### Changed
+- Update mockito version from 2.24.0 to 3.8.0
+- [#426]: Update module-info.java
+- [#455]: Do not rely on version from Manifest
+- Update Log4j version to 2.17.1
 
 #### Added
+- [#430]: Add a unit test in AbstractExtensionFinderTest to reproduce #428
+- [#450]: Add wrapper to plugin manager (SecurePluginManagerWrapper)
+- Add code analyses via Sonar
+- Add support for reading plugin descriptor from zip
 
 #### Removed
 
@@ -450,6 +461,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#490]: https://github.com/pf4j/pf4j/pull/490
+[#455]: https://github.com/pf4j/pf4j/pull/455
+[#451]: https://github.com/pf4j/pf4j/pull/451
+[#450]: https://github.com/pf4j/pf4j/pull/450
+[#435]: https://github.com/pf4j/pf4j/pull/435
+[#430]: https://github.com/pf4j/pf4j/pull/430
+[#426]: https://github.com/pf4j/pf4j/pull/426
 [#415]: https://github.com/pf4j/pf4j/pull/415
 [#404]: https://github.com/pf4j/pf4j/pull/404
 [#402]: https://github.com/pf4j/pf4j/pull/402
