@@ -34,16 +34,16 @@ public class WelcomePlugin extends Plugin {
 
     @Override
     public void start() {
-        System.out.println("WelcomePlugin.start()");
+        log.info("WelcomePlugin.start()");
         // for testing the development mode
         if (RuntimeMode.DEVELOPMENT.equals(wrapper.getRuntimeMode())) {
-            System.out.println(StringUtils.upperCase("WelcomePlugin"));
+            log.info(StringUtils.upperCase("WelcomePlugin"));
         }
     }
 
     @Override
     public void stop() {
-        System.out.println("WelcomePlugin.stop()");
+        log.info("WelcomePlugin.stop()");
     }
 
     @Extension

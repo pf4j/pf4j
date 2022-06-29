@@ -33,12 +33,12 @@ public class HelloPlugin extends Plugin {
 
     @Override
     public void start() {
-        System.out.println("HelloPlugin.start()");
+        log.info("HelloPlugin.start()");
     }
 
     @Override
     public void stop() {
-        System.out.println("HelloPlugin.stop()");
+        log.info("HelloPlugin.stop()");
     }
 
     @Extension(ordinal=1)
