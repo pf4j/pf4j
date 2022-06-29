@@ -96,7 +96,7 @@ public class Boot {
 
         // print extensions instances from classpath (non plugin)
         log.info("Extensions instances added by classpath:");
-        List extensions = pluginManager.getExtensions((String) null);
+        List<?> extensions = pluginManager.getExtensions((String) null);
         for (Object extension : extensions) {
             log.info("   {}", extension);
         }
@@ -134,6 +134,7 @@ public class Boot {
     private static PluginManager createPluginManager() {
         return new DefaultPluginManager() {
 
+            @Override
             protected ExtensionFinder createExtensionFinder() {
                 DefaultExtensionFinder extensionFinder = (DefaultExtensionFinder) super.createExtensionFinder();
                 extensionFinder.addServiceProviderExtensionFinder(); // to activate "HowdyGreeting" extension
