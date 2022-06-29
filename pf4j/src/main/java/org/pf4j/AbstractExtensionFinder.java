@@ -151,7 +151,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                         checkDifferentClassLoaders(type, extensionClass);
                     }
                 }
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException | NoClassDefFoundError e) {
                 log.error(e.getMessage(), e);
             }
         }
