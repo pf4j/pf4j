@@ -16,9 +16,7 @@
 package org.pf4j.demo;
 
 import org.apache.commons.lang.StringUtils;
-import org.pf4j.DefaultExtensionFinder;
 import org.pf4j.DefaultPluginManager;
-import org.pf4j.ExtensionFinder;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.pf4j.demo.api.Greeting;
@@ -132,6 +130,10 @@ public class Boot {
     }
 
     private static PluginManager createPluginManager() {
+        return new DefaultPluginManager();
+
+        // use below plugin manager instance if you want to enable ServiceProviderExtensionFinder
+        /*
         return new DefaultPluginManager() {
 
             @Override
@@ -143,6 +145,7 @@ public class Boot {
             }
 
         };
+        */
     }
 
 }
