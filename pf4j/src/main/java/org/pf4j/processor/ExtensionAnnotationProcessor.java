@@ -131,7 +131,9 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         }
 
         // write extensions
-        storage.write(extensions);
+        if (extensions.size() > 0) {
+            storage.write(extensions);
+        }
 
         return false;
     }
