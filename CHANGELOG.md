@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [3.8.0] - 2022-10-27
+
+#### Fixed
 - [#492]: Loading extensions crashes kotlin application
 - [#508]: Not create extensions.idx if no extensions exist
  
@@ -449,7 +459,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.7.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.8.0...HEAD
+[3.8.0]: https://github.com/decebals/pf4j/compare/release-3.7.0...release-3.8.0
 [3.7.0]: https://github.com/decebals/pf4j/compare/release-3.6.0...release-3.7.0
 [3.6.0]: https://github.com/decebals/pf4j/compare/release-3.5.0...release-3.6.0
 [3.5.0]: https://github.com/decebals/pf4j/compare/release-3.4.1...release-3.5.0
