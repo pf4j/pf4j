@@ -59,18 +59,23 @@ public class DefaultPluginFactory implements PluginFactory {
         return createInstance(pluginClass, pluginWrapper);
     }
 
-    /**
-     * Creates a plugin instance. If an error occurs than that error is logged and the method returns {@code null}.
-     */
     protected Plugin createInstance(Class<?> pluginClass, PluginWrapper pluginWrapper) {
         try {
-            try {
-                Constructor<?> constructor = pluginClass.getConstructor(PluginWrapper.class);
-                return (Plugin) constructor.newInstance(pluginWrapper);
-            } catch (NoSuchMethodException e) {
-                Constructor<?> constructor = pluginClass.getConstructor();
-                return (Plugin) constructor.newInstance();
-            }
+            Constructor<?> constructor = pluginClass.getConstructor(PluginWrapper.class);
+            return (Plugin) constructor.newInstance(pluginWrapper);
+        } catch (NoSuchMethodException e) {
+            return createUsingNoParametersConstructor(pluginClass);
+       } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return null;
+    }
+
+    protected Plugin createUsingNoParametersConstructor(Class<?> pluginClass) {
+        try {
+            Constructor<?> constructor = pluginClass.getConstructor();
+            return (Plugin) constructor.newInstance();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
