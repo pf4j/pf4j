@@ -33,6 +33,8 @@ public class Plugin {
 
     /**
      * Wrapper of the plugin.
+     * @deprecated Use application custom {@code PluginContext} instead of {@code PluginWrapper}.
+     * See demo for more details.
      */
     @Deprecated
     protected PluginWrapper wrapper;
@@ -58,6 +60,8 @@ public class Plugin {
 
     /**
      * Retrieves the wrapper of this plug-in.
+     * @deprecated Use application custom {@code PluginContext} instead of {@code PluginWrapper}.
+     * See demo for more details.
      */
     @Deprecated
     public final PluginWrapper getWrapper() {
