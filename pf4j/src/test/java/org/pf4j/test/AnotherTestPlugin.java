@@ -18,15 +18,17 @@ package org.pf4j.test;
 import org.pf4j.Plugin;
 
 /**
- * A wrong {@link org.pf4j.Plugin}.
- * It's wrong because it calls super constructor with {@code null} for ({@link org.pf4j.PluginWrapper} parameter).
+ * A simple {@link Plugin}.
  *
- * @author Mario Franco
+ * In real applications you don't need to create a plugin like this if you are not interested in lifecycle events.
+ * {@code PF4J} will automatically create a plugin similar to this (empty / dummy) if no class plugin is specified.
+ *
+ * @author Decebal Suiu
  */
-public class AnotherFailTestPlugin extends Plugin {
+public class AnotherTestPlugin extends Plugin {
 
-    public AnotherFailTestPlugin() {
-        super(null);
+    public AnotherTestPlugin() {
+        super();
     }
 
 }

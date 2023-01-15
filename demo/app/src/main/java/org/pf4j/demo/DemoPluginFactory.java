@@ -13,42 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.demo.hello;
+package org.pf4j.demo;
 
-import org.pf4j.Extension;
-import org.pf4j.demo.api.DemoPlugin;
-import org.pf4j.demo.api.Greeting;
+import org.pf4j.DefaultPluginFactory;
+import org.pf4j.Plugin;
+import org.pf4j.PluginWrapper;
 import org.pf4j.demo.api.PluginContext;
 
-/**
- * A very simple plugin.
- *
- * @author Decebal Suiu
- */
-public class HelloPlugin extends DemoPlugin {
+import java.lang.reflect.Constructor;
 
-    public HelloPlugin(PluginContext context) {
-        super(context);
-    }
+class DemoPluginFactory extends DefaultPluginFactory {
 
     @Override
-    public void start() {
-        log.info("HelloPlugin.start()");
-    }
-
-    @Override
-    public void stop() {
-        log.info("HelloPlugin.stop()");
-    }
-
-    @Extension(ordinal=1)
-    public static class HelloGreeting implements Greeting {
-
-        @Override
-        public String getGreeting() {
-            return "Hello";
+    protected Plugin createInstance(Class<?> pluginClass, PluginWrapper pluginWrapper) {
+        PluginContext context = new PluginContext(pluginWrapper.getRuntimeMode());
+        try {
+            Constructor<?> constructor = pluginClass.getConstructor(PluginContext.class);
+            return (Plugin) constructor.newInstance(context);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
 
+        return null;
     }
 
 }

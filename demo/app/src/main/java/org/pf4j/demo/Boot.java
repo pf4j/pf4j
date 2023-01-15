@@ -16,7 +16,6 @@
 package org.pf4j.demo;
 
 import org.apache.commons.lang.StringUtils;
-import org.pf4j.DefaultPluginManager;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.pf4j.demo.api.Greeting;
@@ -40,7 +39,7 @@ public class Boot {
         printLogo();
 
         // create the plugin manager
-        PluginManager pluginManager = createPluginManager();
+        PluginManager pluginManager = new DemoPluginManager();
 
         // load the plugins
         pluginManager.loadPlugins();
@@ -127,25 +126,6 @@ public class Boot {
         log.info(StringUtils.repeat("#", 40));
         log.info(StringUtils.center("PF4J-DEMO", 40));
         log.info(StringUtils.repeat("#", 40));
-    }
-
-    private static PluginManager createPluginManager() {
-        return new DefaultPluginManager();
-
-        // use below plugin manager instance if you want to enable ServiceProviderExtensionFinder
-        /*
-        return new DefaultPluginManager() {
-
-            @Override
-            protected ExtensionFinder createExtensionFinder() {
-                DefaultExtensionFinder extensionFinder = (DefaultExtensionFinder) super.createExtensionFinder();
-                extensionFinder.addServiceProviderExtensionFinder(); // to activate "HowdyGreeting" extension
-
-                return extensionFinder;
-            }
-
-        };
-        */
     }
 
 }
