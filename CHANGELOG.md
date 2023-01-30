@@ -7,11 +7,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 #### Fixed
 
 #### Changed
-- [#512]: Relax Plugin construction (remove dependency on PluginWrapper)
 
 #### Added
 
 #### Removed
+
+### [3.9.0] - 2023-01-30
+
+#### Changed
+- [#512]: Relax Plugin construction (remove dependency on PluginWrapper)
 
 ### [3.8.0] - 2022-10-27
 
@@ -460,7 +464,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.8.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.9.0...HEAD
+[3.9.0]: https://github.com/decebals/pf4j/compare/release-3.8.0...release-3.9.0
 [3.8.0]: https://github.com/decebals/pf4j/compare/release-3.7.0...release-3.8.0
 [3.7.0]: https://github.com/decebals/pf4j/compare/release-3.6.0...release-3.7.0
 [3.6.0]: https://github.com/decebals/pf4j/compare/release-3.5.0...release-3.6.0
