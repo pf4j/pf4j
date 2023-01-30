@@ -489,7 +489,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
-[#508]: https://github.com/pf4j/pf4j/pull/512
+[#512]: https://github.com/pf4j/pf4j/pull/512
 [#508]: https://github.com/pf4j/pf4j/issues/508
 [#492]: https://github.com/pf4j/pf4j/issues/492
 [#490]: https://github.com/pf4j/pf4j/pull/490
