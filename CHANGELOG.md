@@ -30,8 +30,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Add support for reading plugin descriptor from zip
 - Use logger instead of System.out.println for demo
 
-#### Removed
-
 ### [3.7.0] - 2022-06-28
 
 #### Fixed
@@ -51,19 +49,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Add code analyses via Sonar
 - Add support for reading plugin descriptor from zip
 
-#### Removed
-
 ### [3.6.0] - 2021-01-16
 
 #### Fixed
 - [#394]: `DependencyResolver` lost dependent info after plugin stop
 
-#### Changed
-
 #### Added
 - [#415]: Externalize some useful classes from testing
-
-#### Removed
 
 ### [3.5.0] - 2020-11-08
 
@@ -80,19 +72,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#400]: Add support for JPMS (`module-info.java`) 
 - [#404]: Support multiple plugin root directories 
 
-#### Removed
-
 ### [3.4.1] - 2020-08-14
 
 #### Fixed
 - [#371]: `ClosedFileSystemException` when I run demo (Windows)
 - [#391]: Incorrect enum selection in `ClassLoadingStrategy.ADP`
-
-#### Changed
-
-#### Added
-
-#### Removed
 
 ### [3.3.0] - 2020-04-21
 
@@ -110,8 +94,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#352]: Add `equals`/`hashCode` to some data classes
 - [#365]: `PluginClassLoader` does not resolve classpath resources from plugin dependencies
 
-#### Removed
-
 ### [3.2.0] - 2019-11-29
 
 #### Fixed
@@ -126,8 +108,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#348]: Found extensions when using decorated annotations
 - [#350]: Support any interface as an `ExtensionPoint`
 
-#### Removed
-
 ### [3.1.0] - 2019-09-08
 
 #### Fixed
@@ -140,8 +120,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 #### Added
 - [#323]: Add IDEA classpath for Development mode
 - [#337]: Implement `PluginClassLoader.getResources`
-
-#### Removed
 
 ### [3.0.0] - 2019-06-12
 
@@ -197,8 +175,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#270]: Optional plugin dependencies
 - [#275]: Add automatic module name to `pf4j.jar`
 
-#### Removed
-
 ### [2.5.0] - 2018-12-12
 
 #### Fixed
@@ -213,8 +189,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#242]: Add delete hook method in `Plugin`
 - [#256]: Adds ability to configure plugin directory
 
-#### Removed
-
 ### [2.4.0] - 2018-08-01
 
 #### Fixed
@@ -223,13 +197,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#229]: Can't find `plugin.properties` file inside `.jar`
 - Fix error in `FileUtils.getFileSystem`
 
-#### Changed
-
 #### Added
 - [#229]: Add `SingletonExtensionFactory`
 - [#229]: Allow a way to query all extension classes for a given plugin
-
-#### Removed
 
 ### [2.3.0] - 2018-06-04
 
@@ -246,8 +216,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#199]: Make optional the plugin class attribute of plugin manifest
 - [#206]: Support multiple plugin directories
 - Add aliases to the runtime modes (`dev` for `development` and `prod` for `deployment`)
-
-#### Removed
 
 ### [2.2.0] - 2018-02-11
 
@@ -267,8 +235,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Add new `RESOLVED` as plugin state
 - Add support for PARENT FIRST loading strategy
 
-#### Removed
-
 ### [2.1.0] - 2018-01-10
 
 #### Fixed
@@ -278,10 +244,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Changed
 - [#180]: Refactoring to make `PluginDescriptor` more usable
-
-#### Added
-
-#### Removed
 
 ### [2.0.0] - 2017-10-17
 
@@ -325,8 +287,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#139]: Ability to get `pluginsRoot` from PluginManager
 - Add constructors with varargs in PluginException
 
-#### Removed
-
 ### [1.2.0] - 2017-03-03
 
 #### Fixed
@@ -339,31 +299,21 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 #### Added
 - [#128]: Add `JarPluginManager`, `PluginLoader`, `AbstractPluginManager`
 
-#### Removed
-
 ### [1.1.1] - 2016-11-17
 
 #### Fixed
 - [#116]: Default/System extensions are duplicated
 
-#### Changed
-
 #### Added
 - [#111]: Add inheritance support on Extension annotation
 
-#### Removed
-
 ### [1.1.0] - 2016-08-22
-
-#### Fixed
 
 #### Changed
 - [#107]: PluginDescriptor can't be extended
 
 #### Added
 - [#108]: Return a list of all extensions from a plugin and optional for an extension point
-
-#### Removed
 
 ### [1.0.0] - 2016-07-07
 
@@ -377,10 +327,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Rework defense against [#97]
 - Eliminate duplicate log messages from demo
 - Improve debugging for "no extensions found"
-
-#### Added
-
-#### Removed
 
 ### [0.13.1] - 2016-04-01
 
@@ -422,8 +368,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Add `NameFileFilter` and `OrFileFilter`
 - [#85]: ExtensionStorage based on Java Service Provider (META-INf/services)
 
-#### Removed
-
 ### [0.11.0] - 2015-11-19
 
 #### Fixed
@@ -439,8 +383,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added one more fail test to DefaultPluginFactory
 - Added one more fail test to DefaultExtensionFactory
 - Added ManifestPluginDescriptorFinder tests
-
-#### Removed
 
 ### [0.10.0] - 2015-08-11
 
@@ -461,8 +403,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#40]: Add Plugin status provider
 - [#41]: Added plugin archive source abstraction
 - Added test for DefaultPluginRepository
-
-#### Removed
 
 [unreleased]: https://github.com/decebals/pf4j/compare/release-3.9.0...HEAD
 [3.9.0]: https://github.com/decebals/pf4j/compare/release-3.8.0...release-3.9.0
