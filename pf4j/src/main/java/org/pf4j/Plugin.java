@@ -33,14 +33,20 @@ public class Plugin {
 
     /**
      * Wrapper of the plugin.
+     * @deprecated Use application custom {@code PluginContext} instead of {@code PluginWrapper}.
+     * See demo for more details.
      */
+    @Deprecated
     protected PluginWrapper wrapper;
 
     /**
      * Constructor to be used by plugin manager for plugin instantiation.
      * Your plugins have to provide constructor with this exact signature to
      * be successfully loaded by manager.
+     * @deprecated Use application custom {@code PluginContext} instead of {@code PluginWrapper}.
+     * See demo for more details.
      */
+    @Deprecated
     public Plugin(final PluginWrapper wrapper) {
         if (wrapper == null) {
             throw new IllegalArgumentException("Wrapper cannot be null");
@@ -49,9 +55,15 @@ public class Plugin {
         this.wrapper = wrapper;
     }
 
+    public Plugin() {
+    }
+
     /**
      * Retrieves the wrapper of this plug-in.
+     * @deprecated Use application custom {@code PluginContext} instead of {@code PluginWrapper}.
+     * See demo for more details.
      */
+    @Deprecated
     public final PluginWrapper getWrapper() {
         return wrapper;
     }

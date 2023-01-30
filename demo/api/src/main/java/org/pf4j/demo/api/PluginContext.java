@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,20 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pf4j.test;
+package org.pf4j.demo.api;
 
-import org.pf4j.Plugin;
+import org.pf4j.RuntimeMode;
 
 /**
- * A wrong {@link org.pf4j.Plugin}.
- * It's wrong because it calls super constructor with {@code null} for ({@link org.pf4j.PluginWrapper} parameter).
+ * An instance of this class is provided to plugins in their constructor.
+ * It's safe for plugins to keep a reference to the instance for later use.
+ * This class facilitates communication with application and plugin manager.
  *
- * @author Mario Franco
+ * @author Decebal Suiu
  */
-public class AnotherFailTestPlugin extends Plugin {
+public class PluginContext {
 
-    public AnotherFailTestPlugin() {
-        super(null);
+    private final RuntimeMode runtimeMode;
+
+    public PluginContext(RuntimeMode runtimeMode) {
+        this.runtimeMode = runtimeMode;
+    }
+
+    public RuntimeMode getRuntimeMode() {
+        return runtimeMode;
     }
 
 }
