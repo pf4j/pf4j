@@ -113,7 +113,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     /**
      * The plugins roots are supplied as comma-separated list by {@code System.getProperty("pf4j.pluginsDir", "plugins")}.
      */
-    public AbstractPluginManager() {
+    protected AbstractPluginManager() {
         initialize();
     }
 
@@ -122,7 +122,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      *
      * @param pluginsRoots the roots to search for plugins
      */
-    public AbstractPluginManager(Path... pluginsRoots) {
+    protected AbstractPluginManager(Path... pluginsRoots) {
         this(Arrays.asList(pluginsRoots));
     }
 
@@ -131,7 +131,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      *
      * @param pluginsRoots the roots to search for plugins
      */
-    public AbstractPluginManager(List<Path> pluginsRoots) {
+    protected AbstractPluginManager(List<Path> pluginsRoots) {
         this.pluginsRoots.addAll(pluginsRoots);
 
         initialize();
@@ -877,10 +877,10 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         return pluginWrapper;
     }
-    
+
     /**
      * creates the plugin wrapper. override this if you want to prevent plugins having full access to the plugin manager
-     * 
+     *
      * @return
      */
     protected PluginWrapper createPluginWrapper(PluginDescriptor pluginDescriptor, Path pluginPath, ClassLoader pluginClassLoader) {
@@ -933,7 +933,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     /**
      * Set to true to allow requires expression to be exactly x.y.z.
      * The default is false, meaning that using an exact version x.y.z will
-     * implicitly mean the same as >=x.y.z
+     * implicitly mean the same as &gt;=x.y.z
      *
      * @param exactVersionAllowed set to true or false
      */
