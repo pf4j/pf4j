@@ -201,7 +201,7 @@ public class AbstractExtensionFinderTest {
      */
     @Test
     public void testFindExtensionWrappersFromPluginId() {
-        // complicate the test to show hot to deal with dynamic Java classes (generated at runtime from sources)
+        // complicate the test to show how to deal with dynamic Java classes (generated at runtime from sources)
         PluginWrapper plugin3 = mock(PluginWrapper.class);
         JavaFileObject object = JavaSources.compile(DefaultExtensionFactoryTest.FailTestExtension);
         JavaFileObjectClassLoader classLoader = new JavaFileObjectClassLoader();
