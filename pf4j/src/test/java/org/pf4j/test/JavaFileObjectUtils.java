@@ -17,26 +17,33 @@ package org.pf4j.test;
 
 import com.google.common.io.ByteStreams;
 
+import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Get class data from the class path.
- *
  * @author Decebal Suiu
  */
-public class DefaultClassDataProvider implements ClassDataProvider {
+public class JavaFileObjectUtils {
 
-    @Override
-    public byte[] getClassData(String className) {
-        String path = className.replace('.', '/') + ".class";
-        InputStream classDataStream = getClass().getClassLoader().getResourceAsStream(path);
-        if (classDataStream == null) {
-            throw new RuntimeException("Cannot find class data");
+    private JavaFileObjectUtils() {}
+
+    public static String getClassName(JavaFileObject object) {
+        if (object.getKind() != JavaFileObject.Kind.CLASS) {
+            throw new IllegalStateException("Only Kind.CLASS is supported");
         }
 
-        try {
-            return ByteStreams.toByteArray(classDataStream);
+        String name = object.getName();
+        // Remove "/CLASS_OUT/" from head and ".class" from tail
+        name = name.substring(14, name.length() - 6);
+        name = name.replace('/', '.');
+
+        return name;
+    }
+
+    public static byte[] getAllBytes(JavaFileObject object) {
+        try (InputStream in = object.openInputStream()) {
+            return ByteStreams.toByteArray(in);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

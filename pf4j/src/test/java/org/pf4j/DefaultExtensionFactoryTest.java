@@ -15,11 +15,15 @@
  */
 package org.pf4j;
 
+import com.google.testing.compile.JavaFileObjects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pf4j.test.FailTestExtension;
+import org.pf4j.test.JavaFileObjectClassLoader;
+import org.pf4j.test.JavaSources;
 import org.pf4j.test.TestExtension;
+
+import javax.tools.JavaFileObject;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,6 +32,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Mario Franco
  */
 public class DefaultExtensionFactoryTest {
+
+    public static final JavaFileObject FailTestExtension = JavaFileObjects.forSourceLines("FailTestExtension",
+        "package test;",
+        "import org.pf4j.test.TestExtensionPoint;",
+        "import org.pf4j.Extension;",
+        "",
+        "@Extension",
+        "public class FailTestExtension implements TestExtensionPoint {",
+        "    public FailTestExtension(String name) {}",
+        "",
+        "    @Override",
+        "    public String saySomething() { return \"I am a fail test extension\";}",
+        "}");
 
     private ExtensionFactory extensionFactory;
 
@@ -54,7 +71,10 @@ public class DefaultExtensionFactoryTest {
      */
     @Test
     public void testCreateFailConstructor() {
-        assertThrows(PluginRuntimeException.class, () -> extensionFactory.create(FailTestExtension.class));
+        JavaFileObject object = JavaSources.compile(FailTestExtension);
+        JavaFileObjectClassLoader classLoader = new JavaFileObjectClassLoader();
+        Class<?> extensionClass = (Class<?>) classLoader.load(object).values().toArray()[0];
+        assertThrows(PluginRuntimeException.class, () -> extensionFactory.create(extensionClass));
     }
 
 }
