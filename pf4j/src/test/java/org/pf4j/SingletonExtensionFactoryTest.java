@@ -18,7 +18,6 @@ package org.pf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pf4j.test.FailTestExtension;
 import org.pf4j.test.TestExtension;
 
 import java.io.File;
@@ -57,7 +56,7 @@ public class SingletonExtensionFactoryTest {
 
     @Test
     public void createNewEachTime() {
-        ExtensionFactory extensionFactory = new SingletonExtensionFactory(pluginManager, FailTestExtension.class.getName());
+        ExtensionFactory extensionFactory = new SingletonExtensionFactory(pluginManager, "FailTestExtension.class");
         Object extensionOne = extensionFactory.create(TestExtension.class);
         Object extensionTwo = extensionFactory.create(TestExtension.class);
         assertNotSame(extensionOne, extensionTwo);
