@@ -28,8 +28,6 @@ No XML, only Java.
 
 You can mark any interface or abstract class as an extension point (with marker interface ExtensionPoint) and you specified that an class is an extension with @Extension annotation.
 
-Also, PF4J can be used in web applications. For example web applications that require want modularity can use [pf4j-wicket](https://github.com/pf4j/pf4j-wicket).
-
 Components
 -------------------
 - **Plugin** is the base class for all plugins types. Each plugin is loaded into a separate class loader to avoid conflicts.
@@ -93,7 +91,7 @@ public class WelcomePlugin extends Plugin {
 }
 ```
 
-In above code we've been created a plugin (welcome) that comes with one extension for the `Greeting` extension point.
+In above code we've created a plugin (welcome) that comes with one extension for the `Greeting` extension point.
 
 You can distribute your plugin as a jar file (the simple solution). In this case add the plugin's metadata in `MANIFEST.MF` file of jar:
 
