@@ -17,7 +17,7 @@ Features/Benefits
 With PF4J you can easily transform a monolithic java application in a modular application.  
 PF4J is an open source (Apache license) lightweight (around __100 KB__) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see `PluginDescriptorFinder` and `ExtensionFinder`).   
 
-Practically PF4J is a microframework and the aim is to keep the core simple but extensible. I try to create a little ecosystem (extensions) based on this core with the help of the community.  
+Practically, PF4J is a microframework that aims to keep the core simple but extensible. We also have a community-driven ecosystem of extensions.
 For now are available these extensions:
 - [pf4j-update](https://github.com/pf4j/pf4j-update) (update mechanism for PF4J)
 - [pf4j-spring](https://github.com/pf4j/pf4j-spring) (PF4J - Spring Framework integration)
@@ -28,7 +28,7 @@ No XML, only Java.
 
 You can mark any interface or abstract class as an extension point (with marker interface ExtensionPoint) and you specified that an class is an extension with @Extension annotation.
 
-Also, PF4J can be used in web applications. For my web applications when I want modularity I use [pf4j-wicket](https://github.com/pf4j/pf4j-wicket).
+Also, PF4J can be used in web applications. For example web applications that require want modularity can use [pf4j-wicket](https://github.com/pf4j/pf4j-wicket).
 
 Components
 -------------------
@@ -93,7 +93,7 @@ public class WelcomePlugin extends Plugin {
 }
 ```
 
-In above code I created a plugin (welcome) that comes with one extension for the `Greeting` extension point.
+In above code we've been created a plugin (welcome) that comes with one extension for the `Greeting` extension point.
 
 You can distribute your plugin as a jar file (the simple solution). In this case add the plugin's metadata in `MANIFEST.MF` file of jar:
 
@@ -110,8 +110,7 @@ Plugin-Provider: Decebal Suiu
 Plugin-Version: 0.0.1
 ```
 
-In above manifest I described a plugin with id `welcome-plugin` (mandatory attribute), with class `org.pf4j.demo.welcome.WelcomePlugin` (optional attribute), with version `0.0.1` (mandatory attribute) and with dependencies
-to plugins `x, y, z` (optional attribute).
+In the manifest above, we've described a plugin with the id of `welcome-plugin` (mandatory attribute). We've also defined a class `org.pf4j.demo.welcome.WelcomePlugin` (optional attribute), with version `0.0.1` (mandatory attribute) and with dependencies to plugins `x, y, z` (optional attribute).
 
 Now you can play with plugins and extensions in your code:
 
