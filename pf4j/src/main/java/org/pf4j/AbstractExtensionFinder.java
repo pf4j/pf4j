@@ -41,7 +41,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
     protected volatile Map<String, ExtensionInfo> extensionInfos; // cache extension infos by class name
     protected Boolean checkForExtensionDependencies = null;
 
-    public AbstractExtensionFinder(PluginManager pluginManager) {
+    protected AbstractExtensionFinder(PluginManager pluginManager) {
         this.pluginManager = pluginManager;
     }
 
@@ -50,7 +50,6 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
     public abstract Map<String, Set<String>> readClasspathStorages();
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
         log.debug("Finding extensions of extension point '{}'", type.getName());
         Map<String, Set<String>> entries = getEntries();
@@ -151,7 +150,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                         checkDifferentClassLoaders(type, extensionClass);
                     }
                 }
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException | NoClassDefFoundError e) {
                 log.error(e.getMessage(), e);
             }
         }

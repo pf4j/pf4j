@@ -10,10 +10,13 @@ import java.util.stream.Collectors;
 
 /**
  * Use this class to wrap the original plugin manager to prevent full access from within plugins.
- * Override AbstractPluginManager.createPluginWrapper to use this class
- * @author Wolfram Haussig
+ * Override AbstractPluginManager.createPluginWrapper to use this class.
+ * @deprecated Use application custom {@code PluginContext} instead of {@code PluginWrapper} to communicate with {@link Plugin}.
+ * See demo for more details.
  *
+ * @author Wolfram Haussig
  */
+@Deprecated()
 public class SecurePluginManagerWrapper implements PluginManager {
 
     private static final String PLUGIN_PREFIX = "Plugin ";
@@ -38,7 +41,7 @@ public class SecurePluginManagerWrapper implements PluginManager {
     /**
      * constructor
      * @param original the original plugin manager
-     * @param currentPlugin the current pluginId
+     * @param currentPluginId the current pluginId
      */
     public SecurePluginManagerWrapper(PluginManager original, String currentPluginId) {
         this.original = original;

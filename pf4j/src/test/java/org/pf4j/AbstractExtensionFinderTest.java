@@ -15,34 +15,26 @@
  */
 package org.pf4j;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.io.ByteStreams;
-import com.google.testing.compile.Compilation;
-import java.util.Comparator;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pf4j.test.FailTestPlugin;
+import org.pf4j.test.JavaFileObjectClassLoader;
+import org.pf4j.test.JavaFileObjectUtils;
+import org.pf4j.test.JavaSources;
+import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestExtensionPoint;
 
 import javax.tools.JavaFileObject;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,9 +56,9 @@ public class AbstractExtensionFinderTest {
         when(pluginStopped.getPluginState()).thenReturn(PluginState.STOPPED);
 
         pluginManager = mock(PluginManager.class);
-        when(pluginManager.getPlugin(eq("plugin1"))).thenReturn(pluginStarted);
-        when(pluginManager.getPlugin(eq("plugin2"))).thenReturn(pluginStopped);
-        when(pluginManager.getPluginClassLoader(eq("plugin1"))).thenReturn(getClass().getClassLoader());
+        when(pluginManager.getPlugin("plugin1")).thenReturn(pluginStarted);
+        when(pluginManager.getPlugin("plugin2")).thenReturn(pluginStopped);
+        when(pluginManager.getPluginClassLoader("plugin1")).thenReturn(getClass().getClassLoader());
         when(pluginManager.getExtensionFactory()).thenReturn(new DefaultExtensionFactory());
     }
 
@@ -93,7 +85,7 @@ public class AbstractExtensionFinderTest {
             }
 
         };
-        List<ExtensionWrapper<FailTestPlugin>> list = instance.find(FailTestPlugin.class);
+        List<ExtensionWrapper<TestExtension>> list = instance.find(TestExtension.class);
         assertEquals(0, list.size());
     }
 
@@ -115,7 +107,6 @@ public class AbstractExtensionFinderTest {
 
                 Set<String> bucket = new HashSet<>();
                 bucket.add("org.pf4j.test.TestExtension");
-                bucket.add("org.pf4j.test.FailTestExtension");
                 entries.put(null, bucket);
 
                 return entries;
@@ -124,7 +115,7 @@ public class AbstractExtensionFinderTest {
         };
 
         List<ExtensionWrapper<TestExtensionPoint>> list = instance.find(TestExtensionPoint.class);
-        assertEquals(2, list.size());
+        assertEquals(1, list.size());
     }
 
     /**
@@ -140,7 +131,6 @@ public class AbstractExtensionFinderTest {
 
                 Set<String> bucket = new HashSet<>();
                 bucket.add("org.pf4j.test.TestExtension");
-                bucket.add("org.pf4j.test.FailTestExtension");
                 entries.put("plugin1", bucket);
                 bucket = new HashSet<>();
                 bucket.add("org.pf4j.test.TestExtension");
@@ -157,12 +147,13 @@ public class AbstractExtensionFinderTest {
         };
 
         List<ExtensionWrapper<TestExtensionPoint>> list = instance.find(TestExtensionPoint.class);
-        assertEquals(2, list.size());
+        assertEquals(1, list.size());
 
         list = instance.find(TestExtensionPoint.class, "plugin1");
-        assertEquals(2, list.size());
+        assertEquals(1, list.size());
 
         list = instance.find(TestExtensionPoint.class, "plugin2");
+        // "0" because the status of "plugin2" is STOPPED => no extensions
         assertEquals(0, list.size());
     }
 
@@ -210,6 +201,16 @@ public class AbstractExtensionFinderTest {
      */
     @Test
     public void testFindExtensionWrappersFromPluginId() {
+        // complicate the test to show hot to deal with dynamic Java classes (generated at runtime from sources)
+        PluginWrapper plugin3 = mock(PluginWrapper.class);
+        JavaFileObject object = JavaSources.compile(DefaultExtensionFactoryTest.FailTestExtension);
+        JavaFileObjectClassLoader classLoader = new JavaFileObjectClassLoader();
+        classLoader.load(object);
+        when(plugin3.getPluginClassLoader()).thenReturn(classLoader);
+        when(plugin3.getPluginState()).thenReturn(PluginState.STARTED);
+        when(pluginManager.getPluginClassLoader("plugin3")).thenReturn(classLoader);
+        when(pluginManager.getPlugin("plugin3")).thenReturn(plugin3);
+
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -218,11 +219,13 @@ public class AbstractExtensionFinderTest {
 
                 Set<String> bucket = new HashSet<>();
                 bucket.add("org.pf4j.test.TestExtension");
-                bucket.add("org.pf4j.test.FailTestExtension");
                 entries.put("plugin1", bucket);
                 bucket = new HashSet<>();
                 bucket.add("org.pf4j.test.TestExtension");
                 entries.put("plugin2", bucket);
+                bucket = new HashSet<>();
+                bucket.add(JavaFileObjectUtils.getClassName(object));
+                entries.put("plugin3", bucket);
 
                 return entries;
             }
@@ -235,73 +238,40 @@ public class AbstractExtensionFinderTest {
         };
 
         List<ExtensionWrapper> plugin1Result = instance.find("plugin1");
-        assertEquals(2, plugin1Result.size());
+        assertEquals(1, plugin1Result.size());
 
         List<ExtensionWrapper> plugin2Result = instance.find("plugin2");
         assertEquals(0, plugin2Result.size());
 
-        List<ExtensionWrapper> plugin3Result = instance.find(UUID.randomUUID().toString());
-        assertEquals(0, plugin3Result.size());
+        List<ExtensionWrapper> plugin3Result = instance.find("plugin3");
+        assertEquals(1, plugin3Result.size());
+
+        List<ExtensionWrapper> plugin4Result = instance.find(UUID.randomUUID().toString());
+        assertEquals(0, plugin4Result.size());
     }
 
     @Test
-    public void findExtensionAnnotation() throws Exception {
-        Compilation compilation = javac().compile(ExtensionAnnotationProcessorTest.Greeting,
-            ExtensionAnnotationProcessorTest.WhazzupGreeting);
-        assertThat(compilation).succeededWithoutWarnings();
-        ImmutableList<JavaFileObject> generatedFiles = compilation.generatedFiles();
+    public void findExtensionAnnotation() {
+        List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.Greeting, JavaSources.WhazzupGreeting);
         assertEquals(2, generatedFiles.size());
 
-        JavaFileObjectClassLoader classLoader = new JavaFileObjectClassLoader();
-        Map<String, Class<?>> loadedClasses = classLoader.loadClasses(new ArrayList<>(generatedFiles));
+        Map<String, Class<?>> loadedClasses = new JavaFileObjectClassLoader().load(generatedFiles);
         Class<?> clazz = loadedClasses.get("test.WhazzupGreeting");
         Extension extension = AbstractExtensionFinder.findExtensionAnnotation(clazz);
-        assertNotNull(extension);
+        Assertions.assertNotNull(extension);
     }
 
     @Test
-    public void findExtensionAnnotationThatMissing() throws Exception {
-        Compilation compilation = javac().compile(ExtensionAnnotationProcessorTest.Greeting,
+    public void findExtensionAnnotationThatMissing() {
+        List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.Greeting,
             ExtensionAnnotationProcessorTest.SpinnakerExtension_NoExtension,
             ExtensionAnnotationProcessorTest.WhazzupGreeting_SpinnakerExtension);
-        assertThat(compilation).succeededWithoutWarnings();
-        ImmutableList<JavaFileObject> generatedFiles = compilation.generatedFiles();
         assertEquals(3, generatedFiles.size());
 
-        JavaFileObjectClassLoader classLoader = new JavaFileObjectClassLoader();
-        Map<String, Class<?>> loadedClasses = classLoader.loadClasses(new ArrayList<>(generatedFiles));
+        Map<String, Class<?>> loadedClasses = new JavaFileObjectClassLoader().load(generatedFiles);
         Class<?> clazz = loadedClasses.get("test.WhazzupGreeting");
         Extension extension = AbstractExtensionFinder.findExtensionAnnotation(clazz);
-        assertNull(extension);
-    }
-
-   static class JavaFileObjectClassLoader extends ClassLoader {
-
-        public Map<String, Class<?>> loadClasses(List<JavaFileObject> classes) throws IOException {
-            // Sort generated ".class" by lastModified field
-            classes.sort(Comparator.comparingLong(JavaFileObject::getLastModified));
-
-            // Load classes
-            Map<String, Class<?>> loadedClasses = new HashMap<>(classes.size());
-            for (JavaFileObject clazz : classes) {
-                String className = getClassName(clazz);
-                byte[] data = ByteStreams.toByteArray(clazz.openInputStream());
-                Class<?> loadedClass = defineClass(className, data,0, data.length);
-                loadedClasses.put(className, loadedClass);
-            }
-
-            return loadedClasses;
-        }
-
-        private static String getClassName(JavaFileObject object) {
-            String name = object.getName();
-            // Remove "/CLASS_OUT/" from head and ".class" from tail
-            name = name.substring(14, name.length() - 6);
-            name = name.replace('/', '.');
-
-            return name;
-        }
-
+        Assertions.assertNull(extension);
     }
 
 }

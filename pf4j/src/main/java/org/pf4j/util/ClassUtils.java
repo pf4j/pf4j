@@ -28,6 +28,8 @@ import java.util.Map;
  */
 public class ClassUtils {
 
+    private ClassUtils() {}
+
     public static List<String> getAllInterfacesNames(Class<?> aClass) {
         return toString(getAllInterfaces(aClass));
     }
@@ -56,26 +58,6 @@ public class ClassUtils {
         return list;
     }
 
-    /*
-    public static List<String> getAllAbstractClassesNames(Class<?> aClass) {
-        return toString(getAllInterfaces(aClass));
-    }
-
-    public static List getAllAbstractClasses(Class aClass) {
-        List<Class<?>> list = new ArrayList<>();
-
-        Class<?> superclass = aClass.getSuperclass();
-        while (superclass != null) {
-            if (Modifier.isAbstract(superclass.getModifiers())) {
-                list.add(superclass);
-            }
-            superclass = superclass.getSuperclass();
-        }
-
-        return list;
-    }
-    */
-
     /**
      * Get a certain annotation of a {@link TypeElement}.
      * See <a href="https://stackoverflow.com/a/10167558">stackoverflow.com</a> for more information.
@@ -95,13 +77,6 @@ public class ClassUtils {
 
         return null;
     }
-
-    /*
-    public static Element getAnnotationMirrorElement(TypeElement typeElement, Class<?> annotationClass) {
-        AnnotationMirror annotationMirror = getAnnotationMirror(typeElement, annotationClass);
-        return annotationMirror != null ? annotationMirror.getAnnotationType().asElement() : null;
-    }
-    */
 
     /**
      * Get a certain parameter of an {@link AnnotationMirror}.
@@ -139,9 +114,6 @@ public class ClassUtils {
 
     /**
      * Uses {@link Class#getSimpleName()} to convert from {@link Class} to {@link String}.
-     *
-     * @param classes
-     * @return
      */
     private static List<String> toString(List<Class<?>> classes) {
         List<String> list = new ArrayList<>();

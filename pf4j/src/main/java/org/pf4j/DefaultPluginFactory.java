@@ -23,18 +23,16 @@ import java.lang.reflect.Modifier;
 
 /**
  * The default implementation for {@link PluginFactory}.
- * It uses {@link Class#newInstance()} method.
+ * It uses {@link Constructor#newInstance(Object...)} method.
  *
  * @author Decebal Suiu
  */
 public class DefaultPluginFactory implements PluginFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultPluginFactory.class);
+    protected static final Logger log = LoggerFactory.getLogger(DefaultPluginFactory.class);
 
     /**
-     * Creates a plugin instance. If an error occurs than that error is logged and the method returns null.
-     * @param pluginWrapper
-     * @return
+     * Creates a plugin instance. If an error occurs than that error is logged and the method returns {@code null}.
      */
     @Override
     public Plugin create(final PluginWrapper pluginWrapper) {
@@ -58,10 +56,26 @@ public class DefaultPluginFactory implements PluginFactory {
             return null;
         }
 
-        // create the plugin instance
+        return createInstance(pluginClass, pluginWrapper);
+    }
+
+    protected Plugin createInstance(Class<?> pluginClass, PluginWrapper pluginWrapper) {
         try {
             Constructor<?> constructor = pluginClass.getConstructor(PluginWrapper.class);
             return (Plugin) constructor.newInstance(pluginWrapper);
+        } catch (NoSuchMethodException e) {
+            return createUsingNoParametersConstructor(pluginClass);
+       } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return null;
+    }
+
+    protected Plugin createUsingNoParametersConstructor(Class<?> pluginClass) {
+        try {
+            Constructor<?> constructor = pluginClass.getConstructor();
+            return (Plugin) constructor.newInstance();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

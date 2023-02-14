@@ -16,34 +16,33 @@
 package org.pf4j.demo.welcome;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.pf4j.PluginWrapper;
-import org.pf4j.RuntimeMode;
-import org.pf4j.demo.api.Greeting;
 import org.pf4j.Extension;
-import org.pf4j.Plugin;
+import org.pf4j.RuntimeMode;
+import org.pf4j.demo.api.DemoPlugin;
+import org.pf4j.demo.api.Greeting;
+import org.pf4j.demo.api.PluginContext;
 
 /**
  * @author Decebal Suiu
  */
-public class WelcomePlugin extends Plugin {
+public class WelcomePlugin extends DemoPlugin {
 
-    public WelcomePlugin(PluginWrapper wrapper) {
-        super(wrapper);
+    public WelcomePlugin(PluginContext context) {
+        super(context);
     }
 
     @Override
     public void start() {
-        System.out.println("WelcomePlugin.start()");
+        log.info("WelcomePlugin.start()");
         // for testing the development mode
-        if (RuntimeMode.DEVELOPMENT.equals(wrapper.getRuntimeMode())) {
-            System.out.println(StringUtils.upperCase("WelcomePlugin"));
+        if (RuntimeMode.DEVELOPMENT.equals(context.getRuntimeMode())) {
+            log.info(StringUtils.upperCase("WelcomePlugin"));
         }
     }
 
     @Override
     public void stop() {
-        System.out.println("WelcomePlugin.stop()");
+        log.info("WelcomePlugin.stop()");
     }
 
     @Extension
