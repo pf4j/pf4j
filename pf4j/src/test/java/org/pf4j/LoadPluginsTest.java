@@ -161,10 +161,13 @@ public class LoadPluginsTest {
 
         assertEquals(1, pluginManager.getPlugins().size());
         assertTrue(pluginManager.unloadPlugin(pluginId));
-        // duplicate check
+        assertEquals(0, pluginManager.getPlugins().size());
         assertNull(pluginManager.idForPath(pluginZip.unzippedPath()));
-        // Double unload ok
+
+        // double unload ok
         assertThrows(IllegalArgumentException.class, () -> pluginManager.unloadPlugin(pluginId), "Unknown pluginId " + pluginId);
+
+        // load plugin again
         assertNotNull(pluginManager.loadPlugin(pluginZip.unzippedPath()));
     }
 
