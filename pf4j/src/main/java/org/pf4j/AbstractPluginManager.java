@@ -271,6 +271,8 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     protected boolean unloadPlugin(String pluginId, boolean unloadDependents) {
+        checkPluginId(pluginId);
+
         try {
             if (unloadDependents) {
                 List<String> dependents = dependencyResolver.getDependents(pluginId);
@@ -451,18 +453,11 @@ public abstract class AbstractPluginManager implements PluginManager {
     protected PluginState stopPlugin(String pluginId, boolean stopDependents) {
         checkPluginId(pluginId);
 
-        PluginWrapper pluginWrapper = getPlugin(pluginId);
-        PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
-        PluginState pluginState = pluginWrapper.getPluginState();
-        if (PluginState.STOPPED == pluginState) {
-            log.debug("Already stopped plugin '{}'", getPluginLabel(pluginDescriptor));
-            return PluginState.STOPPED;
-        }
-
-        // test for disabled plugin
-        if (PluginState.DISABLED == pluginState) {
+        // test for started plugin
+        if (!checkPluginState(pluginId, PluginState.STARTED)) {
             // do nothing
-            return pluginState;
+            log.debug("Plugin '{}' is not started", getPluginLabel(pluginId));
+            return getPlugin(pluginId).getPluginState();
         }
 
         if (stopDependents) {
@@ -474,20 +469,31 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
-        log.info("Stop plugin '{}'", getPluginLabel(pluginDescriptor));
+        log.info("Stop plugin '{}'", getPluginLabel(pluginId));
+        PluginWrapper pluginWrapper = getPlugin(pluginId);
         pluginWrapper.getPlugin().stop();
         pluginWrapper.setPluginState(PluginState.STOPPED);
-        startedPlugins.remove(pluginWrapper);
+        getStartedPlugins().remove(pluginWrapper);
 
-        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
+        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, PluginState.STOPPED));
 
-        return pluginWrapper.getPluginState();
+        return PluginState.STOPPED;
     }
 
+    /**
+     * This method throws an {@link IllegalArgumentException} if there is no plugin with this id.
+     */
     protected void checkPluginId(String pluginId) {
         if (!plugins.containsKey(pluginId)) {
             throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
         }
+    }
+
+    /**
+     * This method returns {@code true} if the plugin state is equals with the value passed for parameter {@code pluginState}.
+     */
+    protected boolean checkPluginState(String pluginId, PluginState pluginState) {
+        return getPlugin(pluginId).getPluginState() == pluginState;
     }
 
     @Override
@@ -879,15 +885,14 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * creates the plugin wrapper. override this if you want to prevent plugins having full access to the plugin manager
-     *
-     * @return
+     * Creates the plugin wrapper. override this if you want to prevent plugins having full access to the plugin manager.
      */
     protected PluginWrapper createPluginWrapper(PluginDescriptor pluginDescriptor, Path pluginPath, ClassLoader pluginClassLoader) {
         // create the plugin wrapper
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
         PluginWrapper pluginWrapper = new PluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
         pluginWrapper.setPluginFactory(getPluginFactory());
+
         return pluginWrapper;
     }
 
@@ -946,8 +951,12 @@ public abstract class AbstractPluginManager implements PluginManager {
         return versionManager;
     }
 
+    protected String getPluginLabel(String pluginId) {
+        return getPluginLabel(getPlugin(pluginId).getDescriptor());
+    }
+
     /**
-     * The plugin label is used in logging and it's a string in format {@code pluginId@pluginVersion}.
+     * The plugin label is used in logging, and it's a string in format {@code pluginId@pluginVersion}.
      */
     protected String getPluginLabel(PluginDescriptor pluginDescriptor) {
         return pluginDescriptor.getPluginId() + "@" + pluginDescriptor.getVersion();
