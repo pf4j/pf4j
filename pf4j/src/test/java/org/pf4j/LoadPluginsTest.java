@@ -152,18 +152,19 @@ public class LoadPluginsTest {
 
     @Test
     public void loadUnloadLoad() throws Exception {
-        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
+        String pluginId = "myPlugin";
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), pluginId)
             .pluginVersion("1.2.3")
             .build();
 
         pluginManager.loadPlugins();
 
         assertEquals(1, pluginManager.getPlugins().size());
-        assertTrue(pluginManager.unloadPlugin(pluginManager.idForPath(pluginZip.unzippedPath())));
+        assertTrue(pluginManager.unloadPlugin(pluginId));
         // duplicate check
         assertNull(pluginManager.idForPath(pluginZip.unzippedPath()));
         // Double unload ok
-        assertFalse(pluginManager.unloadPlugin(pluginManager.idForPath(pluginZip.unzippedPath())));
+        assertThrows(IllegalArgumentException.class, () -> pluginManager.unloadPlugin(pluginId), "Unknown pluginId " + pluginId);
         assertNotNull(pluginManager.loadPlugin(pluginZip.unzippedPath()));
     }
 
