@@ -15,14 +15,17 @@
  */
 package org.pf4j.demo;
 
+import java.lang.reflect.Constructor;
 import org.pf4j.DefaultPluginFactory;
 import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
 import org.pf4j.demo.api.PluginContext;
-
-import java.lang.reflect.Constructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class DemoPluginFactory extends DefaultPluginFactory {
+
+    private static final Logger log = LoggerFactory.getLogger(DemoPluginFactory.class);
 
     @Override
     protected Plugin createInstance(Class<?> pluginClass, PluginWrapper pluginWrapper) {
