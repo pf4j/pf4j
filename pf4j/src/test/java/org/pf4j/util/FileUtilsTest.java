@@ -19,9 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginZip;
 
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -65,4 +67,32 @@ public class FileUtilsTest {
         assertEquals(folder, FileUtils.expandIfZip(folder));
     }
 
+    @Test
+    public void readLinesIgnoreCommentTest() throws IOException {
+        File file = createSampleFile("test");
+
+        // ignoreComments = true
+        List<String> ignoreCommentsLines = FileUtils.readLines(file.toPath(), true);
+        assertEquals("1 content", ignoreCommentsLines.get(0));
+        assertEquals(2, ignoreCommentsLines.size());
+
+        // ignoreComments = false
+        List<String> lines = FileUtils.readLines(file.toPath(), false);
+        assertEquals("# 1 comment", lines.get(0));
+        assertEquals(4, lines.size());
+        file.deleteOnExit();
+    }
+
+    public File createSampleFile(String fileName) throws IOException {
+        File file = File.createTempFile(fileName, ".txt");
+        file.deleteOnExit();
+
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(file.toPath()))) {
+            writer.write("# 1 comment\n");
+            writer.write("1 content\n");
+            writer.write("2 content\n");
+            writer.write("# 2 comment\n");
+        }
+        return file;
+    }
 }

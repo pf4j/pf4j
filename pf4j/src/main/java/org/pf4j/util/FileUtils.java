@@ -57,7 +57,7 @@ public final class FileUtils {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (ignoreComments && !line.startsWith("#") && !lines.contains(line)) {
+                if (!(ignoreComments && line.startsWith("#")) && !lines.contains(line)) {
                     lines.add(line);
                 }
             }
