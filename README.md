@@ -19,6 +19,7 @@ PF4J is an open source (Apache license) lightweight (around __100 KB__) plugin f
 
 Practically, PF4J is a microframework that aims to keep the core simple but extensible. We also have a community-driven ecosystem of extensions.
 For now are available these extensions:
+- [pf4j-shell](https://github.com/pf4j/pf4j-shell) (interactive shell for PF4J)
 - [pf4j-update](https://github.com/pf4j/pf4j-update) (update mechanism for PF4J)
 - [pf4j-spring](https://github.com/pf4j/pf4j-spring) (PF4J - Spring Framework integration)
 - [pf4j-wicket](https://github.com/pf4j/pf4j-wicket) (PF4J - Wicket integration)
