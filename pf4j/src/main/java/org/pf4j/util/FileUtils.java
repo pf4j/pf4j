@@ -185,11 +185,6 @@ public final class FileUtils {
         String directoryName = fileName.substring(0, fileName.lastIndexOf("."));
         Path pluginDirectory = filePath.resolveSibling(directoryName);
 
-        // Check whether directory traversal risks exist in the path
-        if (!isInvalidPath(pluginDirectory)) {
-            throw new SecurityException("Invalid destination directory");
-        }
-
         if (!Files.exists(pluginDirectory) || pluginZipDate.compareTo(Files.getLastModifiedTime(pluginDirectory)) > 0) {
             // expand '.zip' file
             Unzip unzip = new Unzip();
@@ -202,13 +197,6 @@ public final class FileUtils {
         return pluginDirectory;
     }
 
-    /**
-     * Use regular expressions to check whether the path contains a path traversal attempt
-     */
-    private static boolean isInvalidPath(Path path) {
-        String pathStr = path.toString();
-        return pathStr.matches(".*\\.\\.(\\\\|/).*");
-    }
 
     /**
      * Return true only if path is a zip file.

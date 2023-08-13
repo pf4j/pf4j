@@ -20,7 +20,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 
 import org.slf4j.Logger;
@@ -80,6 +83,11 @@ public class Unzip {
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 File file = new File(destination, zipEntry.getName());
 
+                // add check
+                if (zipEntry.getName().indexOf("..") != -1 && !file.getCanonicalPath().startsWith(destination.getCanonicalPath())) {
+                    throw new ZipException("The file "+zipEntry.getName()+" is trying to leave the target output directory of "+destination+". Ignoring this file.");
+                }
+
                 // create intermediary directories - sometimes zip don't add them
                 File dir = new File(file.getParent());
 
@@ -99,6 +107,8 @@ public class Unzip {
             }
         }
     }
+
+
 
     private static void mkdirsOrThrow(File dir) throws IOException {
         if (!dir.exists() && !dir.mkdirs()) {
