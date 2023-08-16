@@ -15,16 +15,16 @@
  */
 package org.pf4j.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class extracts the content of the plugin zip into a directory.
@@ -75,10 +75,16 @@ public class Unzip {
             FileUtils.delete(destination.toPath());
         }
 
+        String destinationCanonicalPath = destination.getCanonicalPath();
         try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(source))) {
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 File file = new File(destination, zipEntry.getName());
+
+                String fileCanonicalPath = file.getCanonicalPath();
+                if (!fileCanonicalPath.startsWith(destinationCanonicalPath)) {
+                    throw new ZipException("The file "+ zipEntry.getName() + " is trying to leave the target output directory of "+ destination);
+                }
 
                 // create intermediary directories - sometimes zip don't add them
                 File dir = new File(file.getParent());
