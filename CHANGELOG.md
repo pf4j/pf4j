@@ -5,8 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#526]: Path Traversal when unzip zip file
 
 #### Changed
+- Update compile-testing dependency from 0.18 to 0.21.0
+- [#514]: Switch to slf4j-2.x and replace log4j with slf4j-simple
+- [#515]: Improve class generation for testing
+- [#517]: Update Gradle demo to pass plugin dependencies into Manifest
+- [#524]: Keep the access modifier consistent
 
 #### Added
 
@@ -434,6 +440,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#526]: https://github.com/pf4j/pf4j/issues/526
+[#524]: https://github.com/pf4j/pf4j/issues/524
+[#517]: https://github.com/pf4j/pf4j/pull/517
+[#515]: https://github.com/pf4j/pf4j/pull/515
+[#514]: https://github.com/pf4j/pf4j/pull/514
 [#512]: https://github.com/pf4j/pf4j/pull/512
 [#508]: https://github.com/pf4j/pf4j/issues/508
 [#492]: https://github.com/pf4j/pf4j/issues/492
