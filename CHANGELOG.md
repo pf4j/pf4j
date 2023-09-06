@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Fixed
 - [#526]: Path Traversal when unzip zip file
+- [#527]: Wrong judgment condition for ignoreComments
 
 #### Changed
 - Update compile-testing dependency from 0.18 to 0.21.0
@@ -440,6 +441,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#527]: https://github.com/pf4j/pf4j/issues/527
 [#526]: https://github.com/pf4j/pf4j/issues/526
 [#524]: https://github.com/pf4j/pf4j/issues/524
 [#517]: https://github.com/pf4j/pf4j/pull/517
