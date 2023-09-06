@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [3.10.0] - 2023-09-06
+
+#### Fixed
 - [#526]: Path Traversal when unzip zip file
 - [#527]: Wrong judgment condition for ignoreComments
 
@@ -14,10 +24,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#515]: Improve class generation for testing
 - [#517]: Update Gradle demo to pass plugin dependencies into Manifest
 - [#524]: Keep the access modifier consistent
-
-#### Added
-
-#### Removed
 
 ### [3.9.0] - 2023-01-30
 
@@ -411,7 +417,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#41]: Added plugin archive source abstraction
 - Added test for DefaultPluginRepository
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.9.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.10.0...HEAD
+[3.10.0]: https://github.com/decebals/pf4j/compare/release-3.9.0...release-3.10.0
 [3.9.0]: https://github.com/decebals/pf4j/compare/release-3.8.0...release-3.9.0
 [3.8.0]: https://github.com/decebals/pf4j/compare/release-3.7.0...release-3.8.0
 [3.7.0]: https://github.com/decebals/pf4j/compare/release-3.6.0...release-3.7.0
