@@ -19,6 +19,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
 import org.pf4j.test.TestExtension;
@@ -100,7 +102,8 @@ public class JarPluginManagerTest {
     }
 
     @Test
-    public void releaseBrokenJar() throws IOException {
+    @EnabledOnOs(OS.WINDOWS)
+    public void releaseBrokenJarOnWindows() throws IOException {
         PluginJar pluginZip = new PluginJar.Builder(pluginsPath.resolve("test.jar"), "test")
             .pluginVersion("1.2.3")
             .pluginClass("invalidClass")
