@@ -110,17 +110,17 @@ public class JarPluginManagerTest {
             .build();
 
         pluginManager.loadPlugins();
-        final Path pluginPath = pluginManager.getPlugin(pluginZip.pluginId()).getPluginPath();
+        Path pluginPath = pluginManager.getPlugin(pluginZip.pluginId()).getPluginPath();
 
         try {
             pluginManager.startPlugin(pluginZip.pluginId());
-        } catch (final Exception exceptionStartPlugin) {
+        } catch (Exception exceptionStartPlugin) {
             Assertions.assertThrows(FileSystemException.class, () -> Files.delete(pluginPath));
 
             // Try to remove the plugin if it cannot be started
             try {
                 pluginManager.unloadPlugin(pluginZip.pluginId());
-            } catch (final Exception ignored2) {
+            } catch (Exception ignored2) {
             }
             Assertions.assertDoesNotThrow(() -> Files.delete(pluginPath));
         }

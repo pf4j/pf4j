@@ -289,7 +289,7 @@ public abstract class AbstractPluginManager implements PluginManager {
                 }
 
                 log.info("Unload plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 if (pluginWrapper == null) {
                     return false;
                 }
