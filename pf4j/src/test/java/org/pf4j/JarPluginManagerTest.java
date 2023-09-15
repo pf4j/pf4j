@@ -16,8 +16,11 @@
 package org.pf4j;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
 import org.pf4j.test.TestExtension;
@@ -25,8 +28,11 @@ import org.pf4j.test.TestExtensionPoint;
 import org.pf4j.test.TestPlugin;
 
 import java.io.IOException;
+import java.nio.file.FileSystemException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -95,4 +101,28 @@ public class JarPluginManagerTest {
         assertFalse(pluginJar.file().exists());
     }
 
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    public void releaseBrokenJarOnWindows() throws IOException {
+        PluginJar pluginZip = new PluginJar.Builder(pluginsPath.resolve("test.jar"), "test")
+            .pluginVersion("1.2.3")
+            .pluginClass("invalidClass")
+            .build();
+
+        pluginManager.loadPlugins();
+        Path pluginPath = pluginManager.getPlugin(pluginZip.pluginId()).getPluginPath();
+
+        try {
+            pluginManager.startPlugin(pluginZip.pluginId());
+        } catch (Exception exceptionStartPlugin) {
+            Assertions.assertThrows(FileSystemException.class, () -> Files.delete(pluginPath));
+
+            // Try to remove the plugin if it cannot be started
+            try {
+                pluginManager.unloadPlugin(pluginZip.pluginId());
+            } catch (Exception ignored2) {
+            }
+            Assertions.assertDoesNotThrow(() -> Files.delete(pluginPath));
+        }
+    }
 }

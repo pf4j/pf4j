@@ -280,14 +280,21 @@ public abstract class AbstractPluginManager implements PluginManager {
                     dependents.addAll(0, dependencyResolver.getDependents(dependent));
                 }
             }
-
-            PluginState pluginState = stopPlugin(pluginId, false);
-            if (PluginState.STARTED == pluginState) {
-                return false;
-            }
-
             PluginWrapper pluginWrapper = getPlugin(pluginId);
-            log.info("Unload plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
+            PluginState pluginState;
+            try {
+                pluginState = stopPlugin(pluginId, false);
+                if (PluginState.STARTED == pluginState) {
+                    return false;
+                }
+
+                log.info("Unload plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
+            } catch (Exception e) {
+                if (pluginWrapper == null) {
+                    return false;
+                }
+                pluginState = PluginState.FAILED;
+            }
 
             // remove the plugin
             plugins.remove(pluginId);
