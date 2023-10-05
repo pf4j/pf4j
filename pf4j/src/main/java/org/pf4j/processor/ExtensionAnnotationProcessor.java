@@ -130,10 +130,10 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
             }
         }
 
-        // write extensions
-        if (extensions.size() > 0) {
-            storage.write(extensions);
-        }
+        // Even an empty extensions descriptor is semantically correct and should be
+        // written to prevent classloaders from falling back to extension descriptor
+        // resources from dependencies of the plugin being processed.
+        storage.write(extensions);
 
         return false;
     }
