@@ -190,4 +190,44 @@ public class DefaultPluginManagerTest {
         assertFalse(pluginJar.file().exists());
     }
 
+    @Test
+    public void loadingPluginWithMissingDependencyDoesNotBreakOtherPlugins() throws IOException {
+        // Load 2 plugins, one with a dependency that is missing and one without any dependencies.
+        PluginZip pluginZip1 = new PluginZip.Builder(pluginsPath.resolve("my-first-plugin-1.1.1.zip"), "myPlugin1")
+            .pluginVersion("1.1.1")
+            .pluginDependencies("myBasePlugin")
+            .build();
+
+        PluginZip pluginZip2 = new PluginZip.Builder(pluginsPath.resolve("my-second-plugin-2.2.2.zip"), "myPlugin2")
+            .pluginVersion("2.2.2")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        // myPlugin2 should have been started at this point.
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin(pluginZip2.pluginId()).getPluginState());
+
+        pluginManager.unloadPlugin(pluginZip1.pluginId());
+
+        // No traces should remain of myPlugin1.
+        assertTrue(
+            pluginManager.getUnresolvedPlugins().stream()
+                .noneMatch(pluginWrapper -> pluginWrapper.getPluginId().equals(pluginZip1.pluginId()))
+        );
+
+        // Load the missing dependency, everything should start working.
+        PluginZip pluginZipBase = new PluginZip.Builder(pluginsPath.resolve("my-base-plugin-3.0.0.zip"), "myBasePlugin")
+            .pluginVersion("3.0.0")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin(pluginZip1.pluginId()).getPluginState());
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin(pluginZip2.pluginId()).getPluginState());
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin(pluginZipBase.pluginId()).getPluginState());
+
+        assertTrue(pluginManager.getUnresolvedPlugins().isEmpty());
+    }
 }
