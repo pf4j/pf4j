@@ -243,11 +243,28 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
+        // Make sure that any plugins with missing dependencies are unloaded
+        // before plugins are resolved, otherwise the internal state of
+        // AbstractPluginManager is corrupted.
+        unloadPluginsWithMissingDependencies();
+
         // resolve plugins
         try {
             resolvePlugins();
         } catch (PluginRuntimeException e) {
             log.error(e.getMessage(), e);
+        }
+    }
+
+    private void unloadPluginsWithMissingDependencies() {
+        List<PluginDescriptor> descriptors = new ArrayList<>();
+        for (PluginWrapper plugin : plugins.values()) {
+            descriptors.add(plugin.getDescriptor());
+        }
+
+        DependencyResolver.Result result = dependencyResolver.resolve(descriptors);
+        for (String notFoundDependency : result.getNotFoundDependencies()) {
+            unloadPlugin(notFoundDependency, true);
         }
     }
 
@@ -276,7 +293,7 @@ public abstract class AbstractPluginManager implements PluginManager {
                 List<String> dependents = dependencyResolver.getDependents(pluginId);
                 while (!dependents.isEmpty()) {
                     String dependent = dependents.remove(0);
-                    unloadPlugin(dependent, false);
+                    unloadPlugin(dependent, true);
                     dependents.addAll(0, dependencyResolver.getDependents(dependent));
                 }
             }
@@ -299,6 +316,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             // remove the plugin
             plugins.remove(pluginId);
             getResolvedPlugins().remove(pluginWrapper);
+            getUnresolvedPlugins().remove( pluginWrapper );
 
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
 
