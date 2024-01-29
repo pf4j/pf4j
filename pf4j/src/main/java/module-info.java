@@ -34,7 +34,7 @@ module org.pf4j {
     // The java-semver library currently does not provide a module.
     // Maybe we should send them a pull request, that at least they provide an
     // automatic module name in their MANIFEST file.
-    requires java.semver;
+    requires com.github.zafarkhaja.semver;
 
     // Maybe we should reconsider the package hierarchy, that only classes are
     // exported, which are required by 3rd party developers.
