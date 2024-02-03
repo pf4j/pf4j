@@ -243,16 +243,11 @@ public abstract class AbstractPluginManager implements PluginManager {
             try {
                 loadPluginFromPath(pluginPath);
             } catch (PluginRuntimeException e) {
-                log.error(e.getMessage(), e);
+                log.error("Cannot load plugin '{}'", pluginPath, e);
             }
         }
 
-        // resolve plugins
-        try {
-            resolvePlugins();
-        } catch (PluginRuntimeException e) {
-            log.error(e.getMessage(), e);
-        }
+        resolvePlugins();
     }
 
     /**
