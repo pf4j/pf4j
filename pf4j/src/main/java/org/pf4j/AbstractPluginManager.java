@@ -38,8 +38,8 @@ import java.util.stream.Collectors;
  * This class implements the boilerplate plugin code that any {@link PluginManager}
  * implementation would have to support.
  * It helps cut the noise out of the subclass that handles plugin management.
- *
- * <p>This class is not thread-safe.
+ * <p>
+ * This class is not thread-safe.
  *
  * @author Decebal Suiu
  */
@@ -160,14 +160,9 @@ public abstract class AbstractPluginManager implements PluginManager {
      */
     @Override
     public List<PluginWrapper> getPlugins(PluginState pluginState) {
-        List<PluginWrapper> plugins = new ArrayList<>();
-        for (PluginWrapper plugin : getPlugins()) {
-            if (pluginState.equals(plugin.getPluginState())) {
-                plugins.add(plugin);
-            }
-        }
-
-        return plugins;
+        return getPlugins().stream()
+            .filter(plugin -> pluginState.equals(plugin.getPluginState()))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -190,6 +185,14 @@ public abstract class AbstractPluginManager implements PluginManager {
         return plugins.get(pluginId);
     }
 
+    /**
+     * Load a plugin.
+     *
+     * @param pluginPath the plugin location
+     * @return the pluginId of the loaded plugin as specified in its {@linkplain PluginDescriptor metadata}
+     * @throws IllegalArgumentException if the plugin location does not exist
+     * @throws PluginRuntimeException if something goes wrong
+     */
     @Override
     public String loadPlugin(Path pluginPath) {
         if ((pluginPath == null) || Files.notExists(pluginPath)) {
@@ -212,6 +215,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     @Override
     public void loadPlugins() {
         log.debug("Lookup plugins in '{}'", pluginsRoots);
+
         // check for plugins roots
         if (pluginsRoots.isEmpty()) {
             log.warn("No plugins roots configured");
@@ -264,12 +268,22 @@ public abstract class AbstractPluginManager implements PluginManager {
 
     /**
      * Unload the specified plugin and it's dependents.
+     *
+     * @param pluginId the pluginId of the plugin to unload
+     * @return true if the plugin was unloaded, otherwise false
      */
     @Override
     public boolean unloadPlugin(String pluginId) {
         return unloadPlugin(pluginId, true);
     }
 
+    /**
+     * Unload the specified plugin and it's dependents.
+     *
+     * @param pluginId the pluginId of the plugin to unload
+     * @param unloadDependents if true, unload dependents
+     * @return true if the plugin was unloaded, otherwise false
+     */
     protected boolean unloadPlugin(String pluginId, boolean unloadDependents) {
         try {
             if (unloadDependents) {
@@ -347,9 +361,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         // notify the plugin as it's deleted
         plugin.delete();
 
-        Path pluginPath = pluginWrapper.getPluginPath();
-
-        return pluginRepository.deletePluginPath(pluginPath);
+        return pluginRepository.deletePluginPath(pluginWrapper.getPluginPath());
     }
 
     /**
@@ -405,7 +417,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         for (PluginDependency dependency : pluginDescriptor.getDependencies()) {
-            // start dependency only if it marked as required (non optional) or if it optional and loaded
+            // start dependency only if it marked as required (non-optional) or if it optional and loaded
             if (!dependency.isOptional() || plugins.containsKey(dependency.getPluginId())) {
                 startPlugin(dependency.getPluginId());
             }
@@ -455,6 +467,13 @@ public abstract class AbstractPluginManager implements PluginManager {
         return stopPlugin(pluginId, true);
     }
 
+    /**
+     * Stop the specified plugin and it's dependents.
+     *
+     * @param pluginId the pluginId of the plugin to stop
+     * @param stopDependents if true, stop dependents
+     * @return the plugin state after stopping
+     */
     protected PluginState stopPlugin(String pluginId, boolean stopDependents) {
         checkPluginId(pluginId);
 
@@ -491,6 +510,12 @@ public abstract class AbstractPluginManager implements PluginManager {
         return pluginWrapper.getPluginState();
     }
 
+    /**
+     * Check if the plugin exists in the list of plugins.
+     *
+     * @param pluginId the pluginId to check
+     * @throws IllegalArgumentException if the plugin does not exist
+     */
     protected void checkPluginId(String pluginId) {
         if (!plugins.containsKey(pluginId)) {
             throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
@@ -741,6 +766,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         pluginsDir = isDevelopment() ? DEVELOPMENT_PLUGINS_DIR : DEFAULT_PLUGINS_DIR;
+
         return Collections.singletonList(Paths.get(pluginsDir));
     }
 
@@ -760,19 +786,30 @@ public abstract class AbstractPluginManager implements PluginManager {
             return true;
         }
 
-        PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         log.warn("Plugin '{}' requires a minimum system version of {}, and you have {}",
-            getPluginLabel(pluginDescriptor),
+            getPluginLabel(pluginWrapper.getDescriptor()),
             requires,
             getSystemVersion());
 
         return false;
     }
 
+    /**
+     * Check if the plugin is disabled.
+     *
+     * @param pluginId the pluginId to check
+     * @return true if the plugin is disabled, otherwise false
+     */
     protected boolean isPluginDisabled(String pluginId) {
         return pluginStatusProvider.isPluginDisabled(pluginId);
     }
 
+    /**
+     * It resolves the plugins by checking the dependencies.
+     * It also checks for cyclic dependencies, missing dependencies and wrong versions of the dependencies.
+     *
+     * @throws PluginRuntimeException if something goes wrong
+     */
     protected void resolvePlugins() {
         // retrieves the plugins descriptors
         List<PluginDescriptor> descriptors = new ArrayList<>();
@@ -815,6 +852,12 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
     }
 
+    /**
+     * Fire a plugin state event.
+     * This method is called when a plugin is loaded, started, stopped, etc.
+     *
+     * @param event the plugin state event
+     */
     protected synchronized void firePluginStateEvent(PluginStateEvent event) {
         for (PluginStateListener listener : pluginStateListeners) {
             log.trace("Fire '{}' to '{}'", event, listener);
@@ -822,6 +865,14 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
     }
 
+    /**
+     * Load the plugin from the specified path.
+     *
+     * @param pluginPath the path to the plugin
+     * @return the loaded plugin
+     * @throws PluginAlreadyLoadedException if the plugin is already loaded
+     * @throws InvalidPluginDescriptorException if the plugin is invalid
+     */
     protected PluginWrapper loadPluginFromPath(Path pluginPath) {
         // Test for plugin path duplication
         String pluginId = idForPath(pluginPath);
@@ -886,15 +937,21 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * creates the plugin wrapper. override this if you want to prevent plugins having full access to the plugin manager
+     * Creates the plugin wrapper.
+     * <p>
+     * Override this if you want to prevent plugins having full access to the plugin manager.
      *
-     * @return
+     * @param pluginDescriptor the plugin descriptor
+     * @param pluginPath the path to the plugin
+     * @param pluginClassLoader the class loader for the plugin
+     * @return the plugin wrapper
      */
     protected PluginWrapper createPluginWrapper(PluginDescriptor pluginDescriptor, Path pluginPath, ClassLoader pluginClassLoader) {
         // create the plugin wrapper
         log.debug("Creating wrapper for plugin '{}'", pluginPath);
         PluginWrapper pluginWrapper = new PluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
         pluginWrapper.setPluginFactory(getPluginFactory());
+
         return pluginWrapper;
     }
 
@@ -918,19 +975,21 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Override this to change the validation criteria.
      *
      * @param descriptor the plugin descriptor to validate
-     * @throws PluginRuntimeException if validation fails
+     * @throws InvalidPluginDescriptorException if validation fails
      */
     protected void validatePluginDescriptor(PluginDescriptor descriptor) {
         if (StringUtils.isNullOrEmpty(descriptor.getPluginId())) {
-            throw new PluginRuntimeException("Field 'id' cannot be empty");
+            throw new InvalidPluginDescriptorException("Field 'id' cannot be empty");
         }
 
         if (descriptor.getVersion() == null) {
-            throw new PluginRuntimeException("Field 'version' cannot be empty");
+            throw new InvalidPluginDescriptorException("Field 'version' cannot be empty");
         }
     }
 
     /**
+     * Check if the exact version in requires is allowed.
+     *
      * @return true if exact versions in requires is allowed
      */
     public boolean isExactVersionAllowed() {
@@ -954,7 +1013,10 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * The plugin label is used in logging and it's a string in format {@code pluginId@pluginVersion}.
+     * The plugin label is used in logging, and it's a string in format {@code pluginId@pluginVersion}.
+     *
+     * @param pluginDescriptor the plugin descriptor
+     * @return the plugin label
      */
     protected String getPluginLabel(PluginDescriptor pluginDescriptor) {
         return pluginDescriptor.getPluginId() + "@" + pluginDescriptor.getVersion();
