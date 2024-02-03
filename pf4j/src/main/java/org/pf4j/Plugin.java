@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This class will be extended by all plugins and
  * serve as the common class between a plugin and the application.
+ * <p>
+ * Create (it's optional) a Plugin class if you are interested in plugin's lifecycle events (start, stop, ...)
+ * or you want to pass some context to the plugin.
  *
  * @author Decebal Suiu
  */

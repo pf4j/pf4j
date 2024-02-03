@@ -16,6 +16,10 @@
 package org.pf4j;
 
 /**
+ * Describes an extension.
+ * The extension is described by the class and the ordinal (the order of the extension).
+
+ *
  * @author Decebal Suiu
  */
 public class ExtensionDescriptor {

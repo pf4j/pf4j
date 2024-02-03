@@ -24,20 +24,65 @@ import java.util.List;
  */
 public interface PluginDescriptor {
 
+    /**
+     * The unique identifier of the plugin.
+     *
+     * @return the plugin id
+     */
     String getPluginId();
 
+    /**
+     * Returns a description of the plugin.
+     *
+     * @return the plugin description
+     */
     String getPluginDescription();
 
+    /**
+     * Returns the fully qualified class name of the plugin class.
+     * The plugin class must implement the {@link Plugin} interface.
+     *
+     * @return the plugin class
+     */
     String getPluginClass();
 
+    /**
+     * Returns the plugin version.
+     * The version must be unique for each release of the plugin.
+     * The version is used to check if the plugin is compatible with the application.
+     *
+     * @see VersionManager
+     * @return the plugin version
+     */
     String getVersion();
 
+    /**
+     * Returns the required version of the application.
+     *
+     * @return the required version of the application
+     */
     String getRequires();
 
+    /**
+     * Returns the author of the plugin.
+     *
+     * @return the author of the plugin
+     */
     String getProvider();
 
+    /**
+     * Returns the license of the plugin.
+     *
+     * @return the license of the plugin
+     */
     String getLicense();
 
+    /**
+     * Returns the dependencies of the plugin.
+     * A dependency is represented by a {@link PluginDependency} object.
+     *
+     * @return the dependencies of the plugin
+     */
     List<PluginDependency> getDependencies();
 
 }

@@ -18,13 +18,26 @@ package org.pf4j;
 import java.util.Objects;
 
 /**
+ * A plugin dependency is a dependency that the plugin has on another plugin.
+ * <p>
+ * The dependency is defined by the plugin id and the version of the plugin that is required.
+ * <p>
+ * A dependency is considered as optional, if the plugin id ends with a question mark.
+ * For example, the plugin id "my-plugin?" is considered as optional.
+ * <p>
+ * The plugin id and the version are separated by the '@' character.
+ * For example, the dependency "my-plugin@1.0.0" means that the plugin "my-plugin" with version "1.0.0" is required.
+ * If the version is not specified, then the plugin is required with any version.
+ * For example, the dependency "my-plugin" means that the plugin "my-plugin" with any version is required.
+ *
+ * @see VersionManager
  * @author Decebal Suiu
  */
 public class PluginDependency {
 
     private String pluginId;
     private String pluginVersionSupport = "*";
-    private boolean optional;
+    private final boolean optional;
 
     public PluginDependency(String dependency) {
         int index = dependency.indexOf('@');
@@ -44,14 +57,29 @@ public class PluginDependency {
         }
     }
 
+    /**
+     * Returns the unique identifier of the plugin.
+     *
+     * @return the plugin id
+     */
     public String getPluginId() {
         return pluginId;
     }
 
+    /**
+     * Returns the version of the plugin that is required.
+     *
+     * @return the version of the plugin that is required
+     */
     public String getPluginVersionSupport() {
         return pluginVersionSupport;
     }
 
+    /**
+     * Returns {@code true} if the dependency is optional, {@code false} otherwise.
+     *
+     * @return {@code true} if the dependency is optional, {@code false} otherwise
+     */
     public boolean isOptional() {
         return optional;
     }
@@ -77,4 +105,5 @@ public class PluginDependency {
     public int hashCode() {
         return Objects.hash(pluginId, pluginVersionSupport, optional);
     }
+
 }

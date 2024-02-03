@@ -19,7 +19,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Directory that contains plugins. A plugin could be a {@code directory}, @code zip} or {@code jar} file.
+ * Directory that contains plugins. A plugin could be a {@code directory}, {@code zip} or {@code jar} file.
  *
  * @author Decebal Suiu
  * @author Mário Franco

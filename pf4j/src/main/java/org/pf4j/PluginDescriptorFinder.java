@@ -19,6 +19,7 @@ import java.nio.file.Path;
 
 /**
  * Find a plugin descriptor for a plugin path.
+ * <p>
  * You can find the plugin descriptor in manifest file {@link ManifestPluginDescriptorFinder},
  * properties file {@link PropertiesPluginDescriptorFinder}, xml file,
  * java services (with {@link java.util.ServiceLoader}), etc.
@@ -28,10 +29,19 @@ import java.nio.file.Path;
 public interface PluginDescriptorFinder {
 
     /**
-     * Returns true if this finder is applicable to the given {@link Path}.
+     * Returns {@code true} if this finder is applicable to the given {@code pluginPath}.
+     * This is used to select the appropriate finder for a given plugin path.
+     *
+     * @param pluginPath the plugin path
      */
     boolean isApplicable(Path pluginPath);
 
+    /**
+     * Find the plugin descriptor for the given {@code pluginPath}.
+     *
+     * @param pluginPath the plugin path
+     * @return the plugin descriptor or {@code null} if not found
+     */
     PluginDescriptor find(Path pluginPath);
 
 }

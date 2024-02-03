@@ -19,19 +19,30 @@ import java.nio.file.Path;
 
 /**
  * Load all information (classes) needed by a plugin.
+ * <p>
+ * The plugin loader is responsible for creating a class loader for a plugin
+ * and loading all classes/resources needed by the plugin.
  *
  * @author Decebal Suiu
  */
 public interface PluginLoader {
 
     /**
-     * Returns true if this loader is applicable to the given {@link Path}.
+     * Returns {@code true} if this loader is applicable to the given plugin path.
+     * This is used to select the appropriate loader for a given plugin path.
      *
-     * @param pluginPath
-     * @return
+     * @param pluginPath the plugin path
+     * @return true if this loader is applicable to the given {@link Path}
      */
     boolean isApplicable(Path pluginPath);
 
+    /**
+     * Load all information (classes) needed by a plugin.
+     *
+     * @param pluginPath the plugin path
+     * @param pluginDescriptor the plugin descriptor
+     * @return the class loader for the plugin
+     */
     ClassLoader loadPlugin(Path pluginPath, PluginDescriptor pluginDescriptor);
 
 }

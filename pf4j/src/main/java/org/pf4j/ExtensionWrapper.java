@@ -17,6 +17,7 @@ package org.pf4j;
 
 /**
  * A wrapper over extension instance.
+ * It contains the extension descriptor and the extension instance.
  *
  * @author Decebal Suiu
  */

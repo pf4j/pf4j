@@ -20,6 +20,12 @@ package org.pf4j;
  */
 public interface ExtensionFactory {
 
+    /**
+     * Creates an extension instance.
+     *
+     * @param extensionClass the extension class
+     * @return the extension instance
+     */
     <T> T create(Class<T> extensionClass);
 
 }

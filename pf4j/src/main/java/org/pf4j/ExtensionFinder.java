@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Provides the functionality for finding extensions.
+ *
  * @author Decebal Suiu
  */
 public interface ExtensionFinder {
@@ -34,7 +36,7 @@ public interface ExtensionFinder {
     <T> List<ExtensionWrapper<T>> find(Class<T> type, String pluginId);
 
     /**
-     * Retrieves a list with all extensions found for a plugin
+     * Retrieves a list with all extensions found for a plugin.
      */
     List<ExtensionWrapper> find(String pluginId);
 

@@ -15,15 +15,19 @@
  */
 package org.pf4j;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
+ * An extension is a class that extends an extension point.
+ * Use this annotation to mark a class as an extension.
+ * The extension class must implement the extension point interface or extend the extension point abstract class.
+ *
  * @author Decebal Suiu
  */
 @Retention(RUNTIME)
@@ -32,6 +36,12 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Extension {
 
+    /**
+     * The order of the extension.
+     * The ordinal is used to sort the extensions.
+     *
+     * @return the order of the extension
+     */
     int ordinal() default 0;
 
     /**

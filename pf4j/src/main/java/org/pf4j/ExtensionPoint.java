@@ -17,6 +17,10 @@ package org.pf4j;
 
 /**
  * An extension point is a formal declaration in a plugin (or in application API) where customization is allowed.
+ * It's a place where custom code can be "plugged in".
+ * <p>
+ * An extension point is defined by an interface or an abstract class.
+ * The extension point is used by the application to discover and use the custom implementations.
  *
  * @author Decebal Suiu
  */

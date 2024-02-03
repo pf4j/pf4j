@@ -23,38 +23,75 @@ import java.util.Set;
 
 /**
  * The classpath of the plugin.
+ * <p>
  * It contains {@code classes} directories (directories that contain classes files)
  * and {@code jars} directories (directories that contain jars files).
+ * <p>
+ * The classpath is used to create the {@link ClassLoader} for the plugin.
  *
  * @author Decebal Suiu
  */
 public class PluginClasspath {
 
-    private Set<String> classesDirectories = new HashSet<>();
-    private Set<String> jarsDirectories = new HashSet<>();
+    private final Set<String> classesDirectories = new HashSet<>();
+    private final Set<String> jarsDirectories = new HashSet<>();
 
+    /**
+     * Get the classes directories.
+     *
+     * @return a set of directories that contain classes files
+     */
     public Set<String> getClassesDirectories() {
         return classesDirectories;
     }
 
+    /**
+     * Add classes directories.
+     *
+     * @param classesDirectories a set of directories that contain classes files
+     * @return this object for chaining
+     */
     public PluginClasspath addClassesDirectories(String... classesDirectories) {
         return addClassesDirectories(Arrays.asList(classesDirectories));
     }
 
+    /**
+     * Add classes directories.
+     *
+     * @param classesDirectories a collection of directories that contain classes files
+     * @return this object for chaining
+     */
     public PluginClasspath addClassesDirectories(Collection<String> classesDirectories) {
         this.classesDirectories.addAll(classesDirectories);
 
         return this;
     }
 
+    /**
+     * Get the jars directories.
+     *
+     * @return a set of directories that contain jars files
+     */
     public Set<String> getJarsDirectories() {
         return jarsDirectories;
     }
 
+    /**
+     * Add jars directories.
+     *
+     * @param jarsDirectories a set of directories that contain jars files
+     * @return this object for chaining
+     */
     public PluginClasspath addJarsDirectories(String... jarsDirectories) {
         return addJarsDirectories(Arrays.asList(jarsDirectories));
     }
 
+    /**
+     * Add jars directories.
+     *
+     * @param jarsDirectories a collection of directories that contain jars files
+     * @return this object for chaining
+     */
     public PluginClasspath addJarsDirectories(Collection<String> jarsDirectories) {
         this.jarsDirectories.addAll(jarsDirectories);
 
@@ -74,4 +111,5 @@ public class PluginClasspath {
     public int hashCode() {
         return Objects.hash(classesDirectories, jarsDirectories);
     }
+
 }

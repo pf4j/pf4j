@@ -16,10 +16,16 @@
 package org.pf4j;
 
 /**
- * Creates a plugin instance.
+ * It's responsible for creating a plugin instance.
  */
 public interface PluginFactory {
 
+    /**
+     * Create a plugin instance.
+     *
+     * @param pluginWrapper the plugin wrapper
+     * @return a plugin instance
+     */
     Plugin create(PluginWrapper pluginWrapper);
 
 }

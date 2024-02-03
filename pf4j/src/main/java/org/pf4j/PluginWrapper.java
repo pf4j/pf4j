@@ -24,13 +24,13 @@ import java.nio.file.Path;
  */
 public class PluginWrapper {
 
-    private PluginManager pluginManager;
-    private PluginDescriptor descriptor;
-    private Path pluginPath;
-    private ClassLoader pluginClassLoader;
+    private final PluginManager pluginManager;
+    private final PluginDescriptor descriptor;
+    private final Path pluginPath;
+    private final ClassLoader pluginClassLoader;
     private PluginFactory pluginFactory;
     private PluginState pluginState;
-    private RuntimeMode runtimeMode;
+    private final RuntimeMode runtimeMode;
 
     private Throwable failedException;
 
@@ -48,6 +48,8 @@ public class PluginWrapper {
 
     /**
      * Returns the plugin manager.
+     *
+     * @return the plugin manager
      */
     public PluginManager getPluginManager() {
         return pluginManager;
@@ -55,6 +57,8 @@ public class PluginWrapper {
 
     /**
      * Returns the plugin descriptor.
+     *
+     * @return the plugin descriptor
      */
     public PluginDescriptor getDescriptor() {
         return descriptor;
@@ -62,20 +66,29 @@ public class PluginWrapper {
 
     /**
      * Returns the path of this plugin.
+     *
+     * @return the path of this plugin
      */
     public Path getPluginPath() {
         return pluginPath;
     }
 
     /**
-     * Returns the plugin class loader used to load classes and resources
-     * for this plug-in. The class loader can be used to directly access
-     * plug-in resources and classes.
+     * Returns the plugin {@link ClassLoader} used to load classes and resources for this plug-in.
+     * <p>
+     * The class loader can be used to directly access plug-in resources and classes.
+     *
+     * @return the plugin class loader
      */
     public ClassLoader getPluginClassLoader() {
         return pluginClassLoader;
     }
 
+    /**
+     * Returns the plugin instance.
+     *
+     * @return the plugin instance
+     */
     public Plugin getPlugin() {
         if (plugin == null) {
             plugin = pluginFactory.create(this);
@@ -84,16 +97,26 @@ public class PluginWrapper {
         return plugin;
     }
 
+    /**
+     * Returns the plugin factory.
+     *
+     * @return the plugin factory
+     */
     public PluginState getPluginState() {
         return pluginState;
     }
 
+    /**
+     * Returns the runtime mode.
+     *
+     * @return the runtime mode
+     */
     public RuntimeMode getRuntimeMode() {
         return runtimeMode;
     }
 
     /**
-     * Shortcut
+     * Shortcut for {@code getDescriptor().getPluginId()}.
      */
     public String getPluginId() {
         return getDescriptor().getPluginId();
@@ -133,10 +156,20 @@ public class PluginWrapper {
         return "PluginWrapper [descriptor=" + descriptor + ", pluginPath=" + pluginPath + "]";
     }
 
+    /**
+     * Used internally by the framework to set the plugin factory.
+     *
+     * @param pluginState the plugin state
+     */
     public void setPluginState(PluginState pluginState) {
         this.pluginState = pluginState;
     }
 
+    /**
+     * Used internally by the framework to set the plugin factory.
+     *
+     * @param pluginFactory the plugin factory
+     */
     public void setPluginFactory(PluginFactory pluginFactory) {
         this.pluginFactory = pluginFactory;
     }
@@ -144,11 +177,18 @@ public class PluginWrapper {
     /**
      * Returns the exception with which the plugin fails to start.
      * See @{link PluginStatus#FAILED}.
+     *
+     * @return the exception with which the plugin fails to start
      */
     public Throwable getFailedException() {
         return failedException;
     }
 
+    /**
+     * Used internally by the framework to set the exception with which the plugin fails to start.
+     *
+     * @param failedException the exception with which the plugin fails to start
+     */
     public void setFailedException(Throwable failedException) {
         this.failedException = failedException;
     }

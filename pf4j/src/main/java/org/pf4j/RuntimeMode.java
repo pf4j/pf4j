@@ -20,6 +20,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
+ * The runtime mode of the PF4J application.
+ * <p>
+ * The runtime mode is used to determine the behavior of the application.
+ * For example, in development mode, the application may display detailed error messages,
+ * while in deployment mode, the application may display a generic error message.
+ *
  * @author Decebal Suiu
  */
 public enum RuntimeMode {
@@ -51,6 +57,13 @@ public enum RuntimeMode {
         return name;
     }
 
+    /**
+     * Returns the runtime mode with the specified name.
+     *
+     * @param name the name of the runtime mode
+     * @return the runtime mode with the specified name
+     * @throws NoSuchElementException if the runtime mode with the specified name is not found
+     */
     public static RuntimeMode byName(String name) {
         if (map.containsKey(name)) {
             return map.get(name);

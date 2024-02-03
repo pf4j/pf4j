@@ -141,6 +141,12 @@ public interface PluginManager {
      */
     boolean deletePlugin(String pluginId);
 
+    /**
+     * Retrieves the class loader for the specified plugin.
+     *
+     * @param pluginId the unique plugin identifier, specified in its metadata
+     * @return the class loader for the plugin
+     */
     ClassLoader getPluginClassLoader(String pluginId);
 
     List<Class<?>> getExtensionClasses(String pluginId);
@@ -153,6 +159,12 @@ public interface PluginManager {
 
     <T> List<T> getExtensions(Class<T> type, String pluginId);
 
+    /**
+     * Retrieves the extensions for the specified plugin.
+     *
+     * @param pluginId the unique plugin identifier, specified in its metadata
+     * @return the extensions for the plugin
+     */
     List getExtensions(String pluginId);
 
     Set<String> getExtensionClassNames(String pluginId);
@@ -165,14 +177,14 @@ public interface PluginManager {
     RuntimeMode getRuntimeMode();
 
     /**
-     * Returns {@code true} if the runtime mode is {@code RuntimeMode.DEVELOPMENT}.
+     * Returns {@code true} if the runtime mode is {@link RuntimeMode#DEVELOPMENT}.
      */
     default boolean isDevelopment() {
         return RuntimeMode.DEVELOPMENT.equals(getRuntimeMode());
     }
 
     /**
-     * Returns {@code true} if the runtime mode is not {@code RuntimeMode.DEVELOPMENT}.
+     * Returns {@code true} if the runtime mode is not {@link RuntimeMode#DEVELOPMENT}.
      */
     default boolean isNotDevelopment() {
         return !isDevelopment();
@@ -193,7 +205,7 @@ public interface PluginManager {
      * disables all version checking.
      *
      * @default 0.0.0
-     * @param version
+     * @param version the system version
      */
     void setSystemVersion(String version);
 
@@ -215,7 +227,7 @@ public interface PluginManager {
     Path getPluginsRoot();
 
     /**
-     * Gets the a read-only list of all paths of the folders where plugins are installed.
+     * Gets a read-only list of all paths of the folders where plugins are installed.
      *
      * @return Paths of plugins roots
      */

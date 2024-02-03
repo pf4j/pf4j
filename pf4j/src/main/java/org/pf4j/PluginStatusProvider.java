@@ -16,6 +16,12 @@
 package org.pf4j;
 
 /**
+ * Provides a way to check if a plugin is disabled and to disable/enable a plugin.
+ * <p>
+ * This is useful when you want to store the plugin status in a database or in a file.
+ *
+ * @see PluginState#DISABLED
+ *
  * @author Decebal Suiu
  * @author Mário Franco
  */

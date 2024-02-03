@@ -19,6 +19,7 @@ import java.util.Comparator;
 
 /**
  * Manager responsible for versions of plugins.
+ * It's used to check if a version matches a constraint and to compare two versions.
  *
  * @author Decebal Suiu
  */
@@ -28,17 +29,17 @@ public interface VersionManager {
      * Check if a {@code constraint} and a {@code version} match.
      * A possible constrain can be {@code >=1.0.0 & <2.0.0}.
      *
-     * @param version
-     * @param constraint
-     * @return
+     * @param version the version to check
+     * @param constraint the constraint to check
+     * @return {@code true} if the version matches the constraint, {@code false} otherwise
      */
     boolean checkVersionConstraint(String version, String constraint);
 
     /**
      * Compare two versions. It's similar with {@link Comparator#compare(Object, Object)}.
      *
-     * @param v1
-     * @param v2
+     * @param v1 the first version to compare
+     * @param v2 the second version to compare
      */
     int compareVersions(String v1, String v2);
 

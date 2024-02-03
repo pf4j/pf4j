@@ -16,6 +16,14 @@
 package org.pf4j;
 
 /**
+ * The state of a plugin.
+ * <p>
+ * Lifecycle of a plugin:
+ * <pre>
+ * CREATED -> RESOLVED -> STARTED -> STOPPED
+ * CREATED -> DISABLED
+ * CREATED -> FAILED
+ *
  * @author Decebal Suiu
  */
 public enum PluginState {
@@ -51,14 +59,14 @@ public enum PluginState {
      */
     FAILED("FAILED");
 
-    private String status;
+    private final String status;
 
-    private PluginState(String status) {
+    PluginState(String status) {
         this.status = status;
     }
 
     public boolean equals(String status) {
-    	return (status == null ? false : this.status.equalsIgnoreCase(status));
+        return (this.status.equalsIgnoreCase(status));
     }
 
     @Override
@@ -66,13 +74,20 @@ public enum PluginState {
         return status;
     }
 
+    /**
+     * Parse a string to a {@link PluginState}.
+     *
+     * @param string the string to parse
+     * @return the {@link PluginState} or null if the string is not a valid state
+     */
     public static PluginState parse(String string) {
-		for (PluginState status : values()) {
-			if (status.equals(string)) {
-				return status;
-			}
-		}
+        for (PluginState status : values()) {
+            if (status.equals(string)) {
+                return status;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
+
 }

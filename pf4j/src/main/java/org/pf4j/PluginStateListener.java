@@ -18,14 +18,19 @@ package org.pf4j;
 import java.util.EventListener;
 
 /**
- * PluginStateListener defines the interface for an object that listens to plugin state changes.
+ * Defines the interface for an object that listens to plugin state changes.
+ * <p>
+ * The class that is interested in processing a plugin state event implements this interface.
  *
+ * @see PluginStateEvent
  * @author Decebal Suiu
  */
 public interface PluginStateListener extends EventListener {
 
     /**
-     * Invoked when a plugin's state (for example DISABLED, STARTED) is changed.
+     * Invoked when a plugin's state (for example {@link PluginState#DISABLED}, {@link PluginState#STARTED}) is changed.
+     *
+     * @param event the plugin state event
      */
     void pluginStateChanged(PluginStateEvent event);
 
