@@ -31,7 +31,7 @@ import java.util.Map;
  * The {@code Result} class contains nice information about the result of resolve operation (if it's a cyclic dependency,
  * they are not found dependencies, they are dependencies with wrong version).
  * This class is very useful for if-else scenarios.
- *
+ * <p>
  * Only some attributes (pluginId, dependencies and pluginVersion) from {@link PluginDescriptor} are used in
  * the process of {@code resolve} operation.
  *
@@ -41,7 +41,7 @@ public class DependencyResolver {
 
     private static final Logger log = LoggerFactory.getLogger(DependencyResolver.class);
 
-    private VersionManager versionManager;
+    private final VersionManager versionManager;
 
     private DirectedGraph<String> dependenciesGraph; // the value is 'pluginId'
     private DirectedGraph<String> dependentsGraph; // the value is 'pluginId'
@@ -51,6 +51,12 @@ public class DependencyResolver {
         this.versionManager = versionManager;
     }
 
+    /**
+     * Resolve the dependencies for the given plugins.
+     *
+     * @param plugins the list of plugins
+     * @return a {@link Result} object
+     */
     public Result resolve(List<PluginDescriptor> plugins) {
         // create graphs
         dependenciesGraph = new DirectedGraph<>();
@@ -128,9 +134,9 @@ public class DependencyResolver {
     /**
      * Check if an existing version of dependency is compatible with the required version (from plugin descriptor).
      *
-     * @param requiredVersion
-     * @param existingVersion
-     * @return
+     * @param requiredVersion the required version
+     * @param existingVersion the existing version
+     * @return {@code true} if the existing version is compatible with the required version, {@code false} otherwise
      */
     protected boolean checkDependencyVersion(String requiredVersion, String existingVersion) {
         return versionManager.checkVersionConstraint(existingVersion, requiredVersion);
@@ -180,12 +186,15 @@ public class DependencyResolver {
             "' for plugin '" + dependent.getPluginId() + "'");
     }
 
+    /**
+     * The result of the {@link #resolve(List)} operation.
+     */
     public static class Result {
 
         private boolean cyclicDependency;
-        private List<String> notFoundDependencies; // value is "pluginId"
-        private List<String> sortedPlugins; // value is "pluginId"
-        private List<WrongDependencyVersion> wrongVersionDependencies;
+        private final List<String> notFoundDependencies; // value is "pluginId"
+        private final List<String> sortedPlugins; // value is "pluginId"
+        private final List<WrongDependencyVersion> wrongVersionDependencies;
 
         Result(List<String> sortedPlugins) {
             if (sortedPlugins == null) {
@@ -201,6 +210,8 @@ public class DependencyResolver {
 
         /**
          * Returns true is a cyclic dependency was detected.
+         *
+         * @return true is a cyclic dependency was detected
          */
         public boolean hasCyclicDependency() {
             return cyclicDependency;
@@ -208,6 +219,8 @@ public class DependencyResolver {
 
         /**
          * Returns a list with dependencies required that were not found.
+         *
+         * @return a list with dependencies required that were not found
          */
         public List<String> getNotFoundDependencies() {
             return notFoundDependencies;
@@ -215,6 +228,8 @@ public class DependencyResolver {
 
         /**
          * Returns a list with dependencies with wrong version.
+         *
+         * @return a list with dependencies with wrong version
          */
         public List<WrongDependencyVersion> getWrongVersionDependencies() {
             return wrongVersionDependencies;
@@ -222,6 +237,8 @@ public class DependencyResolver {
 
         /**
          * Get the list of plugins in dependency sorted order.
+         *
+         * @return the list of plugins in dependency sorted order
          */
         public List<String> getSortedPlugins() {
             return sortedPlugins;
@@ -237,12 +254,15 @@ public class DependencyResolver {
 
     }
 
+    /**
+     * Represents a wrong dependency version.
+     */
     public static class WrongDependencyVersion {
 
-        private String dependencyId; // value is "pluginId"
-        private String dependentId; // value is "pluginId"
-        private String existingVersion;
-        private String requiredVersion;
+        private final String dependencyId; // value is "pluginId"
+        private final String dependentId; // value is "pluginId"
+        private final String existingVersion;
+        private final String requiredVersion;
 
         WrongDependencyVersion(String dependencyId, String dependentId, String existingVersion, String requiredVersion) {
             this.dependencyId = dependencyId;
@@ -294,7 +314,7 @@ public class DependencyResolver {
      */
     public static class DependenciesNotFoundException extends PluginRuntimeException {
 
-        private List<String> dependencies;
+        private final List<String> dependencies;
 
         public DependenciesNotFoundException(List<String> dependencies) {
             super("Dependencies '{}' not found", dependencies);
