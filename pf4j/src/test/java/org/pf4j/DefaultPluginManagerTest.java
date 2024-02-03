@@ -28,6 +28,8 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -90,7 +92,7 @@ public class DefaultPluginManagerTest {
 
     @Test
     public void isPluginValid() {
-        // By default accept all since system version not given
+        // By default, accept all since system version not given
         assertTrue(pluginManager.isPluginValid(pluginWrapper));
 
         pluginManager.setSystemVersion("1.0.0");
@@ -107,7 +109,7 @@ public class DefaultPluginManagerTest {
     public void isPluginValidAllowExact() {
         pluginManager.setExactVersionAllowed(true);
 
-        // By default accept all since system version not given
+        // By default, accept all since system version not given
         assertTrue(pluginManager.isPluginValid(pluginWrapper));
 
         pluginManager.setSystemVersion("1.0.0");
@@ -127,7 +129,7 @@ public class DefaultPluginManagerTest {
 
     /**
      * Test that a disabled plugin doesn't start.
-     * See https://github.com/pf4j/pf4j/issues/223.
+     * See <a href="https://github.com/pf4j/pf4j/issues/223">#223</a>.
      */
     @Test
     public void testPluginDisabledNoStart() throws IOException {
@@ -188,6 +190,23 @@ public class DefaultPluginManagerTest {
         assertTrue(deleted);
 
         assertFalse(pluginJar.file().exists());
+    }
+
+    @Test
+    public void loadedPluginWithMissingDependencyCanBeUnloaded() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.1.1.zip"), "myPlugin")
+            .pluginVersion("1.1.1")
+            .pluginDependencies("myBasePlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        PluginWrapper myPlugin = pluginManager.getPlugin(pluginZip.pluginId());
+        assertNotNull(myPlugin);
+        assertNotEquals(PluginState.STARTED, myPlugin.getPluginState());
+
+        assertTrue(pluginManager.unloadPlugin(pluginZip.pluginId()));
     }
 
 }
