@@ -199,7 +199,12 @@ public class DefaultPluginManagerTest {
             .pluginDependencies("myBasePlugin")
             .build();
 
-        pluginManager.loadPlugins();
+        try {
+            pluginManager.loadPlugin(pluginZip.path());
+        } catch (DependencyResolver.DependenciesNotFoundException e) {
+            // expected
+        }
+
         pluginManager.startPlugins();
 
         PluginWrapper myPlugin = pluginManager.getPlugin(pluginZip.pluginId());
