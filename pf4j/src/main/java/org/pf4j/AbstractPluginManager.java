@@ -861,6 +861,11 @@ public abstract class AbstractPluginManager implements PluginManager {
      * @param event the plugin state event
      */
     protected synchronized void firePluginStateEvent(PluginStateEvent event) {
+        if (event.getPluginState() == event.getOldState()) {
+            // ignore events without state change
+            return;
+        }
+
         for (PluginStateListener listener : pluginStateListeners) {
             log.trace("Fire '{}' to '{}'", event, listener);
             listener.pluginStateChanged(event);
