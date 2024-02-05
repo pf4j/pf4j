@@ -28,8 +28,6 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -194,24 +192,122 @@ public class DefaultPluginManagerTest {
 
     @Test
     public void loadedPluginWithMissingDependencyCanBeUnloaded() throws IOException {
+        pluginManager.setResolveRecoveryStrategy(AbstractPluginManager.ResolveRecoveryStrategy.IGNORE_PLUGIN_AND_CONTINUE);
+
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.1.1.zip"), "myPlugin")
             .pluginVersion("1.1.1")
             .pluginDependencies("myBasePlugin")
             .build();
 
-        try {
-            pluginManager.loadPlugin(pluginZip.path());
-        } catch (DependencyResolver.DependenciesNotFoundException e) {
-            // expected
-        }
+        // try to load the plugin with a missing dependency
+        pluginManager.loadPlugin(pluginZip.path());
 
+        // the plugin is unloaded automatically
+        assertTrue(pluginManager.getPlugins().isEmpty());
+
+        // start plugins
         pluginManager.startPlugins();
 
-        PluginWrapper myPlugin = pluginManager.getPlugin(pluginZip.pluginId());
-        assertNotNull(myPlugin);
-        assertNotEquals(PluginState.STARTED, myPlugin.getPluginState());
+        assertTrue(pluginManager.getStartedPlugins().isEmpty());
+        assertTrue(pluginManager.getUnresolvedPlugins().isEmpty());
+        assertTrue(pluginManager.getResolvedPlugins().isEmpty());
+        assertTrue(pluginManager.getPlugins().isEmpty());
+    }
 
-        assertTrue(pluginManager.unloadPlugin(pluginZip.pluginId()));
+    @Test
+    void loadingPluginWithMissingDependencyDoesNotBreakOtherPlugins() throws IOException {
+        pluginManager.setResolveRecoveryStrategy(AbstractPluginManager.ResolveRecoveryStrategy.IGNORE_PLUGIN_AND_CONTINUE);
+
+        // Load 2 plugins, one with a dependency that is missing and one without any dependencies.
+        PluginZip pluginZip1 = new PluginZip.Builder(pluginsPath.resolve("my-first-plugin-1.1.1.zip"), "myPlugin1")
+            .pluginVersion("1.1.1")
+            .pluginDependencies("myBasePlugin")
+            .build();
+
+        PluginZip pluginZip2 = new PluginZip.Builder(pluginsPath.resolve("my-second-plugin-2.2.2.zip"), "myPlugin2")
+            .pluginVersion("2.2.2")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        // myPlugin2 should have been started at this point.
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin(pluginZip2.pluginId()).getPluginState());
+
+        pluginManager.unloadPlugin(pluginZip1.pluginId());
+
+        // No traces should remain of myPlugin1.
+        assertTrue(
+            pluginManager.getUnresolvedPlugins().stream()
+                .noneMatch(pluginWrapper -> pluginWrapper.getPluginId().equals(pluginZip1.pluginId()))
+        );
+
+        pluginManager.unloadPlugin(pluginZip2.pluginId());
+
+        // Load the missing dependency, everything should start working.
+        PluginZip pluginZipBase = new PluginZip.Builder(pluginsPath.resolve("my-base-plugin-3.0.0.zip"), "myBasePlugin")
+            .pluginVersion("3.0.0")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin(pluginZip1.pluginId()).getPluginState());
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin(pluginZip2.pluginId()).getPluginState());
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin(pluginZipBase.pluginId()).getPluginState());
+
+        assertTrue(pluginManager.getUnresolvedPlugins().isEmpty());
+    }
+
+    @Test
+    void loadingPluginWithMissingDependencyFails() throws IOException {
+        pluginManager.setResolveRecoveryStrategy(AbstractPluginManager.ResolveRecoveryStrategy.THROW_EXCEPTION);
+
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.1.1.zip"), "myPlugin")
+            .pluginVersion("1.1.1")
+            .pluginDependencies("myBasePlugin")
+            .build();
+
+        // try to load the plugin with a missing dependency
+        Path pluginPath = pluginZip.path();
+        assertThrows(DependencyResolver.DependenciesNotFoundException.class, () -> pluginManager.loadPlugin(pluginPath));
+    }
+
+    @Test
+    void loadingPluginWithWrongDependencyVersionFails() throws IOException {
+        pluginManager.setResolveRecoveryStrategy(AbstractPluginManager.ResolveRecoveryStrategy.THROW_EXCEPTION);
+
+        PluginZip pluginZip1 = new PluginZip.Builder(pluginsPath.resolve("my-first-plugin-1.1.1.zip"), "myPlugin1")
+            .pluginVersion("1.1.1")
+            .pluginDependencies("myPlugin2@3.0.0")
+            .build();
+
+        PluginZip pluginZip2 = new PluginZip.Builder(pluginsPath.resolve("my-second-plugin-2.2.2.zip"), "myPlugin2")
+            .pluginVersion("2.2.2")
+            .build();
+
+        // try to load the plugins with cyclic dependencies
+        Path pluginPath1 = pluginZip1.path();
+        Path pluginPath2 = pluginZip2.path();
+        assertThrows(DependencyResolver.DependenciesWrongVersionException.class, () -> pluginManager.loadPlugins());
+    }
+
+    @Test
+    void loadingPluginsWithCyclicDependenciesFails() throws IOException {
+        PluginZip pluginZip1 = new PluginZip.Builder(pluginsPath.resolve("my-first-plugin-1.1.1.zip"), "myPlugin1")
+            .pluginVersion("1.1.1")
+            .pluginDependencies("myPlugin2")
+            .build();
+
+        PluginZip pluginZip2 = new PluginZip.Builder(pluginsPath.resolve("my-second-plugin-2.2.2.zip"), "myPlugin2")
+            .pluginVersion("2.2.2")
+            .pluginDependencies("myPlugin1")
+            .build();
+
+        // try to load the plugins with cyclic dependencies
+        Path pluginPath1 = pluginZip1.path();
+        Path pluginPath2 = pluginZip2.path();
+        assertThrows(DependencyResolver.CyclicDependencyException.class, () -> pluginManager.loadPlugins());
     }
 
 }

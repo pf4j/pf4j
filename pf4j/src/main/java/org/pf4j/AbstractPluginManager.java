@@ -109,6 +109,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     protected boolean exactVersionAllowed = false;
 
     protected VersionManager versionManager;
+    protected ResolveRecoveryStrategy resolveRecoveryStrategy;
 
     /**
      * The plugins roots are supplied as comma-separated list by {@code System.getProperty("pf4j.pluginsDir", "plugins")}.
@@ -280,56 +281,54 @@ public abstract class AbstractPluginManager implements PluginManager {
      * @return true if the plugin was unloaded, otherwise false
      */
     protected boolean unloadPlugin(String pluginId, boolean unloadDependents) {
-        try {
-            if (unloadDependents) {
-                List<String> dependents = dependencyResolver.getDependents(pluginId);
-                while (!dependents.isEmpty()) {
-                    String dependent = dependents.remove(0);
-                    unloadPlugin(dependent, false);
-                    dependents.addAll(0, dependencyResolver.getDependents(dependent));
-                }
+        if (unloadDependents) {
+            List<String> dependents = dependencyResolver.getDependents(pluginId);
+            while (!dependents.isEmpty()) {
+                String dependent = dependents.remove(0);
+                unloadPlugin(dependent, false);
+                dependents.addAll(0, dependencyResolver.getDependents(dependent));
             }
-            PluginWrapper pluginWrapper = getPlugin(pluginId);
-            PluginState pluginState;
-            try {
-                pluginState = stopPlugin(pluginId, false);
-                if (PluginState.STARTED == pluginState) {
-                    return false;
-                }
-
-                log.info("Unload plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
-            } catch (Exception e) {
-                if (pluginWrapper == null) {
-                    return false;
-                }
-                pluginState = PluginState.FAILED;
-            }
-
-            // remove the plugin
-            plugins.remove(pluginId);
-            getResolvedPlugins().remove(pluginWrapper);
-
-            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-
-            // remove the classloader
-            Map<String, ClassLoader> pluginClassLoaders = getPluginClassLoaders();
-            if (pluginClassLoaders.containsKey(pluginId)) {
-                ClassLoader classLoader = pluginClassLoaders.remove(pluginId);
-                if (classLoader instanceof Closeable) {
-                    try {
-                        ((Closeable) classLoader).close();
-                    } catch (IOException e) {
-                        throw new PluginRuntimeException(e, "Cannot close classloader");
-                    }
-                }
-            }
-
-            return true;
-        } catch (IllegalArgumentException e) {
-            // ignore not found exceptions because this method is recursive
         }
 
-        return false;
+        if (!plugins.containsKey(pluginId)) {
+            // nothing to do
+            return false;
+        }
+
+        PluginWrapper pluginWrapper = getPlugin(pluginId);
+        PluginState pluginState;
+        try {
+            pluginState = stopPlugin(pluginId, false);
+            if (PluginState.STARTED == pluginState) {
+                return false;
+            }
+
+            log.info("Unload plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
+        } catch (Exception e) {
+            pluginState = PluginState.FAILED;
+        }
+
+        // remove the plugin
+        plugins.remove(pluginId);
+        getResolvedPlugins().remove(pluginWrapper);
+        getUnresolvedPlugins().remove(pluginWrapper);
+
+        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
+
+        // remove the classloader
+        Map<String, ClassLoader> pluginClassLoaders = getPluginClassLoaders();
+        if (pluginClassLoaders.containsKey(pluginId)) {
+            ClassLoader classLoader = pluginClassLoaders.remove(pluginId);
+            if (classLoader instanceof Closeable) {
+                try {
+                    ((Closeable) classLoader).close();
+                } catch (IOException e) {
+                    throw new PluginRuntimeException(e, "Cannot close classloader");
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -506,11 +505,11 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Check if the plugin exists in the list of plugins.
      *
      * @param pluginId the pluginId to check
-     * @throws IllegalArgumentException if the plugin does not exist
+     * @throws PluginNotFoundException if the plugin does not exist
      */
     protected void checkPluginId(String pluginId) {
         if (!plugins.containsKey(pluginId)) {
-            throw new IllegalArgumentException(String.format("Unknown pluginId %s", pluginId));
+            throw new PluginNotFoundException(pluginId);
         }
     }
 
@@ -749,6 +748,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         versionManager = createVersionManager();
         dependencyResolver = new DependencyResolver(versionManager);
+        resolveRecoveryStrategy = ResolveRecoveryStrategy.THROW_EXCEPTION;
     }
 
     /**
@@ -814,27 +814,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      * @throws PluginRuntimeException if something goes wrong
      */
     protected void resolvePlugins() {
-        // retrieves the plugins descriptors
-        List<PluginDescriptor> descriptors = plugins.values().stream()
-            .map(PluginWrapper::getDescriptor)
-            .collect(Collectors.toList());
-
-        DependencyResolver.Result result = dependencyResolver.resolve(descriptors);
-
-        if (result.hasCyclicDependency()) {
-            throw new DependencyResolver.CyclicDependencyException();
-        }
-
-        List<String> notFoundDependencies = result.getNotFoundDependencies();
-        if (!notFoundDependencies.isEmpty()) {
-            throw new DependencyResolver.DependenciesNotFoundException(notFoundDependencies);
-        }
-
-        List<DependencyResolver.WrongDependencyVersion> wrongVersionDependencies = result.getWrongVersionDependencies();
-        if (!wrongVersionDependencies.isEmpty()) {
-            throw new DependencyResolver.DependenciesWrongVersionException(wrongVersionDependencies);
-        }
-
+        DependencyResolver.Result result = resolveDependencies();
         List<String> sortedPlugins = result.getSortedPlugins();
 
         // move plugins from "unresolved" to "resolved"
@@ -1056,6 +1036,90 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         return extensions;
+    }
+
+    protected DependencyResolver.Result resolveDependencies() {
+        // retrieves the plugins descriptors
+        List<PluginDescriptor> descriptors = plugins.values().stream()
+            .map(PluginWrapper::getDescriptor)
+            .collect(Collectors.toList());
+
+        DependencyResolver.Result result = dependencyResolver.resolve(descriptors);
+
+        if (result.isOK()) {
+            return result;
+        }
+
+        if (result.hasCyclicDependency()) {
+            // cannot recover from cyclic dependency
+            throw new DependencyResolver.CyclicDependencyException();
+        }
+
+        List<String> notFoundDependencies = result.getNotFoundDependencies();
+        if (result.hasNotFoundDependencies() && resolveRecoveryStrategy.equals(ResolveRecoveryStrategy.THROW_EXCEPTION)) {
+            throw new DependencyResolver.DependenciesNotFoundException(notFoundDependencies);
+        }
+
+        List<DependencyResolver.WrongDependencyVersion> wrongVersionDependencies = result.getWrongVersionDependencies();
+        if (result.hasWrongVersionDependencies() && resolveRecoveryStrategy.equals(ResolveRecoveryStrategy.THROW_EXCEPTION)) {
+            throw new DependencyResolver.DependenciesWrongVersionException(wrongVersionDependencies);
+        }
+
+        List<PluginDescriptor> resolvedDescriptors = new ArrayList<>(descriptors);
+
+        for (String notFoundDependency : notFoundDependencies) {
+            List<String> dependents = dependencyResolver.getDependents(notFoundDependency);
+            dependents.forEach(dependent -> resolvedDescriptors.removeIf(descriptor -> descriptor.getPluginId().equals(dependent)));
+        }
+
+        for (DependencyResolver.WrongDependencyVersion wrongVersionDependency : wrongVersionDependencies) {
+            resolvedDescriptors.removeIf(descriptor -> descriptor.getPluginId().equals(wrongVersionDependency.getDependencyId()));
+        }
+
+        List<PluginDescriptor> unresolvedDescriptors = new ArrayList<>(descriptors);
+        unresolvedDescriptors.removeAll(resolvedDescriptors);
+
+        for (PluginDescriptor unresolvedDescriptor : unresolvedDescriptors) {
+            unloadPlugin(unresolvedDescriptor.getPluginId(), false);
+        }
+
+        return resolveDependencies();
+    }
+
+    /**
+     * Retrieve the strategy for handling the recovery of a plugin resolve (load) failure.
+     * Default is {@link ResolveRecoveryStrategy#THROW_EXCEPTION}.
+     *
+     * @return the strategy
+     */
+    protected ResolveRecoveryStrategy getResolveRecoveryStrategy() {
+        return resolveRecoveryStrategy;
+    }
+
+    /**
+     * Set the strategy for handling the recovery of a plugin resolve (load) failure.
+     *
+     * @param resolveRecoveryStrategy the strategy
+     */
+    protected void setResolveRecoveryStrategy(ResolveRecoveryStrategy resolveRecoveryStrategy) {
+        this.resolveRecoveryStrategy = resolveRecoveryStrategy;
+    }
+
+    /**
+     * Strategy for handling the recovery of a plugin that could not be resolved
+     * (loaded) due to a dependency problem.
+     */
+    enum ResolveRecoveryStrategy {
+
+        /**
+         * Throw an exception when a resolve (load) failure occurs.
+         */
+        THROW_EXCEPTION,
+        /**
+         * Ignore the plugin with the resolve (load) failure and continue.
+         * The plugin with problems will be removed/unloaded from the plugins list.
+         */
+        IGNORE_PLUGIN_AND_CONTINUE
     }
 
 }
