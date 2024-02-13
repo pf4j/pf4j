@@ -28,8 +28,8 @@ import java.util.EventObject;
  */
 public class PluginStateEvent extends EventObject {
 
-    private PluginWrapper plugin;
-    private PluginState oldState;
+    private final PluginWrapper plugin;
+    private final PluginState oldState;
 
     public PluginStateEvent(PluginManager source, PluginWrapper plugin, PluginState oldState) {
         super(source);
