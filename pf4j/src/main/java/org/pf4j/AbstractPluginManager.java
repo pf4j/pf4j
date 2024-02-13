@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -305,6 +306,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
             log.info("Unload plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
         } catch (Exception e) {
+            log.error("Cannot stop plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()), e);
             pluginState = PluginState.FAILED;
         }
 
@@ -1092,7 +1094,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      *
      * @return the strategy
      */
-    protected ResolveRecoveryStrategy getResolveRecoveryStrategy() {
+    protected final ResolveRecoveryStrategy getResolveRecoveryStrategy() {
         return resolveRecoveryStrategy;
     }
 
@@ -1102,6 +1104,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      * @param resolveRecoveryStrategy the strategy
      */
     protected void setResolveRecoveryStrategy(ResolveRecoveryStrategy resolveRecoveryStrategy) {
+        Objects.requireNonNull(resolveRecoveryStrategy, "resolveRecoveryStrategy cannot be null");
         this.resolveRecoveryStrategy = resolveRecoveryStrategy;
     }
 
@@ -1109,7 +1112,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      * Strategy for handling the recovery of a plugin that could not be resolved
      * (loaded) due to a dependency problem.
      */
-    enum ResolveRecoveryStrategy {
+    public enum ResolveRecoveryStrategy {
 
         /**
          * Throw an exception when a resolve (load) failure occurs.
