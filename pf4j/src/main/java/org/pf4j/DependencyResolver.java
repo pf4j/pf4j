@@ -218,6 +218,15 @@ public class DependencyResolver {
         }
 
         /**
+         * Returns true if there are dependencies required that were not found.
+         *
+         * @return true if there are dependencies required that were not found
+         */
+        public boolean hasNotFoundDependencies() {
+            return !notFoundDependencies.isEmpty();
+        }
+
+        /**
          * Returns a list with dependencies required that were not found.
          *
          * @return a list with dependencies required that were not found
@@ -227,12 +236,30 @@ public class DependencyResolver {
         }
 
         /**
+         * Returns true if there are dependencies with wrong version.
+         *
+         * @return true if there are dependencies with wrong version
+         */
+        public boolean hasWrongVersionDependencies() {
+            return !wrongVersionDependencies.isEmpty();
+        }
+
+        /**
          * Returns a list with dependencies with wrong version.
          *
          * @return a list with dependencies with wrong version
          */
         public List<WrongDependencyVersion> getWrongVersionDependencies() {
             return wrongVersionDependencies;
+        }
+
+        /**
+         * Returns true if the result is OK (no cyclic dependency, no not found dependencies, no wrong version dependencies).
+         *
+         * @return true if the result is OK
+         */
+        public boolean isOK() {
+            return !hasCyclicDependency() && !hasNotFoundDependencies() && !hasWrongVersionDependencies();
         }
 
         /**
@@ -333,7 +360,7 @@ public class DependencyResolver {
      */
     public static class DependenciesWrongVersionException extends PluginRuntimeException {
 
-        private List<WrongDependencyVersion> dependencies;
+        private final List<WrongDependencyVersion> dependencies;
 
         public DependenciesWrongVersionException(List<WrongDependencyVersion> dependencies) {
             super("Dependencies '{}' have wrong version", dependencies);

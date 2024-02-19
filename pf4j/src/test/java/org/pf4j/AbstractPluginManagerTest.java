@@ -18,12 +18,10 @@ package org.pf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestExtensionPoint;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -118,7 +116,7 @@ public class AbstractPluginManagerTest {
 
     @Test
     void checkNotExistedPluginId() {
-        assertThrows(IllegalArgumentException.class, () -> pluginManager.checkPluginId("plugin1"));
+        assertThrows(PluginNotFoundException.class, () -> pluginManager.checkPluginId("plugin1"));
     }
 
     private PluginWrapper createPluginWrapper(String pluginId) {
@@ -127,7 +125,7 @@ public class AbstractPluginManagerTest {
         pluginDescriptor.setPluginVersion("1.2.3");
 
         PluginWrapper pluginWrapper = new PluginWrapper(pluginManager, pluginDescriptor, Paths.get("plugin1"), getClass().getClassLoader());
-        Plugin plugin= mock(Plugin.class);
+        Plugin plugin = mock(Plugin.class);
         pluginWrapper.setPluginFactory(wrapper -> plugin);
 
         return pluginWrapper;
