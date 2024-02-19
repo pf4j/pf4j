@@ -311,6 +311,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         // remove the plugin
+        pluginWrapper.setPluginState(PluginState.UNLOADED);
         plugins.remove(pluginId);
         getResolvedPlugins().remove(pluginWrapper);
         getUnresolvedPlugins().remove(pluginWrapper);

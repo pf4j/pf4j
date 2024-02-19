@@ -25,6 +25,9 @@ import org.pf4j.test.PluginZip;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -40,12 +43,17 @@ public class DefaultPluginManagerTest {
     private DefaultPluginDescriptor pluginDescriptor;
     private PluginWrapper pluginWrapper;
 
+    private List<PluginStateEvent> receivedEvents;
+
     @TempDir
     Path pluginsPath;
 
     @BeforeEach
     public void setUp() throws IOException {
+        receivedEvents = new ArrayList<>();
+
         pluginManager = new DefaultPluginManager(pluginsPath);
+        pluginManager.addPluginStateListener(event -> receivedEvents.add(event));
 
         pluginDescriptor = new DefaultPluginDescriptor();
         pluginDescriptor.setPluginId("myPlugin");
@@ -63,6 +71,7 @@ public class DefaultPluginManagerTest {
         pluginManager = null;
         pluginDescriptor = null;
         pluginWrapper = null;
+        receivedEvents = null;
     }
 
     @Test
@@ -140,6 +149,7 @@ public class DefaultPluginManagerTest {
 
         PluginManager pluginManager = new DefaultPluginManager(pluginsPath) {
 
+            @Override
             protected PluginStatusProvider createPluginStatusProvider() {
                 return statusProvider;
             }
@@ -171,6 +181,12 @@ public class DefaultPluginManagerTest {
         assertTrue(deleted);
 
         assertFalse(pluginZip.file().exists());
+
+        Optional<PluginStateEvent> unloadedEvent = receivedEvents.stream()
+            .filter(event -> event.getPluginState() == PluginState.UNLOADED)
+            .findFirst();
+
+        assertTrue(unloadedEvent.isPresent());
     }
 
     @Test
@@ -188,6 +204,12 @@ public class DefaultPluginManagerTest {
         assertTrue(deleted);
 
         assertFalse(pluginJar.file().exists());
+
+        Optional<PluginStateEvent> unloadedEvent = receivedEvents.stream()
+            .filter(event -> event.getPluginState() == PluginState.UNLOADED)
+            .findFirst();
+
+        assertTrue(unloadedEvent.isPresent());
     }
 
     @Test
@@ -310,4 +332,25 @@ public class DefaultPluginManagerTest {
         assertThrows(DependencyResolver.CyclicDependencyException.class, () -> pluginManager.loadPlugins());
     }
 
+    @Test
+    public void deleteZipPluginForPluginThatHasNotBeenStartedPostsUnloadedEvent() throws Exception {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        pluginManager.loadPlugin(pluginZip.path());
+
+        assertEquals(1, pluginManager.getPlugins().size());
+
+        boolean deleted = pluginManager.deletePlugin(pluginZip.pluginId());
+        assertTrue(deleted);
+
+        assertFalse(pluginZip.file().exists());
+
+        Optional<PluginStateEvent> unloadedEvent = receivedEvents.stream()
+            .filter(event -> event.getPluginState() == PluginState.UNLOADED)
+            .findFirst();
+
+        assertTrue(unloadedEvent.isPresent());
+    }
 }

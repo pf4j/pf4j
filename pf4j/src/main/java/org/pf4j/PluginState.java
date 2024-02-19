@@ -20,7 +20,7 @@ package org.pf4j;
  * <p>
  * Lifecycle of a plugin:
  * <pre>
- * CREATED -> RESOLVED -> STARTED -> STOPPED
+ * CREATED -> RESOLVED -> STARTED -> STOPPED -> UNLOADED
  * CREATED -> DISABLED
  * CREATED -> FAILED
  *
@@ -57,7 +57,14 @@ public enum PluginState {
     /**
      * Plugin failed to start.
      */
-    FAILED("FAILED");
+    FAILED("FAILED"),
+
+    /**
+     * The plugin has been unloaded. After this event has been completed, the plugin's
+     * {@link ClassLoader} will be closed.
+     */
+    UNLOADED("UNLOADED"),
+    ;
 
     private final String status;
 
