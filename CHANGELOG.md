@@ -5,10 +5,23 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#520]: Call stopPlugin only for started plugin
+- [#546]: Unload broken plugins
+- [#561]: Fix the problem of unable doing sonar scanning in JDK 11
+- [#563]: Method AbstractPluginManager#loadPlugins logs and return silently for resolve plugins errors
+- [#568]: Fix maven warning about plugin version
+- Ignore fire plugin state event without state change
 
 #### Changed
+- [#560]: Upgrade Java SemVer to 0.10.2
+- [#566]: Make PluginStateEvent fields final
+- Write empty extensions descriptor even if no extensions are found
 
 #### Added
+- [#564]: Add strategy for handling the recovery of a plugin that could not be resolved
+- [#565]: Add support for coverage in sonar
+- [#567]: Post PluginState.UNLOADED event when plugins are unloaded
+- Add InvalidPluginDescriptorException
 
 #### Removed
 
@@ -448,9 +461,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#568]: https://github.com/pf4j/pf4j/pull/568
+[#567]: https://github.com/pf4j/pf4j/pull/567
+[#566]: https://github.com/pf4j/pf4j/pull/566
+[#565]: https://github.com/pf4j/pf4j/pull/565
+[#564]: https://github.com/pf4j/pf4j/pull/564
+[#563]: https://github.com/pf4j/pf4j/issues/563
+[#561]: https://github.com/pf4j/pf4j/pull/561
+[#560]: https://github.com/pf4j/pf4j/pull/560
+[#546]: https://github.com/pf4j/pf4j/issues/546
 [#527]: https://github.com/pf4j/pf4j/issues/527
 [#526]: https://github.com/pf4j/pf4j/issues/526
 [#524]: https://github.com/pf4j/pf4j/issues/524
+[#520]: https://github.com/pf4j/pf4j/issues/520
 [#517]: https://github.com/pf4j/pf4j/pull/517
 [#515]: https://github.com/pf4j/pf4j/pull/515
 [#514]: https://github.com/pf4j/pf4j/pull/514
