@@ -42,5 +42,14 @@ public interface VersionManager {
      * @param v2 the second version to compare
      */
     int compareVersions(String v1, String v2);
+    
+    /**
+     * Checks that the given version is stable
+     * @param version
+     * @return
+     */
+    default boolean isStable(String version) {
+        return true;
+    }
 
 }
