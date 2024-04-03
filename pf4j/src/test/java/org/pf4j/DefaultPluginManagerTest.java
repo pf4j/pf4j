@@ -167,6 +167,19 @@ public class DefaultPluginManagerTest {
     }
 
     @Test
+    void shouldDisablePluginAfterStarting() throws IOException {
+        new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
+            .pluginVersion("1.2.3")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin("myPlugin").getPluginState());
+        pluginManager.disablePlugin("myPlugin");
+        assertEquals(PluginState.DISABLED, pluginManager.getPlugin("myPlugin").getPluginState());
+    }
+
+    @Test
     public void deleteZipPlugin() throws Exception {
         PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
             .pluginVersion("1.2.3")

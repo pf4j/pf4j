@@ -537,7 +537,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             log.debug("Already disabled plugin '{}'", getPluginLabel(pluginDescriptor));
             return true;
         } else if (PluginState.STARTED == pluginState) {
-            if (PluginState.STOPPED == stopPlugin(pluginId)) {
+            if (PluginState.STOPPED != stopPlugin(pluginId)) {
                 log.error("Failed to stop plugin '{}' on disable", getPluginLabel(pluginDescriptor));
                 return false;
             }
