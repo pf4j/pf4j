@@ -331,6 +331,9 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
+        // resolve the plugins again (update plugins graph)
+        resolveDependencies();
+
         return true;
     }
 
