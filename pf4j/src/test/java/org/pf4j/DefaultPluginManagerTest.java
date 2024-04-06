@@ -366,4 +366,34 @@ public class DefaultPluginManagerTest {
 
         assertTrue(unloadedEvent.isPresent());
     }
+
+    @Test
+    void stopPluginWithDeletedDependency() throws IOException {
+        PluginZip pluginZip1 = new PluginZip.Builder(pluginsPath.resolve("my-first-plugin-1.1.1.zip"), "myPlugin1")
+            .pluginVersion("1.1.1")
+            .build();
+
+        PluginZip pluginZip2 = new PluginZip.Builder(pluginsPath.resolve("my-second-plugin-2.2.2.zip"), "myPlugin2")
+            .pluginVersion("2.2.2")
+            .pluginDependencies("myPlugin1")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin(pluginZip1.pluginId()).getPluginState());
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin(pluginZip2.pluginId()).getPluginState());
+
+        System.out.println("Stopping " + pluginZip1.pluginId());
+        pluginManager.stopPlugin(pluginZip1.pluginId());
+        assertEquals(PluginState.STOPPED, pluginManager.getPlugin(pluginZip1.pluginId()).getPluginState());
+
+        boolean deleted = pluginManager.deletePlugin(pluginZip1.pluginId());
+        assertTrue(deleted);
+
+        assertEquals(0, pluginManager.getPlugins().size());
+
+        assertThrows(PluginNotFoundException.class, () -> pluginManager.stopPlugin(pluginZip2.pluginId()));
+    }
+
 }
