@@ -5,14 +5,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
-- [#574]: Plugin status can‘t change from STARTED to DISABLED
-- [#582]: Remove 'final' for AbstractPluginManager.getResolveRecoveryStrategy method
 
 #### Changed
 
 #### Added
 
 #### Removed
+
+### [3.11.1] - 2024-05-19
+
+#### Fixed
+- [#574]: Plugin status can‘t change from STARTED to DISABLED
+- [#582]: Remove 'final' for AbstractPluginManager.getResolveRecoveryStrategy method
 
 ### [3.11.0] - 2024-03-06
 
@@ -440,7 +444,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#41]: Added plugin archive source abstraction
 - Added test for DefaultPluginRepository
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.11.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.11.1...HEAD
+[3.11.1]: https://github.com/decebals/pf4j/compare/release-3.11.0...release-3.11.1
 [3.11.0]: https://github.com/decebals/pf4j/compare/release-3.10.0...release-3.11.0
 [3.10.0]: https://github.com/decebals/pf4j/compare/release-3.9.0...release-3.10.0
 [3.9.0]: https://github.com/decebals/pf4j/compare/release-3.8.0...release-3.9.0
