@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
-- [#582] Remove 'final' for AbstractPluginManager.getResolveRecoveryStrategy method
+- [#582]: Remove 'final' for AbstractPluginManager.getResolveRecoveryStrategy method
 
 #### Changed
 
