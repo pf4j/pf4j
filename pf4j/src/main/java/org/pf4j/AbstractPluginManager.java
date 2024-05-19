@@ -1100,7 +1100,7 @@ public abstract class AbstractPluginManager implements PluginManager {
      *
      * @return the strategy
      */
-    protected final ResolveRecoveryStrategy getResolveRecoveryStrategy() {
+    protected ResolveRecoveryStrategy getResolveRecoveryStrategy() {
         return resolveRecoveryStrategy;
     }
 
