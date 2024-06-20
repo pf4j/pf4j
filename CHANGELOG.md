@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Fixed
 - [#574]: Plugin status can‘t change from STARTED to DISABLED
+- [#576]: Error due to incorrect dependency update after plugin deletion
 - [#582]: Remove 'final' for AbstractPluginManager.getResolveRecoveryStrategy method
 
 ### [3.11.0] - 2024-03-06
@@ -478,6 +479,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
 [#582]: https://github.com/pf4j/pf4j/issues/582
+[#576]: https://github.com/pf4j/pf4j/issues/576
 [#574]: https://github.com/pf4j/pf4j/issues/574
 [#568]: https://github.com/pf4j/pf4j/pull/568
 [#567]: https://github.com/pf4j/pf4j/pull/567
