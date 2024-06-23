@@ -1,0 +1,6 @@
+dependencies {
+    implementation group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}"
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+
+    testImplementation group: 'junit', name: 'junit', version: '4.+'
+}

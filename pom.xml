@@ -167,7 +167,7 @@
 
     <modules>
         <module>pf4j</module>
-        <module>demo</module>
+        <module>demo/maven</module>
         <module>maven-archetypes/quickstart</module>
     </modules>
 

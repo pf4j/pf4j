@@ -11,11 +11,11 @@ mkdir demo-dist
 mkdir demo-dist\plugins
 
 REM copy artifacts to demo-dist folder
-xcopy demo\app\target\pf4j-demo-app-*.zip demo-dist /s /i
-xcopy demo\plugins\plugin1\target\pf4j-demo-plugin1-*-all.jar demo-dist\plugins /s
-xcopy demo\plugins\plugin2\target\pf4j-demo-plugin2-*-all.jar demo-dist\plugins /s
-xcopy demo\plugins\enabled.txt demo-dist\plugins /s
-xcopy demo\plugins\disabled.txt demo-dist\plugins /s
+xcopy demo\maven\app\target\pf4j-demo-app-*.zip demo-dist /s /i
+xcopy demo\maven\plugins\plugin1\target\pf4j-demo-plugin1-*-all.jar demo-dist\plugins /s
+xcopy demo\maven\plugins\plugin2\target\pf4j-demo-plugin2-*-all.jar demo-dist\plugins /s
+xcopy demo\maven\plugins\enabled.txt demo-dist\plugins /s
+xcopy demo\maven\plugins\disabled.txt demo-dist\plugins /s
 
 cd demo-dist
 

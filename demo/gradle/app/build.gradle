@@ -6,13 +6,13 @@ run {
 }
 
 dependencies {
-  compile project(':api')
-  compile group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}"
+  implementation project(':api')
+  implementation group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}"
   annotationProcessor(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")
-  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
-  compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+  implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
 
-  testCompile group: 'junit', name: 'junit', version: '4.+'
+  testImplementation group: 'junit', name: 'junit', version: '4.+'
 }
 
 task uberjar(type: Jar, dependsOn: ['compileJava']) {
