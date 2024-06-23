@@ -282,11 +282,23 @@ public abstract class AbstractPluginManager implements PluginManager {
      * @return true if the plugin was unloaded, otherwise false
      */
     protected boolean unloadPlugin(String pluginId, boolean unloadDependents) {
+        return unloadPlugin(pluginId, unloadDependents, true);
+    }
+
+    /**
+     * Unload the specified plugin and it's dependents.
+     *
+     * @param pluginId the pluginId of the plugin to unload
+     * @param unloadDependents if true, unload dependents
+     * @param resolveDependencies if true, resolve dependencies
+     * @return true if the plugin was unloaded, otherwise false
+     */
+    protected boolean unloadPlugin(String pluginId, boolean unloadDependents, boolean resolveDependencies) {
         if (unloadDependents) {
             List<String> dependents = dependencyResolver.getDependents(pluginId);
             while (!dependents.isEmpty()) {
                 String dependent = dependents.remove(0);
-                unloadPlugin(dependent, false);
+                unloadPlugin(dependent, false, false);
                 dependents.addAll(0, dependencyResolver.getDependents(dependent));
             }
         }
@@ -332,7 +344,9 @@ public abstract class AbstractPluginManager implements PluginManager {
         }
 
         // resolve the plugins again (update plugins graph)
-        resolveDependencies();
+        if (resolveDependencies) {
+            resolveDependencies();
+        }
 
         return true;
     }
@@ -920,7 +934,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         pluginId = pluginDescriptor.getPluginId();
 
         // add plugin to the list with plugins
-        plugins.put(pluginId, pluginWrapper);
+        addPlugin(pluginWrapper);
         getUnresolvedPlugins().add(pluginWrapper);
 
         // add plugin class loader to the list with class loaders
@@ -1115,6 +1129,10 @@ public abstract class AbstractPluginManager implements PluginManager {
     protected void setResolveRecoveryStrategy(ResolveRecoveryStrategy resolveRecoveryStrategy) {
         Objects.requireNonNull(resolveRecoveryStrategy, "resolveRecoveryStrategy cannot be null");
         this.resolveRecoveryStrategy = resolveRecoveryStrategy;
+    }
+
+    void addPlugin(PluginWrapper pluginWrapper) {
+        plugins.put(pluginWrapper.getPluginId(), pluginWrapper);
     }
 
     /**

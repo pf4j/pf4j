@@ -36,6 +36,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -49,7 +51,7 @@ public class AbstractPluginManagerTest {
 
     @BeforeEach
     void setUp() {
-        pluginManager = mock(AbstractPluginManager.class, withSettings()
+        pluginManager = mock(AbstractPluginManagerWithDefaultVersionManager.class, withSettings()
             .useConstructor()
             .defaultAnswer(CALLS_REAL_METHODS));
     }
@@ -119,16 +121,51 @@ public class AbstractPluginManagerTest {
         assertThrows(PluginNotFoundException.class, () -> pluginManager.checkPluginId("plugin1"));
     }
 
-    private PluginWrapper createPluginWrapper(String pluginId) {
-        DefaultPluginDescriptor pluginDescriptor = new DefaultPluginDescriptor();
-        pluginDescriptor.setPluginId(pluginId);
-        pluginDescriptor.setPluginVersion("1.2.3");
+    @Test
+    void unloadPluginCallsResolveDependenciesOnce() {
+        PluginWrapper pluginWrapper1 = createPluginWrapper("plugin1", "plugin2");
+        PluginWrapper pluginWrapper2 = createPluginWrapper("plugin2");
 
+        pluginManager.addPlugin(pluginWrapper1);
+        pluginManager.addPlugin(pluginWrapper2);
+        pluginManager.resolveDependencies();
+
+        // reset the mock to not count the explicit call of resolveDependencies
+        reset(pluginManager);
+
+        pluginManager.unloadPlugin("plugin2", true);
+
+        verify(pluginManager, times(1)).resolveDependencies();
+    }
+
+    private PluginWrapper createPluginWrapper(String pluginId, String... dependencies) {
+        PluginDescriptor pluginDescriptor = new DefaultPluginDescriptor()
+            .setPluginId(pluginId)
+            .setPluginVersion("1.2.3")
+            .setDependencies(String.join(", ", dependencies));
+
+        return createPluginWrapper(pluginDescriptor);
+    }
+
+    private PluginWrapper createPluginWrapper(PluginDescriptor pluginDescriptor) {
         PluginWrapper pluginWrapper = new PluginWrapper(pluginManager, pluginDescriptor, Paths.get("plugin1"), getClass().getClassLoader());
         Plugin plugin = mock(Plugin.class);
         pluginWrapper.setPluginFactory(wrapper -> plugin);
 
         return pluginWrapper;
+    }
+
+    static abstract class AbstractPluginManagerWithDefaultVersionManager extends AbstractPluginManager {
+
+        public AbstractPluginManagerWithDefaultVersionManager() {
+            super();
+        }
+
+        @Override
+        protected VersionManager createVersionManager() {
+            return new DefaultVersionManager();
+        }
+
     }
 
 }
