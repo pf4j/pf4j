@@ -64,7 +64,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
 
         final Set<String> bucket = new HashSet<>();
         try {
-            Enumeration<URL> urls = getClass().getClassLoader().getResources(EXTENSIONS_RESOURCE);
+            Enumeration<URL> urls = getExtensionResource(getClass().getClassLoader());
             if (urls.hasMoreElements()) {
                 collectExtensions(urls, bucket);
             } else {
@@ -88,12 +88,12 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
 
         List<PluginWrapper> plugins = pluginManager.getPlugins();
         for (PluginWrapper plugin : plugins) {
-            String pluginId = plugin.getDescriptor().getPluginId();
+            String pluginId = plugin.getPluginId();
             log.debug("Reading extensions storages for plugin '{}'", pluginId);
             final Set<String> bucket = new HashSet<>();
 
             try {
-                Enumeration<URL> urls = ((PluginClassLoader) plugin.getPluginClassLoader()).findResources(EXTENSIONS_RESOURCE);
+                Enumeration<URL> urls = findExtensionResource((PluginClassLoader) plugin.getPluginClassLoader());
                 if (urls.hasMoreElements()) {
                     collectExtensions(urls, bucket);
                 } else {
@@ -109,6 +109,14 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
         }
 
         return result;
+    }
+
+    Enumeration<URL> getExtensionResource(ClassLoader classLoader) throws IOException {
+        return classLoader.getResources(EXTENSIONS_RESOURCE);
+    }
+
+    Enumeration<URL> findExtensionResource(PluginClassLoader classLoader) throws IOException {
+        return classLoader.findResources(EXTENSIONS_RESOURCE);
     }
 
     private void collectExtensions(Enumeration<URL> urls, Set<String> bucket) throws URISyntaxException, IOException {

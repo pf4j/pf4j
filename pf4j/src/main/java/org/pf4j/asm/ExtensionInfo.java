@@ -43,7 +43,7 @@ public final class ExtensionInfo {
     List<String> plugins = new ArrayList<>();
     List<String> points = new ArrayList<>();
 
-    private ExtensionInfo(String className) {
+    ExtensionInfo(String className) {
         this.className = className;
     }
 
