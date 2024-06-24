@@ -5,10 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#576]: Error due to incorrect dependency update after plugin deletion
 
 #### Changed
+- [#584]: Consolidate demo projects in the 'demo' directory
 
 #### Added
+- Add PluginClassLoader#isClosed method
 
 #### Removed
 
@@ -16,7 +19,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Fixed
 - [#574]: Plugin status can‘t change from STARTED to DISABLED
-- [#576]: Error due to incorrect dependency update after plugin deletion
 - [#582]: Remove 'final' for AbstractPluginManager.getResolveRecoveryStrategy method
 
 ### [3.11.0] - 2024-03-06
@@ -478,6 +480,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#584]: https://github.com/pf4j/pf4j/pull/584
 [#582]: https://github.com/pf4j/pf4j/issues/582
 [#576]: https://github.com/pf4j/pf4j/issues/576
 [#574]: https://github.com/pf4j/pf4j/issues/574
