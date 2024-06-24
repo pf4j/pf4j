@@ -15,7 +15,7 @@
  */
 package org.pf4j.util;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -24,16 +24,18 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Decebal Suiu
  */
-public class DirectedGraphTest {
+class DirectedGraphTest {
 
     private static DirectedGraph<Character> graph;
 
-    @BeforeAll
-    public static void setUp() {
+    @BeforeEach
+    public void setUp() {
         graph = new DirectedGraph<>();
 
         // add vertex
@@ -54,21 +56,21 @@ public class DirectedGraphTest {
     }
 
     @Test
-    public void reverseTopologicalSort() {
+    void reverseTopologicalSort() {
         List<Character> result = graph.reverseTopologicalSort();
         List<Character> expected = Arrays.asList('C', 'G', 'F', 'B', 'A', 'E', 'D');
         assertEquals(expected, result);
     }
 
     @Test
-    public void topologicalSort() {
+    void topologicalSort() {
         List<Character> result = graph.topologicalSort();
         List<Character> expected = Arrays.asList('D', 'E', 'A', 'B', 'F', 'G', 'C');
         assertEquals(expected, result);
     }
 
     @Test
-    public void inDegree() {
+    void inDegree() {
         Map<Character, Integer> result = graph.inDegree();
         Map<Character, Integer> expected = new HashMap<>(7);
         expected.put('A', 0);
@@ -82,7 +84,7 @@ public class DirectedGraphTest {
     }
 
     @Test
-    public void outDegree() {
+    void outDegree() {
         Map<Character, Integer> result = graph.outDegree();
         Map<Character, Integer> expected = new HashMap<>(7);
         expected.put('A', 1);
@@ -93,6 +95,46 @@ public class DirectedGraphTest {
         expected.put('F', 1);
         expected.put('G', 0);
         assertEquals(expected, result);
+    }
+
+    @Test
+    void getNeighbors() {
+        List<Character> result = graph.getNeighbors('B');
+        List<Character> expected = Arrays.asList('C', 'F');
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void removeEdge() {
+        graph.removeEdge('B', 'F');
+        List<Character> result = graph.getNeighbors('B');
+        List<Character> expected = Arrays.asList('C');
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void removeVertex() {
+        graph.removeVertex('B');
+        assertFalse(graph.containsVertex('B'));
+    }
+
+    @Test
+    void addEdge() {
+        graph.addEdge('B', 'G');
+        List<Character> result = graph.getNeighbors('B');
+        List<Character> expected = Arrays.asList('C', 'F', 'G');
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void addVertex() {
+        graph.addVertex('H');
+        assertTrue(graph.containsVertex('H'));
+    }
+
+    @Test
+    void containsVertex() {
+        assertTrue(graph.containsVertex('A'));
     }
 
 }

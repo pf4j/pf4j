@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Decebal Suiu
  */
-public class DependencyResolverTest {
+class DependencyResolverTest {
 
     private DependencyResolver resolver;
 
@@ -40,7 +40,25 @@ public class DependencyResolverTest {
     }
 
     @Test
-    public void sortedPlugins() {
+    void resolve() {
+        PluginDescriptor pd1 = new DefaultPluginDescriptor()
+            .setPluginId("p1")
+            .setDependencies("p2");
+
+        PluginDescriptor pd2 = new DefaultPluginDescriptor()
+            .setPluginId("p2");
+
+        List<PluginDescriptor> plugins = Arrays.asList(pd1, pd2);
+
+        DependencyResolver.Result result = resolver.resolve(plugins);
+
+        assertFalse(result.hasCyclicDependency());
+        assertTrue(result.getNotFoundDependencies().isEmpty());
+        assertTrue(result.getWrongVersionDependencies().isEmpty());
+    }
+
+    @Test
+    void sortedPlugins() {
         // create incomplete plugin descriptor (ignore some attributes)
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
@@ -61,7 +79,7 @@ public class DependencyResolverTest {
     }
 
     @Test
-    public void notFoundDependencies() {
+    void notFoundDependencies() {
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setDependencies("p2, p3");
@@ -72,11 +90,11 @@ public class DependencyResolverTest {
         DependencyResolver.Result result = resolver.resolve(plugins);
 
         assertFalse(result.getNotFoundDependencies().isEmpty());
-        assertEquals(result.getNotFoundDependencies(), Arrays.asList("p2", "p3"));
+        assertEquals(Arrays.asList("p2", "p3"), result.getNotFoundDependencies());
     }
 
     @Test
-    public void cyclicDependencies() {
+    void cyclicDependencies() {
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setPluginVersion("0.0.0")
@@ -103,7 +121,7 @@ public class DependencyResolverTest {
     }
 
     @Test
-    public void wrongDependencyVersion() {
+    void wrongDependencyVersion() {
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
 //            .setDependencies("p2@2.0.0"); // simple version
@@ -123,7 +141,7 @@ public class DependencyResolverTest {
     }
 
     @Test
-    public void goodDependencyVersion() {
+    void goodDependencyVersion() {
         PluginDescriptor pd1 = new DefaultPluginDescriptor()
             .setPluginId("p1")
             .setDependencies("p2@2.0.0");
