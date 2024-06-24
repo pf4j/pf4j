@@ -146,7 +146,6 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
         return this;
     }
 
-
     protected DefaultPluginDescriptor setPluginVersion(String version) {
         this.version = version;
 
@@ -171,13 +170,18 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
         if (dependencies != null) {
             dependencies = dependencies.trim();
             if (!dependencies.isEmpty()) {
-                String[] tokens = dependencies.split(",");
-                for (String dependency : tokens) {
-                    dependency = dependency.trim();
-                    if (!dependency.isEmpty()) {
-                        this.dependencies.add(new PluginDependency(dependency));
-                    }
-                }
+                setDependencies(dependencies.split(","));
+            }
+        }
+
+        return this;
+    }
+
+    protected PluginDescriptor setDependencies(String... dependencies) {
+        for (String dependency : dependencies) {
+            dependency = dependency.trim();
+            if (!dependency.isEmpty()) {
+                this.dependencies.add(new PluginDependency(dependency));
             }
         }
 
@@ -209,4 +213,5 @@ public class DefaultPluginDescriptor implements PluginDescriptor {
     public int hashCode() {
         return Objects.hash(pluginId, pluginDescription, pluginClass, version, requires, provider, dependencies, license);
     }
+
 }
