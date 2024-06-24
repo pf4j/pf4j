@@ -31,20 +31,20 @@ public class DefaultVersionManager implements VersionManager {
      * Checks if a version satisfies the specified SemVer {@link Expression} string.
      * If the constraint is empty or null then the method returns true.
      * Constraint examples: {@code >2.0.0} (simple), {@code ">=1.4.0 & <1.6.0"} (range).
-     * See https://github.com/zafarkhaja/jsemver#semver-expressions-api-ranges for more info.
+     * See <a href="https://github.com/zafarkhaja/jsemver#semver-expressions-api-ranges">semver-expressions-api-ranges</a> for more info.
      *
-     * @param version
-     * @param constraint
-     * @return
+     * @param version  the version to check
+     * @param constraint the constraint to check
+     * @return {@code true} if the version satisfies the constraint, {@code false} otherwise
      */
     @Override
     public boolean checkVersionConstraint(String version, String constraint) {
-        return StringUtils.isNullOrEmpty(constraint) || "*".equals(constraint) || Version.valueOf(version).satisfies(constraint);
+        return StringUtils.isNullOrEmpty(constraint) || "*".equals(constraint) || Version.parse(version).satisfies(constraint);
     }
 
     @Override
     public int compareVersions(String v1, String v2) {
-        return Version.valueOf(v1).compareTo(Version.valueOf(v2));
+        return Version.parse(v1).compareTo(Version.parse(v2));
     }
 
 }
