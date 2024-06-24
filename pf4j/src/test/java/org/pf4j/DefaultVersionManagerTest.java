@@ -16,9 +16,11 @@
 package org.pf4j;
 
 import com.github.zafarkhaja.semver.ParseException;
+import com.github.zafarkhaja.semver.expr.LexerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Decebal Suiu
  */
-public class DefaultVersionManagerTest {
+class DefaultVersionManagerTest {
 
     private VersionManager versionManager;
 
@@ -36,25 +38,35 @@ public class DefaultVersionManagerTest {
     }
 
     @Test
-    public void checkVersionConstraint() {
+    void checkVersionConstraint() {
         assertFalse(versionManager.checkVersionConstraint("1.4.3", ">2.0.0")); // simple
         assertTrue(versionManager.checkVersionConstraint("1.4.3", ">=1.4.0 & <1.6.0")); // range
         assertTrue(versionManager.checkVersionConstraint("undefined", "*"));
+//        assertTrue(versionManager.checkVersionConstraint("1.0.0", ">=1.0.0-SNAPSHOT")); // issue #440
+        assertThrows(LexerException.class, () -> versionManager.checkVersionConstraint("1.0.0", ">=1.0.0-SNAPSHOT"));
     }
 
     @Test
-    public void nullOrEmptyVersion() {
+    void nullOrEmptyVersion() {
         assertThrows(IllegalArgumentException.class, () -> versionManager.checkVersionConstraint(null, ">2.0.0"));
     }
 
     @Test
-    public void invalidVersion() {
+    void invalidVersion() {
         assertThrows(ParseException.class, () -> versionManager.checkVersionConstraint("1.0", ">2.0.0"));
     }
 
     @Test
-    public void compareVersions() {
+    void compareVersions() {
         assertTrue(versionManager.compareVersions("1.1.0", "1.0.0") > 0);
+    }
+
+    @Test
+    void compareSnapshotVersion() {
+        assertTrue(versionManager.compareVersions("1.1.0", "1.0.0-SNAPSHOT") > 0);
+        assertTrue(versionManager.compareVersions("1.1.0", "1.2.0-SNAPSHOT") < 0);
+        assertTrue(versionManager.compareVersions("1.0.0-SNAPSHOT", "1.1.0-SNAPSHOT") < 0);
+        assertEquals(0, versionManager.compareVersions("1.0.0-SNAPSHOT", "1.0.0-SNAPSHOT"));
     }
 
 }
