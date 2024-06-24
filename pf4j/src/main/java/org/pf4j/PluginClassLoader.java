@@ -49,6 +49,7 @@ public class PluginClassLoader extends URLClassLoader {
     private final PluginManager pluginManager;
     private final PluginDescriptor pluginDescriptor;
     private final ClassLoadingStrategy classLoadingStrategy;
+    private boolean closed;
 
     public PluginClassLoader(PluginManager pluginManager, PluginDescriptor pluginDescriptor, ClassLoader parent) {
         this(pluginManager, pluginDescriptor, parent, ClassLoadingStrategy.PDA);
@@ -206,7 +207,6 @@ public class PluginClassLoader extends URLClassLoader {
         return null;
     }
 
-
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
         List<URL> resources = new ArrayList<>();
@@ -229,6 +229,27 @@ public class PluginClassLoader extends URLClassLoader {
         }
 
         return Collections.enumeration(resources);
+    }
+
+    /**
+     * Closes this class loader.
+     * <p>
+     * This method should be called when the class loader is no longer needed.
+     */
+    @Override
+    public void close() throws IOException {
+        super.close();
+
+        closed = true;
+    }
+
+    /**
+     * Returns whether this class loader has been closed.
+     *
+     * @return {@code true} if this class loader has been closed, {@code false} otherwise
+     */
+    public boolean isClosed() {
+        return closed;
     }
 
     /**

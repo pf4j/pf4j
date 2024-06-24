@@ -35,12 +35,16 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Sebastian Lövdahl
  */
-public class PluginClassLoaderTest {
+class PluginClassLoaderTest {
 
     private TestPluginManager pluginManager;
     private TestPluginManager pluginManagerParentFirst;
@@ -125,8 +129,8 @@ public class PluginClassLoaderTest {
             Path jarsDirectoryPath = pluginDependencyZip.unzippedPath().resolve(jarsDirectory);
             List<File> jars = FileUtils.getJars(jarsDirectoryPath);
             for (File jar : jars) {
-            	parentLastPluginDependencyClassLoader.addFile(jar);
-            	parentFirstPluginDependencyClassLoader.addFile(jar);
+                parentLastPluginDependencyClassLoader.addFile(jar);
+                parentFirstPluginDependencyClassLoader.addFile(jar);
             }
         }
 
@@ -321,6 +325,12 @@ public class PluginClassLoaderTest {
         assertNumberOfResourcesAndFirstLineOfFirstElement(3, "parent", resources);
     }
 
+    @Test
+    void isClosed() throws IOException {
+        parentLastPluginClassLoader.close();
+        assertTrue(parentLastPluginClassLoader.isClosed());
+    }
+
     private static void assertFirstLine(String expected, URL resource) throws URISyntaxException, IOException {
         assertNotNull(resource);
         assertEquals(expected, Files.readAllLines(Paths.get(resource.toURI())).get(0));
@@ -334,14 +344,16 @@ public class PluginClassLoaderTest {
         assertEquals(expectedFirstLine, Files.readAllLines(Paths.get(firstResource.toURI())).get(0));
     }
 
-    class TestPluginManager extends DefaultPluginManager {
+    static class TestPluginManager extends DefaultPluginManager {
 
-    	public TestPluginManager(Path pluginsPath) {
-			super(pluginsPath);
-		}
+        public TestPluginManager(Path pluginsPath) {
+            super(pluginsPath);
+        }
 
-		void addClassLoader(String pluginId, PluginClassLoader classLoader) {
-    		getPluginClassLoaders().put(pluginId, classLoader);
-    	}
+        void addClassLoader(String pluginId, PluginClassLoader classLoader) {
+            getPluginClassLoaders().put(pluginId, classLoader);
+        }
+
     }
+
 }
