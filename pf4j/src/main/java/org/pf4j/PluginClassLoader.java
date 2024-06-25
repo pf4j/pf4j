@@ -181,8 +181,9 @@ public class PluginClassLoader extends URLClassLoader {
      */
     @Override
     public URL getResource(String name) {
+        ClassLoadingStrategy loadingStrategy = getClassLoadingStrategy(name);
         log.trace("Received request to load resource '{}'", name);
-        for (ClassLoadingStrategy.Source classLoadingSource : classLoadingStrategy.getSources()) {
+        for (ClassLoadingStrategy.Source classLoadingSource : loadingStrategy.getSources()) {
             URL url = null;
             switch (classLoadingSource) {
                 case APPLICATION:
@@ -210,9 +211,9 @@ public class PluginClassLoader extends URLClassLoader {
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
         List<URL> resources = new ArrayList<>();
-
+        ClassLoadingStrategy loadingStrategy = getClassLoadingStrategy(name);
         log.trace("Received request to load resources '{}'", name);
-        for (ClassLoadingStrategy.Source classLoadingSource : classLoadingStrategy.getSources()) {
+        for (ClassLoadingStrategy.Source classLoadingSource : loadingStrategy.getSources()) {
             switch (classLoadingSource) {
                 case APPLICATION:
                     if (getParent() != null) {
@@ -229,6 +230,14 @@ public class PluginClassLoader extends URLClassLoader {
         }
 
         return Collections.enumeration(resources);
+    }
+
+    private ClassLoadingStrategy getClassLoadingStrategy(String name) {
+        ClassLoadingStrategy loadingStrategy = classLoadingStrategy;
+        if (LegacyExtensionFinder.EXTENSIONS_RESOURCE.equals(name)) {
+            loadingStrategy = ClassLoadingStrategy.PAD;
+        }
+        return loadingStrategy;
     }
 
     /**
