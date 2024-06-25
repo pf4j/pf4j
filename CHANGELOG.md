@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Changed
 - [#584]: Consolidate demo projects in the 'demo' directory
+- Upgrade Mockito to 5.2.0
 
 #### Added
 - Add PluginClassLoader#isClosed method
