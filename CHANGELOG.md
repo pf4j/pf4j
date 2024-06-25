@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [3.12.0] - 2024-06-25
+
+#### Fixed
 - [#576]: Error due to incorrect dependency update after plugin deletion
 
 #### Changed
@@ -13,8 +23,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Added
 - Add PluginClassLoader#isClosed method
-
-#### Removed
 
 ### [3.11.1] - 2024-05-19
 
@@ -448,7 +456,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#41]: Added plugin archive source abstraction
 - Added test for DefaultPluginRepository
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.11.1...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.12.0...HEAD
+[3.12.0]: https://github.com/decebals/pf4j/compare/release-3.11.1...release-3.12.0
 [3.11.1]: https://github.com/decebals/pf4j/compare/release-3.11.0...release-3.11.1
 [3.11.0]: https://github.com/decebals/pf4j/compare/release-3.10.0...release-3.11.0
 [3.10.0]: https://github.com/decebals/pf4j/compare/release-3.9.0...release-3.10.0
