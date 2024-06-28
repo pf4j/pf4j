@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.processor.LegacyExtensionStorage;
 import org.pf4j.test.PluginZip;
 import org.pf4j.util.FileUtils;
 
@@ -74,6 +75,8 @@ class PluginClassLoaderTest {
         createFile(parentClassPathBase.resolve("META-INF").resolve("file-in-both-parent-and-dependency-and-plugin"));
         createFile(parentClassPathBase.resolve("META-INF").resolve("file-in-both-parent-and-dependency"));
         createFile(parentClassPathBase.resolve("META-INF").resolve("file-in-both-parent-and-plugin"));
+        createFile(parentClassPathBase.resolve(LegacyExtensionStorage.EXTENSIONS_RESOURCE));
+
     }
 
     private static void createFile(Path pathToFile) throws IOException {
@@ -106,7 +109,8 @@ class PluginClassLoaderTest {
                 .addFile(Paths.get("classes/META-INF/dependency-file"), "dependency")
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency-and-plugin"), "dependency")
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency"), "dependency")
-                .build();
+                .addFile(Paths.get("classes/" + LegacyExtensionStorage.EXTENSIONS_RESOURCE), "dependency")
+            .build();
 
         FileUtils.expandIfZip(pluginDependencyZip.path());
 
@@ -148,6 +152,7 @@ class PluginClassLoaderTest {
                 .addFile(Paths.get("classes/META-INF/plugin-file"), "plugin")
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency-and-plugin"), "plugin")
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-plugin"), "plugin")
+                .addFile(Paths.get("classes/" + LegacyExtensionStorage.EXTENSIONS_RESOURCE), "plugin")
                 .build();
 
         FileUtils.expandIfZip(pluginZip.path());
@@ -323,6 +328,18 @@ class PluginClassLoaderTest {
     void parentFirstGetResourcesExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
         Enumeration<URL> resources = parentFirstPluginClassLoader.getResources("META-INF/file-in-both-parent-and-dependency-and-plugin");
         assertNumberOfResourcesAndFirstLineOfFirstElement(3, "parent", resources);
+    }
+
+    @Test
+    void parentFirstGetExtensionsIndexExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
+        URL resource = parentLastPluginClassLoader.getResource(LegacyExtensionFinder.EXTENSIONS_RESOURCE);
+        assertFirstLine("plugin", resource);
+    }
+
+    @Test
+    void parentLastGetExtensionsIndexExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
+        URL resource = parentLastPluginClassLoader.getResource(LegacyExtensionFinder.EXTENSIONS_RESOURCE);
+        assertFirstLine("plugin", resource);
     }
 
     @Test
