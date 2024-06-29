@@ -76,7 +76,6 @@ class PluginClassLoaderTest {
         createFile(parentClassPathBase.resolve("META-INF").resolve("file-in-both-parent-and-dependency"));
         createFile(parentClassPathBase.resolve("META-INF").resolve("file-in-both-parent-and-plugin"));
         createFile(parentClassPathBase.resolve(LegacyExtensionStorage.EXTENSIONS_RESOURCE));
-
     }
 
     private static void createFile(Path pathToFile) throws IOException {
@@ -110,7 +109,7 @@ class PluginClassLoaderTest {
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency-and-plugin"), "dependency")
                 .addFile(Paths.get("classes/META-INF/file-in-both-parent-and-dependency"), "dependency")
                 .addFile(Paths.get("classes/" + LegacyExtensionStorage.EXTENSIONS_RESOURCE), "dependency")
-            .build();
+                .build();
 
         FileUtils.expandIfZip(pluginDependencyZip.path());
 
