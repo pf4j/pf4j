@@ -312,7 +312,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         PluginState pluginState;
         try {
             pluginState = stopPlugin(pluginId, false);
-            if (PluginState.STARTED == pluginState) {
+            if (pluginState.isStarted()) {
                 return false;
             }
 
@@ -358,7 +358,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         // stop the plugin if it's started
         PluginState pluginState = stopPlugin(pluginId);
-        if (PluginState.STARTED == pluginState) {
+        if (pluginState.isStarted()) {
             log.error("Failed to stop plugin '{}' on delete", pluginId);
             return false;
         }
@@ -385,7 +385,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     public void startPlugins() {
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
             PluginState pluginState = pluginWrapper.getPluginState();
-            if ((PluginState.DISABLED != pluginState) && (PluginState.STARTED != pluginState)) {
+            if (!pluginState.isDisabled() && !pluginState.isStarted()) {
                 try {
                     log.info("Start plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
                     pluginWrapper.getPlugin().start();
@@ -413,7 +413,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
-        if (PluginState.STARTED == pluginState) {
+        if (pluginState.isStarted()) {
             log.debug("Already started plugin '{}'", getPluginLabel(pluginDescriptor));
             return PluginState.STARTED;
         }
@@ -423,7 +423,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             return pluginState;
         }
 
-        if (PluginState.DISABLED == pluginState) {
+        if (pluginState.isDisabled()) {
             // automatically enable plugin on manual plugin start
             if (!enablePlugin(pluginId)) {
                 return pluginState;
@@ -458,7 +458,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         while (itr.hasNext()) {
             PluginWrapper pluginWrapper = itr.next();
             PluginState pluginState = pluginWrapper.getPluginState();
-            if (PluginState.STARTED == pluginState) {
+            if (pluginState.isStarted()) {
                 try {
                     log.info("Stop plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
                     pluginWrapper.getPlugin().stop();
@@ -550,11 +550,11 @@ public abstract class AbstractPluginManager implements PluginManager {
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
-        if (PluginState.DISABLED == pluginState) {
+        if (pluginState.isDisabled()) {
             log.debug("Already disabled plugin '{}'", getPluginLabel(pluginDescriptor));
             return true;
-        } else if (PluginState.STARTED == pluginState) {
-            if (PluginState.STOPPED != stopPlugin(pluginId)) {
+        } else if (pluginState.isStarted()) {
+            if (!stopPlugin(pluginId).isStopped()) {
                 log.error("Failed to stop plugin '{}' on disable", getPluginLabel(pluginDescriptor));
                 return false;
             }
@@ -582,7 +582,7 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
-        if (PluginState.DISABLED != pluginState) {
+        if (!pluginState.isDisabled()) {
             log.debug("Plugin '{}' is not disabled", getPluginLabel(pluginDescriptor));
             return true;
         }
@@ -842,7 +842,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             PluginWrapper pluginWrapper = plugins.get(pluginId);
             if (unresolvedPlugins.remove(pluginWrapper)) {
                 PluginState pluginState = pluginWrapper.getPluginState();
-                if (pluginState != PluginState.DISABLED) {
+                if (!pluginState.isDisabled()) {
                     pluginWrapper.setPluginState(PluginState.RESOLVED);
                 }
 

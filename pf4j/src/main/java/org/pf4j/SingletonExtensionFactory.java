@@ -39,7 +39,7 @@ public class SingletonExtensionFactory extends DefaultExtensionFactory {
         cache = new HashMap<>();
 
         pluginManager.addPluginStateListener(event -> {
-            if (event.getPluginState() != PluginState.STARTED) {
+            if (!event.getPluginState().isStarted()) {
                 cache.remove(event.getPlugin().getPluginClassLoader());
             }
         });

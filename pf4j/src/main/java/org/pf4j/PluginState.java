@@ -72,8 +72,57 @@ public enum PluginState {
         this.status = status;
     }
 
+    /**
+     * Returns {@code true} if the value is {@link #CREATED}.
+     */
+    public boolean isCreated() {
+        return this == CREATED;
+    }
+
+    /**
+     * Returns {@code true} if the value is {@link #DISABLED}.
+     */
+    public boolean isDisabled() {
+        return this == DISABLED;
+    }
+
+    /**
+     * Returns {@code true} if the value is {@link #RESOLVED}.
+     */
+    public boolean isResolved() {
+        return this == RESOLVED;
+    }
+
+    /**
+     * Returns {@code true} if the value is {@link #STARTED}.
+     */
+    public boolean isStarted() {
+        return this == STARTED;
+    }
+
+    /**
+     * Returns {@code true} if the value is {@link #STOPPED}.
+     */
+    public boolean isStopped() {
+        return this == STOPPED;
+    }
+
+    /**
+     * Returns {@code true} if the value is {@link #FAILED}.
+     */
+    public boolean isFailed() {
+        return this == FAILED;
+    }
+
+    /**
+     * Returns {@code true} if the value is {@link #UNLOADED}.
+     */
+    public boolean isUnloaded() {
+        return this == UNLOADED;
+    }
+
     public boolean equals(String status) {
-        return (this.status.equalsIgnoreCase(status));
+        return this.status.equalsIgnoreCase(status);
     }
 
     @Override

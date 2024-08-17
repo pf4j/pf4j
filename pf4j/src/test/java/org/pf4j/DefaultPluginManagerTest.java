@@ -203,7 +203,7 @@ class DefaultPluginManagerTest {
         assertFalse(pluginZip.file().exists());
 
         Optional<PluginStateEvent> unloadedEvent = receivedEvents.stream()
-            .filter(event -> event.getPluginState() == PluginState.UNLOADED)
+            .filter(event -> event.getPluginState().isUnloaded())
             .findFirst();
 
         assertTrue(unloadedEvent.isPresent());
@@ -226,7 +226,7 @@ class DefaultPluginManagerTest {
         assertFalse(pluginJar.file().exists());
 
         Optional<PluginStateEvent> unloadedEvent = receivedEvents.stream()
-            .filter(event -> event.getPluginState() == PluginState.UNLOADED)
+            .filter(event -> event.getPluginState().isUnloaded())
             .findFirst();
 
         assertTrue(unloadedEvent.isPresent());
@@ -368,7 +368,7 @@ class DefaultPluginManagerTest {
         assertFalse(pluginZip.file().exists());
 
         Optional<PluginStateEvent> unloadedEvent = receivedEvents.stream()
-            .filter(event -> event.getPluginState() == PluginState.UNLOADED)
+            .filter(event -> event.getPluginState().isUnloaded())
             .findFirst();
 
         assertTrue(unloadedEvent.isPresent());
