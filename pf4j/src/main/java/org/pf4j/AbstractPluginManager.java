@@ -516,7 +516,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         pluginWrapper.setPluginState(PluginState.STOPPED);
         getStartedPlugins().remove(pluginWrapper);
 
-        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, PluginState.STOPPED));
+        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, PluginState.STARTED));
 
         return PluginState.STOPPED;
     }

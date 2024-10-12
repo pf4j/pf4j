@@ -138,6 +138,25 @@ public class AbstractPluginManagerTest {
         verify(pluginManager, times(1)).resolveDependencies();
     }
 
+    @Test
+    void stopPluginFirePluginStateListeners() {
+        PluginStateListener pluginStateListener = mock(PluginStateListener.class);
+        pluginManager.addPluginStateListener(pluginStateListener);
+
+        String pluginId = "plugin1";
+        PluginWrapper pluginWrapper = createPluginWrapper(pluginId);
+        pluginWrapper.setPluginState(PluginState.STARTED);
+
+        doReturn(pluginWrapper).when(pluginManager).getPlugin(pluginId);
+        doNothing().when(pluginManager).checkPluginId(pluginId);
+        doReturn(new ArrayList<>(Arrays.asList(pluginWrapper))).when(pluginManager).getStartedPlugins();
+
+        pluginManager.stopPlugin(pluginId, false);
+
+        PluginStateEvent event = new PluginStateEvent(pluginManager, pluginWrapper, PluginState.STARTED);
+        verify(pluginStateListener).pluginStateChanged(event);
+    }
+
     private PluginWrapper createPluginWrapper(String pluginId, String... dependencies) {
         PluginDescriptor pluginDescriptor = new DefaultPluginDescriptor()
             .setPluginId(pluginId)

@@ -16,6 +16,7 @@
 package org.pf4j;
 
 import java.util.EventObject;
+import java.util.Objects;
 
 /**
  * Event object that indicates a change in the state of a plugin.
@@ -81,6 +82,19 @@ public class PluginStateEvent extends EventObject {
                 ", newState=" + getPluginState() +
                 ", oldState=" + oldState +
                 ']';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PluginStateEvent that = (PluginStateEvent) o;
+        return Objects.equals(plugin, that.plugin) && oldState == that.oldState;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(plugin, oldState);
     }
 
 }
