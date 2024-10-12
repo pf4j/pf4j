@@ -5,14 +5,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
-- [#586]: Plugin Extensions should be detected with any ClassLoadingStrategy
-- [#590]: Fix fire PluginStateEvent for STOPPED state
 
 #### Changed
 
 #### Added
 
 #### Removed
+
+### [3.12.1] - 2024-10-12
+
+#### Fixed
+- [#586]: Plugin Extensions should be detected with any ClassLoadingStrategy
+- [#590]: Fix fire PluginStateEvent for STOPPED state
 
 ### [3.12.0] - 2024-06-25
 
@@ -458,7 +462,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#41]: Added plugin archive source abstraction
 - Added test for DefaultPluginRepository
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.12.0...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.12.1...HEAD
+[3.12.1]: https://github.com/decebals/pf4j/compare/release-3.12.0...release-3.12.1
 [3.12.0]: https://github.com/decebals/pf4j/compare/release-3.11.1...release-3.12.0
 [3.11.1]: https://github.com/decebals/pf4j/compare/release-3.11.0...release-3.11.1
 [3.11.0]: https://github.com/decebals/pf4j/compare/release-3.10.0...release-3.11.0
