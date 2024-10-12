@@ -15,15 +15,6 @@
  */
 package org.pf4j;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +23,14 @@ import org.pf4j.test.PluginJar;
 import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestExtensionPoint;
 import org.pf4j.test.TestPlugin;
+
+import java.io.IOException;
+import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SecurePluginManagerWrapperTest {
 
