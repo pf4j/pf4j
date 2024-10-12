@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#586]: Plugin Extensions should be detected with any ClassLoadingStrategy
+- [#590]: Fix fire PluginStateEvent for STOPPED state
 
 #### Changed
 
@@ -490,6 +492,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#590]: https://github.com/pf4j/pf4j/issues/590
+[#586]: https://github.com/pf4j/pf4j/pull/586
 [#584]: https://github.com/pf4j/pf4j/pull/584
 [#582]: https://github.com/pf4j/pf4j/issues/582
 [#576]: https://github.com/pf4j/pf4j/issues/576
