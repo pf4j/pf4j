@@ -107,7 +107,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                     // If optional dependencies are used, the class loader might not be able
                     // to load the extension class because of missing optional dependencies.
                     //
-                    // Therefore we're extracting the extension annotation via asm, in order
+                    // Therefore, we're extracting the extension annotation via asm, in order
                     // to extract the required plugins for an extension. Only if all required
                     // plugins are currently available and started, the corresponding
                     // extension is loaded through the class loader.
@@ -146,9 +146,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                     log.debug("Added extension '{}' with ordinal {}", className, extensionWrapper.getOrdinal());
                 } else {
                     log.trace("'{}' is not an extension for extension point '{}'", className, type.getName());
-                    if (RuntimeMode.DEVELOPMENT.equals(pluginManager.getRuntimeMode())) {
-                        checkDifferentClassLoaders(type, extensionClass);
-                    }
+                    checkDifferentClassLoaders(type, extensionClass);
                 }
             } catch (ClassNotFoundException | NoClassDefFoundError e) {
                 log.error(e.getMessage(), e);
@@ -375,7 +373,9 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         ClassLoader typeClassLoader = type.getClassLoader(); // class loader of extension point
         ClassLoader extensionClassLoader = extensionClass.getClassLoader();
         boolean match = ClassUtils.getAllInterfacesNames(extensionClass).contains(type.getSimpleName());
-        if (match && !extensionClassLoader.equals(typeClassLoader)) {
+        if (!match) {
+            log.error("Extension '{}' does not implement extension point '{}'", extensionClass, type);
+        } else if (!extensionClassLoader.equals(typeClassLoader)) {
             // in this scenario the method 'isAssignableFrom' returns only FALSE
             // see http://www.coderanch.com/t/557846/java/java/FWIW-FYI-isAssignableFrom-isInstance-differing
             log.error("Different class loaders: '{}' (E) and '{}' (EP)", extensionClassLoader, typeClassLoader);
