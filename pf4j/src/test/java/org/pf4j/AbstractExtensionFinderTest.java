@@ -15,6 +15,7 @@
  */
 package org.pf4j;
 
+import kotlin.sequences.Sequence;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -274,4 +275,11 @@ public class AbstractExtensionFinderTest {
         Assertions.assertNull(extension);
     }
 
+    // This is a regression test, as this caused an StackOverflowError with the previous implementation
+    @Test
+    public void runningOnNonExtensionKotlinClassDoesNotThrowException() {
+        Extension result = AbstractExtensionFinder.findExtensionAnnotation(Sequence.class);
+
+        Assertions.assertNull(result);
+    }
 }
