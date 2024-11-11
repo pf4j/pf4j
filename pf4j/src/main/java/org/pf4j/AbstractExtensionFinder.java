@@ -358,7 +358,12 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         // search recursively through all annotations
         for (Annotation annotation : clazz.getAnnotations()) {
             Class<? extends Annotation> annotationClass = annotation.annotationType();
-            if (!annotationClass.getName().startsWith("java.lang.annotation")) {
+            if (!annotationClass.getName().startsWith("java.lang.annotation") && !annotationClass.getName().startsWith("kotlin")) {
+                // In case an annotation is annotated with itself,
+                // an example would be @Target, which is ignored by the check above
+                // however, other libraries might do similar things
+                if (annotationClass.equals(clazz)) continue;
+
                 Extension extensionAnnotation = findExtensionAnnotation(annotationClass);
                 if (extensionAnnotation != null) {
                     return extensionAnnotation;
