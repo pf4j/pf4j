@@ -254,24 +254,24 @@ class AbstractExtensionFinderTest {
 
     @Test
     void findExtensionAnnotation() {
-        List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.Greeting, JavaSources.WhazzupGreeting);
+        List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.GREETING, JavaSources.WHAZZUP_GREETING);
         assertEquals(2, generatedFiles.size());
 
         Map<String, Class<?>> loadedClasses = new JavaFileObjectClassLoader().load(generatedFiles);
-        Class<?> clazz = loadedClasses.get("test.WhazzupGreeting");
+        Class<?> clazz = loadedClasses.get(JavaSources.WHAZZUP_GREETING_CLASS_NAME);
         Extension extension = AbstractExtensionFinder.findExtensionAnnotation(clazz);
         Assertions.assertNotNull(extension);
     }
 
     @Test
     void findExtensionAnnotationThatMissing() {
-        List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.Greeting,
+        List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.GREETING,
             ExtensionAnnotationProcessorTest.SpinnakerExtension_NoExtension,
             ExtensionAnnotationProcessorTest.WhazzupGreeting_SpinnakerExtension);
         assertEquals(3, generatedFiles.size());
 
         Map<String, Class<?>> loadedClasses = new JavaFileObjectClassLoader().load(generatedFiles);
-        Class<?> clazz = loadedClasses.get("test.WhazzupGreeting");
+        Class<?> clazz = loadedClasses.get(JavaSources.WHAZZUP_GREETING_CLASS_NAME);
         Extension extension = AbstractExtensionFinder.findExtensionAnnotation(clazz);
         Assertions.assertNull(extension);
     }
@@ -300,7 +300,7 @@ class AbstractExtensionFinderTest {
 
         };
 
-        List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.Greeting, JavaSources.WhazzupGreeting);
+        List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.GREETING, JavaSources.WHAZZUP_GREETING);
         assertEquals(2, generatedFiles.size());
         Class<?> extensionPointClass = new JavaFileObjectClassLoader().load(generatedFiles).get(JavaSources.GREETING_CLASS_NAME);
         Class<?> extensionClass = new JavaFileObjectClassLoader().load(generatedFiles).get(JavaSources.WHAZZUP_GREETING_CLASS_NAME);

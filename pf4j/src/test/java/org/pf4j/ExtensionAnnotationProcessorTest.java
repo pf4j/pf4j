@@ -125,7 +125,7 @@ public class ExtensionAnnotationProcessorTest {
     @Test
     public void options() {
         Compilation compilation = compiler().withOptions("-Ab=2", "-Ac=3")
-            .compile(JavaSources.Greeting, JavaSources.WhazzupGreeting);
+            .compile(JavaSources.GREETING, JavaSources.WHAZZUP_GREETING);
         assertEquals(Compilation.Status.SUCCESS, compilation.status());
         Map<String, String> options = new HashMap<>();
         options.put("b", "2");
@@ -135,20 +135,20 @@ public class ExtensionAnnotationProcessorTest {
 
     @Test
     public void storage() {
-        Compilation compilation = compile(JavaSources.Greeting, JavaSources.WhazzupGreeting);
+        Compilation compilation = compile(JavaSources.GREETING, JavaSources.WHAZZUP_GREETING);
         assertEquals(Compilation.Status.SUCCESS, compilation.status());
         assertEquals(annotationProcessor.getStorage().getClass(), LegacyExtensionStorage.class);
     }
 
     @Test
     public void compileWithoutError() {
-         Compilation compilation = compile(JavaSources.Greeting, JavaSources.WhazzupGreeting);
+         Compilation compilation = compile(JavaSources.GREETING, JavaSources.WHAZZUP_GREETING);
          assertThat(compilation).succeededWithoutWarnings();
     }
 
     @Test
     public void compileWithError() {
-        Compilation compilation = compile(JavaSources.Greeting, WhazzupGreeting_NoExtensionPoint);
+        Compilation compilation = compile(JavaSources.GREETING, WhazzupGreeting_NoExtensionPoint);
         assertThat(compilation).failed();
         assertThat(compilation).hadErrorContaining("it doesn't implement ExtensionPoint")
             .inFile(WhazzupGreeting_NoExtensionPoint)
@@ -158,19 +158,19 @@ public class ExtensionAnnotationProcessorTest {
 
     @Test
     public void getExtensions() {
-        Compilation compilation = compile(JavaSources.Greeting, JavaSources.WhazzupGreeting);
+        Compilation compilation = compile(JavaSources.GREETING, JavaSources.WHAZZUP_GREETING);
         assertThat(compilation).succeededWithoutWarnings();
         Map<String, Set<String>> extensions = new HashMap<>();
-        extensions.put("test.Greeting", new HashSet<>(Collections.singletonList("test.WhazzupGreeting")));
+        extensions.put(JavaSources.GREETING_CLASS_NAME, new HashSet<>(Collections.singletonList(JavaSources.WHAZZUP_GREETING_CLASS_NAME)));
         assertEquals(extensions, annotationProcessor.getExtensions());
     }
 
     @Test
     public void compileNestedExtensionAnnotation() {
-        Compilation compilation = compile(JavaSources.Greeting, SpinnakerExtension, WhazzupGreeting_SpinnakerExtension);
+        Compilation compilation = compile(JavaSources.GREETING, SpinnakerExtension, WhazzupGreeting_SpinnakerExtension);
         assertThat(compilation).succeededWithoutWarnings();
         Map<String, Set<String>> extensions = new HashMap<>();
-        extensions.put("test.Greeting", new HashSet<>(Collections.singletonList("test.WhazzupGreeting")));
+        extensions.put(JavaSources.GREETING_CLASS_NAME, new HashSet<>(Collections.singletonList(JavaSources.WHAZZUP_GREETING_CLASS_NAME)));
         assertEquals(extensions, annotationProcessor.getExtensions());
     }
 

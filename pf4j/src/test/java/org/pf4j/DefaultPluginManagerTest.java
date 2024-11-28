@@ -42,7 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.pf4j.test.JavaSources.Greeting;
 
 class DefaultPluginManagerTest {
 
@@ -441,7 +440,7 @@ class DefaultPluginManagerTest {
 
     @Test
     void unloadPlugin() throws IOException, ClassNotFoundException {
-        JavaFileObject object = JavaSources.compile(Greeting);
+        JavaFileObject object = JavaSources.compile(JavaSources.GREETING);
         String pluginClassName = JavaFileObjectUtils.getClassName(object);
         byte[] pluginBytes = JavaFileObjectUtils.getAllBytes(object);
 
