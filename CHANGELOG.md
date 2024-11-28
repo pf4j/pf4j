@@ -5,14 +5,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
-- [#595]: Fix StackOverFlow error on Kotlin classes without @Extension
 
 #### Changed
-- [#594]: Always check for ClassLoaders differences in AbstractExtensionFinder
 
 #### Added
 
 #### Removed
+
+### [3.13.0] - 2024-11-29
+
+#### Fixed
+- [#595]: Fix StackOverFlow error on Kotlin classes without @Extension
+
+#### Changed
+- [#594]: Always check for ClassLoaders differences in AbstractExtensionFinder
 
 ### [3.12.1] - 2024-10-12
 
@@ -465,6 +471,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added test for DefaultPluginRepository
 
 [unreleased]: https://github.com/decebals/pf4j/compare/release-3.12.1...HEAD
+[3.13.0]: https://github.com/decebals/pf4j/compare/release-3.12.1...release-3.13.0
 [3.12.1]: https://github.com/decebals/pf4j/compare/release-3.12.0...release-3.12.1
 [3.12.0]: https://github.com/decebals/pf4j/compare/release-3.11.1...release-3.12.0
 [3.11.1]: https://github.com/decebals/pf4j/compare/release-3.11.0...release-3.11.1
