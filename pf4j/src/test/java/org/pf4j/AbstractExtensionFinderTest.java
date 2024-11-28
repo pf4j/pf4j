@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Mario Franco
  */
-public class AbstractExtensionFinderTest {
+class AbstractExtensionFinderTest {
 
     private PluginManager pluginManager;
 
@@ -73,7 +73,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#find(Class)}.
      */
     @Test
-    public void testFindFailType() {
+    void testFindFailType() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -95,7 +95,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#find(Class)}.
      */
     @Test
-    public void testFindFromClasspath() {
+    void testFindFromClasspath() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -124,7 +124,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#find(Class, String)}.
      */
     @Test
-    public void testFindFromPlugin() {
+    void testFindFromPlugin() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -163,7 +163,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link AbstractExtensionFinder#findClassNames(String)}.
      */
     @Test
-    public void testFindClassNames() {
+    void testFindClassNames() {
         ExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
 
             @Override
@@ -202,7 +202,7 @@ public class AbstractExtensionFinderTest {
      * Test of {@link org.pf4j.AbstractExtensionFinder#find(java.lang.String)}.
      */
     @Test
-    public void testFindExtensionWrappersFromPluginId() {
+    void testFindExtensionWrappersFromPluginId() {
         // complicate the test to show hot to deal with dynamic Java classes (generated at runtime from sources)
         PluginWrapper plugin3 = mock(PluginWrapper.class);
         JavaFileObject object = JavaSources.compile(DefaultExtensionFactoryTest.FailTestExtension);
@@ -253,7 +253,7 @@ public class AbstractExtensionFinderTest {
     }
 
     @Test
-    public void findExtensionAnnotation() {
+    void findExtensionAnnotation() {
         List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.Greeting, JavaSources.WhazzupGreeting);
         assertEquals(2, generatedFiles.size());
 
@@ -264,7 +264,7 @@ public class AbstractExtensionFinderTest {
     }
 
     @Test
-    public void findExtensionAnnotationThatMissing() {
+    void findExtensionAnnotationThatMissing() {
         List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.Greeting,
             ExtensionAnnotationProcessorTest.SpinnakerExtension_NoExtension,
             ExtensionAnnotationProcessorTest.WhazzupGreeting_SpinnakerExtension);
