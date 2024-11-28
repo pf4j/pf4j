@@ -146,7 +146,9 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                     log.debug("Added extension '{}' with ordinal {}", className, extensionWrapper.getOrdinal());
                 } else {
                     log.trace("'{}' is not an extension for extension point '{}'", className, type.getName());
-                    checkDifferentClassLoaders(type, extensionClass);
+                    if (checkDifferentClassLoaders(type, extensionClass)) {
+                        log.error("Different class loaders: '{}' (E) and '{}' (EP)", extensionClass.getClassLoader(), type.getClassLoader());
+                    }
                 }
             } catch (ClassNotFoundException | NoClassDefFoundError e) {
                 log.error(e.getMessage(), e);
@@ -374,17 +376,13 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
         return null;
     }
 
-    private void checkDifferentClassLoaders(Class<?> type, Class<?> extensionClass) {
+    boolean checkDifferentClassLoaders(Class<?> type, Class<?> extensionClass) {
         ClassLoader typeClassLoader = type.getClassLoader(); // class loader of extension point
         ClassLoader extensionClassLoader = extensionClass.getClassLoader();
         boolean match = ClassUtils.getAllInterfacesNames(extensionClass).contains(type.getSimpleName());
-        if (!match) {
-            log.error("Extension '{}' does not implement extension point '{}'", extensionClass, type);
-        } else if (!extensionClassLoader.equals(typeClassLoader)) {
-            // in this scenario the method 'isAssignableFrom' returns only FALSE
-            // see http://www.coderanch.com/t/557846/java/java/FWIW-FYI-isAssignableFrom-isInstance-differing
-            log.error("Different class loaders: '{}' (E) and '{}' (EP)", extensionClassLoader, typeClassLoader);
-        }
+        // in this scenario the method 'isAssignableFrom' returns only FALSE
+        // see http://www.coderanch.com/t/557846/java/java/FWIW-FYI-isAssignableFrom-isInstance-differing
+        return match && extensionClassLoader != typeClassLoader;
     }
 
 }

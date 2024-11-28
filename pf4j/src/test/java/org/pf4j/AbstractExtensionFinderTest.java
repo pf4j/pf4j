@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -282,4 +283,29 @@ public class AbstractExtensionFinderTest {
 
         Assertions.assertNull(result);
     }
+
+    @Test
+    void checkDifferentClassLoaders() {
+        AbstractExtensionFinder extensionFinder = new AbstractExtensionFinder(pluginManager) {
+
+            @Override
+            public Map<String, Set<String>> readPluginsStorages() {
+                return Collections.emptyMap();
+            }
+
+            @Override
+            public Map<String, Set<String>> readClasspathStorages() {
+                return Collections.emptyMap();
+            }
+
+        };
+
+        List<JavaFileObject> generatedFiles = JavaSources.compileAll(JavaSources.Greeting, JavaSources.WhazzupGreeting);
+        assertEquals(2, generatedFiles.size());
+        Class<?> extensionPointClass = new JavaFileObjectClassLoader().load(generatedFiles).get(JavaSources.GREETING_CLASS_NAME);
+        Class<?> extensionClass = new JavaFileObjectClassLoader().load(generatedFiles).get(JavaSources.WHAZZUP_GREETING_CLASS_NAME);
+
+        assertTrue(extensionFinder.checkDifferentClassLoaders(extensionPointClass, extensionClass));
+    }
+
 }
