@@ -18,9 +18,11 @@ package org.pf4j;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,8 +59,8 @@ class CompoundPluginRepositoryTest {
         PluginRepository mockRepository2 = mock(PluginRepository.class);
         Path path1 = mock(Path.class);
         Path path2 = mock(Path.class);
-        when(mockRepository1.getPluginPaths()).thenReturn(List.of(path1));
-        when(mockRepository2.getPluginPaths()).thenReturn(List.of(path2));
+        when(mockRepository1.getPluginPaths()).thenReturn(Collections.singletonList(path1));
+        when(mockRepository2.getPluginPaths()).thenReturn(Collections.singletonList(path2));
         compoundRepository.add(mockRepository1);
         compoundRepository.add(mockRepository2);
         List<Path> paths = compoundRepository.getPluginPaths();
