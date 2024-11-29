@@ -24,14 +24,25 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 
 /**
+ * A {@link PluginLoader} that delegates to a list of {@link PluginLoader}s.
+ * The first applicable {@link PluginLoader} is used to load the plugin.
+ * If no {@link PluginLoader} is applicable, a {@link RuntimeException} is thrown.
+ * The order of the {@link PluginLoader}s is important.
+ *
  * @author Decebal Suiu
  */
 public class CompoundPluginLoader implements PluginLoader {
 
     private static final Logger log = LoggerFactory.getLogger(CompoundPluginLoader.class);
 
-    private List<PluginLoader> loaders = new ArrayList<>();
+    private final List<PluginLoader> loaders = new ArrayList<>();
 
+    /**
+     * Add a {@link PluginLoader}.
+     *
+     * @param loader the {@link PluginLoader} to add
+     * @return this {@link CompoundPluginLoader}
+     */
     public CompoundPluginLoader add(PluginLoader loader) {
         if (loader == null) {
             throw new IllegalArgumentException("null not allowed");
@@ -45,9 +56,9 @@ public class CompoundPluginLoader implements PluginLoader {
     /**
      * Add a {@link PluginLoader} only if the {@code condition} is satisfied.
      *
-     * @param loader
-     * @param condition
-     * @return
+     * @param loader the {@link PluginLoader} to add
+     * @param condition the condition to be satisfied
+     * @return this {@link CompoundPluginLoader}
      */
     public CompoundPluginLoader add(PluginLoader loader, BooleanSupplier condition) {
         if (condition.getAsBoolean()) {
@@ -57,6 +68,11 @@ public class CompoundPluginLoader implements PluginLoader {
         return this;
     }
 
+    /**
+     * Get the list of {@link PluginLoader}s.
+     *
+     * @return the list of {@link PluginLoader}s
+     */
     public int size() {
         return loaders.size();
     }
@@ -92,6 +108,15 @@ public class CompoundPluginLoader implements PluginLoader {
         }
 
         throw new RuntimeException("No PluginLoader for plugin '" + pluginPath + "' and descriptor '" + pluginDescriptor + "'");
+    }
+
+    /**
+     * Get the list of {@link PluginLoader}s.
+     *
+     * @return the list of {@link PluginLoader}s
+     */
+    public List<PluginLoader> getLoaders() {
+        return loaders;
     }
 
 }

@@ -23,12 +23,17 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 /**
+ * A {@link PluginRepository} that delegates to a list of {@link PluginRepository}s.
+ * The first applicable {@link PluginRepository} is used to get the plugin paths.
+ * If no {@link PluginRepository} is applicable, a {@link RuntimeException} is thrown.
+ * The order of the {@link PluginRepository}s is important.
+ *
  * @author Decebal Suiu
  * @author Mário Franco
  */
 public class CompoundPluginRepository implements PluginRepository {
 
-    private List<PluginRepository> repositories = new ArrayList<>();
+    private final List<PluginRepository> repositories = new ArrayList<>();
 
     public CompoundPluginRepository add(PluginRepository repository) {
         if (repository == null) {
@@ -43,9 +48,9 @@ public class CompoundPluginRepository implements PluginRepository {
     /**
      * Add a {@link PluginRepository} only if the {@code condition} is satisfied.
      *
-     * @param repository
-     * @param condition
-     * @return
+     * @param repository the {@link PluginRepository} to add
+     * @param condition the condition to be satisfied
+     * @return this {@link CompoundPluginRepository}
      */
     public CompoundPluginRepository add(PluginRepository repository, BooleanSupplier condition) {
         if (condition.getAsBoolean()) {
@@ -74,6 +79,15 @@ public class CompoundPluginRepository implements PluginRepository {
         }
 
         return false;
+    }
+
+    /**
+     * Get the list of {@link PluginRepository}s.
+     *
+     * @return the list of {@link PluginRepository}s
+     */
+    public List<PluginRepository> getRepositories() {
+        return repositories;
     }
 
 }
