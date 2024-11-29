@@ -86,4 +86,17 @@ class CompoundPluginRepositoryTest {
         assertFalse(compoundRepository.deletePluginPath(path));
     }
 
+    @Test
+    void deletePluginPathFromMultipleRepositories() {
+        CompoundPluginRepository compoundRepository = new CompoundPluginRepository();
+        PluginRepository mockRepository1 = mock(PluginRepository.class);
+        PluginRepository mockRepository2 = mock(PluginRepository.class);
+        Path path = mock(Path.class);
+        when(mockRepository1.deletePluginPath(path)).thenReturn(false);
+        when(mockRepository2.deletePluginPath(path)).thenReturn(true);
+        compoundRepository.add(mockRepository1);
+        compoundRepository.add(mockRepository2);
+        assertTrue(compoundRepository.deletePluginPath(path));
+    }
+
 }
