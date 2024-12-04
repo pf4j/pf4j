@@ -51,7 +51,7 @@
 
         <junit.version>5.4.0</junit.version>
         <hamcrest.version>2.1</hamcrest.version>
-        <mockito.version>5.2.0</mockito.version>
+        <mockito.version>5.14.2</mockito.version>
 
         <javadoc.disabled>false</javadoc.disabled>
         <deploy.disabled>false</deploy.disabled>
