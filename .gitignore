@@ -5,3 +5,5 @@ target/
 .idea/
 *.iml
 demo-dist/
+bin/
+
