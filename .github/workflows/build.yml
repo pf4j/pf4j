@@ -8,9 +8,9 @@ on:
 jobs:
     build:
         name: Build
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
               with:
                   fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
             - name: Set up JDK 17
@@ -20,11 +20,10 @@ jobs:
                   java-version: 17
                   cache: maven
             - name: Cache SonarCloud packages
-              uses: actions/cache@v1
+              uses: actions/cache@v4
               with:
                   path: ~/.sonar/cache
                   key: ${{ runner.os }}-sonar
-                  restore-keys: ${{ runner.os }}-sonar
             - name: Build and analyze
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
