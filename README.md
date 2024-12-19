@@ -159,3 +159,9 @@ Quickstart (call to action)
 1. Read this file to have an overview about what this project does
 2. Read [Getting started](https://pf4j.org/doc/getting-started.html) section of documentation to understand the basic concepts
 3. Read [Quickstart](https://pf4j.org/dev/quickstart.html) section of documentation to create your first PF4J-based modular application
+
+Credits
+-------
+Many thanks to:
+* [JetBrains](https://www.jetbrains.com) for their free OpenSource license
+* [JProfiler](https://www.ej-technologies.com/jprofiler) for their free OpenSource license
