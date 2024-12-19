@@ -43,8 +43,8 @@ public class PluginClassLoader extends URLClassLoader {
 
     private static final Logger log = LoggerFactory.getLogger(PluginClassLoader.class);
 
-    private static final String JAVA_PACKAGE_PREFIX = "java.";
-    private static final String PLUGIN_PACKAGE_PREFIX = "org.pf4j.";
+    private  final String JAVA_PACKAGE_PREFIX = "java.";
+    private  final String PLUGIN_PACKAGE_PREFIX = "org.pf4j.";
 
     private final PluginManager pluginManager;
     private final PluginDescriptor pluginDescriptor;
