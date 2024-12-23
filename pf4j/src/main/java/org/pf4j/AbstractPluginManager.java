@@ -337,6 +337,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             if (classLoader instanceof Closeable) {
                 try {
                     ((Closeable) classLoader).close();
+                    classLoader = null; // help GC to collect the classloader
                 } catch (IOException e) {
                     throw new PluginRuntimeException(e, "Cannot close classloader");
                 }
