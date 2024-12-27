@@ -18,8 +18,8 @@ package org.pf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
-import org.pf4j.test.PluginZip;
 import org.pf4j.test.TestPlugin;
+import org.pf4j.test.PropertiesUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -113,7 +113,7 @@ public class CompoundPluginDescriptorFinderTest {
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, ">=1");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
 
-        return PluginZip.createProperties(map);
+        return PropertiesUtils.createProperties(map);
     }
 
     private void storePropertiesToPath(Properties properties, Path pluginPath) throws IOException {

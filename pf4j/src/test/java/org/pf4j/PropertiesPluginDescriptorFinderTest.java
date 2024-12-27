@@ -18,8 +18,8 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.pf4j.test.PluginZip;
 import org.pf4j.test.TestPlugin;
+import org.pf4j.test.PropertiesUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -118,7 +118,7 @@ public class PropertiesPluginDescriptorFinderTest {
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, ">=1");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
 
-        return PluginZip.createProperties(map);
+        return PropertiesUtils.createProperties(map);
     }
 
     private Properties getPlugin2Properties() {
@@ -129,7 +129,7 @@ public class PropertiesPluginDescriptorFinderTest {
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
 
-        return PluginZip.createProperties(map);
+        return PropertiesUtils.createProperties(map);
     }
 
     private Properties getPlugin4Properties() {
@@ -140,7 +140,7 @@ public class PropertiesPluginDescriptorFinderTest {
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 
-        return PluginZip.createProperties(map);
+        return PropertiesUtils.createProperties(map);
     }
 
     private Properties getPlugin5Properties() {
@@ -151,7 +151,7 @@ public class PropertiesPluginDescriptorFinderTest {
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 
-        return PluginZip.createProperties(map);
+        return PropertiesUtils.createProperties(map);
     }
 
     private Properties getPlugin6Properties() {
@@ -162,7 +162,7 @@ public class PropertiesPluginDescriptorFinderTest {
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
         map.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
 
-        return PluginZip.createProperties(map);
+        return PropertiesUtils.createProperties(map);
     }
 
     private void storePropertiesToPath(Properties properties, Path pluginPath) throws IOException {

@@ -18,7 +18,7 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.pf4j.test.PluginJar;
+import org.pf4j.test.ManifestUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -121,7 +121,7 @@ public class ManifestPluginDescriptorFinderTest {
         map.put(ManifestPluginDescriptorFinder.PLUGIN_REQUIRES, "*");
         map.put(ManifestPluginDescriptorFinder.PLUGIN_LICENSE, "Apache-2.0");
 
-        return PluginJar.createManifest(map);
+        return ManifestUtils.createManifest(map);
     }
 
     private Manifest getPlugin2Manifest() {
@@ -132,7 +132,7 @@ public class ManifestPluginDescriptorFinderTest {
         map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
         map.put(ManifestPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "");
 
-        return PluginJar.createManifest(map);
+        return ManifestUtils.createManifest(map);
     }
 
     private Manifest getPlugin4Manifest() {
@@ -141,7 +141,7 @@ public class ManifestPluginDescriptorFinderTest {
         map.put(ManifestPluginDescriptorFinder.PLUGIN_VERSION, "0.0.1");
         map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
 
-        return PluginJar.createManifest(map);
+        return ManifestUtils.createManifest(map);
     }
 
     private Manifest getPlugin5Manifest() {
@@ -150,7 +150,7 @@ public class ManifestPluginDescriptorFinderTest {
         map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
         map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
 
-        return PluginJar.createManifest(map);
+        return ManifestUtils.createManifest(map);
     }
 
     private Manifest getPlugin6Manifest() {
@@ -158,7 +158,7 @@ public class ManifestPluginDescriptorFinderTest {
         map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, "org.pf4j.plugin.TestPlugin");
         map.put(ManifestPluginDescriptorFinder.PLUGIN_PROVIDER, "Decebal Suiu");
 
-        return PluginJar.createManifest(map);
+        return ManifestUtils.createManifest(map);
     }
 
     private void storeManifestToPath(Manifest manifest, Path pluginPath) throws IOException {

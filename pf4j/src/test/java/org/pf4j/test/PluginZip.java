@@ -16,6 +16,7 @@
 package org.pf4j.test;
 
 import org.pf4j.PropertiesPluginDescriptorFinder;
+import org.pf4j.util.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,52 +50,79 @@ public class PluginZip {
         this.pluginDependencies = builder.pluginDependencies;
     }
 
+    /**
+     * Returns the path of the {@code zip} file.
+     */
     public Path path() {
         return path;
     }
 
+    /**
+     * Returns the {@code zip} file.
+     */
     public File file() {
         return path.toFile();
     }
 
+    /**
+     * Returns the plugin id.
+     */
     public String pluginId() {
         return pluginId;
     }
 
+    /**
+     * Returns the plugin class.
+     */
     public String pluginClass() {
         return pluginClass;
     }
 
+    /**
+     * Returns the plugin version.
+     */
     public String pluginVersion() {
         return pluginVersion;
     }
 
+    /**
+     * Returns the plugin dependencies.
+     */
     public String pluginDependencies() { return pluginDependencies; }
 
+    /**
+     * Returns the path where the {@code zip} file will be unzipped.
+     */
     public Path unzippedPath() {
-        Path path = path();
-        String fileName = path.getFileName().toString();
+        Path zipPath = path();
+        String fileName = zipPath.getFileName().toString();
 
-        return path.getParent().resolve(fileName.substring(0, fileName.length() - 4)); // without ".zip" suffix
+        return zipPath.getParent().resolve(fileName.substring(0, fileName.length() - 4)); // without ".zip" suffix
     }
 
-    public static Properties createProperties(Map<String, String> map) {
-        Properties properties = new Properties();
-        properties.putAll(map);
-
-        return properties;
+    /**
+     * Unzips the {@code zip} file.
+     */
+    public Path unzip() throws IOException {
+        return FileUtils.expandIfZip(path());
     }
 
+    /**
+     * Builder for {@link PluginZip}.
+     * The {@code plugin.properties} file is created on the fly from the information supplied in this builder.
+     * The {@code plugin.properties} file is created in the root of the {@code zip} file.
+     * The {@code zip} file can contain extra files.
+     */
     public static class Builder {
 
         private final Path path;
         private final String pluginId;
+        private final Map<String, String> properties = new LinkedHashMap<>();
+        private final Map<Path, byte[]> files = new LinkedHashMap<>();
 
         private String pluginClass;
         private String pluginVersion;
         private String pluginDependencies;
-        private Map<String, String> properties = new LinkedHashMap<>();
-        private Map<Path, byte[]> files = new LinkedHashMap<>();
 
         public Builder(Path path, String pluginId) {
             this.path = path;
@@ -163,30 +191,14 @@ public class PluginZip {
             return this;
         }
 
+        /**
+         * Builds the {@link PluginZip} instance.
+         */
         public PluginZip build() throws IOException {
-            createPropertiesFile();
-
-            return new PluginZip(this);
-        }
-
-        protected void createPropertiesFile() throws IOException {
-            Map<String, String> map = new LinkedHashMap<>();
-            map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, pluginId);
-            map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, pluginVersion);
-            if (pluginDependencies != null) {
-                map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, pluginDependencies);
-            }
-            if (pluginClass != null) {
-                map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, pluginClass);
-            }
-            if (properties != null) {
-                map.putAll(properties);
-            }
-
             try (ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(path.toFile()))) {
                 ZipEntry propertiesFile = new ZipEntry(PropertiesPluginDescriptorFinder.DEFAULT_PROPERTIES_FILE_NAME);
                 outputStream.putNextEntry(propertiesFile);
-                createProperties(map).store(outputStream, "");
+                createProperties().store(outputStream, "");
                 outputStream.closeEntry();
 
                 for (Map.Entry<Path, byte[]> fileEntry : files.entrySet()) {
@@ -196,6 +208,24 @@ public class PluginZip {
                     outputStream.closeEntry();
                 }
             }
+
+            return new PluginZip(this);
+        }
+
+        private Properties createProperties() {
+            Map<String, String> map = new LinkedHashMap<>();
+            map.put(PropertiesPluginDescriptorFinder.PLUGIN_ID, pluginId);
+            map.put(PropertiesPluginDescriptorFinder.PLUGIN_VERSION, pluginVersion);
+            if (pluginDependencies != null) {
+                map.put(PropertiesPluginDescriptorFinder.PLUGIN_DEPENDENCIES, pluginDependencies);
+            }
+            if (pluginClass != null) {
+                map.put(PropertiesPluginDescriptorFinder.PLUGIN_CLASS, pluginClass);
+            }
+
+            map.putAll(properties);
+
+            return PropertiesUtils.createProperties(map);
         }
 
     }

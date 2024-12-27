@@ -133,7 +133,7 @@ class PluginClassLoaderTest {
                 .addFile(whaszzupGreetingClassPath, JavaFileObjectUtils.getAllBytes(generatedClasses.get(JavaSources.WHAZZUP_GREETING_CLASS_NAME)))
                 .build();
 
-        FileUtils.expandIfZip(pluginDependencyZip.path());
+        pluginDependencyZip.unzip();
 
         PluginClasspath pluginDependencyClasspath = new DefaultPluginClasspath();
 
@@ -175,7 +175,7 @@ class PluginClassLoaderTest {
                 .addFile(classesPath.resolve(LegacyExtensionStorage.EXTENSIONS_RESOURCE), "plugin")
                 .build();
 
-        FileUtils.expandIfZip(pluginZip.path());
+        pluginZip.unzip();
 
         PluginClasspath pluginClasspath = new DefaultPluginClasspath();
 

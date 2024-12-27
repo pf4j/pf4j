@@ -16,6 +16,7 @@
 package org.pf4j.test;
 
 import org.pf4j.ManifestPluginDescriptorFinder;
+import org.pf4j.processor.LegacyExtensionStorage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,7 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -53,46 +53,50 @@ public class PluginJar {
         this.pluginVersion = builder.pluginVersion;
     }
 
+    /**
+     * Returns the {@code jar} file path.
+     */
     public Path path() {
         return path;
     }
 
+    /**
+     * Returns the {@code jar} file.
+     */
     public File file() {
         return path.toFile();
     }
 
+    /**
+     * Returns the plugin class.
+     */
     public String pluginClass() {
         return pluginClass;
     }
 
+    /**
+     * Returns the plugin id.
+     */
     public String pluginId() {
         return pluginId;
     }
 
+    /**
+     * Returns the plugin version.
+     */
     public String pluginVersion() {
         return pluginVersion;
-    }
-
-    public static Manifest createManifest(Map<String, String> map) {
-        Manifest manifest = new Manifest();
-        Attributes attributes = manifest.getMainAttributes();
-        attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0.0");
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            attributes.put(new Attributes.Name(entry.getKey()), entry.getValue());
-        }
-
-        return manifest;
     }
 
     public static class Builder {
 
         private final Path path;
         private final String pluginId;
+        private final Map<String, String> manifestAttributes = new LinkedHashMap<>();
+        private final Set<String> extensions = new LinkedHashSet<>();
 
         private String pluginClass;
         private String pluginVersion;
-        private Map<String, String> manifestAttributes = new LinkedHashMap<>();
-        private Set<String> extensions = new LinkedHashSet<>();
         private ClassDataProvider classDataProvider = new DefaultClassDataProvider();
 
         public Builder(Path path, String pluginId) {
@@ -144,13 +148,15 @@ public class PluginJar {
              return this;
         }
 
+        /**
+         * Builds the {@link PluginJar} instance.
+         */
         public PluginJar build() throws IOException {
-            Manifest manifest = createManifest();
             try (OutputStream outputStream = new FileOutputStream(path.toFile());
-                 JarOutputStream jarOutputStream = new JarOutputStream(outputStream, manifest)) {
+                JarOutputStream jarOutputStream = new JarOutputStream(outputStream, createManifest())) {
                 if (!extensions.isEmpty()) {
                     // add extensions.idx
-                    JarEntry jarEntry = new JarEntry("META-INF/extensions.idx");
+                    JarEntry jarEntry = new JarEntry(LegacyExtensionStorage.EXTENSIONS_RESOURCE);
                     jarOutputStream.putNextEntry(jarEntry);
                     jarOutputStream.write(extensionsAsByteArray());
                     jarOutputStream.closeEntry();
@@ -175,11 +181,9 @@ public class PluginJar {
             if (pluginClass != null) {
                 map.put(ManifestPluginDescriptorFinder.PLUGIN_CLASS, pluginClass);
             }
-            if (manifestAttributes != null) {
-                map.putAll(manifestAttributes);
-            }
+            map.putAll(manifestAttributes);
 
-            return PluginJar.createManifest(map);
+            return ManifestUtils.createManifest(map);
         }
 
         private byte[] extensionsAsByteArray() throws IOException {
