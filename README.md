@@ -24,6 +24,7 @@ For now are available these extensions:
 - [pf4j-spring](https://github.com/pf4j/pf4j-spring) (PF4J - Spring Framework integration)
 - [pf4j-wicket](https://github.com/pf4j/pf4j-wicket) (PF4J - Wicket integration)
 - [pf4j-web](https://github.com/pf4j/pf4j-web) (PF4J in web applications)
+- [jmix-plugin-addon](https://github.com/Gamer08YT/jmix-plugin-addon) (PF4J as Jmix Framework Addon)
 
 No XML, only Java.
 
