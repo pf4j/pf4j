@@ -470,7 +470,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#41]: Added plugin archive source abstraction
 - Added test for DefaultPluginRepository
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.12.1...HEAD
+[unreleased]: https://github.com/decebals/pf4j/compare/release-3.13.0...HEAD
 [3.13.0]: https://github.com/decebals/pf4j/compare/release-3.12.1...release-3.13.0
 [3.12.1]: https://github.com/decebals/pf4j/compare/release-3.12.0...release-3.12.1
 [3.12.0]: https://github.com/decebals/pf4j/compare/release-3.11.1...release-3.12.0
