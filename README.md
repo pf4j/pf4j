@@ -7,6 +7,16 @@ Plugin Framework for Java (PF4J)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pf4j_pf4j&metric=coverage)](https://sonarcloud.io/summary/new_code?id=pf4j_pf4j)
 [![Maven Central](http://img.shields.io/maven-central/v/org.pf4j/pf4j.svg)](http://search.maven.org/#search|ga|1|pf4j)
 
+## Trusted By
+
+- **Netflix Spinnaker** - Continuous delivery platform  
+- **Facebook Buck** (Java version) - Build system  
+- **Appsmith** [![GitHub stars](https://img.shields.io/github/stars/appsmithorg/appsmith.svg)](https://github.com/appsmithorg/appsmith) - Low-code application platform
+- **Halo CMS** [![GitHub stars](https://img.shields.io/github/stars/halo-dev/halo.svg)](https://github.com/halo-dev/halo) - Modern content management  
+- **[View more projects...](https://github.com/pf4j/pf4j/issues/173)**
+
+---
+
 A plugin is a way for a third party to extend the functionality of an application. A plugin implements extension points
 declared by application or other plugins. Also, a plugin can define extension points.  
 
@@ -16,6 +26,12 @@ Features/Benefits
 -------------------
 With PF4J you can easily transform a monolithic java application in a modular application.  
 PF4J is an open source (Apache license) lightweight (around __100 KB__) plugin framework for java, with minimal dependencies (only slf4j-api) and very extensible (see `PluginDescriptorFinder` and `ExtensionFinder`).   
+
+**Why Choose PF4J?**
+- **Enterprise-proven**: Powers Netflix Spinnaker and Facebook Buck
+- **Lightweight**: Only ~100KB with minimal dependencies
+- **Simple**: No XML configuration, pure Java
+- **Alternative to OSGi**: Easy to learn and implement
 
 Practically, PF4J is a microframework that aims to keep the core simple but extensible. We also have a community-driven ecosystem of extensions.
 For now are available these extensions:
