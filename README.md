@@ -10,7 +10,9 @@ Plugin Framework for Java (PF4J)
 ## Trusted By
 
 - **Netflix Spinnaker** - Continuous delivery platform  
-- **Facebook Buck** (Java version) - Build system  
+- **Facebook Buck** (Java version) - Build system
+- **Huawei Cloud** - Real-time data processing and scoring systems (MRS - MapReduce Service)
+- **Eclipse Foundation** - Connected Services Platform (ECSP) for automotive software-defined vehicles
 - **Appsmith** [![GitHub stars](https://img.shields.io/github/stars/appsmithorg/appsmith.svg)](https://github.com/appsmithorg/appsmith) - Low-code application platform
 - **Halo CMS** [![GitHub stars](https://img.shields.io/github/stars/halo-dev/halo.svg)](https://github.com/halo-dev/halo) - Modern content management  
 - **[View more projects...](https://github.com/pf4j/pf4j/issues/173)**
