@@ -19,8 +19,7 @@ Plugin Framework for Java (PF4J)
 
 ---
 
-A plugin is a way for a third party to extend the functionality of an application. A plugin implements extension points
-declared by application or other plugins. Also, a plugin can define extension points.  
+A plugin is a way for a third party to extend the functionality of an application. A plugin implements extension points declared by application or other plugins. Also, a plugin can define extension points.  
 
 **NOTE:** Starting with version 0.9 you can define an extension directly in the application jar (you're not obligated to put the extension in a plugin - you can see this extension as a default/system extension). See [WhazzupGreeting](https://github.com/pf4j/pf4j/blob/master/demo/gradle/app/src/main/java/org/pf4j/demo/WhazzupGreeting.java) for a real example.  
 
@@ -36,12 +35,6 @@ PF4J is an open source (Apache license) lightweight (around __100 KB__) plugin f
 - **Alternative to OSGi**: Easy to learn and implement
 
 Practically, PF4J is a microframework that aims to keep the core simple but extensible. We also have a community-driven ecosystem of extensions.
-For now are available these extensions:
-- [pf4j-shell](https://github.com/pf4j/pf4j-shell) (interactive shell for PF4J)
-- [pf4j-update](https://github.com/pf4j/pf4j-update) (update mechanism for PF4J)
-- [pf4j-spring](https://github.com/pf4j/pf4j-spring) (PF4J - Spring Framework integration)
-- [pf4j-wicket](https://github.com/pf4j/pf4j-wicket) (PF4J - Wicket integration)
-- [pf4j-web](https://github.com/pf4j/pf4j-web) (PF4J in web applications)
 
 No XML, only Java.
 
