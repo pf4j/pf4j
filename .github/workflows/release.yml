@@ -49,14 +49,14 @@ jobs:
           mvn -B release:prepare \
             -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
             -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} \
-            -Darguments="-DskipTests"
+            -Darguments="-DskipTests -Prelease"
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           MAVEN_TOKEN: ${{ secrets.SONATYPE_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Perform release
-        run: mvn -B release:perform -Darguments="-DskipTests"
+        run: mvn -B release:perform -Darguments="-DskipTests -Prelease"
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           MAVEN_TOKEN: ${{ secrets.SONATYPE_TOKEN }}
