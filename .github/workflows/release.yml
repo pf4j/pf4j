@@ -74,23 +74,34 @@ jobs:
       - name: Summary
         if: success()
         run: |
+          RELEASE_VERSION="${{ github.event.inputs.releaseVersion }}"
+          DEV_VERSION="${{ github.event.inputs.developmentVersion }}"
+          TAG_NAME="release-$RELEASE_VERSION"
+
           echo "## Release Complete! :tada:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Released version:** ${{ github.event.inputs.releaseVersion }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Next development version:** ${{ github.event.inputs.developmentVersion }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Released version:** \`$RELEASE_VERSION\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Next development version:** \`$DEV_VERSION\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Git tag:** \`$TAG_NAME\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "### GitHub Release:" >> $GITHUB_STEP_SUMMARY
+          echo "https://github.com/pf4j/pf4j/releases/tag/$TAG_NAME" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The release will be available on Maven Central within a few hours." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Maven Coordinates:" >> $GITHUB_STEP_SUMMARY
+          echo "### Maven Usage:" >> $GITHUB_STEP_SUMMARY
           echo '```xml' >> $GITHUB_STEP_SUMMARY
           echo '<dependency>' >> $GITHUB_STEP_SUMMARY
           echo '  <groupId>org.pf4j</groupId>' >> $GITHUB_STEP_SUMMARY
           echo '  <artifactId>pf4j</artifactId>' >> $GITHUB_STEP_SUMMARY
-          echo '  <version>${{ github.event.inputs.releaseVersion }}</version>' >> $GITHUB_STEP_SUMMARY
+          echo "  <version>$RELEASE_VERSION</version>" >> $GITHUB_STEP_SUMMARY
           echo '</dependency>' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Verify on Maven Central:" >> $GITHUB_STEP_SUMMARY
-          echo "https://central.sonatype.com/artifact/org.pf4j/pf4j/${{ github.event.inputs.releaseVersion }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Verify Deployment:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "mvn dependency:get -DgroupId=org.pf4j -DartifactId=pf4j -Dversion=$RELEASE_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Maven Central:" >> $GITHUB_STEP_SUMMARY
+          echo "https://central.sonatype.com/artifact/org.pf4j/pf4j/$RELEASE_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo ":white_check_mark: **Release is LIVE and ready to use!**" >> $GITHUB_STEP_SUMMARY
