@@ -25,6 +25,14 @@
         <tag>HEAD</tag>
     </scm>
 
+    <developers>
+        <developer>
+            <id>decebals</id>
+            <name>Decebal Suiu</name>
+            <email>decebal.suiu@gmail.com</email>
+        </developer>
+    </developers>
+
     <!--
     Replaced by centralSnapshotsUrl in central-publishing-maven-plugin configuration
     <distributionManagement>
