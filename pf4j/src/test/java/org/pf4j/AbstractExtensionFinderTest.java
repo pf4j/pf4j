@@ -67,6 +67,10 @@ class AbstractExtensionFinderTest {
     @AfterEach
     public void tearDown() {
         pluginManager = null;
+        // Force garbage collection to clean up ClassLoaders from dynamic class loading tests
+        // This helps prevent ClassLoader conflicts, especially on Java 11
+        System.gc();
+        // TODO: Test is still flaky, needs further investigation
     }
 
     /**
