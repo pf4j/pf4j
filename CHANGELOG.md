@@ -5,10 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#614]: Demo application shows zero Greeting extensions under JDK 23
+- Set class loader to null on unload plugin
 
 #### Changed
 
 #### Added
+- [#598]: Add Maven wrapper
 
 #### Removed
 
@@ -506,6 +509,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#614]: https://github.com/pf4j/pf4j/issues/614
+[#598]: https://github.com/pf4j/pf4j/pull/598
 [#595]: https://github.com/pf4j/pf4j/pull/595
 [#594]: https://github.com/pf4j/pf4j/issues/594
 [#590]: https://github.com/pf4j/pf4j/issues/590
