@@ -46,9 +46,7 @@ jobs:
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "## Snapshot Deployed! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Repository:** https://central.sonatype.com/repository/maven-snapshots/" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** \`$VERSION\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Maven Usage:" >> $GITHUB_STEP_SUMMARY
           echo '```xml' >> $GITHUB_STEP_SUMMARY
@@ -57,4 +55,9 @@ jobs:
           echo '  <artifactId>pf4j</artifactId>' >> $GITHUB_STEP_SUMMARY
           echo "  <version>$VERSION</version>" >> $GITHUB_STEP_SUMMARY
           echo '</dependency>' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Verify Deployment:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "mvn dependency:get -DgroupId=org.pf4j -DartifactId=pf4j -Dversion=$VERSION" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
