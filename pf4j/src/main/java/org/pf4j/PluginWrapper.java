@@ -90,7 +90,7 @@ public class PluginWrapper {
      * @return the plugin instance
      */
     public Plugin getPlugin() {
-        if (plugin == null) {
+        if (plugin == null && pluginState != PluginState.UNLOADED) {
             plugin = pluginFactory.create(this);
         }
 
