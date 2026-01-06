@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#618], [#623]: Fix path traversal vulnerabilities in ZIP extraction
+- [#570]: Avoid instantiating Plugin class if a plugin is already unloaded
 
 #### Changed
 
@@ -516,6 +518,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#623]: https://github.com/pf4j/pf4j/issues/623
+[#618]: https://github.com/pf4j/pf4j/issues/618
 [#614]: https://github.com/pf4j/pf4j/issues/614
 [#598]: https://github.com/pf4j/pf4j/pull/598
 [#595]: https://github.com/pf4j/pf4j/pull/595
@@ -526,6 +530,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [#582]: https://github.com/pf4j/pf4j/issues/582
 [#576]: https://github.com/pf4j/pf4j/issues/576
 [#574]: https://github.com/pf4j/pf4j/issues/574
+[#570]: https://github.com/pf4j/pf4j/pull/570
 [#568]: https://github.com/pf4j/pf4j/pull/568
 [#567]: https://github.com/pf4j/pf4j/pull/567
 [#566]: https://github.com/pf4j/pf4j/pull/566
