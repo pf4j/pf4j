@@ -41,19 +41,85 @@ public class UnzipTest {
         unzip.setDestination(destination.toFile());
 
         Exception exception = assertThrows(ZipException.class, unzip::extract);
-        assertTrue(exception.getMessage().contains("is trying to leave the target output directory"));
+        assertTrue(exception.getMessage().contains("attempting to write outside the target directory"));
+    }
+
+    /**
+     * Test for issue #618: Bypass using sibling directory with matching prefix.
+     * Attack: If destination is "/tmp/zipSlip", attacker uses "../zipSlip_evil/malicious.sh"
+     * The canonical path becomes "/tmp/zipSlip_evil/malicious.sh" which startsWith("/tmp/zipSlip")
+     * This demonstrates the vulnerability: the file SHOULD be rejected but validation passes.
+     */
+    @Test
+    public void zipSlipBypasWithSiblingDirectory() throws IOException {
+        Path tempDir = Files.createTempDirectory("test");
+        Path destination = Files.createDirectory(tempDir.resolve("zipSlip"));
+        Path siblingDir = Files.createDirectory(tempDir.resolve("zipSlip_evil"));
+
+        // Create malicious zip that tries to escape to sibling directory
+        File zipFile = createZipWithEntry("../zipSlip_evil/malicious.sh");
+
+        Unzip unzip = new Unzip();
+        unzip.setSource(zipFile);
+        unzip.setDestination(destination.toFile());
+
+        Exception exception = assertThrows(ZipException.class, unzip::extract);
+        assertTrue(exception.getMessage().contains("attempting to write outside the target directory"));
+    }
+
+    /**
+     * Test for issue #623: Bypass using partial prefix match.
+     * Attack: If destination is "/tmp/dir", path "/tmp/directory/file" passes startsWith check
+     * This demonstrates the vulnerability: the file SHOULD be rejected but validation passes.
+     */
+    @Test
+    public void zipSlipBypassWithPartialPrefixMatch() throws IOException {
+        Path tempDir = Files.createTempDirectory("test");
+        Path destination = Files.createDirectory(tempDir.resolve("dir"));
+        Path similarDir = Files.createDirectory(tempDir.resolve("directory"));
+
+        // Create malicious zip that tries to escape to directory with similar name
+        File zipFile = createZipWithEntry("../directory/malicious.sh");
+
+        Unzip unzip = new Unzip();
+        unzip.setSource(zipFile);
+        unzip.setDestination(destination.toFile());
+
+        Exception exception = assertThrows(ZipException.class, unzip::extract);
+        assertTrue(exception.getMessage().contains("attempting to write outside the target directory"));
+    }
+
+    /**
+     * Positive test: Verify legitimate nested paths work correctly.
+     */
+    @Test
+    public void extractLegitimateNestedPaths() throws IOException {
+        Path destination = Files.createTempDirectory("legitimate");
+        File zipFile = createZipWithEntry("subdir/nested/file.txt");
+
+        Unzip unzip = new Unzip();
+        unzip.setSource(zipFile);
+        unzip.setDestination(destination.toFile());
+
+        // Should extract without throwing exception
+        unzip.extract();
+
+        Path extractedFile = destination.resolve("subdir/nested/file.txt");
+        assertTrue(Files.exists(extractedFile));
     }
 
     private File createMaliciousZipFile() throws IOException {
-        File zipFile = File.createTempFile("malicious", ".zip");
-        String maliciousFileName = "../malicious.sh";
+        return createZipWithEntry("../malicious.sh");
+    }
+
+    private File createZipWithEntry(String entryName) throws IOException {
+        File zipFile = File.createTempFile("test", ".zip");
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFile))) {
-            ZipEntry entry = new ZipEntry(maliciousFileName);
+            ZipEntry entry = new ZipEntry(entryName);
             zipOutputStream.putNextEntry(entry);
-            zipOutputStream.write("Malicious content".getBytes());
+            zipOutputStream.write("Test content".getBytes());
             zipOutputStream.closeEntry();
         }
-
         return zipFile;
     }
 

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
@@ -75,16 +76,13 @@ public class Unzip {
             FileUtils.delete(destination.toPath());
         }
 
-        String destinationCanonicalPath = destination.getCanonicalPath();
         try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(source))) {
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 File file = new File(destination, zipEntry.getName());
 
-                String fileCanonicalPath = file.getCanonicalPath();
-                if (!fileCanonicalPath.startsWith(destinationCanonicalPath)) {
-                    throw new ZipException("The file "+ zipEntry.getName() + " is trying to leave the target output directory of "+ destination);
-                }
+                // Validate path before any file operations
+                validateExtractPath(destination, file, zipEntry.getName());
 
                 // create intermediary directories - sometimes zip don't add them
                 File dir = new File(file.getParent());
@@ -102,6 +100,36 @@ public class Unzip {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Validates that the extraction path is within the destination directory.
+     * Uses Path API with normalization to prevent directory traversal attacks.
+     *
+     * @param destination the intended extraction directory
+     * @param file the file to be extracted
+     * @param entryName the zip entry name (for error messages)
+     * @throws ZipException if the file would be extracted outside the destination
+     */
+    private void validateExtractPath(File destination, File file, String entryName) throws ZipException {
+        try {
+            // Normalize and resolve to absolute paths to eliminate ".." and "." components
+            Path destinationPath = destination.toPath().toRealPath();
+            Path filePath = file.toPath().normalize().toAbsolutePath();
+
+            // Path.startsWith() performs proper path component comparison, not string prefix matching
+            if (!filePath.startsWith(destinationPath)) {
+                throw new ZipException("Entry '" + entryName + "' is attempting to write outside the target directory: " + destination);
+            }
+        } catch (IOException e) {
+            // If toRealPath() fails (destination doesn't exist), use normalize + toAbsolutePath
+            Path destinationPath = destination.toPath().normalize().toAbsolutePath();
+            Path filePath = file.toPath().normalize().toAbsolutePath();
+
+            if (!filePath.startsWith(destinationPath)) {
+                throw new ZipException("Entry '" + entryName + "' is attempting to write outside the target directory: " + destination);
             }
         }
     }
