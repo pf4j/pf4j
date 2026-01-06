@@ -33,6 +33,14 @@
             </resource>
         </resources>
 
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.archetype</groupId>
+                <artifactId>archetype-packaging</artifactId>
+                <version>2.3</version>
+            </extension>
+        </extensions>     
+
         <pluginManagement>
             <plugins>
                 <plugin>
