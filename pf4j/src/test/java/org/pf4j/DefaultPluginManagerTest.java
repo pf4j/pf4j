@@ -470,4 +470,54 @@ class DefaultPluginManagerTest {
         assertTrue(pluginClassLoader.isClosed());
     }
 
+    @Test
+    void startPluginWithExceptionSetsStateToFailed() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-plugin-1.0.0.zip"), "failingPlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugin("failingPlugin");
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingPlugin");
+        assertEquals(PluginState.FAILED, plugin.getPluginState());
+        assertNotNull(plugin.getFailedException());
+        assertEquals("Intentional failure for testing", plugin.getFailedException().getMessage());
+        assertFalse(pluginManager.getStartedPlugins().contains(plugin));
+    }
+
+    @Test
+    void startPluginWithExceptionFiresStateEvent() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-plugin-1.0.0.zip"), "failingPlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugin("failingPlugin");
+
+        boolean failedEventFired = receivedEvents.stream()
+            .anyMatch(event -> event.getPluginState() == PluginState.FAILED
+                && event.getPlugin().getPluginId().equals("failingPlugin"));
+
+        assertTrue(failedEventFired);
+    }
+
+    @Test
+    void startPluginsWithExceptionSetsStateToFailed() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-plugin-1.0.0.zip"), "failingPlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingPlugin");
+        assertEquals(PluginState.FAILED, plugin.getPluginState());
+        assertNotNull(plugin.getFailedException());
+        assertFalse(pluginManager.getStartedPlugins().contains(plugin));
+    }
+
 }
