@@ -387,19 +387,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
             PluginState pluginState = pluginWrapper.getPluginState();
             if (!pluginState.isDisabled() && !pluginState.isStarted()) {
-                try {
-                    log.info("Start plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
-                    pluginWrapper.getPlugin().start();
-                    pluginWrapper.setPluginState(PluginState.STARTED);
-                    pluginWrapper.setFailedException(null);
-                    startedPlugins.add(pluginWrapper);
-                } catch (Exception | LinkageError e) {
-                    pluginWrapper.setPluginState(PluginState.FAILED);
-                    pluginWrapper.setFailedException(e);
-                    log.error("Unable to start plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()), e);
-                } finally {
-                    firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-                }
+                doStartPlugin(pluginWrapper);
             }
         }
     }
@@ -438,13 +426,31 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
-        log.info("Start plugin '{}'", getPluginLabel(pluginDescriptor));
-        pluginWrapper.getPlugin().start();
-        pluginWrapper.setPluginState(PluginState.STARTED);
-        startedPlugins.add(pluginWrapper);
+        return doStartPlugin(pluginWrapper);
+    }
 
-        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-
+    /**
+     * Performs the actual plugin start operation with proper exception handling.
+     * This method is used by both {@link #startPlugin(String)} and {@link #startPlugins()}.
+     *
+     * @param pluginWrapper the plugin wrapper to start
+     * @return the plugin state after the start operation
+     */
+    private PluginState doStartPlugin(PluginWrapper pluginWrapper) {
+        PluginState pluginState = pluginWrapper.getPluginState();
+        try {
+            log.info("Start plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
+            pluginWrapper.getPlugin().start();
+            pluginWrapper.setPluginState(PluginState.STARTED);
+            pluginWrapper.setFailedException(null);
+            startedPlugins.add(pluginWrapper);
+        } catch (Exception | LinkageError e) {
+            pluginWrapper.setPluginState(PluginState.FAILED);
+            pluginWrapper.setFailedException(e);
+            log.error("Unable to start plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()), e);
+        } finally {
+            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
+        }
         return pluginWrapper.getPluginState();
     }
 
