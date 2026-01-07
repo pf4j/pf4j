@@ -419,14 +419,77 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
-        for (PluginDependency dependency : pluginDescriptor.getDependencies()) {
-            // start dependency only if it marked as required (non-optional) or if it optional and loaded
-            if (!dependency.isOptional() || plugins.containsKey(dependency.getPluginId())) {
-                startPlugin(dependency.getPluginId());
-            }
+        // Start and validate dependencies
+        if (!startDependencies(pluginWrapper)) {
+            return PluginState.FAILED;
         }
 
         return doStartPlugin(pluginWrapper);
+    }
+
+    /**
+     * Starts all dependencies of a plugin and validates that required dependencies started successfully.
+     * <p>
+     * This method is called before {@link #doStartPlugin(PluginWrapper)} to ensure all dependencies
+     * are in a valid state before starting the dependent plugin.
+     * <p>
+     * <b>Behavior for required dependencies:</b>
+     * <ul>
+     *   <li>If a required dependency fails to start (state is not {@link PluginState#STARTED}),
+     *       the dependent plugin will NOT be started</li>
+     *   <li>The dependent plugin state is set to {@link PluginState#FAILED}</li>
+     *   <li>A {@link PluginRuntimeException} is set as the failure cause</li>
+     *   <li>An error is logged indicating which dependency failed</li>
+     *   <li>A state change event is fired</li>
+     * </ul>
+     * <p>
+     * <b>Behavior for optional dependencies:</b>
+     * <ul>
+     *   <li>If an optional dependency is not loaded, it is skipped (no attempt to start)</li>
+     *   <li>If an optional dependency is loaded but fails to start, a warning is logged</li>
+     *   <li>The dependent plugin will still be started (allows degraded mode/reduced functionality)</li>
+     *   <li>It is the plugin's responsibility to handle missing optional dependencies gracefully</li>
+     * </ul>
+     *
+     * @param pluginWrapper the plugin whose dependencies should be started
+     * @return {@code true} if all required dependencies started successfully and the plugin can proceed to start;
+     *         {@code false} if a required dependency failed to start (plugin state is set to FAILED)
+     */
+    private boolean startDependencies(PluginWrapper pluginWrapper) {
+        PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
+        String pluginId = pluginDescriptor.getPluginId();
+        PluginState pluginState = pluginWrapper.getPluginState();
+
+        for (PluginDependency dependency : pluginDescriptor.getDependencies()) {
+            // Start dependency only if it marked as required (non-optional) or if it optional and loaded
+            if (!dependency.isOptional() || plugins.containsKey(dependency.getPluginId())) {
+                PluginState dependencyState = startPlugin(dependency.getPluginId());
+
+                // Validate that the dependency started successfully
+                if (!dependencyState.isStarted()) {
+                    if (dependency.isOptional()) {
+                        // Optional dependency failed: log warning but continue
+                        log.warn("Optional dependency '{}' of plugin '{}' failed to start (state: {}). " +
+                                "Plugin will start with reduced functionality.",
+                                dependency.getPluginId(), pluginId, dependencyState);
+                    } else {
+                        // Required dependency failed: fail fast
+                        log.error("Cannot start plugin '{}' because required dependency '{}' failed to start (state: {})",
+                                pluginId, dependency.getPluginId(), dependencyState);
+
+                        pluginWrapper.setPluginState(PluginState.FAILED);
+                        pluginWrapper.setFailedException(
+                            new PluginRuntimeException("Required dependency '" + dependency.getPluginId() + "' failed to start")
+                        );
+                        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
+
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
