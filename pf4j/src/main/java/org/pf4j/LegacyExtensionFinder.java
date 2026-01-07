@@ -24,14 +24,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.JarURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarFile;
 
 /**
  * All extensions declared in a plugin are indexed in a file {@code META-INF/extensions.idx}.
@@ -87,11 +94,42 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
             try {
                 log.debug("Read '{}'", EXTENSIONS_RESOURCE);
                 ClassLoader pluginClassLoader = plugin.getPluginClassLoader();
-                try (InputStream resourceStream = pluginClassLoader.getResourceAsStream(EXTENSIONS_RESOURCE)) {
-                    if (resourceStream == null) {
-                        log.debug("Cannot find '{}'", EXTENSIONS_RESOURCE);
-                    } else {
-                        collectExtensions(resourceStream, bucket);
+                List<URL> extensionFiles = Collections.list(pluginClassLoader.getResources(EXTENSIONS_RESOURCE));
+                URL targetFile = null;
+                
+                if (extensionFiles.size() == 1) {
+                    targetFile = extensionFiles.get(0);
+                } else if (extensionFiles.size() > 1) {
+                    targetFile = extensionFiles.get(0);
+                    //Detect the correct extension file. in the past, getResourceAsStream was used but this fails
+                    //if ClassLoadingStrategy.APD is used and the application also contains a META-INF/extensions.idx file
+                    Path pluginPath = plugin.getPluginPath();
+                    for (URL url : extensionFiles) {
+                        URI extensionUri = "jar".equals(url.getProtocol()) ? new URI(url.getFile()) : url.toURI();
+                        Path extensionPath = java.nio.file.Paths.get(extensionUri);
+                        if (extensionPath.toString().startsWith(pluginPath.toString())) {
+                            targetFile = url;
+                            break;
+                        }
+                    }
+                    
+                }
+
+                if (targetFile != null) {pluginClassLoader.getResourceAsStream(EXTENSIONS_RESOURCE);
+                    URLConnection urlc = targetFile.openConnection();
+                    try (InputStream resourceStream = urlc.getInputStream()) {
+                        if (resourceStream == null) {
+                            log.debug("Cannot find '{}'", EXTENSIONS_RESOURCE);
+                        } else {
+                            collectExtensions(resourceStream, bucket);
+                        }
+                    } finally {
+                        //close jar file of jar url connection - otherwise the file cannot be deleted
+                        if (urlc instanceof JarURLConnection) {
+                            JarURLConnection juc = (JarURLConnection)urlc;
+                            JarFile jar = juc.getJarFile();
+                            jar.close();
+                        }
                     }
                 }
 
@@ -99,6 +137,8 @@ public class LegacyExtensionFinder extends AbstractExtensionFinder {
 
                 result.put(pluginId, bucket);
             } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            } catch (URISyntaxException e) {
                 log.error(e.getMessage(), e);
             }
         }
