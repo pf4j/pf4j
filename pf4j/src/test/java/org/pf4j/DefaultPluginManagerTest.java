@@ -616,4 +616,68 @@ class DefaultPluginManagerTest {
         assertTrue(pluginManager.getStartedPlugins().isEmpty());
     }
 
+    @Test
+    void invalidPluginSetsFailedException() throws IOException {
+        // Set system version to 2.0.0
+        pluginManager.setSystemVersion("2.0.0");
+
+        // Create plugin that requires version 3.0.0
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("invalid-plugin-1.0.0.zip"), "invalidPlugin")
+            .pluginVersion("1.0.0")
+            .pluginRequires("3.0.0")
+            .build();
+
+        pluginManager.loadPlugins();
+
+        PluginWrapper plugin = pluginManager.getPlugin("invalidPlugin");
+        assertEquals(PluginState.DISABLED, plugin.getPluginState());
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("validation failed"));
+    }
+
+    @Test
+    void stopPluginsWithExceptionSetsFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-stop-plugin-1.0.0.zip"), "failingStopPlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingStopPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugin("failingStopPlugin");
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingStopPlugin");
+        assertEquals(PluginState.STARTED, plugin.getPluginState());
+
+        // Stop all plugins - this will trigger exception in stop()
+        pluginManager.stopPlugins();
+
+        assertEquals(PluginState.FAILED, plugin.getPluginState());
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("stop"));
+    }
+
+    @Test
+    void enableInvalidPluginSetsFailedException() throws IOException {
+        // Set system version to 2.0.0
+        pluginManager.setSystemVersion("2.0.0");
+
+        // Create plugin that requires version 3.0.0
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("invalid-enable-plugin-1.0.0.zip"), "invalidEnablePlugin")
+            .pluginVersion("1.0.0")
+            .pluginRequires("3.0.0")
+            .build();
+
+        pluginManager.loadPlugins();
+
+        PluginWrapper plugin = pluginManager.getPlugin("invalidEnablePlugin");
+        assertEquals(PluginState.DISABLED, plugin.getPluginState());
+
+        // Try to enable the invalid plugin
+        boolean result = pluginManager.enablePlugin("invalidEnablePlugin");
+
+        assertFalse(result);
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("validation failed"));
+    }
+
 }

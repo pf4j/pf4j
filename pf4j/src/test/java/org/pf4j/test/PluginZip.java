@@ -147,6 +147,12 @@ public class PluginZip {
             return this;
         }
 
+        public Builder pluginRequires(String pluginRequires) {
+            this.properties.put(PropertiesPluginDescriptorFinder.PLUGIN_REQUIRES, pluginRequires);
+
+            return this;
+        }
+
         /**
          * Add extra properties to the {@code properties} file.
          * As possible attribute name please see {@link PropertiesPluginDescriptorFinder}.

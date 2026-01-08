@@ -538,6 +538,9 @@ public abstract class AbstractPluginManager implements PluginManager {
                     firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
                 } catch (PluginRuntimeException e) {
                     log.error(e.getMessage(), e);
+                    pluginWrapper.setPluginState(PluginState.FAILED);
+                    pluginWrapper.setFailedException(e);
+                    firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
                 }
             } else {
                 // do nothing
@@ -647,6 +650,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         if (!isPluginValid(pluginWrapper)) {
             log.warn("Plugin '{}' can not be enabled", getPluginLabel(pluginWrapper.getDescriptor()));
+            pluginWrapper.setFailedException(new PluginRuntimeException("Plugin validation failed"));
             return false;
         }
 
@@ -997,6 +1001,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         if (!isPluginValid(pluginWrapper)) {
             log.warn("Plugin '{}' is invalid and it will be disabled", pluginPath);
             pluginWrapper.setPluginState(PluginState.DISABLED);
+            pluginWrapper.setFailedException(new PluginRuntimeException("Plugin validation failed"));
         }
 
         log.debug("Created wrapper '{}' for plugin '{}'", pluginWrapper, pluginPath);
