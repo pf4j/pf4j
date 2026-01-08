@@ -680,4 +680,46 @@ class DefaultPluginManagerTest {
         assertTrue(plugin.getFailedException().getMessage().contains("validation failed"));
     }
 
+    @Test
+    void disablePluginWithStopFailureSetsFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-disable-plugin-1.0.0.zip"), "failingDisablePlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingStopPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugin("failingDisablePlugin");
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingDisablePlugin");
+        assertEquals(PluginState.STARTED, plugin.getPluginState());
+
+        // Try to disable - stop will fail
+        boolean result = pluginManager.disablePlugin("failingDisablePlugin");
+
+        assertFalse(result);
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("stop"));
+    }
+
+    @Test
+    void deletePluginWithStopFailureSetsFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-delete-plugin-1.0.0.zip"), "failingDeletePlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingStopPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugin("failingDeletePlugin");
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingDeletePlugin");
+        assertEquals(PluginState.STARTED, plugin.getPluginState());
+
+        // Try to delete - stop will fail
+        boolean result = pluginManager.deletePlugin("failingDeletePlugin");
+
+        assertFalse(result);
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("stop"));
+    }
+
 }
