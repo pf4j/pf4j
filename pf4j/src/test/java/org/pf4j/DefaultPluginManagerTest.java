@@ -520,4 +520,100 @@ class DefaultPluginManagerTest {
         assertFalse(pluginManager.getStartedPlugins().contains(plugin));
     }
 
+    @Test
+    void shouldFailToStartPluginWhenRequiredDependencyFailsToStart() throws IOException {
+        // Create a plugin that fails on start
+        PluginZip dependency = new PluginZip.Builder(pluginsPath.resolve("failing-dep-1.0.0.zip"), "failingDep")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingPlugin")
+            .build();
+
+        // Create a plugin that depends on the failing plugin
+        PluginZip dependent = new PluginZip.Builder(pluginsPath.resolve("dependent-1.0.0.zip"), "dependent")
+            .pluginVersion("1.0.0")
+            .pluginDependencies("failingDep@1.0.0")
+            .build();
+
+        pluginManager.loadPlugins();
+        PluginState result = pluginManager.startPlugin("dependent");
+
+        // Both plugins should be FAILED
+        assertEquals(PluginState.FAILED, pluginManager.getPlugin("failingDep").getPluginState());
+        assertEquals(PluginState.FAILED, pluginManager.getPlugin("dependent").getPluginState());
+        assertEquals(PluginState.FAILED, result);
+
+        // Verify the dependent plugin has the correct exception
+        PluginWrapper dependentPlugin = pluginManager.getPlugin("dependent");
+        assertNotNull(dependentPlugin.getFailedException());
+        assertEquals("Required dependency 'failingDep' failed to start", dependentPlugin.getFailedException().getMessage());
+
+        // Neither plugin should be in started plugins list
+        assertFalse(pluginManager.getStartedPlugins().contains(pluginManager.getPlugin("failingDep")));
+        assertFalse(pluginManager.getStartedPlugins().contains(dependentPlugin));
+    }
+
+    @Test
+    void shouldStartPluginWhenOptionalDependencyFailsToStart() throws IOException {
+        // Create a plugin that fails on start
+        PluginZip dependency = new PluginZip.Builder(pluginsPath.resolve("failing-optional-dep-1.0.0.zip"), "failingOptionalDep")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingPlugin")
+            .build();
+
+        // Create a plugin with optional dependency on the failing plugin
+        PluginZip dependent = new PluginZip.Builder(pluginsPath.resolve("dependent-optional-1.0.0.zip"), "dependentOptional")
+            .pluginVersion("1.0.0")
+            .pluginDependencies("failingOptionalDep?@1.0.0")
+            .build();
+
+        pluginManager.loadPlugins();
+        PluginState result = pluginManager.startPlugin("dependentOptional");
+
+        // Dependency should be FAILED, but dependent should be STARTED
+        assertEquals(PluginState.FAILED, pluginManager.getPlugin("failingOptionalDep").getPluginState());
+        assertEquals(PluginState.STARTED, pluginManager.getPlugin("dependentOptional").getPluginState());
+        assertEquals(PluginState.STARTED, result);
+
+        // Only the dependent plugin should be in started plugins list
+        assertFalse(pluginManager.getStartedPlugins().contains(pluginManager.getPlugin("failingOptionalDep")));
+        assertTrue(pluginManager.getStartedPlugins().contains(pluginManager.getPlugin("dependentOptional")));
+    }
+
+    @Test
+    void shouldHandleCascadingDependencyFailures() throws IOException {
+        // Create a chain: pluginC -> pluginB -> pluginA
+        // pluginA will fail to start
+        PluginZip pluginA = new PluginZip.Builder(pluginsPath.resolve("plugin-a-1.0.0.zip"), "pluginA")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingPlugin")
+            .build();
+
+        PluginZip pluginB = new PluginZip.Builder(pluginsPath.resolve("plugin-b-1.0.0.zip"), "pluginB")
+            .pluginVersion("1.0.0")
+            .pluginDependencies("pluginA@1.0.0")
+            .build();
+
+        PluginZip pluginC = new PluginZip.Builder(pluginsPath.resolve("plugin-c-1.0.0.zip"), "pluginC")
+            .pluginVersion("1.0.0")
+            .pluginDependencies("pluginB@1.0.0")
+            .build();
+
+        pluginManager.loadPlugins();
+        PluginState result = pluginManager.startPlugin("pluginC");
+
+        // All plugins should be FAILED due to cascading failure
+        assertEquals(PluginState.FAILED, pluginManager.getPlugin("pluginA").getPluginState());
+        assertEquals(PluginState.FAILED, pluginManager.getPlugin("pluginB").getPluginState());
+        assertEquals(PluginState.FAILED, pluginManager.getPlugin("pluginC").getPluginState());
+        assertEquals(PluginState.FAILED, result);
+
+        // Verify error messages
+        assertEquals("Intentional failure for testing", pluginManager.getPlugin("pluginA").getFailedException().getMessage());
+        assertEquals("Required dependency 'pluginA' failed to start", pluginManager.getPlugin("pluginB").getFailedException().getMessage());
+        assertEquals("Required dependency 'pluginB' failed to start", pluginManager.getPlugin("pluginC").getFailedException().getMessage());
+
+        // No plugins should be started
+        assertTrue(pluginManager.getStartedPlugins().isEmpty());
+    }
+
 }

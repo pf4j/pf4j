@@ -175,10 +175,14 @@ public class PluginWrapper {
     }
 
     /**
-     * Returns the exception with which the plugin fails to start.
-     * See @{link PluginStatus#FAILED}.
+     * Returns the exception that caused the plugin to fail.
+     * <p>
+     * When a plugin's state is {@link PluginState#FAILED}, this method returns the exception
+     * that caused the failure (e.g., exception during start, dependency failure, etc.).
+     * Returns {@code null} if the plugin has not failed or if no exception information is available.
      *
-     * @return the exception with which the plugin fails to start
+     * @return the exception that caused the plugin to fail, or {@code null} if not applicable
+     * @see PluginState#FAILED
      */
     public Throwable getFailedException() {
         return failedException;
