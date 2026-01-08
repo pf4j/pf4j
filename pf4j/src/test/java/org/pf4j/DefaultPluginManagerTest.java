@@ -722,4 +722,29 @@ class DefaultPluginManagerTest {
         assertTrue(plugin.getFailedException().getMessage().contains("stop"));
     }
 
+    @Test
+    void unloadPluginWithStopFailureSetsFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-unload-plugin-1.0.0.zip"), "failingUnloadPlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingStopPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugin("failingUnloadPlugin");
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingUnloadPlugin");
+        assertEquals(PluginState.STARTED, plugin.getPluginState());
+
+        // Unload - stop will fail
+        boolean result = pluginManager.unloadPlugin("failingUnloadPlugin");
+
+        // unloadPlugin continues even if stop fails, so result is true
+        assertTrue(result);
+        // Plugin should be in UNLOADED state now (set after the exception)
+        assertEquals(PluginState.UNLOADED, plugin.getPluginState());
+        // But failedException should be set from the stop failure
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("stop"));
+    }
+
 }
