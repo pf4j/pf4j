@@ -81,9 +81,14 @@ public interface PluginManager {
 
     /**
      * Start the specified plugin and its dependencies.
+     * <p>
+     * If the returned state is {@link PluginState#FAILED}, you can retrieve the failure reason
+     * by calling {@link PluginWrapper#getFailedException()} on the plugin wrapper.
      *
-     * @return the plugin state
+     * @param pluginId the unique plugin identifier, specified in its metadata
+     * @return the plugin state after the start operation
      * @throws PluginRuntimeException if something goes wrong
+     * @see PluginWrapper#getFailedException()
      */
     PluginState startPlugin(String pluginId);
 
