@@ -747,4 +747,71 @@ class DefaultPluginManagerTest {
         assertTrue(plugin.getFailedException().getMessage().contains("stop"));
     }
 
+    @Test
+    void deletePluginWithUnloadFailureSetsFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-unload-delete-plugin-1.0.0.zip"), "failingUnloadDeletePlugin")
+            .pluginVersion("1.0.0")
+            .build();
+
+        // Create a custom plugin manager that simulates unloadPlugin failure
+        pluginManager = new DefaultPluginManager(pluginsPath) {
+            @Override
+            protected boolean unloadPlugin(String pluginId, boolean unloadDependents, boolean resolveDependencies) {
+                if ("failingUnloadDeletePlugin".equals(pluginId)) {
+                    // Simulate unload failure
+                    return false;
+                }
+                return super.unloadPlugin(pluginId, unloadDependents, resolveDependencies);
+            }
+        };
+
+        pluginManager.loadPlugins();
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingUnloadDeletePlugin");
+        assertNotNull(plugin);
+
+        // Try to delete - unload will fail
+        boolean result = pluginManager.deletePlugin("failingUnloadDeletePlugin");
+
+        assertFalse(result);
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("Failed to unload plugin"));
+    }
+
+    @Test
+    void deletePluginWithUnloadFailurePreservesExistingFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-unload-preserve-plugin-1.0.0.zip"), "failingUnloadPreservePlugin")
+            .pluginVersion("1.0.0")
+            .build();
+
+        // Create a custom plugin manager that simulates unloadPlugin failure
+        pluginManager = new DefaultPluginManager(pluginsPath) {
+            @Override
+            protected boolean unloadPlugin(String pluginId, boolean unloadDependents, boolean resolveDependencies) {
+                if ("failingUnloadPreservePlugin".equals(pluginId)) {
+                    // Simulate unload failure
+                    return false;
+                }
+                return super.unloadPlugin(pluginId, unloadDependents, resolveDependencies);
+            }
+        };
+
+        pluginManager.loadPlugins();
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingUnloadPreservePlugin");
+        assertNotNull(plugin);
+
+        // Set an existing failedException before deletePlugin
+        PluginRuntimeException existingException = new PluginRuntimeException("Existing error");
+        plugin.setFailedException(existingException);
+
+        // Try to delete - unload will fail
+        boolean result = pluginManager.deletePlugin("failingUnloadPreservePlugin");
+
+        assertFalse(result);
+        // Should preserve the existing exception, not overwrite it
+        assertSame(existingException, plugin.getFailedException());
+        assertEquals("Existing error", plugin.getFailedException().getMessage());
+    }
+
 }
