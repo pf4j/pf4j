@@ -616,4 +616,202 @@ class DefaultPluginManagerTest {
         assertTrue(pluginManager.getStartedPlugins().isEmpty());
     }
 
+    @Test
+    void invalidPluginSetsFailedException() throws IOException {
+        // Set system version to 2.0.0
+        pluginManager.setSystemVersion("2.0.0");
+
+        // Create plugin that requires version 3.0.0
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("invalid-plugin-1.0.0.zip"), "invalidPlugin")
+            .pluginVersion("1.0.0")
+            .pluginRequires("3.0.0")
+            .build();
+
+        pluginManager.loadPlugins();
+
+        PluginWrapper plugin = pluginManager.getPlugin("invalidPlugin");
+        assertEquals(PluginState.DISABLED, plugin.getPluginState());
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("validation failed"));
+    }
+
+    @Test
+    void stopPluginsWithExceptionSetsFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-stop-plugin-1.0.0.zip"), "failingStopPlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingStopPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugin("failingStopPlugin");
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingStopPlugin");
+        assertEquals(PluginState.STARTED, plugin.getPluginState());
+
+        // Stop all plugins - this will trigger exception in stop()
+        pluginManager.stopPlugins();
+
+        assertEquals(PluginState.FAILED, plugin.getPluginState());
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("stop"));
+    }
+
+    @Test
+    void enableInvalidPluginSetsFailedException() throws IOException {
+        // Set system version to 2.0.0
+        pluginManager.setSystemVersion("2.0.0");
+
+        // Create plugin that requires version 3.0.0
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("invalid-enable-plugin-1.0.0.zip"), "invalidEnablePlugin")
+            .pluginVersion("1.0.0")
+            .pluginRequires("3.0.0")
+            .build();
+
+        pluginManager.loadPlugins();
+
+        PluginWrapper plugin = pluginManager.getPlugin("invalidEnablePlugin");
+        assertEquals(PluginState.DISABLED, plugin.getPluginState());
+
+        // Try to enable the invalid plugin
+        boolean result = pluginManager.enablePlugin("invalidEnablePlugin");
+
+        assertFalse(result);
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("validation failed"));
+    }
+
+    @Test
+    void disablePluginWithStopFailureSetsFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-disable-plugin-1.0.0.zip"), "failingDisablePlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingStopPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugin("failingDisablePlugin");
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingDisablePlugin");
+        assertEquals(PluginState.STARTED, plugin.getPluginState());
+
+        // Try to disable - stop will fail
+        boolean result = pluginManager.disablePlugin("failingDisablePlugin");
+
+        assertFalse(result);
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("stop"));
+    }
+
+    @Test
+    void deletePluginWithStopFailureSetsFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-delete-plugin-1.0.0.zip"), "failingDeletePlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingStopPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugin("failingDeletePlugin");
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingDeletePlugin");
+        assertEquals(PluginState.STARTED, plugin.getPluginState());
+
+        // Try to delete - stop will fail
+        boolean result = pluginManager.deletePlugin("failingDeletePlugin");
+
+        assertFalse(result);
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("stop"));
+    }
+
+    @Test
+    void unloadPluginWithStopFailureSetsFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-unload-plugin-1.0.0.zip"), "failingUnloadPlugin")
+            .pluginVersion("1.0.0")
+            .pluginClass("org.pf4j.test.FailingStopPlugin")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugin("failingUnloadPlugin");
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingUnloadPlugin");
+        assertEquals(PluginState.STARTED, plugin.getPluginState());
+
+        // Unload - stop will fail
+        boolean result = pluginManager.unloadPlugin("failingUnloadPlugin");
+
+        // unloadPlugin continues even if stop fails, so result is true
+        assertTrue(result);
+        // Plugin should be in UNLOADED state now (set after the exception)
+        assertEquals(PluginState.UNLOADED, plugin.getPluginState());
+        // But failedException should be set from the stop failure
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("stop"));
+    }
+
+    @Test
+    void deletePluginWithUnloadFailureSetsFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-unload-delete-plugin-1.0.0.zip"), "failingUnloadDeletePlugin")
+            .pluginVersion("1.0.0")
+            .build();
+
+        // Create a custom plugin manager that simulates unloadPlugin failure
+        pluginManager = new DefaultPluginManager(pluginsPath) {
+            @Override
+            protected boolean unloadPlugin(String pluginId, boolean unloadDependents, boolean resolveDependencies) {
+                if ("failingUnloadDeletePlugin".equals(pluginId)) {
+                    // Simulate unload failure
+                    return false;
+                }
+                return super.unloadPlugin(pluginId, unloadDependents, resolveDependencies);
+            }
+        };
+
+        pluginManager.loadPlugins();
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingUnloadDeletePlugin");
+        assertNotNull(plugin);
+
+        // Try to delete - unload will fail
+        boolean result = pluginManager.deletePlugin("failingUnloadDeletePlugin");
+
+        assertFalse(result);
+        assertNotNull(plugin.getFailedException());
+        assertTrue(plugin.getFailedException().getMessage().contains("Failed to unload plugin"));
+    }
+
+    @Test
+    void deletePluginWithUnloadFailurePreservesExistingFailedException() throws IOException {
+        PluginZip pluginZip = new PluginZip.Builder(pluginsPath.resolve("failing-unload-preserve-plugin-1.0.0.zip"), "failingUnloadPreservePlugin")
+            .pluginVersion("1.0.0")
+            .build();
+
+        // Create a custom plugin manager that simulates unloadPlugin failure
+        pluginManager = new DefaultPluginManager(pluginsPath) {
+            @Override
+            protected boolean unloadPlugin(String pluginId, boolean unloadDependents, boolean resolveDependencies) {
+                if ("failingUnloadPreservePlugin".equals(pluginId)) {
+                    // Simulate unload failure
+                    return false;
+                }
+                return super.unloadPlugin(pluginId, unloadDependents, resolveDependencies);
+            }
+        };
+
+        pluginManager.loadPlugins();
+
+        PluginWrapper plugin = pluginManager.getPlugin("failingUnloadPreservePlugin");
+        assertNotNull(plugin);
+
+        // Set an existing failedException before deletePlugin
+        PluginRuntimeException existingException = new PluginRuntimeException("Existing error");
+        plugin.setFailedException(existingException);
+
+        // Try to delete - unload will fail
+        boolean result = pluginManager.deletePlugin("failingUnloadPreservePlugin");
+
+        assertFalse(result);
+        // Should preserve the existing exception, not overwrite it
+        assertSame(existingException, plugin.getFailedException());
+        assertEquals("Existing error", plugin.getFailedException().getMessage());
+    }
+
 }

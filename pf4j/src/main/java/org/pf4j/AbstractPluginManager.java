@@ -320,6 +320,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         } catch (Exception e) {
             log.error("Cannot stop plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()), e);
             pluginState = PluginState.FAILED;
+            pluginWrapper.setFailedException(e);
         }
 
         // remove the plugin
@@ -359,8 +360,9 @@ public abstract class AbstractPluginManager implements PluginManager {
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         // stop the plugin if it's started
         PluginState pluginState = stopPlugin(pluginId);
-        if (pluginState.isStarted()) {
+        if (pluginState.isFailed()) {
             log.error("Failed to stop plugin '{}' on delete", pluginId);
+            // failedException already set by doStopPlugin()
             return false;
         }
 
@@ -370,6 +372,9 @@ public abstract class AbstractPluginManager implements PluginManager {
 
         if (!unloadPlugin(pluginId)) {
             log.error("Failed to unload plugin '{}' on delete", pluginId);
+            if (pluginWrapper.getFailedException() == null) {
+                pluginWrapper.setFailedException(new PluginRuntimeException("Failed to unload plugin"));
+            }
             return false;
         }
 
@@ -529,16 +534,7 @@ public abstract class AbstractPluginManager implements PluginManager {
             PluginWrapper pluginWrapper = itr.next();
             PluginState pluginState = pluginWrapper.getPluginState();
             if (pluginState.isStarted()) {
-                try {
-                    log.info("Stop plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
-                    pluginWrapper.getPlugin().stop();
-                    pluginWrapper.setPluginState(PluginState.STOPPED);
-                    itr.remove();
-
-                    firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
-                } catch (PluginRuntimeException e) {
-                    log.error(e.getMessage(), e);
-                }
+                doStopPlugin(pluginWrapper);
             } else {
                 // do nothing
                 log.debug("Plugin '{}' is not started, nothing to stop", getPluginLabel(pluginWrapper.getDescriptor()));
@@ -580,15 +576,32 @@ public abstract class AbstractPluginManager implements PluginManager {
             }
         }
 
-        log.info("Stop plugin '{}'", getPluginLabel(pluginId));
         PluginWrapper pluginWrapper = getPlugin(pluginId);
-        pluginWrapper.getPlugin().stop();
-        pluginWrapper.setPluginState(PluginState.STOPPED);
-        getStartedPlugins().remove(pluginWrapper);
+        return doStopPlugin(pluginWrapper);
+    }
 
-        firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, PluginState.STARTED));
-
-        return PluginState.STOPPED;
+    /**
+     * Performs the actual plugin stop operation with proper exception handling.
+     * This method is used by both {@link #stopPlugin(String, boolean)} and {@link #stopPlugins()}.
+     *
+     * @param pluginWrapper the plugin wrapper to stop
+     * @return the plugin state after the stop operation
+     */
+    private PluginState doStopPlugin(PluginWrapper pluginWrapper) {
+        PluginState pluginState = pluginWrapper.getPluginState();
+        try {
+            log.info("Stop plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
+            pluginWrapper.getPlugin().stop();
+            pluginWrapper.setPluginState(PluginState.STOPPED);
+            getStartedPlugins().remove(pluginWrapper);
+        } catch (PluginRuntimeException e) {
+            log.error(e.getMessage(), e);
+            pluginWrapper.setPluginState(PluginState.FAILED);
+            pluginWrapper.setFailedException(e);
+        } finally {
+            firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
+        }
+        return pluginWrapper.getPluginState();
     }
 
     /**
@@ -624,8 +637,10 @@ public abstract class AbstractPluginManager implements PluginManager {
             log.debug("Already disabled plugin '{}'", getPluginLabel(pluginDescriptor));
             return true;
         } else if (pluginState.isStarted()) {
-            if (!stopPlugin(pluginId).isStopped()) {
+            PluginState result = stopPlugin(pluginId);
+            if (result.isFailed()) {
                 log.error("Failed to stop plugin '{}' on disable", getPluginLabel(pluginDescriptor));
+                // failedException already set by doStopPlugin()
                 return false;
             }
         }
@@ -647,6 +662,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         if (!isPluginValid(pluginWrapper)) {
             log.warn("Plugin '{}' can not be enabled", getPluginLabel(pluginWrapper.getDescriptor()));
+            pluginWrapper.setFailedException(new PluginRuntimeException("Plugin validation failed"));
             return false;
         }
 
@@ -997,6 +1013,7 @@ public abstract class AbstractPluginManager implements PluginManager {
         if (!isPluginValid(pluginWrapper)) {
             log.warn("Plugin '{}' is invalid and it will be disabled", pluginPath);
             pluginWrapper.setPluginState(PluginState.DISABLED);
+            pluginWrapper.setFailedException(new PluginRuntimeException("Plugin validation failed"));
         }
 
         log.debug("Created wrapper '{}' for plugin '{}'", pluginWrapper, pluginPath);
