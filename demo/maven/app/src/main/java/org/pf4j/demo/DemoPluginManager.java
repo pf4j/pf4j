@@ -20,6 +20,7 @@ import org.pf4j.DefaultPluginFactory;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.ExtensionFinder;
 import org.pf4j.PluginFactory;
+import org.pf4j.PluginLoader;
 
 class DemoPluginManager extends DefaultPluginManager {
 
@@ -37,6 +38,13 @@ class DemoPluginManager extends DefaultPluginManager {
     @Override
     protected PluginFactory createPluginFactory() {
         return new DemoPluginFactory();
+    }
+
+    @Override
+    protected PluginLoader createPluginLoader() {
+        // Use custom DemoPluginLoader which uses DemoPluginClassLoader
+        // This demonstrates how to customize class loading behavior
+        return new DemoPluginLoader(this);
     }
 
 }

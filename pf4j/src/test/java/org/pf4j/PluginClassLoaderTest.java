@@ -409,6 +409,56 @@ class PluginClassLoaderTest {
         assertEquals(expectedFirstLine, Files.readAllLines(Paths.get(firstResource.toURI())).get(0));
     }
 
+    @Test
+    void shouldDelegateToParentForPf4jCoreClasses() {
+        assertTrue(parentLastPluginClassLoader.shouldDelegateToParent("org.pf4j.PluginManager"));
+        assertTrue(parentLastPluginClassLoader.shouldDelegateToParent("org.pf4j.PluginClassLoader"));
+        assertTrue(parentLastPluginClassLoader.shouldDelegateToParent("org.pf4j.ExtensionPoint"));
+    }
+
+    @Test
+    void shouldDelegateToParentForDemoClasses() {
+        // org.pf4j.demo is not excluded, so it should be delegated to parent like any other org.pf4j.* class
+        assertTrue(parentLastPluginClassLoader.shouldDelegateToParent("org.pf4j.demo.Boot"));
+        assertTrue(parentLastPluginClassLoader.shouldDelegateToParent("org.pf4j.demo.api.Greeting"));
+    }
+
+    @Test
+    void shouldNotDelegateToParentForTestClasses() {
+        assertFalse(parentLastPluginClassLoader.shouldDelegateToParent("org.pf4j.test.TestExtension"));
+        assertFalse(parentLastPluginClassLoader.shouldDelegateToParent("org.pf4j.test.PluginJar"));
+    }
+
+    @Test
+    void shouldNotDelegateToParentForNonPf4jClasses() {
+        assertFalse(parentLastPluginClassLoader.shouldDelegateToParent("com.example.MyClass"));
+        assertFalse(parentLastPluginClassLoader.shouldDelegateToParent("org.springframework.Boot"));
+    }
+
+    @Test
+    void shouldDelegateToParentCanBeOverridden() {
+        // Create a custom classloader that adds custom exclusion for org.pf4j.plus.demo
+        // This demonstrates how framework extensions (like PF4J-Plus) can exclude their own demo packages
+        PluginClassLoader customClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, PluginClassLoaderTest.class.getClassLoader()) {
+            @Override
+            protected boolean shouldDelegateToParent(String className) {
+                return super.shouldDelegateToParent(className)
+                    && !className.startsWith("org.pf4j.plus.demo");
+            }
+        };
+
+        // Verify that org.pf4j.plus.demo classes are NOT delegated to parent (custom exclusion)
+        assertFalse(customClassLoader.shouldDelegateToParent("org.pf4j.plus.demo.Boot"));
+        assertFalse(customClassLoader.shouldDelegateToParent("org.pf4j.plus.demo.plugins.PluginA"));
+
+        // Verify that other org.pf4j classes are still delegated to parent
+        assertTrue(customClassLoader.shouldDelegateToParent("org.pf4j.PluginManager"));
+        assertTrue(customClassLoader.shouldDelegateToParent("org.pf4j.Extension"));
+
+        // Verify that test exclusions still work
+        assertFalse(customClassLoader.shouldDelegateToParent("org.pf4j.test.TestExtension"));
+    }
+
     static class TestPluginManager extends DefaultPluginManager {
 
         public TestPluginManager(Path pluginsPath) {
