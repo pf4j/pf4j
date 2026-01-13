@@ -15,8 +15,10 @@
  */
 package org.pf4j.demo;
 
-import org.pf4j.BasePluginLoader;
-import org.pf4j.DefaultPluginClasspath;
+import org.pf4j.DefaultPluginLoader;
+import org.pf4j.DevelopmentPluginLoader;
+import org.pf4j.JarPluginLoader;
+import org.pf4j.CompoundPluginLoader;
 import org.pf4j.PluginClassLoader;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginManager;
@@ -28,15 +30,27 @@ import java.nio.file.Path;
  *
  * @author Decebal Suiu
  */
-class DemoPluginLoader extends BasePluginLoader {
+class DemoPluginLoader extends CompoundPluginLoader {
 
     public DemoPluginLoader(PluginManager pluginManager) {
-        super(pluginManager, new DefaultPluginClasspath());
-    }
-
-    @Override
-    protected PluginClassLoader createPluginClassLoader(Path pluginPath, PluginDescriptor pluginDescriptor) {
-        return new DemoPluginClassLoader(pluginManager, pluginDescriptor, getClass().getClassLoader());
+        add(new DevelopmentPluginLoader(pluginManager) {
+            @Override
+            protected PluginClassLoader createPluginClassLoader(Path pluginPath, PluginDescriptor pluginDescriptor) {
+                return new DemoPluginClassLoader(pluginManager, pluginDescriptor, getClass().getClassLoader());
+            }
+        }, pluginManager::isDevelopment);
+        add(new JarPluginLoader(pluginManager) {
+            @Override
+            protected PluginClassLoader createPluginClassLoader(Path pluginPath, PluginDescriptor pluginDescriptor) {
+                return new DemoPluginClassLoader(pluginManager, pluginDescriptor, getClass().getClassLoader());
+            }
+        }, pluginManager::isNotDevelopment);
+        add(new DefaultPluginLoader(pluginManager) {
+            @Override
+            protected PluginClassLoader createPluginClassLoader(Path pluginPath, PluginDescriptor pluginDescriptor) {
+                return new DemoPluginClassLoader(pluginManager, pluginDescriptor, getClass().getClassLoader());
+            }
+        }, pluginManager::isNotDevelopment);
     }
 
 }
