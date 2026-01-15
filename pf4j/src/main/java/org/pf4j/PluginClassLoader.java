@@ -128,7 +128,7 @@ public class PluginClassLoader extends URLClassLoader {
             }
 
             // if the class is part of the plugin engine use parent class loader
-            if (className.startsWith(PLUGIN_PACKAGE_PREFIX) && !className.startsWith("org.pf4j.demo") && !className.startsWith("org.pf4j.test")) {
+            if (shouldDelegateToParent(className)) {
 //                log.trace("Delegate the loading of PF4J class '{}' to parent", className);
                 return getParent().loadClass(className);
             }
@@ -238,6 +238,23 @@ public class PluginClassLoader extends URLClassLoader {
             loadingStrategy = ClassLoadingStrategy.PAD;
         }
         return loadingStrategy;
+    }
+
+    /**
+     * Determines whether a class should be delegated to the parent class loader.
+     * <p>
+     * By default, classes in the {@code org.pf4j} package are delegated to the parent class loader,
+     * except for test utilities ({@code org.pf4j.test}) which are part of the plugin's test classpath.
+     * <p>
+     * This method can be overridden by subclasses to customize which packages should be excluded
+     * from parent delegation. This is useful for framework extensions or custom class loading policies.
+     *
+     * @param className the name of the class to check
+     * @return {@code true} if the class should be loaded by the parent class loader, {@code false} otherwise
+     */
+    protected boolean shouldDelegateToParent(String className) {
+        return className.startsWith(PLUGIN_PACKAGE_PREFIX)
+            && !className.startsWith("org.pf4j.test");
     }
 
     /**

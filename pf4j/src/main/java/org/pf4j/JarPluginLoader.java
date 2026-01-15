@@ -38,10 +38,14 @@ public class JarPluginLoader implements PluginLoader {
 
     @Override
     public ClassLoader loadPlugin(Path pluginPath, PluginDescriptor pluginDescriptor) {
-        PluginClassLoader pluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, getClass().getClassLoader());
+        PluginClassLoader pluginClassLoader = createPluginClassLoader(pluginPath, pluginDescriptor);
         pluginClassLoader.addFile(pluginPath.toFile());
 
         return pluginClassLoader;
+    }
+
+    protected PluginClassLoader createPluginClassLoader(Path pluginPath, PluginDescriptor pluginDescriptor) {
+        return new PluginClassLoader(pluginManager, pluginDescriptor, getClass().getClassLoader());
     }
 
 }

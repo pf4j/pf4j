@@ -18,6 +18,7 @@ package org.pf4j.demo;
 import org.apache.commons.lang3.StringUtils;
 import org.pf4j.CompoundPluginDescriptorFinder;
 import org.pf4j.ManifestPluginDescriptorFinder;
+import org.pf4j.PluginLoader;
 import org.pf4j.PropertiesPluginDescriptorFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,13 @@ public class Boot {
                 // PropertiesPluginDescriptorFinder is commented out just to avoid error log
                 //.add(new PropertiesPluginDescriptorFinder())
                 .add(new ManifestPluginDescriptorFinder());
+          }
+
+          @Override
+          protected PluginLoader createPluginLoader() {
+            // Use custom DemoPluginLoader which uses DemoPluginClassLoader
+            // This demonstrates how to customize class loading behavior
+            return new DemoPluginLoader(this);
           }
         };
 
