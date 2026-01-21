@@ -16,7 +16,7 @@
 package org.pf4j;
 
 import org.pf4j.processor.ExtensionStorage;
-import org.pf4j.processor.LegacyExtensionStorage;
+import org.pf4j.processor.IndexedExtensionStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,17 +35,20 @@ import java.util.Set;
 
 /**
  * All extensions declared in a plugin are indexed in a file {@code META-INF/extensions.idx}.
- * This class lookup extensions in all extensions index files {@code META-INF/extensions.idx}.
+ * This class looks up extensions in all extensions index files {@code META-INF/extensions.idx}.
+ * <p>
+ * This is the default extension finder used by PF4J.
+ * The name "Indexed" refers to the index file ({@code extensions.idx}) used to store extension class names.
  *
  * @author Decebal Suiu
  */
-public class LegacyExtensionFinder extends AbstractExtensionFinder {
+public class IndexedExtensionFinder extends AbstractExtensionFinder {
 
-    private static final Logger log = LoggerFactory.getLogger(LegacyExtensionFinder.class);
+    private static final Logger log = LoggerFactory.getLogger(IndexedExtensionFinder.class);
 
-    public static final String EXTENSIONS_RESOURCE = LegacyExtensionStorage.EXTENSIONS_RESOURCE;
+    public static final String EXTENSIONS_RESOURCE = IndexedExtensionStorage.EXTENSIONS_RESOURCE;
 
-    public LegacyExtensionFinder(PluginManager pluginManager) {
+    public IndexedExtensionFinder(PluginManager pluginManager) {
         super(pluginManager);
     }
 

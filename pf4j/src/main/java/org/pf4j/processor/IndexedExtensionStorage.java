@@ -29,14 +29,17 @@ import java.util.Set;
 
 /**
  * Stores {@link org.pf4j.Extension}s in {@code META-INF/extensions.idx}.
+ * <p>
+ * This is the default extension storage mechanism used by PF4J.
+ * The name "Indexed" refers to the index file ({@code extensions.idx}) used to store extension class names.
  *
  * @author Decebal Suiu
  */
-public class LegacyExtensionStorage extends ExtensionStorage {
+public class IndexedExtensionStorage extends ExtensionStorage {
 
     public static final String EXTENSIONS_RESOURCE = "META-INF/extensions.idx";
 
-    public LegacyExtensionStorage(ExtensionAnnotationProcessor processor) {
+    public IndexedExtensionStorage(ExtensionAnnotationProcessor processor) {
         super(processor);
     }
 
