@@ -285,7 +285,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
 
         if (storage == null) {
             // default storage
-            storage = new LegacyExtensionStorage(this);
+            storage = new IndexedExtensionStorage(this);
         }
     }
 

@@ -21,7 +21,7 @@ import com.google.testing.compile.JavaFileObjects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.processor.ExtensionAnnotationProcessor;
-import org.pf4j.processor.LegacyExtensionStorage;
+import org.pf4j.processor.IndexedExtensionStorage;
 import org.pf4j.test.JavaSources;
 
 import javax.tools.JavaFileObject;
@@ -137,7 +137,7 @@ public class ExtensionAnnotationProcessorTest {
     public void storage() {
         Compilation compilation = compile(JavaSources.GREETING, JavaSources.WHAZZUP_GREETING);
         assertEquals(Compilation.Status.SUCCESS, compilation.status());
-        assertEquals(annotationProcessor.getStorage().getClass(), LegacyExtensionStorage.class);
+        assertEquals(annotationProcessor.getStorage().getClass(), IndexedExtensionStorage.class);
     }
 
     @Test
