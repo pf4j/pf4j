@@ -70,4 +70,32 @@ public class LegacyExtensionFinderTest {
         assertFalse(pluginJar.file().exists());
     }
 
+    @Test
+    public void shouldFindExtensionsWithApdStrategy() throws Exception {
+        PluginJar pluginJar = new PluginJar.Builder(pluginsPath.resolve("test-plugin.jar"), "test-plugin").pluginClass(TestPlugin.class.getName()).pluginVersion("1.2.3").extension(TestExtension.class.getName()).build();
+        assertTrue(pluginJar.file().exists());
+
+        PluginManager pluginManager = new JarPluginManager(pluginsPath) {
+            @Override
+            protected PluginLoader createPluginLoader() {
+                return new JarPluginLoader(this) {
+                    @Override
+                    public ClassLoader loadPlugin(Path pluginPath, PluginDescriptor pluginDescriptor) {
+                        PluginClassLoader pluginClassLoader = new PluginClassLoader(pluginManager, pluginDescriptor, getClass().getClassLoader(), ClassLoadingStrategy.APD);
+                        pluginClassLoader.addFile(pluginPath.toFile());
+
+                        return pluginClassLoader;
+                    }
+                };
+            }
+        };
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        assertEquals(1, pluginManager.getPlugins().size());
+
+        LegacyExtensionFinder extensionFinder = new LegacyExtensionFinder(pluginManager);
+        assertEquals(1, extensionFinder.find("test-plugin").size());
+        pluginManager.unloadPlugin(pluginJar.pluginId());
+    }
 }
