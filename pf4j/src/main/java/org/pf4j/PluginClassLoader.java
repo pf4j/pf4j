@@ -234,7 +234,7 @@ public class PluginClassLoader extends URLClassLoader {
 
     private ClassLoadingStrategy getClassLoadingStrategy(String name) {
         ClassLoadingStrategy loadingStrategy = classLoadingStrategy;
-        if (LegacyExtensionFinder.EXTENSIONS_RESOURCE.equals(name)) {
+        if (IndexedExtensionFinder.EXTENSIONS_RESOURCE.equals(name)) {
             loadingStrategy = ClassLoadingStrategy.PAD;
         }
         return loadingStrategy;
