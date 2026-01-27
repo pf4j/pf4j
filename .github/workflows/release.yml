@@ -71,6 +71,14 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Update Gradle demo version
+        run: |
+          RELEASE_VERSION="${{ github.event.inputs.releaseVersion }}"
+          sed -i "s/^pf4jVersion=.*/pf4jVersion=$RELEASE_VERSION/" demo/gradle/gradle.properties
+          git add demo/gradle/gradle.properties
+          git commit -m "Update Gradle demo to version $RELEASE_VERSION [skip ci]"
+          git push
+
       - name: Summary
         if: success()
         run: |
