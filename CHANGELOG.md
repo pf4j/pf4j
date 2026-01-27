@@ -12,6 +12,21 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Removed
 
+### [3.15.0] - 2026-01-27
+
+#### Fixed
+- [#625]: Fix exception handling inconsistency in `startPlugin()`
+- [#630], [#631]: Set `failedException` when plugin validation or stop fails
+- Fix coverage badge link to show overall metrics instead of new code only
+
+#### Changed
+- [#645]: Rename `LegacyExtension*` classes to `IndexedExtension*`
+
+#### Added
+- [#629]: Validate dependency state on plugin start
+- [#633]: Allow customization of `PluginClassLoader` parent delegation
+- Add unit tests to improve code coverage (63 new tests, coverage increased from 79.9% to 85.2%)
+
 ### [3.14.1] - 2026-01-06
 
 #### Fixed
@@ -485,8 +500,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#41]: Added plugin archive source abstraction
 - Added test for DefaultPluginRepository
 
-[unreleased]: https://github.com/decebals/pf4j/compare/release-3.14.1...HEAD
-[3.14.1]: https://github.com/decebals/pf4j/compare/release-3.14.0...release-3.14.1
+[unreleased]: https://github.com/pf4j/pf4j/compare/release-3.15.0...HEAD
+[3.15.0]: https://github.com/pf4j/pf4j/compare/release-3.14.1...release-3.15.0
+[3.14.1]: https://github.com/pf4j/pf4j/compare/release-3.14.0...release-3.14.1
 [3.14.0]: https://github.com/decebals/pf4j/compare/release-3.13.0...release-3.14.0
 [3.13.0]: https://github.com/decebals/pf4j/compare/release-3.12.1...release-3.13.0
 [3.12.1]: https://github.com/decebals/pf4j/compare/release-3.12.0...release-3.12.1
@@ -523,6 +539,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#645]: https://github.com/pf4j/pf4j/pull/645
+[#633]: https://github.com/pf4j/pf4j/pull/633
+[#631]: https://github.com/pf4j/pf4j/pull/631
+[#630]: https://github.com/pf4j/pf4j/issues/630
+[#629]: https://github.com/pf4j/pf4j/pull/629
+[#625]: https://github.com/pf4j/pf4j/pull/625
 [#623]: https://github.com/pf4j/pf4j/issues/623
 [#618]: https://github.com/pf4j/pf4j/issues/618
 [#614]: https://github.com/pf4j/pf4j/issues/614
