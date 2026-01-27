@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 #### Changed
 
 #### Added
+- [#646]: Automate Gradle demo version update after release
 
 #### Removed
 
@@ -539,6 +540,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#646]: https://github.com/pf4j/pf4j/pull/646
 [#645]: https://github.com/pf4j/pf4j/pull/645
 [#633]: https://github.com/pf4j/pf4j/pull/633
 [#631]: https://github.com/pf4j/pf4j/pull/631
