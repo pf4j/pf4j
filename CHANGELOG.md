@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#648]: Restore missing `module-info.class` in multi-release JAR
 
 #### Changed
 
