@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -633,6 +634,30 @@ class DefaultPluginManagerTest {
         assertEquals(PluginState.DISABLED, plugin.getPluginState());
         assertNotNull(plugin.getFailedException());
         assertTrue(plugin.getFailedException().getMessage().contains("validation failed"));
+    }
+
+    @Test
+    void stopPluginsDoesNotThrowConcurrentModificationException() throws IOException {
+        // 3 plugins are needed: doStopPlugin() removes from startedPlugins while stopPlugins() iterates it,
+        // and with fewer than 3 the iterator cursor happens to coincide with the shrunken list size before CME fires.
+        new PluginZip.Builder(pluginsPath.resolve("plugin-a-1.0.0.zip"), "pluginA")
+            .pluginVersion("1.0.0")
+            .build();
+        new PluginZip.Builder(pluginsPath.resolve("plugin-b-1.0.0.zip"), "pluginB")
+            .pluginVersion("1.0.0")
+            .build();
+        new PluginZip.Builder(pluginsPath.resolve("plugin-c-1.0.0.zip"), "pluginC")
+            .pluginVersion("1.0.0")
+            .build();
+
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
+        assertEquals(3, pluginManager.getStartedPlugins().size());
+
+        assertDoesNotThrow(() -> pluginManager.stopPlugins());
+
+        assertTrue(pluginManager.getStartedPlugins().isEmpty());
     }
 
     @Test

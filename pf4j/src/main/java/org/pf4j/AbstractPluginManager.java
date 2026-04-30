@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -529,9 +528,8 @@ public abstract class AbstractPluginManager implements PluginManager {
     public void stopPlugins() {
         // stop started plugins in reverse order
         Collections.reverse(startedPlugins);
-        Iterator<PluginWrapper> itr = startedPlugins.iterator();
-        while (itr.hasNext()) {
-            PluginWrapper pluginWrapper = itr.next();
+        // iterate over a copy because doStopPlugin removes entries from startedPlugins
+        for (PluginWrapper pluginWrapper : new ArrayList<>(startedPlugins)) {
             PluginState pluginState = pluginWrapper.getPluginState();
             if (pluginState.isStarted()) {
                 doStopPlugin(pluginWrapper);
