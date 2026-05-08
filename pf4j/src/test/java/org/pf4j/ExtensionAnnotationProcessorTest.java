@@ -147,10 +147,22 @@ public class ExtensionAnnotationProcessorTest {
     }
 
     @Test
+    public void compileWithErrorNoExtensionPoint() {
+        ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
+        Compilation compilation = javac().withProcessors(processor).withOptions("-A" + ExtensionAnnotationProcessor.CHECK_EXTENSION_POINT)
+            .compile(Greeting, WhazzupGreeting_NoExtensionPoint);
+        assertThat(compilation).failed();
+        assertThat(compilation).hadErrorContaining("it doesn't implement ExtensionPoint")
+            .inFile(WhazzupGreeting_NoExtensionPoint)
+            .onLine(5)
+            .atColumn(8);
+    }
+
+    @Test
     public void compileWithError() {
         Compilation compilation = compile(JavaSources.GREETING, WhazzupGreeting_NoExtensionPoint);
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("it doesn't implement ExtensionPoint")
+        assertThat(compilation).hadErrorContaining("it doesn't implement any interface")
             .inFile(WhazzupGreeting_NoExtensionPoint)
             .onLine(5)
             .atColumn(8);
