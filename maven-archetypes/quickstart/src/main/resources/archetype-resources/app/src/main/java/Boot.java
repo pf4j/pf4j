@@ -1,6 +1,6 @@
 package ${package};
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.ExtensionFinder;
 import org.pf4j.PluginManager;

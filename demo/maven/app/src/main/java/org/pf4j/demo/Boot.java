@@ -15,7 +15,7 @@
  */
 package org.pf4j.demo;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.pf4j.demo.api.Greeting;

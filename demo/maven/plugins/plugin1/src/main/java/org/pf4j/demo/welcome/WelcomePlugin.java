@@ -15,7 +15,7 @@
  */
 package org.pf4j.demo.welcome;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.pf4j.Extension;
 import org.pf4j.RuntimeMode;
 import org.pf4j.demo.api.DemoPlugin;
