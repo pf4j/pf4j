@@ -6,11 +6,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Fixed
 - [#648]: Restore missing `module-info.class` in multi-release JAR
+- [#656]: Fix `ConcurrentModificationException` in `stopPlugins()`
 
 #### Changed
+- Replace EOL `commons-lang` 2.x with `commons-lang3` in the demo and the Maven archetype (CVE-2025-48924)
+- Bump `maven-archetype-plugin` to 3.3.0 (CVE-2024-47197)
 
 #### Added
 - [#646]: Automate Gradle demo version update after release
+- Add `SECURITY.md` describing how to report a vulnerability privately
 
 #### Removed
 
@@ -541,7 +545,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
-[#646]: https://github.com/pf4j/pf4j/pull/646
+[#656]: https://github.com/pf4j/pf4j/issues/656
+[#648]: https://github.com/pf4j/pf4j/issues/648
+[#646]: https://github.com/pf4j/pf4j/issues/646
 [#645]: https://github.com/pf4j/pf4j/pull/645
 [#633]: https://github.com/pf4j/pf4j/pull/633
 [#631]: https://github.com/pf4j/pf4j/pull/631
