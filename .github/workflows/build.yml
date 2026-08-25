@@ -28,4 +28,12 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-              run: cd pf4j && mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+              run: |
+                  # SONAR_TOKEN is not exposed to pull requests from forks, and the
+                  # scanner fails hard without it. Build without analysis in that case.
+                  if [ -n "$SONAR_TOKEN" ]; then
+                      cd pf4j && mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+                  else
+                      echo "SONAR_TOKEN unavailable (fork pull request). Skipping analysis."
+                      cd pf4j && mvn -B verify
+                  fi
