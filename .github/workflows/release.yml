@@ -62,11 +62,25 @@ jobs:
           MAVEN_TOKEN: ${{ secrets.SONATYPE_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
+      - name: Extract release notes from CHANGELOG
+        run: |
+          VERSION=${{ github.event.inputs.releaseVersion }}
+          awk -v ver="$VERSION" '
+            $0 ~ "^### \\["ver"\\]" { flag=1; next }
+            flag && /^### \[/          { exit }
+            flag                       { print }
+          ' CHANGELOG.md | sed '/^#### [A-Za-z]*$/{N;/\n$/d}' > notes.md
+          grep -oE '\[#[0-9]+\]' notes.md | sort -u | while read -r ref; do
+            grep -m1 -F "$ref:" CHANGELOG.md
+          done >> notes.md
+          echo "--- release notes ---"; cat notes.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: release-${{ github.event.inputs.releaseVersion }}
           name: Release ${{ github.event.inputs.releaseVersion }}
+          body_path: notes.md
           generate_release_notes: true
           draft: false
           prerelease: false
