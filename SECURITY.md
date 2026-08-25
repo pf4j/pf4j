@@ -3,7 +3,7 @@
 ## Supported versions
 
 Security fixes are applied to the latest 3.x release. Older releases are not
-backported — if you are affected, the fix will be to upgrade.
+backported, so if you are affected the fix is to upgrade.
 
 ## Reporting a vulnerability
 
@@ -22,7 +22,7 @@ for a fix before disclosing publicly.
 
 ## Scope
 
-PF4J loads and executes third-party code — that is what it is for. Separate
+PF4J loads and executes third-party code. That is what it is for. Separate
 class loaders isolate plugins from classpath conflicts, **not** from malicious
 behaviour: a plugin runs with the same JVM privileges as the application that
 loads it, and modern JDKs no longer provide an in-process sandbox to fall back
