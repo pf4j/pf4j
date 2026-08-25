@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [3.15.1] - 2026-08-25
+
+#### Fixed
 - [#648]: Restore missing `module-info.class` in multi-release JAR
 - [#656]: Fix `ConcurrentModificationException` in `stopPlugins()`
 
@@ -506,7 +516,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#41]: Added plugin archive source abstraction
 - Added test for DefaultPluginRepository
 
-[unreleased]: https://github.com/pf4j/pf4j/compare/release-3.15.0...HEAD
+[unreleased]: https://github.com/pf4j/pf4j/compare/release-3.15.1...HEAD
+[3.15.1]: https://github.com/pf4j/pf4j/compare/release-3.15.0...release-3.15.1
 [3.15.0]: https://github.com/pf4j/pf4j/compare/release-3.14.1...release-3.15.0
 [3.14.1]: https://github.com/pf4j/pf4j/compare/release-3.14.0...release-3.14.1
 [3.14.0]: https://github.com/decebals/pf4j/compare/release-3.13.0...release-3.14.0
