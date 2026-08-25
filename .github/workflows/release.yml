@@ -71,7 +71,7 @@ jobs:
             flag                       { print }
           ' CHANGELOG.md | sed '/^#### [A-Za-z]*$/{N;/\n$/d}' > notes.md
           grep -oE '\[#[0-9]+\]' notes.md | sort -u | while read -r ref; do
-            grep -m1 -F "$ref:" CHANGELOG.md
+            awk -v r="$ref:" 'index($0, r) == 1 { print; exit }' CHANGELOG.md
           done >> notes.md
           echo "--- release notes ---"; cat notes.md
 
