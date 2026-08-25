@@ -13,6 +13,8 @@ Plugin Framework for Java (PF4J)
 - **Facebook Buck** (Java version) - Build system
 - **Huawei Cloud** - Real-time data processing and scoring systems (MRS - MapReduce Service)
 - **Eclipse Foundation** - Connected Services Platform (ECSP) for automotive software-defined vehicles
+- **Dremio** (now part of SAP) - Data lakehouse platform, with its own plugin manager and class loaders built on PF4J
+- **Apache Tika** - Content detection and extraction toolkit, uses PF4J for its pipes plugins
 - **Appsmith** [![GitHub stars](https://img.shields.io/github/stars/appsmithorg/appsmith.svg)](https://github.com/appsmithorg/appsmith) - Low-code application platform
 - **Halo CMS** [![GitHub stars](https://img.shields.io/github/stars/halo-dev/halo.svg)](https://github.com/halo-dev/halo) - Modern content management  
 - **[View more projects...](https://github.com/pf4j/pf4j/issues/173)**
