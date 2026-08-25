@@ -73,6 +73,11 @@ jobs:
           grep -oE '\[#[0-9]+\]' notes.md | sort -u | while read -r ref; do
             awk -v r="$ref:" 'index($0, r) == 1 { print; exit }' CHANGELOG.md
           done >> notes.md
+          PREV=$(git describe --tags --abbrev=0 "release-$VERSION^" 2>/dev/null)
+          if [ -n "$PREV" ]; then
+            printf '\n**Full Changelog**: https://github.com/%s/compare/%s...release-%s\n' \
+              "${{ github.repository }}" "$PREV" "$VERSION" >> notes.md
+          fi
           echo "--- release notes ---"; cat notes.md
 
       - name: Create GitHub Release
@@ -81,7 +86,6 @@ jobs:
           tag_name: release-${{ github.event.inputs.releaseVersion }}
           name: Release ${{ github.event.inputs.releaseVersion }}
           body_path: notes.md
-          generate_release_notes: true
           draft: false
           prerelease: false
 
