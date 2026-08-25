@@ -22,6 +22,8 @@
     </properties>
 
     <dependencies>
+        <!-- Intentionally a different version than the app uses - see the comment
+             in demo/maven/app/pom.xml. Do not align these versions. -->
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
