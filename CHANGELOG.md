@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Fixed
 - [#669]: Read extension annotations from class files produced by recent Java releases
+- [#670]: Read the `ordinal` attribute of the `Extension` annotation via ASM
 
 #### Changed
 
@@ -560,6 +561,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#670]: https://github.com/pf4j/pf4j/issues/670
 [#669]: https://github.com/pf4j/pf4j/issues/669
 [#656]: https://github.com/pf4j/pf4j/issues/656
 [#648]: https://github.com/pf4j/pf4j/issues/648

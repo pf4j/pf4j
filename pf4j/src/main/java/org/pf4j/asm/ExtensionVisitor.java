@@ -61,16 +61,25 @@ class ExtensionVisitor extends ClassVisitor {
         return new AnnotationVisitor(ASM_VERSION) {
 
             @Override
+            public void visit(String name, Object value) {
+                // "ordinal" is a scalar attribute, therefore it is reported here and not in visitArray
+                if ("ordinal".equals(name)) {
+                    log.debug("Load annotation attribute {} = {} ({})", name, value, value.getClass().getName());
+                    extensionInfo.ordinal = ((Number) value).intValue();
+                }
+
+                super.visit(name, value);
+            }
+
+            @Override
             public AnnotationVisitor visitArray(final String name) {
-                if ("ordinal".equals(name) || "plugins".equals(name) || "points".equals(name)) {
+                if ("plugins".equals(name) || "points".equals(name)) {
                     return new AnnotationVisitor(ASM_VERSION, super.visitArray(name)) {
 
                         @Override
                         public void visit(String key, Object value) {
                             log.debug("Load annotation attribute {} = {} ({})", name, value, value.getClass().getName());
-                            if ("ordinal".equals(name)) {
-                                extensionInfo.ordinal = Integer.parseInt(value.toString());
-                            } else if ("plugins".equals(name)) {
+                            if ("plugins".equals(name)) {
                                 if (value instanceof String) {
                                     log.debug("Found plugin {}", value);
                                     extensionInfo.plugins.add((String) value);
