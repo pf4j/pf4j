@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#669]: Read extension annotations from class files produced by recent Java releases
 
 #### Changed
 
@@ -559,6 +560,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#669]: https://github.com/pf4j/pf4j/issues/669
 [#656]: https://github.com/pf4j/pf4j/issues/656
 [#648]: https://github.com/pf4j/pf4j/issues/648
 [#646]: https://github.com/pf4j/pf4j/issues/646

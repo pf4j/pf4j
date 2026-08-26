@@ -99,6 +99,12 @@ public final class ExtensionInfo {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             return null;
+        } catch (RuntimeException e) {
+            // The class file cannot be parsed by the bundled ASM version, for example because it was
+            // compiled for a newer Java release. Skip this extension instead of aborting the whole
+            // extension discovery, see https://github.com/pf4j/pf4j/issues/669.
+            log.error("Cannot read the extension annotation of '{}'", className, e);
+            return null;
         }
     }
 
