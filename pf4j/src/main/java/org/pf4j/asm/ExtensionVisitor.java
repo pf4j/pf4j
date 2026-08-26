@@ -42,7 +42,7 @@ class ExtensionVisitor extends ClassVisitor {
     
     private static final Logger log = LoggerFactory.getLogger(ExtensionVisitor.class);
 
-    private static final int ASM_VERSION = Opcodes.ASM7;
+    private static final int ASM_VERSION = Opcodes.ASM9;
 
     private final ExtensionInfo extensionInfo;
 
