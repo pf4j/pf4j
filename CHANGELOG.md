@@ -55,6 +55,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#614]: Demo application shows zero Greeting extensions under JDK 23
 - Set class loader to null on unload plugin
 
+#### Changed
+- `DefaultPluginDescriptor` setters return the concrete type instead of `PluginDescriptor`, so that they can be chained. This is source compatible but not binary compatible, code compiled against 3.13.0 or earlier has to be recompiled.
+
 #### Added
 - [#598]: Add Maven wrapper
 
