@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#673]: Read the extensions index of a plugin from every jar on the plugin classpath
 
 #### Added
+- [#293]: Document when `PluginManager.getExtensions` creates instances and what it returns
 
 #### Removed
 
