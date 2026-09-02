@@ -269,6 +269,30 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     /**
+     * Returns the class loader of a dependency of the plugin.
+     * <p>
+     * The class loader is missing when an optional dependency is not installed, which is expected, and
+     * when a dependency was unloaded or disabled while this plugin stayed loaded, which is not.
+     *
+     * @param dependency the dependency of the plugin
+     * @return the class loader of the dependency, {@code null} if it is not available
+     */
+    protected ClassLoader getDependencyClassLoader(PluginDependency dependency) {
+        ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
+        if (classLoader == null) {
+            if (dependency.isOptional()) {
+                log.debug("Cannot find the class loader of the optional dependency '{}' of plugin '{}'",
+                    dependency.getPluginId(), pluginDescriptor.getPluginId());
+            } else {
+                log.warn("Cannot find the class loader of the dependency '{}' of plugin '{}'",
+                    dependency.getPluginId(), pluginDescriptor.getPluginId());
+            }
+        }
+
+        return classLoader;
+    }
+
+    /**
      * Loads the class with the specified name from the dependencies of the plugin.
      *
      * @param className the name of the class
@@ -278,10 +302,8 @@ public class PluginClassLoader extends URLClassLoader {
         log.trace("Search in dependencies for class '{}'", className);
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
         for (PluginDependency dependency : dependencies) {
-            ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
-
-            // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null && dependency.isOptional()) {
+            ClassLoader classLoader = getDependencyClassLoader(dependency);
+            if (classLoader == null) {
                 continue;
             }
 
@@ -305,10 +327,8 @@ public class PluginClassLoader extends URLClassLoader {
         log.trace("Search in dependencies for resource '{}'", name);
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
         for (PluginDependency dependency : dependencies) {
-            ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
-
-            // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null && dependency.isOptional()) {
+            ClassLoader classLoader = getDependencyClassLoader(dependency);
+            if (classLoader == null) {
                 continue;
             }
 
@@ -335,10 +355,8 @@ public class PluginClassLoader extends URLClassLoader {
         List<URL> results = new ArrayList<>();
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
         for (PluginDependency dependency : dependencies) {
-            ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
-
-            // If the dependency is marked as optional, its class loader might not be available.
-            if (classLoader == null && dependency.isOptional()) {
+            ClassLoader classLoader = getDependencyClassLoader(dependency);
+            if (classLoader == null) {
                 continue;
             }
 

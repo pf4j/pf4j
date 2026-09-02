@@ -48,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -393,6 +394,36 @@ class PluginClassLoaderTest {
         Files.write(metaInfPath.resolve("file-only-in-foreign-dependency"), Collections.singletonList("dependency"));
 
         return new URLClassLoader(new URL[] { classesPath.toUri().toURL() }, null);
+    }
+
+    /**
+     * A required dependency has no class loader when it was unloaded while this plugin stayed loaded.
+     * A lookup returns nothing, the same as for an optional dependency that is not installed.
+     */
+    @Test
+    void getResourceWhenTheClassLoaderOfARequiredDependencyIsMissing() throws IOException {
+        PluginClassLoader classLoader = createClassLoaderWithMissingDependency();
+
+        assertNull(classLoader.getResource("META-INF/file-only-in-dependency"));
+        assertFalse(classLoader.getResources("META-INF/file-only-in-dependency").hasMoreElements());
+    }
+
+    @Test
+    void loadClassWhenTheClassLoaderOfARequiredDependencyIsMissing() {
+        PluginClassLoader classLoader = createClassLoaderWithMissingDependency();
+
+        assertThrows(ClassNotFoundException.class, () -> classLoader.loadClass("test.Missing"));
+    }
+
+    private PluginClassLoader createClassLoaderWithMissingDependency() {
+        DefaultPluginDescriptor descriptor = new DefaultPluginDescriptor()
+            .setPluginId("myPluginWithMissingDependency")
+            .setPluginVersion("1.2.3")
+            .setDependencies("missingDependency")
+            .setProvider("Me")
+            .setRequires("5.0.0");
+
+        return new PluginClassLoader(pluginManager, descriptor, PluginClassLoaderTest.class.getClassLoader());
     }
 
     @Test
