@@ -18,8 +18,8 @@ package org.pf4j.test;
 import javax.tools.JavaFileObject;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +32,8 @@ import java.util.Objects;
  */
 public class JavaFileObjectClassLoader extends ClassLoader {
 
+    private final Map<String, byte[]> classes = new HashMap<>();
+
     public Map<String, Class<?>> load(JavaFileObject... objects) {
         return load(Arrays.asList(objects));
     }
@@ -40,9 +42,6 @@ public class JavaFileObjectClassLoader extends ClassLoader {
         Objects.requireNonNull(objects);
 
         List<JavaFileObject> mutableObjects = new ArrayList<>(objects);
-
-        // Sort generated ".class" by lastModified field
-        mutableObjects.sort(Comparator.comparingLong(JavaFileObject::getLastModified));
 
         // Compile Java sources (if exists)
         for (int i = 0; i < mutableObjects.size(); i++) {
@@ -58,16 +57,52 @@ public class JavaFileObjectClassLoader extends ClassLoader {
             }
         }
 
+        // Keep the bytes of every class before defining any of them, a class is defined on demand
+        for (JavaFileObject object : mutableObjects) {
+            classes.put(JavaFileObjectUtils.getClassName(object), JavaFileObjectUtils.getAllBytes(object));
+        }
+
         // Load objects
-        Map<String, Class<?>> loadedClasses = new HashMap<>();
+        Map<String, Class<?>> loadedClasses = new LinkedHashMap<>();
         for (JavaFileObject object : mutableObjects) {
             String className = JavaFileObjectUtils.getClassName(object);
-            byte[] data = JavaFileObjectUtils.getAllBytes(object);
-            Class<?> loadedClass = defineClass(className, data, 0, data.length);
-            loadedClasses.put(className, loadedClass);
+            loadedClasses.put(className, loadGeneratedClass(className));
         }
 
         return loadedClasses;
+    }
+
+    /**
+     * Defines a class from the bytes collected by {@link #load}.
+     * <p>
+     * A class is defined when it is first asked for, either by {@link #load} or by the virtual machine
+     * while it resolves the super types of another class, so the order of the objects does not matter.
+     *
+     * @param name the name of the class
+     * @return the loaded class
+     * @throws ClassNotFoundException if the class was not given to {@link #load}
+     */
+    @Override
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
+        byte[] data = classes.remove(name);
+        if (data == null) {
+            throw new ClassNotFoundException(name);
+        }
+
+        return defineClass(name, data, 0, data.length);
+    }
+
+    private Class<?> loadGeneratedClass(String className) {
+        Class<?> loadedClass = findLoadedClass(className);
+        if (loadedClass != null) {
+            return loadedClass;
+        }
+
+        try {
+            return findClass(className);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }
