@@ -263,10 +263,7 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * Unload the specified plugin and it's dependents.
-     *
-     * @param pluginId the pluginId of the plugin to unload
-     * @return true if the plugin was unloaded, otherwise false
+     * {@inheritDoc}
      */
     @Override
     public boolean unloadPlugin(String pluginId) {
