@@ -66,9 +66,15 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
      * @throws IOException if I/O errors occur
      */
     protected Enumeration<URL> findStorageResources(ClassLoader classLoader, String name) throws IOException {
-        return classLoader instanceof URLClassLoader
-            ? ((URLClassLoader) classLoader).findResources(name)
-            : classLoader.getResources(name);
+        if (classLoader instanceof URLClassLoader) {
+            return ((URLClassLoader) classLoader).findResources(name);
+        }
+
+        log.warn("Cannot read '{}' from the plugin alone, '{}' is not a URLClassLoader."
+            + " The extensions declared by the application may be reported as extensions of the plugin",
+            name, classLoader.getClass().getName());
+
+        return classLoader.getResources(name);
     }
 
     @Override
