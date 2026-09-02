@@ -93,7 +93,7 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
             final Set<String> bucket = new HashSet<>();
 
             try {
-                Enumeration<URL> urls = findExtensionResource((PluginClassLoader) plugin.getPluginClassLoader());
+                Enumeration<URL> urls = findStorageResources(plugin.getPluginClassLoader(), EXTENSIONS_RESOURCE);
                 if (urls.hasMoreElements()) {
                     collectExtensions(urls, bucket);
                 } else {
@@ -113,10 +113,6 @@ public class ServiceProviderExtensionFinder extends AbstractExtensionFinder {
 
     Enumeration<URL> getExtensionResource(ClassLoader classLoader) throws IOException {
         return classLoader.getResources(EXTENSIONS_RESOURCE);
-    }
-
-    Enumeration<URL> findExtensionResource(PluginClassLoader classLoader) throws IOException {
-        return classLoader.findResources(EXTENSIONS_RESOURCE);
     }
 
     private void collectExtensions(Enumeration<URL> urls, Set<String> bucket) throws URISyntaxException, IOException {

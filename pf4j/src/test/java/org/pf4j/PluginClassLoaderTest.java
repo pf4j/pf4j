@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -350,16 +351,48 @@ class PluginClassLoaderTest {
         assertNumberOfResourcesAndFirstLineOfFirstElement(3, "parent", resources);
     }
 
+    /**
+     * The extensions index is resolved with the configured strategy, like any other resource.
+     * The finder reads the index of a plugin from the plugin itself.
+     */
     @Test
     void parentFirstGetExtensionsIndexExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
-        URL resource = parentFirstPluginClassLoader.getResource(LegacyExtensionFinder.EXTENSIONS_RESOURCE);
-        assertFirstLine("plugin", resource);
+        URL resource = parentFirstPluginClassLoader.getResource(IndexedExtensionFinder.EXTENSIONS_RESOURCE);
+        assertFirstLine("parent", resource);
     }
 
     @Test
     void parentLastGetExtensionsIndexExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
-        URL resource = parentLastPluginClassLoader.getResource(LegacyExtensionFinder.EXTENSIONS_RESOURCE);
+        URL resource = parentLastPluginClassLoader.getResource(IndexedExtensionFinder.EXTENSIONS_RESOURCE);
         assertFirstLine("plugin", resource);
+    }
+
+    /**
+     * A {@link PluginLoader} is free to return any class loader, so a dependency is not necessarily
+     * loaded with a {@link PluginClassLoader}.
+     */
+    @Test
+    void getResourceFromDependencyLoadedWithAnotherClassLoader() throws URISyntaxException, IOException {
+        pluginManager.addClassLoader("myDependency", createForeignDependencyClassLoader());
+
+        URL resource = parentLastPluginClassLoader.getResource("META-INF/file-only-in-foreign-dependency");
+        assertFirstLine("dependency", resource);
+    }
+
+    @Test
+    void getResourcesFromDependencyLoadedWithAnotherClassLoader() throws URISyntaxException, IOException {
+        pluginManager.addClassLoader("myDependency", createForeignDependencyClassLoader());
+
+        Enumeration<URL> resources = parentLastPluginClassLoader.getResources("META-INF/file-only-in-foreign-dependency");
+        assertNumberOfResourcesAndFirstLineOfFirstElement(1, "dependency", resources);
+    }
+
+    private ClassLoader createForeignDependencyClassLoader() throws IOException {
+        Path classesPath = pluginsPath.resolve("foreign-dependency");
+        Path metaInfPath = Files.createDirectories(classesPath.resolve("META-INF"));
+        Files.write(metaInfPath.resolve("file-only-in-foreign-dependency"), Collections.singletonList("dependency"));
+
+        return new URLClassLoader(new URL[] { classesPath.toUri().toURL() }, null);
     }
 
     @Test
@@ -465,7 +498,7 @@ class PluginClassLoaderTest {
             super(pluginsPath);
         }
 
-        void addClassLoader(String pluginId, PluginClassLoader classLoader) {
+        void addClassLoader(String pluginId, ClassLoader classLoader) {
             getPluginClassLoaders().put(pluginId, classLoader);
         }
 

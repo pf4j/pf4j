@@ -80,7 +80,7 @@ class ServiceProviderExtensionFinderTest {
         ServiceProviderExtensionFinder finder = new ServiceProviderExtensionFinder(pluginManager) {
 
             @Override
-            Enumeration<URL> findExtensionResource(PluginClassLoader classLoader) throws IOException {
+            protected Enumeration<URL> findStorageResources(ClassLoader classLoader, String name) throws IOException {
                 return getExtensionEnumeration();
             }
 
