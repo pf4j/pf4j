@@ -20,9 +20,13 @@ import org.pf4j.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,6 +52,24 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
     public abstract Map<String, Set<String>> readPluginsStorages();
 
     public abstract Map<String, Set<String>> readClasspathStorages();
+
+    /**
+     * Looks up a storage resource in the plugin itself, without consulting the application or the
+     * dependencies of the plugin. Those declare their own extensions and are read on their own turn.
+     * <p>
+     * A plugin loaded with a class loader that is not a {@link URLClassLoader} cannot be searched in
+     * isolation, such a class loader decides alone what it makes visible.
+     *
+     * @param classLoader the class loader of the plugin
+     * @param name the name of the resource
+     * @return an enumeration of {@link URL} objects for the resource
+     * @throws IOException if I/O errors occur
+     */
+    protected Enumeration<URL> findStorageResources(ClassLoader classLoader, String name) throws IOException {
+        return classLoader instanceof URLClassLoader
+            ? ((URLClassLoader) classLoader).findResources(name)
+            : classLoader.getResources(name);
+    }
 
     @Override
     public <T> List<ExtensionWrapper<T>> find(Class<T> type) {

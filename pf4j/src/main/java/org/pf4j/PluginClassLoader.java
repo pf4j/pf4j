@@ -315,14 +315,16 @@ public class PluginClassLoader extends URLClassLoader {
         log.trace("Search in dependencies for resource '{}'", name);
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
         for (PluginDependency dependency : dependencies) {
-            PluginClassLoader classLoader = (PluginClassLoader) pluginManager.getPluginClassLoader(dependency.getPluginId());
+            ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
             if (classLoader == null && dependency.isOptional()) {
                 continue;
             }
 
-            URL url = classLoader.findResource(name);
+            URL url = classLoader instanceof URLClassLoader
+                ? ((URLClassLoader) classLoader).findResource(name)
+                : classLoader.getResource(name);
             if (Objects.nonNull(url)) {
                 return url;
             }
@@ -343,14 +345,16 @@ public class PluginClassLoader extends URLClassLoader {
         List<URL> results = new ArrayList<>();
         List<PluginDependency> dependencies = pluginDescriptor.getDependencies();
         for (PluginDependency dependency : dependencies) {
-            PluginClassLoader classLoader = (PluginClassLoader) pluginManager.getPluginClassLoader(dependency.getPluginId());
+            ClassLoader classLoader = pluginManager.getPluginClassLoader(dependency.getPluginId());
 
             // If the dependency is marked as optional, its class loader might not be available.
             if (classLoader == null && dependency.isOptional()) {
                 continue;
             }
 
-            results.addAll(Collections.list(classLoader.findResources(name)));
+            results.addAll(Collections.list(classLoader instanceof URLClassLoader
+                ? ((URLClassLoader) classLoader).findResources(name)
+                : classLoader.getResources(name)));
         }
 
         return results;
