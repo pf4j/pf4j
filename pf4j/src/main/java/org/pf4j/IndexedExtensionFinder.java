@@ -89,13 +89,11 @@ public class IndexedExtensionFinder extends AbstractExtensionFinder {
 
             try {
                 log.debug("Read '{}'", EXTENSIONS_RESOURCE);
-                ClassLoader pluginClassLoader = plugin.getPluginClassLoader();
-                try (InputStream resourceStream = pluginClassLoader.getResourceAsStream(EXTENSIONS_RESOURCE)) {
-                    if (resourceStream == null) {
-                        log.debug("Cannot find '{}'", EXTENSIONS_RESOURCE);
-                    } else {
-                        collectExtensions(resourceStream, bucket);
-                    }
+                Enumeration<URL> urls = findStorageResources(plugin.getPluginClassLoader(), EXTENSIONS_RESOURCE);
+                if (urls.hasMoreElements()) {
+                    collectExtensions(urls, bucket);
+                } else {
+                    log.debug("Cannot find '{}'", EXTENSIONS_RESOURCE);
                 }
 
                 debugExtensions(bucket);

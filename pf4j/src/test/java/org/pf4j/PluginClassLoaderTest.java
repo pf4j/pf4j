@@ -351,15 +351,19 @@ class PluginClassLoaderTest {
         assertNumberOfResourcesAndFirstLineOfFirstElement(3, "parent", resources);
     }
 
+    /**
+     * The extensions index is resolved with the configured strategy, like any other resource.
+     * The finder reads the index of a plugin from the plugin itself.
+     */
     @Test
     void parentFirstGetExtensionsIndexExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
-        URL resource = parentFirstPluginClassLoader.getResource(LegacyExtensionFinder.EXTENSIONS_RESOURCE);
-        assertFirstLine("plugin", resource);
+        URL resource = parentFirstPluginClassLoader.getResource(IndexedExtensionFinder.EXTENSIONS_RESOURCE);
+        assertFirstLine("parent", resource);
     }
 
     @Test
     void parentLastGetExtensionsIndexExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
-        URL resource = parentLastPluginClassLoader.getResource(LegacyExtensionFinder.EXTENSIONS_RESOURCE);
+        URL resource = parentLastPluginClassLoader.getResource(IndexedExtensionFinder.EXTENSIONS_RESOURCE);
         assertFirstLine("plugin", resource);
     }
 
