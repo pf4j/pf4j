@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#673]: Read the extensions index of a plugin from every jar on the plugin classpath
 
 #### Added
+- [#293]: Document when `PluginManager.getExtensions` creates instances and what it returns
 
 #### Removed
 
@@ -654,6 +655,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [#297]: https://github.com/pf4j/pf4j/issues/297
 [#296]: https://github.com/pf4j/pf4j/issues/296
 [#294]: https://github.com/pf4j/pf4j/issues/294
+[#293]: https://github.com/pf4j/pf4j/issues/293
 [#292]: https://github.com/pf4j/pf4j/issues/292
 [#288]: https://github.com/pf4j/pf4j/pull/288
 [#287]: https://github.com/pf4j/pf4j/pull/287

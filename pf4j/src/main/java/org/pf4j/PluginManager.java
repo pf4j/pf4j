@@ -160,15 +160,49 @@ public interface PluginManager {
 
     <T> List<Class<? extends T>> getExtensionClasses(Class<T> type, String pluginId);
 
+    /**
+     * Returns extension instances of the given type.
+     * <p>
+     * The result is never {@code null}. An empty list is returned when no
+     * extension of {@code type} is registered. Instances come from the
+     * {@link ExtensionFactory}, which decides whether they are shared or
+     * created per call.
+     *
+     * @param type the extension point
+     * @param <T> the extension point type
+     * @return matching instances, never {@code null}
+     * @see #getExtensions(Class, String)
+     * @see ExtensionFactory
+     */
     <T> List<T> getExtensions(Class<T> type);
 
+    /**
+     * Returns extension instances of the given type contributed by {@code pluginId}.
+     * <p>
+     * Pass {@code null} to retrieve extensions declared on the application classpath.
+     * An unknown id or a type with no matching extensions yields an empty list
+     * rather than an exception. The result is never {@code null}.
+     * Instances come from the {@link ExtensionFactory}, which decides whether
+     * they are shared or created per call.
+     *
+     * @param type the extension point
+     * @param pluginId the plugin id, or {@code null} for classpath extensions
+     * @param <T> the extension point type
+     * @return matching instances, never {@code null}
+     */
     <T> List<T> getExtensions(Class<T> type, String pluginId);
 
     /**
-     * Retrieves the extensions for the specified plugin.
+     * Returns all extension instances contributed by {@code pluginId}.
+     * <p>
+     * Pass {@code null} to retrieve extensions declared on the application classpath.
+     * An unknown id yields an empty list rather than an exception.
+     * The result is never {@code null}. Instances come from the
+     * {@link ExtensionFactory}, which decides whether they are shared or
+     * created per call.
      *
-     * @param pluginId the unique plugin identifier, specified in its metadata
-     * @return the extensions for the plugin
+     * @param pluginId the plugin id, or {@code null} for classpath extensions
+     * @return the extensions for the plugin, never {@code null}
      */
     List getExtensions(String pluginId);
 
