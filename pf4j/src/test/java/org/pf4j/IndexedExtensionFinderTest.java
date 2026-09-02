@@ -28,6 +28,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,6 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 public class IndexedExtensionFinderTest {
 
@@ -114,6 +116,28 @@ public class IndexedExtensionFinderTest {
 
         assertThat(pluginsStorages.get("plugin-a"), contains(TestExtension.class.getName()));
         assertEquals(Collections.emptySet(), pluginsStorages.get("plugin-b"));
+    }
+
+    /**
+     * A plugin loaded with a class loader that is not a {@link java.net.URLClassLoader} cannot be
+     * searched in isolation, the storage is then whatever that class loader makes visible.
+     */
+    @Test
+    public void shouldReadTheStorageOfAPluginLoadedWithAnotherClassLoader() throws Exception {
+        URL url = applicationPath.toUri().toURL();
+        ClassLoader classLoader = new ClassLoader(null) {
+
+            @Override
+            public Enumeration<URL> getResources(String name) {
+                return Collections.enumeration(Collections.singletonList(url));
+            }
+
+        };
+
+        IndexedExtensionFinder extensionFinder = new IndexedExtensionFinder(mock(PluginManager.class));
+        Enumeration<URL> urls = extensionFinder.findStorageResources(classLoader, IndexedExtensionFinder.EXTENSIONS_RESOURCE);
+
+        assertEquals(Collections.singletonList(url), Collections.list(urls));
     }
 
     /**
