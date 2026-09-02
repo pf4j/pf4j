@@ -713,16 +713,42 @@ public abstract class AbstractPluginManager implements PluginManager {
         return getExtensionClasses(extensionFinder.find(type, pluginId));
     }
 
+    /**
+     * Returns extension instances of the given type from the application classpath
+     * and from every plugin that is in the {@link PluginState#STARTED} state.
+     * <p>
+     * Instances are created when this method is called, not when a plugin is loaded
+     * or started. {@link DefaultExtensionFactory} (the {@link DefaultPluginManager}
+     * default) constructs a new instance on every call;
+     * {@link SingletonExtensionFactory} returns the same instance for a given
+     * extension class. Instantiation failures are logged and omitted from the result.
+     */
     @Override
     public <T> List<T> getExtensions(Class<T> type) {
         return getExtensions(extensionFinder.find(type));
     }
 
+    /**
+     * Returns extension instances of the given type contributed by {@code pluginId}.
+     * <p>
+     * For a plugin id, the plugin must be {@link PluginState#STARTED}; a plugin that
+     * is only loaded contributes nothing. Instantiation follows the same
+     * {@link ExtensionFactory} rules as {@link #getExtensions(Class)}, including
+     * logging and omitting failures.
+     */
     @Override
     public <T> List<T> getExtensions(Class<T> type, String pluginId) {
         return getExtensions(extensionFinder.find(type, pluginId));
     }
 
+    /**
+     * Returns all extension instances contributed by {@code pluginId}.
+     * <p>
+     * For a plugin id, the plugin must be {@link PluginState#STARTED}; a plugin that
+     * is only loaded contributes nothing. Instantiation follows the same
+     * {@link ExtensionFactory} rules as {@link #getExtensions(Class)}, including
+     * logging and omitting failures.
+     */
     @Override
     @SuppressWarnings("unchecked")
     public List getExtensions(String pluginId) {

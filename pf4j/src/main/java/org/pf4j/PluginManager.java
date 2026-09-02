@@ -161,17 +161,12 @@ public interface PluginManager {
     <T> List<Class<? extends T>> getExtensionClasses(Class<T> type, String pluginId);
 
     /**
-     * Returns extension instances of the given type from the application classpath
-     * and from every plugin that is in the {@link PluginState#STARTED} state.
+     * Returns extension instances of the given type.
      * <p>
-     * Instances are created when this method is called, not when a plugin is loaded
-     * or started. The {@link ExtensionFactory} decides identity:
-     * {@link DefaultExtensionFactory} (the {@link DefaultPluginManager} default)
-     * constructs a new instance on every call; {@link SingletonExtensionFactory}
-     * returns the same instance for a given extension class.
-     * <p>
-     * Returns an empty list when no extension of {@code type} is registered.
-     * Instantiation failures are logged and omitted from the result.
+     * The result is never {@code null}. An empty list is returned when no
+     * extension of {@code type} is registered. Instances come from the
+     * {@link ExtensionFactory}, which decides whether they are shared or
+     * created per call.
      *
      * @param type the extension point
      * @param <T> the extension point type
@@ -185,11 +180,10 @@ public interface PluginManager {
      * Returns extension instances of the given type contributed by {@code pluginId}.
      * <p>
      * Pass {@code null} to retrieve extensions declared on the application classpath.
-     * For a plugin id, the plugin must be {@link PluginState#STARTED}; a plugin that
-     * is only loaded, an unknown id, or a type with no matching extensions yields
-     * an empty list rather than an exception.
-     * Instantiation follows the same {@link ExtensionFactory} rules as
-     * {@link #getExtensions(Class)}.
+     * An unknown id or a type with no matching extensions yields an empty list
+     * rather than an exception. The result is never {@code null}.
+     * Instances come from the {@link ExtensionFactory}, which decides whether
+     * they are shared or created per call.
      *
      * @param type the extension point
      * @param pluginId the plugin id, or {@code null} for classpath extensions
@@ -202,10 +196,10 @@ public interface PluginManager {
      * Returns all extension instances contributed by {@code pluginId}.
      * <p>
      * Pass {@code null} to retrieve extensions declared on the application classpath.
-     * For a plugin id, the plugin must be {@link PluginState#STARTED}; a plugin that
-     * is only loaded or an unknown id yields an empty list rather than an exception.
-     * Instantiation follows the same {@link ExtensionFactory} rules as
-     * {@link #getExtensions(Class)}.
+     * An unknown id yields an empty list rather than an exception.
+     * The result is never {@code null}. Instances come from the
+     * {@link ExtensionFactory}, which decides whether they are shared or
+     * created per call.
      *
      * @param pluginId the plugin id, or {@code null} for classpath extensions
      * @return the extensions for the plugin, never {@code null}
