@@ -352,7 +352,7 @@ class PluginClassLoaderTest {
 
     @Test
     void parentFirstGetExtensionsIndexExistsInParentAndDependencyAndPlugin() throws URISyntaxException, IOException {
-        URL resource = parentLastPluginClassLoader.getResource(LegacyExtensionFinder.EXTENSIONS_RESOURCE);
+        URL resource = parentFirstPluginClassLoader.getResource(LegacyExtensionFinder.EXTENSIONS_RESOURCE);
         assertFirstLine("plugin", resource);
     }
 
