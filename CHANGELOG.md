@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 #### Added
 - [#293]: Document when `PluginManager.getExtensions` creates instances and what it returns
+- [#291]: Document when `PluginManager.unloadPlugin` returns `false` and what callers can do
 
 #### Removed
 
@@ -657,6 +658,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [#294]: https://github.com/pf4j/pf4j/issues/294
 [#293]: https://github.com/pf4j/pf4j/issues/293
 [#292]: https://github.com/pf4j/pf4j/issues/292
+[#291]: https://github.com/pf4j/pf4j/issues/291
 [#288]: https://github.com/pf4j/pf4j/pull/288
 [#287]: https://github.com/pf4j/pf4j/pull/287
 [#278]: https://github.com/pf4j/pf4j/pull/278

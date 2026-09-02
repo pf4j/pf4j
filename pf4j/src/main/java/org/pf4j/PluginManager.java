@@ -112,10 +112,23 @@ public interface PluginManager {
 
     /**
      * Unload a plugin.
+     * <p>
+     * Dependents are unloaded first. Returns {@code false} if the plugin is
+     * not loaded (unknown id or already unloaded). That is not an error; treat
+     * it as a no-op. Also returns {@code false} if the plugin could not be
+     * stopped and is still {@link PluginState#STARTED}; it remains loaded in
+     * that case. Inspect {@link PluginWrapper#getFailedException()} and retry
+     * after the plugin can be stopped.
+     * <p>
+     * {@link Plugin#stop()} throwing {@link PluginRuntimeException} does not
+     * fail the unload: the plugin is still removed and this method returns
+     * {@code true}. The exception is stored on the wrapper.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
-     * @return true if the plugin was unloaded
-     * @throws PluginRuntimeException if something goes wrong
+     * @return {@code true} if the plugin was unloaded, {@code false} if it was
+     *         not loaded or could not be stopped
+     * @throws PluginRuntimeException if the plugin classloader cannot be closed
+     * @see PluginWrapper#getFailedException()
      */
     boolean unloadPlugin(String pluginId);
 
