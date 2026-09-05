@@ -23,12 +23,15 @@ import org.pf4j.test.TestPlugin;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -119,40 +122,178 @@ public class IndexedExtensionFinderTest {
     }
 
     /**
-     * A plugin loaded with a class loader that is not a {@link java.net.URLClassLoader} cannot be
-     * searched in isolation, the storage is then whatever that class loader makes visible.
+     * A plugin loaded with a class loader that is not a {@link URLClassLoader} declares the
+     * extensions found under its path. The class loader also sees the storage of the application,
+     * and a plugin that declares nothing still declares nothing.
      */
     @Test
-    public void shouldReadTheStorageOfAPluginLoadedWithAnotherClassLoader() throws Exception {
-        URL url = applicationPath.toUri().toURL();
-        ClassLoader classLoader = new ClassLoader(null) {
+    public void shouldFindTheExtensionsOfAPluginLoadedWithAnotherClassLoader() throws Exception {
+        new PluginJar.Builder(pluginsPath.resolve("plugin-a.jar"), "plugin-a")
+                .pluginVersion("1.0.0")
+                .extension(TestExtension.class.getName())
+                .build();
+
+        new PluginJar.Builder(pluginsPath.resolve("plugin-b.jar"), "plugin-b")
+                .pluginVersion("1.0.0")
+                .build();
+
+        ClassLoader applicationClassLoader = createApplicationClassLoader();
+
+        PluginManager pluginManager = new JarPluginManager(pluginsPath) {
 
             @Override
-            public Enumeration<URL> getResources(String name) {
-                return Collections.enumeration(Collections.singletonList(url));
+            protected PluginLoader createPluginLoader() {
+                return new JarPluginLoader(this) {
+
+                    @Override
+                    public ClassLoader loadPlugin(Path pluginPath, PluginDescriptor pluginDescriptor) {
+                        try {
+                            return new CustomClassLoader(pluginPath, applicationClassLoader);
+                        } catch (MalformedURLException e) {
+                            throw new PluginRuntimeException(e);
+                        }
+                    }
+
+                };
             }
 
         };
 
-        IndexedExtensionFinder extensionFinder = new IndexedExtensionFinder(mock(PluginManager.class));
-        Enumeration<URL> urls = extensionFinder.findStorageResources(classLoader, IndexedExtensionFinder.EXTENSIONS_RESOURCE);
+        pluginManager.loadPlugins();
+
+        assertEquals(2, pluginManager.getPlugins().size());
+
+        IndexedExtensionFinder extensionFinder = new IndexedExtensionFinder(pluginManager);
+        Map<String, Set<String>> pluginsStorages = extensionFinder.readPluginsStorages();
+
+        assertThat(pluginsStorages.get("plugin-a"), contains(TestExtension.class.getName()));
+        assertEquals(Collections.emptySet(), pluginsStorages.get("plugin-b"));
+    }
+
+    /**
+     * A plugin loaded with a class loader that is not a {@link URLClassLoader} is searched
+     * through its path, so the storage of the application is left out.
+     */
+    @Test
+    public void shouldReadTheStorageOfAPluginLoadedWithAnotherClassLoader() throws Exception {
+        // a space in the name, the path of a jar is encoded in the url of a resource it holds
+        Path pluginPath = pluginsPath.resolve("test plugin.jar");
+        URL pluginUrl = createPluginIndex(pluginPath);
+        URL applicationUrl = createApplicationIndex().toUri().toURL();
+
+        Enumeration<URL> urls = findStorageResources(pluginPath, applicationUrl, pluginUrl);
+
+        assertEquals(Collections.singletonList(pluginUrl), Collections.list(urls));
+    }
+
+    /**
+     * The path of a plugin and the resources of its class loader can reach the same file through a
+     * link, so both are resolved before they are compared.
+     */
+    @Test
+    public void shouldReadTheStorageOfAPluginReachedThroughALink() throws Exception {
+        Path pluginPath = pluginsPath.resolve("test-plugin.jar");
+        URL pluginUrl = createPluginIndex(pluginPath);
+        Path linkPath = Files.createSymbolicLink(pluginsPath.resolve("linked-plugin.jar"), pluginPath);
+
+        Enumeration<URL> urls = findStorageResources(linkPath, pluginUrl);
+
+        assertEquals(Collections.singletonList(pluginUrl), Collections.list(urls));
+    }
+
+    /**
+     * A resource that does not come from a file cannot be traced to the plugin. It is kept, losing
+     * the extensions of a plugin is worse than reporting extensions it does not declare.
+     */
+    @Test
+    public void shouldKeepAStorageResourceThatIsNotAFile() throws Exception {
+        URL url = new URL("http://localhost/" + IndexedExtensionFinder.EXTENSIONS_RESOURCE);
+
+        Enumeration<URL> urls = findStorageResources(pluginsPath.resolve("test-plugin.jar"), url);
 
         assertEquals(Collections.singletonList(url), Collections.list(urls));
+    }
+
+    /**
+     * Reads the storage of a plugin loaded with a class loader that is not a {@link URLClassLoader}
+     * and makes the given resources visible.
+     */
+    private Enumeration<URL> findStorageResources(Path pluginPath, URL... resources) throws IOException {
+        List<URL> urls = Arrays.asList(resources);
+        ClassLoader classLoader = new ClassLoader(null) {
+
+            @Override
+            public Enumeration<URL> getResources(String name) {
+                return Collections.enumeration(urls);
+            }
+
+        };
+
+        PluginDescriptor pluginDescriptor = new DefaultPluginDescriptor("test-plugin", null, null, "1.2.3", null, null, null);
+        PluginWrapper plugin = new PluginWrapper(mock(PluginManager.class), pluginDescriptor, pluginPath, classLoader);
+
+        IndexedExtensionFinder extensionFinder = new IndexedExtensionFinder(mock(PluginManager.class));
+
+        return extensionFinder.findStorageResources(plugin, IndexedExtensionFinder.EXTENSIONS_RESOURCE);
+    }
+
+    /**
+     * Creates a plugin jar that declares an extension of its own and returns the url of its index.
+     */
+    private URL createPluginIndex(Path pluginPath) throws IOException {
+        PluginJar pluginJar = new PluginJar.Builder(pluginPath, "test-plugin")
+                .pluginVersion("1.2.3")
+                .extension(TestExtension.class.getName())
+                .build();
+
+        return new URL("jar:" + pluginJar.path().toUri().toURL() + "!/" + IndexedExtensionFinder.EXTENSIONS_RESOURCE);
+    }
+
+    /**
+     * Creates the extensions index of an application that declares an extension of its own.
+     */
+    private Path createApplicationIndex() throws IOException {
+        Path metaInfPath = Files.createDirectories(applicationPath.resolve("META-INF"));
+        Path indexPath = metaInfPath.resolve("extensions.idx");
+        try (PrintWriter writer = new PrintWriter(indexPath.toFile())) {
+            writer.println("# Generated by PF4J");
+            writer.println("org.pf4j.test.ApplicationExtension");
+        }
+
+        return indexPath;
     }
 
     /**
      * Creates a class loader for an application that declares an extension of its own.
      */
     private ClassLoader createApplicationClassLoader() throws IOException {
-        Path metaInfPath = Files.createDirectories(applicationPath.resolve("META-INF"));
-        try (PrintWriter writer = new PrintWriter(metaInfPath.resolve("extensions.idx").toFile())) {
-            writer.println("# Generated by PF4J");
-            writer.println("org.pf4j.test.ApplicationExtension");
-        }
+        createApplicationIndex();
 
         URL[] urls = { applicationPath.toUri().toURL() };
 
         return new URLClassLoader(urls, getClass().getClassLoader());
+    }
+
+    /**
+     * A plugin class loader that is not a {@link URLClassLoader}, the type is up to the
+     * {@link PluginLoader} that creates it.
+     */
+    private static class CustomClassLoader extends ClassLoader {
+
+        private final URLClassLoader delegate;
+
+        CustomClassLoader(Path pluginPath, ClassLoader parent) throws MalformedURLException {
+            super(parent);
+
+            URL[] urls = { pluginPath.toUri().toURL() };
+            this.delegate = new URLClassLoader(urls, parent);
+        }
+
+        @Override
+        public Enumeration<URL> getResources(String name) throws IOException {
+            return delegate.getResources(name);
+        }
+
     }
 
 }

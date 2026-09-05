@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#673]: Do not report the extensions of a dependency or of the application as extensions of a plugin
 - [#676]: Read the extensions of a plugin loaded with a custom class loader without a `ClassCastException`
 - [#679]: Skip a dependency whose class loader is missing instead of throwing a `NullPointerException`
+- [#680]: Do not report the extensions of the application as extensions of a plugin loaded with a custom class loader
 
 #### Changed
 - [#673]: Read the extensions index of a plugin from every jar on the plugin classpath
@@ -568,6 +569,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
 [#688]: https://github.com/pf4j/pf4j/issues/688
+[#680]: https://github.com/pf4j/pf4j/issues/680
 [#679]: https://github.com/pf4j/pf4j/issues/679
 [#676]: https://github.com/pf4j/pf4j/issues/676
 [#673]: https://github.com/pf4j/pf4j/issues/673
