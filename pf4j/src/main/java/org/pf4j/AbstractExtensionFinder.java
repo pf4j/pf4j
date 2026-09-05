@@ -17,6 +17,7 @@ package org.pf4j;
 
 import org.pf4j.asm.ExtensionInfo;
 import org.pf4j.util.ClassUtils;
+import org.pf4j.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -57,24 +59,46 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
      * Looks up a storage resource in the plugin itself, without consulting the application or the
      * dependencies of the plugin. Those declare their own extensions and are read on their own turn.
      * <p>
-     * A plugin loaded with a class loader that is not a {@link URLClassLoader} cannot be searched in
-     * isolation, such a class loader decides alone what it makes visible.
+     * A {@link URLClassLoader} searches its own classpath on request. Any other class loader decides
+     * alone what it makes visible, so what it returns is kept only when it comes from the path of the
+     * plugin.
      *
-     * @param classLoader the class loader of the plugin
+     * @param plugin the plugin
      * @param name the name of the resource
      * @return an enumeration of {@link URL} objects for the resource
      * @throws IOException if I/O errors occur
      */
-    protected Enumeration<URL> findStorageResources(ClassLoader classLoader, String name) throws IOException {
+    protected Enumeration<URL> findStorageResources(PluginWrapper plugin, String name) throws IOException {
+        ClassLoader classLoader = plugin.getPluginClassLoader();
         if (classLoader instanceof URLClassLoader) {
             return ((URLClassLoader) classLoader).findResources(name);
         }
 
-        log.warn("Cannot read '{}' from the plugin alone, '{}' is not a URLClassLoader."
-            + " The extensions declared by the application may be reported as extensions of the plugin",
-            name, classLoader.getClass().getName());
+        return filterStorageResources(classLoader.getResources(name), plugin);
+    }
 
-        return classLoader.getResources(name);
+    /**
+     * Keeps the resources that come from the path of the plugin.
+     * A resource that does not come from a file cannot be placed, it is kept because losing the
+     * extensions of a plugin is worse than reporting extensions it does not declare.
+     */
+    protected Enumeration<URL> filterStorageResources(Enumeration<URL> urls, PluginWrapper plugin) {
+        Path pluginPath = FileUtils.getRealPath(plugin.getPluginPath());
+        List<URL> resources = new ArrayList<>();
+        while (urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            Path path = FileUtils.getRealPath(url);
+            if (path == null) {
+                log.warn("Cannot tell whether '{}' comes from plugin '{}', it is kept", url, plugin.getPluginId());
+            } else if (!path.startsWith(pluginPath)) {
+                log.debug("Skip '{}', it does not come from plugin '{}'", url, plugin.getPluginId());
+                continue;
+            }
+
+            resources.add(url);
+        }
+
+        return Collections.enumeration(resources);
     }
 
     @Override

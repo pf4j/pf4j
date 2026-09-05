@@ -20,12 +20,14 @@ import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginZip;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileUtilsTest {
@@ -83,6 +85,29 @@ public class FileUtilsTest {
         file.deleteOnExit();
     }
 
+    @Test
+    public void getRealPathOfAResourceInAJar() throws Exception {
+        // a space in the name, the path of a jar is encoded in the url of a resource it holds
+        Path jarPath = Files.createFile(pluginsPath.resolve("my plugin.jar"));
+        URL url = new URL("jar:" + jarPath.toUri().toURL() + "!/META-INF/extensions.idx");
+
+        assertEquals(FileUtils.getRealPath(jarPath), FileUtils.getRealPath(url));
+    }
+
+    @Test
+    public void getRealPathOfAResourceInANestedJar() throws Exception {
+        URL url = new URL("jar:file:/app.jar!/BOOT-INF/lib/my-plugin.jar!/META-INF/extensions.idx");
+
+        assertNull(FileUtils.getRealPath(url));
+    }
+
+    @Test
+    public void getRealPathOfAResourceThatIsNotAFile() throws Exception {
+        URL url = new URL("http://localhost/META-INF/extensions.idx");
+
+        assertNull(FileUtils.getRealPath(url));
+    }
+
     public File createSampleFile(String fileName) throws IOException {
         File file = File.createTempFile(fileName, ".txt");
         file.deleteOnExit();
@@ -95,4 +120,5 @@ public class FileUtilsTest {
         }
         return file;
     }
+
 }

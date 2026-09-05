@@ -24,6 +24,8 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
@@ -31,6 +33,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -243,6 +246,47 @@ public final class FileUtils {
 
     public static Path getPath(URI uri, String first, String... more) throws IOException {
         return getFileSystem(uri).getPath(first, more);
+    }
+
+    /**
+     * Returns the real path of a file. A path that cannot be resolved, a file that does not exist
+     * for instance, is returned absolute and normalized.
+     */
+    public static Path getRealPath(Path path) {
+        Path absolutePath = path.toAbsolutePath().normalize();
+        try {
+            return absolutePath.toRealPath();
+        } catch (IOException e) {
+            return absolutePath;
+        }
+    }
+
+    /**
+     * Returns the real path of the file that holds a resource.
+     * For a resource in a {@code jar} this is the path of the {@code jar} itself.
+     *
+     * @param url the url of the resource
+     * @return the path of the file, {@code null} when the resource does not come from a file
+     */
+    public static Path getRealPath(URL url) {
+        try {
+            URI uri = url.toURI();
+            if ("jar".equals(uri.getScheme())) {
+                // the scheme specific part is decoded, the raw one keeps the path of the jar as it was encoded
+                String part = uri.getRawSchemeSpecificPart();
+                int separator = part.indexOf("!/");
+                // a nested jar has a second separator and the jar that holds the resource is not a file
+                if (separator < 0 || part.indexOf("!/", separator + 1) >= 0) {
+                    return null;
+                }
+
+                uri = new URI(part.substring(0, separator));
+            }
+
+            return "file".equals(uri.getScheme()) ? getRealPath(Paths.get(uri)) : null;
+        } catch (URISyntaxException | IllegalArgumentException | FileSystemNotFoundException e) {
+            return null;
+        }
     }
 
     public static void closePath(Path path) {

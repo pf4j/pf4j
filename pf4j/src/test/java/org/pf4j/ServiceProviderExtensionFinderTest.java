@@ -73,14 +73,13 @@ class ServiceProviderExtensionFinderTest {
         String pluginId = "testPlugin";
         PluginWrapper pluginWrapper = mock(PluginWrapper.class);
         when(pluginWrapper.getPluginId()).thenReturn(pluginId);
-        when(pluginWrapper.getPluginClassLoader()).thenReturn(null); // not needed for this test
 
         PluginManager pluginManager = mock(PluginManager.class);
         when(pluginManager.getPlugins()).thenReturn(Collections.singletonList(pluginWrapper));
         ServiceProviderExtensionFinder finder = new ServiceProviderExtensionFinder(pluginManager) {
 
             @Override
-            protected Enumeration<URL> findStorageResources(ClassLoader classLoader, String name) throws IOException {
+            protected Enumeration<URL> findStorageResources(PluginWrapper plugin, String name) throws IOException {
                 return getExtensionEnumeration();
             }
 
