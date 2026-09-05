@@ -187,11 +187,13 @@ public class IndexedExtensionFinderTest {
     }
 
     /**
-     * A plugin keeps its storage in more than one file, the classes of the plugin and the jars it
-     * bundles under {@code lib}. All of them are under the path of the plugin.
+     * An unzipped plugin keeps its classes in {@code classes} and the jars it bundles in {@code lib}.
+     * A bundled jar can hold a storage of its own, which is ordinary for {@code META-INF/services},
+     * any library with a {@link java.util.ServiceLoader} service has one, see #272 for the same on
+     * the classpath of the application.
      */
     @Test
-    public void shouldReadEveryStorageUnderThePathOfThePlugin() throws Exception {
+    public void shouldReadTheStorageOfAnUnzippedPlugin() throws Exception {
         Path pluginPath = pluginsPath.resolve("unzipped-plugin");
         URL classesUrl = createIndex(pluginPath.resolve("classes"), TestExtension.class.getName());
         URL libraryUrl = createJarIndex(pluginPath.resolve("lib/library.jar"));
