@@ -85,6 +85,28 @@ public class FileUtilsTest {
         file.deleteOnExit();
     }
 
+    /**
+     * The archive of a plugin is reached through its whole path, and the directories above it
+     * belong to whoever deploys the application. Every character a uri gives a meaning to has to
+     * come back as it was.
+     */
+    @Test
+    public void getPathOfAnEntryOfAnArchiveInAnyDirectory() throws Exception {
+        for (String directory : new String[]{ "plugins", "plug ins", "c#1", "100%", "a+b" }) {
+            Path directoryPath = Files.createDirectories(pluginsPath.resolve(directory));
+            PluginZip pluginZip = new PluginZip.Builder(directoryPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
+                    .pluginVersion("1.2.3")
+                    .build();
+
+            Path propertiesPath = FileUtils.getPath(pluginZip.path(), "plugin.properties");
+            try {
+                assertTrue(Files.exists(propertiesPath), directory);
+            } finally {
+                FileUtils.closePath(propertiesPath);
+            }
+        }
+    }
+
     @Test
     public void getRealPathOfAResourceInAJar() throws Exception {
         // a space in the name, the path of a jar is encoded in the url of a resource it holds

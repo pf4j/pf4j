@@ -18,6 +18,7 @@ package org.pf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.pf4j.test.PluginZip;
 import org.pf4j.test.TestPlugin;
 import org.pf4j.test.PropertiesUtils;
 
@@ -68,6 +69,22 @@ public class PropertiesPluginDescriptorFinderTest {
         storePropertiesToPath(getPlugin6Properties(), pluginPath);
 
         versionManager = new DefaultVersionManager();
+    }
+
+    /**
+     * The descriptor of a zipped plugin is read through the uri of the archive, which carries the
+     * directories above it as well.
+     */
+    @Test
+    public void findInAnArchiveUnderADirectoryThatNeedsEncoding() throws Exception {
+        Path directoryPath = Files.createDirectories(pluginsPath.resolve("100%"));
+        PluginZip pluginZip = new PluginZip.Builder(directoryPath.resolve("my-plugin-1.2.3.zip"), "myPlugin")
+                .pluginVersion("1.2.3")
+                .build();
+
+        PluginDescriptor descriptor = new PropertiesPluginDescriptorFinder().find(pluginZip.path());
+
+        assertEquals("myPlugin", descriptor.getPluginId());
     }
 
     @Test
