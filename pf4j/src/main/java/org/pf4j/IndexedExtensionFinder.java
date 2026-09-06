@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -111,7 +112,20 @@ public class IndexedExtensionFinder extends AbstractExtensionFinder {
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
             log.debug("Read '{}'", url.getFile());
-            collectExtensions(url.openStream(), bucket);
+            collectExtensions(url, bucket);
+        }
+    }
+
+    /**
+     * Reads a storage without caching the archive it comes from. A cached connection to a jar keeps
+     * that jar open for the life of the application, so the plugin could not be deleted or replaced
+     * once its extensions had been read.
+     */
+    private void collectExtensions(URL url, Set<String> bucket) throws IOException {
+        URLConnection connection = url.openConnection();
+        connection.setUseCaches(false);
+        try (InputStream input = connection.getInputStream()) {
+            collectExtensions(input, bucket);
         }
     }
 
