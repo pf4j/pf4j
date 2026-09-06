@@ -233,12 +233,8 @@ public final class FileUtils {
     public static Path getPath(Path path, String first, String... more) throws IOException {
         URI uri = path.toUri();
         if (isZipOrJarFile(path)) {
-            String pathString = path.toAbsolutePath().toString();
-            // transformation for Windows OS
-            pathString = StringUtils.addStart(pathString.replace("\\", "/"), "/");
-            // space is replaced with %20
-            pathString = pathString.replace(" ","%20");
-            uri = URI.create("jar:file:" + pathString);
+            // toUri() makes the path absolute and encodes it, on Windows as well
+            uri = URI.create("jar:" + uri);
         }
 
         return getPath(uri, first, more);
