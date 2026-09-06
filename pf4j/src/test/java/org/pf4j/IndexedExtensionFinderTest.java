@@ -15,12 +15,14 @@
  */
 package org.pf4j;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.PluginJar;
 import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestPlugin;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
@@ -43,11 +45,25 @@ import static org.mockito.Mockito.mock;
 
 public class IndexedExtensionFinderTest {
 
+    private PluginManager pluginManager;
+
     @TempDir
     Path pluginsPath;
 
     @TempDir
     Path applicationPath;
+
+    /**
+     * A plugin class loader holds its jar open, so the plugins have to be unloaded before the
+     * temporary directory of the test can be removed.
+     */
+    @AfterEach
+    public void tearDown() {
+        if (pluginManager != null) {
+            pluginManager.unloadPlugins();
+            pluginManager = null;
+        }
+    }
 
     /**
      * The application has its own {@code extensions.idx} and the plugin is loaded with
@@ -64,7 +80,7 @@ public class IndexedExtensionFinderTest {
 
         ClassLoader applicationClassLoader = createApplicationClassLoader();
 
-        PluginManager pluginManager = new JarPluginManager(pluginsPath) {
+        pluginManager = new JarPluginManager(pluginsPath) {
 
             @Override
             protected PluginLoader createPluginLoader() {
@@ -109,7 +125,7 @@ public class IndexedExtensionFinderTest {
                 .manifestAttribute(ManifestPluginDescriptorFinder.PLUGIN_DEPENDENCIES, "plugin-a")
                 .build();
 
-        PluginManager pluginManager = new JarPluginManager(pluginsPath);
+        pluginManager = new JarPluginManager(pluginsPath);
         pluginManager.loadPlugins();
 
         assertEquals(2, pluginManager.getPlugins().size());
@@ -139,7 +155,7 @@ public class IndexedExtensionFinderTest {
 
         ClassLoader applicationClassLoader = createApplicationClassLoader();
 
-        PluginManager pluginManager = new JarPluginManager(pluginsPath) {
+        pluginManager = new JarPluginManager(pluginsPath) {
 
             @Override
             protected PluginLoader createPluginLoader() {
@@ -304,7 +320,7 @@ public class IndexedExtensionFinderTest {
      * A plugin class loader that is not a {@link URLClassLoader}, the type is up to the
      * {@link PluginLoader} that creates it.
      */
-    private static class CustomClassLoader extends ClassLoader {
+    private static class CustomClassLoader extends ClassLoader implements Closeable {
 
         private final URLClassLoader delegate;
 
@@ -318,6 +334,11 @@ public class IndexedExtensionFinderTest {
         @Override
         public Enumeration<URL> getResources(String name) throws IOException {
             return delegate.getResources(name);
+        }
+
+        @Override
+        public void close() throws IOException {
+            delegate.close();
         }
 
     }
