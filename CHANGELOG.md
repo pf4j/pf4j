@@ -5,6 +5,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [3.16.0] - 2026-09-20
+
+The changes to the extensions index, [#697] and [#698], are made by the annotation processor, so they apply to plugins recompiled with this version. A plugin built earlier keeps the index it was built with.
+
+#### Fixed
 - [#669]: Read extension annotations from class files produced by recent Java releases
 - [#670]: Read the `ordinal` attribute of the `Extension` annotation via ASM
 - [#673]: Do not report the extensions of a dependency or of the application as extensions of a plugin
@@ -534,7 +546,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#41]: Added plugin archive source abstraction
 - Added test for DefaultPluginRepository
 
-[unreleased]: https://github.com/pf4j/pf4j/compare/release-3.15.1...HEAD
+[unreleased]: https://github.com/pf4j/pf4j/compare/release-3.16.0...HEAD
+[3.16.0]: https://github.com/pf4j/pf4j/compare/release-3.15.1...release-3.16.0
 [3.15.1]: https://github.com/pf4j/pf4j/compare/release-3.15.0...release-3.15.1
 [3.15.0]: https://github.com/pf4j/pf4j/compare/release-3.14.1...release-3.15.0
 [3.14.1]: https://github.com/pf4j/pf4j/compare/release-3.14.0...release-3.14.1
