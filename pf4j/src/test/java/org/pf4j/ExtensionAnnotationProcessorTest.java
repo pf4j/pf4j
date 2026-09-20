@@ -22,9 +22,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.processor.ExtensionAnnotationProcessor;
 import org.pf4j.processor.IndexedExtensionStorage;
+import org.pf4j.processor.ServiceProviderExtensionStorage;
 import org.pf4j.test.JavaSources;
 
 import javax.tools.JavaFileObject;
+import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,6 +37,7 @@ import java.util.Set;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mario Franco
@@ -118,6 +121,37 @@ public class ExtensionAnnotationProcessorTest {
         "    public String getGreeting() {",
         "       return \"Hola\";",
         "    }",
+        "}");
+
+    public static final JavaFileObject GreetingAdapter = JavaFileObjects.forSourceLines("GreetingAdapter",
+        "package test;",
+        "",
+        "public abstract class GreetingAdapter implements Greeting {",
+        "   @Override",
+        "    public String getGreeting() {",
+        "       return \"\";",
+        "    }",
+        "}");
+
+    public static final JavaFileObject FrenchGreeting = JavaFileObjects.forSourceLines("FrenchGreeting",
+        "package test;",
+        "import org.pf4j.Extension;",
+        "",
+        "@Extension",
+        "public class FrenchGreeting extends GreetingAdapter {",
+        "   @Override",
+        "    public String getGreeting() {",
+        "       return \"Bonjour\";",
+        "    }",
+        "}");
+
+    public static final JavaFileObject PlainGreeting = JavaFileObjects.forSourceLines("PlainGreeting",
+        "package test;",
+        "import org.pf4j.Extension;",
+        "import org.pf4j.ExtensionPoint;",
+        "",
+        "@Extension",
+        "public class PlainGreeting implements ExtensionPoint {",
         "}");
 
     public static final JavaFileObject LoudGreeting = JavaFileObjects.forSourceLines("LoudGreeting",
@@ -205,8 +239,8 @@ public class ExtensionAnnotationProcessorTest {
         Compilation compilation = compile(JavaSources.GREETING, BaseGreeting, SpanishGreeting);
         assertThat(compilation).succeededWithoutWarnings();
         Map<String, Set<String>> extensions = new HashMap<>();
-        // the extension point of the child is its base class, the first type above it that is an ExtensionPoint
         extensions.put("test.BaseGreeting", new HashSet<>(Collections.singletonList("test.SpanishGreeting")));
+        extensions.put(JavaSources.GREETING_CLASS_NAME, new HashSet<>(Collections.singletonList("test.SpanishGreeting")));
         assertEquals(extensions, annotationProcessor.getExtensions());
     }
 
@@ -215,6 +249,52 @@ public class ExtensionAnnotationProcessorTest {
         Compilation compilation = compile(JavaSources.GREETING, LoudGreeting);
         assertThat(compilation).succeededWithoutWarnings();
         assertEquals(Collections.emptyMap(), annotationProcessor.getExtensions());
+    }
+
+    @Test
+    public void compileExtensionOfAbstractAdapter() {
+        Compilation compilation = compile(JavaSources.GREETING, GreetingAdapter, FrenchGreeting);
+        assertThat(compilation).succeededWithoutWarnings();
+        Map<String, Set<String>> extensions = new HashMap<>();
+        extensions.put("test.GreetingAdapter", new HashSet<>(Collections.singletonList("test.FrenchGreeting")));
+        extensions.put(JavaSources.GREETING_CLASS_NAME, new HashSet<>(Collections.singletonList("test.FrenchGreeting")));
+        assertEquals(extensions, annotationProcessor.getExtensions());
+    }
+
+    @Test
+    public void compileExtensionPointItself() {
+        Compilation compilation = compile(PlainGreeting);
+        assertThat(compilation).succeededWithoutWarnings();
+        Map<String, Set<String>> extensions = new HashMap<>();
+        extensions.put(ExtensionPoint.class.getName(), new HashSet<>(Collections.singletonList("test.PlainGreeting")));
+        assertEquals(extensions, annotationProcessor.getExtensions());
+    }
+
+    @Test
+    public void indexAnExtensionOnce() throws IOException {
+        Compilation compilation = compile(JavaSources.GREETING, GreetingAdapter, FrenchGreeting);
+        assertThat(compilation).succeededWithoutWarnings();
+        JavaFileObject index = compilation.generatedFile(StandardLocation.CLASS_OUTPUT, IndexedExtensionStorage.EXTENSIONS_RESOURCE).get();
+        String[] lines = index.getCharContent(true).toString().split("\\R");
+        assertEquals(2, lines.length); // the header and the extension, attributed to two extension points
+        assertEquals("test.FrenchGreeting", lines[1]);
+    }
+
+    @Test
+    public void serviceProviderStorageNamesEachExtensionPoint() throws IOException {
+        Compilation compilation = compiler()
+            .withOptions("-Apf4j.storageClassName=" + ServiceProviderExtensionStorage.class.getName())
+            .compile(JavaSources.GREETING, GreetingAdapter, FrenchGreeting);
+        assertThat(compilation).succeededWithoutWarnings();
+        assertTrue(readServiceFile(compilation, JavaSources.GREETING_CLASS_NAME).contains("test.FrenchGreeting"));
+        assertTrue(readServiceFile(compilation, "test.GreetingAdapter").contains("test.FrenchGreeting"));
+    }
+
+    private String readServiceFile(Compilation compilation, String extensionPoint) throws IOException {
+        JavaFileObject file = compilation.generatedFile(StandardLocation.CLASS_OUTPUT,
+            ServiceProviderExtensionStorage.EXTENSIONS_RESOURCE + "/" + extensionPoint).get();
+
+        return file.getCharContent(true).toString();
     }
 
     private Compiler compiler() {
