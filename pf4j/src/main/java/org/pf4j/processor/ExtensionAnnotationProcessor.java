@@ -29,7 +29,6 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import java.lang.reflect.Constructor;
@@ -190,7 +189,7 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         }
 
         // check if class extends/implements an extension point
-        if (!ignoreExtensionPoint && !isExtension(element.asType())) {
+        if (!ignoreExtensionPoint && !implementsExtensionPoint(element.asType())) {
             error(element, "%s is not an extension (it doesn't implement ExtensionPoint)", element);
             return;
         }
@@ -228,23 +227,15 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         }
         // detect extension points automatically, if they are not explicitly configured (default behaviour)
         else {
-            // search in interfaces
-            List<? extends TypeMirror> interfaces = extensionElement.getInterfaces();
-            for (TypeMirror item : interfaces) {
-                boolean isExtensionPoint = processingEnv.getTypeUtils().isSubtype(item, getExtensionPointType());
-                if (isExtensionPoint) {
-                    extensionPointElements.add(getElement(item));
-                }
+            // search in the whole hierarchy, an extension implements every extension point above it
+            collectExtensionPoints(extensionElement.asType(), extensionPointElements);
+
+            // a class that implements ExtensionPoint and nothing else has no extension point above it
+            if (extensionPointElements.isEmpty() && implementsExtensionPoint(extensionElement.asType())) {
+                extensionPointElements.add(getElement(getExtensionPointType()));
             }
 
-            // search in superclass
-            TypeMirror superclass = extensionElement.getSuperclass();
-            if (superclass.getKind() != TypeKind.NONE) {
-                boolean isExtensionPoint = processingEnv.getTypeUtils().isSubtype(superclass, getExtensionPointType());
-                if (isExtensionPoint) {
-                    extensionPointElements.add(getElement(superclass));
-                }
-            }
+            List<? extends TypeMirror> interfaces = extensionElement.getInterfaces();
 
             // pickup the first interface
             if (extensionPointElements.isEmpty() && ignoreExtensionPoint) {
@@ -263,7 +254,31 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         return extensionPointElements;
     }
 
-    private boolean isExtension(TypeMirror typeMirror) {
+    /**
+     * Collects the extension points implemented by a type, at any level above it.
+     * {@link ExtensionPoint} itself is not one of them, and a type that is not an extension
+     * point has none above it, so that branch of the hierarchy is left alone.
+     */
+    private void collectExtensionPoints(TypeMirror type, List<TypeElement> extensionPointElements) {
+        for (TypeMirror supertype : processingEnv.getTypeUtils().directSupertypes(type)) {
+            if (!implementsExtensionPoint(supertype)) {
+                continue;
+            }
+
+            TypeElement extensionPointElement = getElement(supertype);
+            if (extensionPointElement.getQualifiedName().contentEquals(ExtensionPoint.class.getName())) {
+                continue;
+            }
+
+            // a type already collected brought its own supertypes with it
+            if (!extensionPointElements.contains(extensionPointElement)) {
+                extensionPointElements.add(extensionPointElement);
+                collectExtensionPoints(supertype, extensionPointElements);
+            }
+        }
+    }
+
+    private boolean implementsExtensionPoint(TypeMirror typeMirror) {
         return processingEnv.getTypeUtils().isAssignable(typeMirror, getExtensionPointType());
     }
 
