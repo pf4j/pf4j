@@ -44,13 +44,16 @@ public class IndexedExtensionStorage extends ExtensionStorage {
         super(processor);
     }
 
+    /**
+     * The index holds the class names alone, so the extension point an extension was attributed to
+     * is not in the file. Everything read back is returned under a {@code null} extension point.
+     */
     @Override
     public Map<String, Set<String>> read() {
         Map<String, Set<String>> extensions = new HashMap<>();
 
         try {
             FileObject file = getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", EXTENSIONS_RESOURCE);
-            // TODO try to calculate the extension point
             Set<String> entries = new HashSet<>();
             ExtensionStorage.read(file.openReader(true), entries);
             extensions.put(null, entries);

@@ -31,6 +31,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * The annotation is {@link Inherited}, so a class that extends an annotated class is registered as an
  * extension without being annotated itself. An annotated class that cannot be instantiated, an abstract
  * class or an interface, is not registered.
+ * <p>
+ * What is inherited is the registration. The attributes are read from the class that carries the
+ * annotation, so {@link #points()} and {@link #plugins()} written on a base class do not apply to the
+ * classes that extend it. {@link #ordinal()} is the exception, it is read through reflection when the
+ * extension is wrapped, and reflection resolves an inherited annotation.
  *
  * @author Decebal Suiu
  */
