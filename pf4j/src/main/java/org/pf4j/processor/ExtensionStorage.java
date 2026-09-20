@@ -42,8 +42,20 @@ public abstract class ExtensionStorage {
         this.processor = processor;
     }
 
+    /**
+     * Reads the extensions already stored, as a map of the extension classes by the extension
+     * point they implement. An extension appears under each extension point it implements.
+     *
+     * @return the stored extensions, empty if there is nothing stored yet
+     */
     public abstract Map<String, Set<String>> read();
 
+    /**
+     * Writes the extensions, keyed by the extension point they implement. A storage that does
+     * not keep the extension point writes the classes alone, see {@link IndexedExtensionStorage}.
+     *
+     * @param extensions the extension classes by extension point
+     */
     public abstract void write(Map<String, Set<String>> extensions);
 
     /**

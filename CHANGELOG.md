@@ -22,6 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 #### Added
 - [#293]: Document when `PluginManager.getExtensions` creates instances and what it returns
 - [#688]: Add a README describing what each demo application demonstrates
+- [#702]: Say what the inheritance of the `Extension` annotation carries and what the extension point key means
 
 #### Removed
 
@@ -572,6 +573,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#702]: https://github.com/pf4j/pf4j/issues/702
 [#698]: https://github.com/pf4j/pf4j/issues/698
 [#697]: https://github.com/pf4j/pf4j/issues/697
 [#694]: https://github.com/pf4j/pf4j/issues/694
