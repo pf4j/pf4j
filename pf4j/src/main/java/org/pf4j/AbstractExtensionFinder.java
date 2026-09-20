@@ -165,7 +165,7 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
                     // extension is loaded through the class loader.
                     ExtensionInfo extensionInfo = getExtensionInfo(className, classLoader);
                     if (extensionInfo == null) {
-                        log.error("No extension annotation was found for '{}'", className);
+                        log.trace("Extension '{}' is ignored, its class file cannot be read", className);
                         continue;
                     }
 
@@ -374,8 +374,8 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
      *
      * @param className name of the class, that holds the requested {@link Extension} annotation
      * @param classLoader class loader to access the class
-     * @return the contents of the {@link Extension} annotation or null, if the class does not
-     * have an {@link Extension} annotation
+     * @return the contents of the {@link Extension} annotation, the default values if the class
+     * is not annotated, or null if its class file cannot be read
      */
     private ExtensionInfo getExtensionInfo(String className, ClassLoader classLoader) {
         if (extensionInfos == null) {
@@ -384,13 +384,9 @@ public abstract class AbstractExtensionFinder implements ExtensionFinder, Plugin
 
         if (!extensionInfos.containsKey(className)) {
             log.trace("Load annotation for '{}' using asm", className);
-            ExtensionInfo info = ExtensionInfo.load(className, classLoader);
-            if (info == null) {
-                log.warn("No extension annotation was found for '{}'", className);
-                extensionInfos.put(className, null);
-            } else {
-                extensionInfos.put(className, info);
-            }
+            // a failed read is reported by ExtensionInfo.load and cached as such,
+            // so it is attempted once per class
+            extensionInfos.put(className, ExtensionInfo.load(className, classLoader));
         }
 
         return extensionInfos.get(className);

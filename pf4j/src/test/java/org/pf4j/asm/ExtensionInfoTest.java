@@ -44,6 +44,11 @@ class ExtensionInfoTest {
         ExtensionInfo info = ExtensionInfo.load("org.pf4j.asm.ExtensionInfo", this.getClass().getClassLoader());
         assertNotNull(info);
         assertEquals("org.pf4j.asm.ExtensionInfo", info.getClassName());
+
+        // the class has no Extension annotation, which gives an info with the default values
+        assertEquals(0, info.getOrdinal());
+        assertTrue(info.getPlugins().isEmpty());
+        assertTrue(info.getPoints().isEmpty());
     }
 
     @Test

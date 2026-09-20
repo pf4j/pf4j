@@ -85,10 +85,12 @@ public final class ExtensionInfo {
 
     /**
      * Load an {@link ExtensionInfo} for a certain class.
+     * A class without an {@link Extension} annotation gives an info with the default values,
+     * null is returned when the class file cannot be read.
      *
      * @param className absolute class name
      * @param classLoader class loader to access the class
-     * @return the {@link ExtensionInfo}, if the class was annotated with an {@link Extension}, otherwise null
+     * @return the {@link ExtensionInfo} of the class, or null if its class file cannot be read
      */
     public static ExtensionInfo load(String className, ClassLoader classLoader) {
         try (InputStream input = classLoader.getResourceAsStream(className.replace('.', '/') + ".class")) {
@@ -97,13 +99,13 @@ public final class ExtensionInfo {
 
             return info;
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            log.error("Cannot read the class file of '{}'", className, e);
             return null;
         } catch (RuntimeException e) {
             // The class file cannot be parsed by the bundled ASM version, for example because it was
             // compiled for a newer Java release. Skip this extension instead of aborting the whole
             // extension discovery, see https://github.com/pf4j/pf4j/issues/669.
-            log.error("Cannot read the extension annotation of '{}'", className, e);
+            log.error("Cannot read the class file of '{}', it may have been compiled for a newer Java release", className, e);
             return null;
         }
     }
