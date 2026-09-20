@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [#680]: Do not report the extensions of the application as extensions of a plugin loaded with a custom class loader
 - [#692]: Read a plugin archive whose path contains a character that a uri encodes, `#` or `%` for instance
 - [#694]: Do not keep the jar of a plugin open after its extensions index has been read
+- [#697]: Do not add an abstract class or an interface annotated with `Extension` to the extensions index
 
 #### Changed
 - [#673]: Read the extensions index of a plugin from every jar on the plugin classpath
@@ -570,6 +571,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#697]: https://github.com/pf4j/pf4j/issues/697
 [#694]: https://github.com/pf4j/pf4j/issues/694
 [#692]: https://github.com/pf4j/pf4j/issues/692
 [#688]: https://github.com/pf4j/pf4j/issues/688

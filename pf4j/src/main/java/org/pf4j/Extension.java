@@ -27,6 +27,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * An extension is a class that extends an extension point.
  * Use this annotation to mark a class as an extension.
  * The extension class must implement the extension point interface or extend the extension point abstract class.
+ * <p>
+ * The annotation is {@link Inherited}, so a class that extends an annotated class is registered as an
+ * extension without being annotated itself. An annotated class that cannot be instantiated, an abstract
+ * class or an interface, is not registered.
  *
  * @author Decebal Suiu
  */

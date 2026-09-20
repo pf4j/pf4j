@@ -26,6 +26,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -178,6 +179,13 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
         // check if @Extension is put on class and not on method or constructor
         if (!(element instanceof TypeElement)) {
             error(element, "Put annotation only on classes (no methods, no fields)");
+            return;
+        }
+
+        // check if the class can be instantiated as an extension.
+        // Extension is @Inherited, so the classes that extend this one are indexed on their own
+        if (element.getKind() == ElementKind.INTERFACE || element.getModifiers().contains(Modifier.ABSTRACT)) {
+            info(element, "Skip %s, an abstract class or an interface cannot be an extension", element);
             return;
         }
 

@@ -102,6 +102,32 @@ public class ExtensionAnnotationProcessorTest {
         "public @interface SpinnakerExtension {",
         "}");
 
+    public static final JavaFileObject BaseGreeting = JavaFileObjects.forSourceLines("BaseGreeting",
+        "package test;",
+        "import org.pf4j.Extension;",
+        "",
+        "@Extension",
+        "public abstract class BaseGreeting implements Greeting {",
+        "}");
+
+    public static final JavaFileObject SpanishGreeting = JavaFileObjects.forSourceLines("SpanishGreeting",
+        "package test;",
+        "",
+        "public class SpanishGreeting extends BaseGreeting {",
+        "   @Override",
+        "    public String getGreeting() {",
+        "       return \"Hola\";",
+        "    }",
+        "}");
+
+    public static final JavaFileObject LoudGreeting = JavaFileObjects.forSourceLines("LoudGreeting",
+        "package test;",
+        "import org.pf4j.Extension;",
+        "",
+        "@Extension",
+        "public interface LoudGreeting extends Greeting {",
+        "}");
+
     private ExtensionAnnotationProcessor annotationProcessor;
 
     @BeforeEach
@@ -172,6 +198,23 @@ public class ExtensionAnnotationProcessorTest {
         Map<String, Set<String>> extensions = new HashMap<>();
         extensions.put(JavaSources.GREETING_CLASS_NAME, new HashSet<>(Collections.singletonList(JavaSources.WHAZZUP_GREETING_CLASS_NAME)));
         assertEquals(extensions, annotationProcessor.getExtensions());
+    }
+
+    @Test
+    public void compileAbstractExtension() {
+        Compilation compilation = compile(JavaSources.GREETING, BaseGreeting, SpanishGreeting);
+        assertThat(compilation).succeededWithoutWarnings();
+        Map<String, Set<String>> extensions = new HashMap<>();
+        // the extension point of the child is its base class, the first type above it that is an ExtensionPoint
+        extensions.put("test.BaseGreeting", new HashSet<>(Collections.singletonList("test.SpanishGreeting")));
+        assertEquals(extensions, annotationProcessor.getExtensions());
+    }
+
+    @Test
+    public void compileInterfaceExtension() {
+        Compilation compilation = compile(JavaSources.GREETING, LoudGreeting);
+        assertThat(compilation).succeededWithoutWarnings();
+        assertEquals(Collections.emptyMap(), annotationProcessor.getExtensions());
     }
 
     private Compiler compiler() {
