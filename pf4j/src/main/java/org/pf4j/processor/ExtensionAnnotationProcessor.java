@@ -270,11 +270,11 @@ public class ExtensionAnnotationProcessor extends AbstractProcessor {
                 continue;
             }
 
+            // a type already collected brought its own supertypes with it
             if (!extensionPointElements.contains(extensionPointElement)) {
                 extensionPointElements.add(extensionPointElement);
+                collectExtensionPoints(supertype, extensionPointElements);
             }
-
-            collectExtensionPoints(supertype, extensionPointElements);
         }
     }
 
