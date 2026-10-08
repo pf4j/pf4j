@@ -15,11 +15,13 @@
  */
 package org.pf4j;
 
+import com.google.testing.compile.JavaFileObjects;
 import kotlin.sequences.Sequence;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.test.JavaFileObjectClassLoader;
 import org.pf4j.test.JavaFileObjectUtils;
 import org.pf4j.test.JavaSources;
@@ -27,6 +29,11 @@ import org.pf4j.test.TestExtension;
 import org.pf4j.test.TestExtensionPoint;
 
 import javax.tools.JavaFileObject;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -36,6 +43,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,6 +52,22 @@ import static org.mockito.Mockito.when;
  * @author Mario Franco
  */
 class AbstractExtensionFinderTest {
+
+    private static final String FOO_GREETING_CLASS_NAME = "test.FooGreeting";
+    private static final JavaFileObject FOO_GREETING = JavaFileObjects.forSourceLines("FooGreeting",
+        "package test;",
+        "import org.pf4j.Extension;",
+        "",
+        "@Extension(plugins = \"foo\")",
+        "public class FooGreeting implements Greeting {",
+        "    @Override",
+        "    public String getGreeting() {",
+        "        return \"Foo\";",
+        "    }",
+        "}");
+
+    @TempDir
+    Path tempDir;
 
     private PluginManager pluginManager;
 
@@ -310,6 +334,116 @@ class AbstractExtensionFinderTest {
         Class<?> extensionClass = new JavaFileObjectClassLoader().load(generatedFiles).get(JavaSources.WHAZZUP_GREETING_CLASS_NAME);
 
         assertTrue(extensionFinder.checkDifferentClassLoaders(extensionPointClass, extensionClass));
+    }
+
+    /**
+     * Test of {@link AbstractExtensionFinder#find(Class)} with an extension that requires
+     * a plugin which is not started.
+     */
+    @Test
+    void findSkipsExtensionWhoseRequiredPluginIsNotStarted() throws Exception {
+        try (ExtensionClassLoader classLoader = createExtensionClassLoader()) {
+            AbstractExtensionFinder instance = createFinderWithExtensionDependencies(classLoader);
+            Class<?> greeting = classLoader.loadClass(JavaSources.GREETING_CLASS_NAME);
+
+            // "foo" is not a plugin
+            assertEquals(0, instance.find(greeting).size());
+
+            // "foo" is a plugin, but it is not started
+            PluginWrapper foo = mock(PluginWrapper.class);
+            when(foo.getPluginState()).thenReturn(PluginState.STOPPED);
+            when(pluginManager.getPlugin("foo")).thenReturn(foo);
+            assertEquals(0, instance.find(greeting).size());
+
+            // the annotation is read with asm, the extension class itself is never loaded
+            assertFalse(classLoader.isLoaded(FOO_GREETING_CLASS_NAME));
+        }
+    }
+
+    /**
+     * Test of {@link AbstractExtensionFinder#find(Class)} with an extension that requires
+     * a plugin which is started.
+     */
+    @Test
+    void findReturnsExtensionWhoseRequiredPluginIsStarted() throws Exception {
+        try (ExtensionClassLoader classLoader = createExtensionClassLoader()) {
+            AbstractExtensionFinder instance = createFinderWithExtensionDependencies(classLoader);
+            Class<?> greeting = classLoader.loadClass(JavaSources.GREETING_CLASS_NAME);
+
+            PluginWrapper foo = mock(PluginWrapper.class);
+            when(foo.getPluginState()).thenReturn(PluginState.STARTED);
+            when(pluginManager.getPlugin("foo")).thenReturn(foo);
+
+            List<? extends ExtensionWrapper<?>> list = instance.find(greeting);
+            assertEquals(1, list.size());
+            assertEquals(FOO_GREETING_CLASS_NAME, list.get(0).getDescriptor().extensionClass.getName());
+            assertTrue(classLoader.isLoaded(FOO_GREETING_CLASS_NAME));
+        }
+    }
+
+    /**
+     * Writes the class files of {@link JavaSources#GREETING} and {@link #FOO_GREETING} to a directory,
+     * so that asm can read them as resources of the returned class loader.
+     */
+    private ExtensionClassLoader createExtensionClassLoader() throws IOException {
+        for (JavaFileObject object : JavaSources.compileAll(JavaSources.GREETING, FOO_GREETING)) {
+            Path classFile = tempDir.resolve(JavaFileObjectUtils.getClassName(object).replace('.', '/') + ".class");
+            Files.createDirectories(classFile.getParent());
+            Files.write(classFile, JavaFileObjectUtils.getAllBytes(object));
+        }
+
+        return new ExtensionClassLoader(tempDir.toUri().toURL(), getClass().getClassLoader());
+    }
+
+    /**
+     * Creates a finder with {@link #FOO_GREETING} in the storage of "plugin3", a started plugin
+     * with an optional dependency, whose start turns on the check for extension dependencies.
+     */
+    private AbstractExtensionFinder createFinderWithExtensionDependencies(ClassLoader classLoader) {
+        PluginDescriptor descriptor = mock(PluginDescriptor.class);
+        when(descriptor.getDependencies()).thenReturn(Collections.singletonList(new PluginDependency("foo?")));
+
+        PluginWrapper plugin3 = mock(PluginWrapper.class);
+        when(plugin3.getDescriptor()).thenReturn(descriptor);
+        when(plugin3.getPluginClassLoader()).thenReturn(classLoader);
+        when(plugin3.getPluginState()).thenReturn(PluginState.STARTED);
+        when(pluginManager.getPlugin("plugin3")).thenReturn(plugin3);
+        when(pluginManager.getPluginClassLoader("plugin3")).thenReturn(classLoader);
+
+        AbstractExtensionFinder instance = new AbstractExtensionFinder(pluginManager) {
+
+            @Override
+            public Map<String, Set<String>> readPluginsStorages() {
+                Map<String, Set<String>> entries = new LinkedHashMap<>();
+                entries.put("plugin3", Collections.singleton(FOO_GREETING_CLASS_NAME));
+
+                return entries;
+            }
+
+            @Override
+            public Map<String, Set<String>> readClasspathStorages() {
+                return Collections.emptyMap();
+            }
+
+        };
+
+        assertFalse(instance.isCheckForExtensionDependencies());
+        instance.pluginStateChanged(new PluginStateEvent(pluginManager, plugin3, PluginState.RESOLVED));
+        assertTrue(instance.isCheckForExtensionDependencies());
+
+        return instance;
+    }
+
+    private static class ExtensionClassLoader extends URLClassLoader {
+
+        ExtensionClassLoader(URL url, ClassLoader parent) {
+            super(new URL[] { url }, parent);
+        }
+
+        boolean isLoaded(String className) {
+            return findLoadedClass(className) != null;
+        }
+
     }
 
 }
