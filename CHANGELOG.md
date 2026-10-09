@@ -33,6 +33,7 @@ The changes to the extensions index, [#697] and [#698], are made by the annotati
 - [#704]: Report an extension whose class file cannot be read for what it is, once
 
 #### Added
+- [#291]: Document when `PluginManager.unloadPlugin` returns `false`
 - [#293]: Document when `PluginManager.getExtensions` creates instances and what it returns
 - [#688]: Add a README describing what each demo application demonstrates
 - [#702]: Say what the inheritance of the `Extension` annotation carries and what the extension point key means
@@ -686,6 +687,7 @@ The changes to the extensions index, [#697] and [#698], are made by the annotati
 [#294]: https://github.com/pf4j/pf4j/issues/294
 [#293]: https://github.com/pf4j/pf4j/issues/293
 [#292]: https://github.com/pf4j/pf4j/issues/292
+[#291]: https://github.com/pf4j/pf4j/issues/291
 [#288]: https://github.com/pf4j/pf4j/pull/288
 [#287]: https://github.com/pf4j/pf4j/pull/287
 [#278]: https://github.com/pf4j/pf4j/pull/278
