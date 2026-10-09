@@ -263,7 +263,24 @@ public abstract class AbstractPluginManager implements PluginManager {
     }
 
     /**
-     * {@inheritDoc}
+     * Unloads the plugin and its dependents, dependents first.
+     * <p>
+     * A {@link PluginRuntimeException} thrown by {@link Plugin#stop()} does not
+     * prevent the unload. The plugin is removed anyway with state
+     * {@link PluginState#FAILED}, the cause is available from
+     * {@link PluginWrapper#getFailedException()}, and this method returns
+     * {@code true}. The plugin class loader is closed at the end.
+     * <p>
+     * The stop path shipped here never leaves the plugin
+     * {@link PluginState#STARTED}: it ends in {@link PluginState#STOPPED} or
+     * {@link PluginState#FAILED}, and any other exception is caught and the
+     * plugin removed anyway. The {@code false} return for a plugin that is still
+     * started is there for subclasses that override the stop.
+     *
+     * @throws PluginRuntimeException if the plugin class loader cannot be closed,
+     *         or if resolving the remaining plugins fails, for example with
+     *         {@link DependencyResolver.CyclicDependencyException} or
+     *         {@link DependencyResolver.DependenciesNotFoundException}
      */
     @Override
     public boolean unloadPlugin(String pluginId) {
