@@ -66,6 +66,13 @@ class AbstractExtensionFinderTest {
         "    }",
         "}");
 
+    private static final String FOO_GREETING_CHILD_CLASS_NAME = "test.FooGreetingChild";
+    private static final JavaFileObject FOO_GREETING_CHILD = JavaFileObjects.forSourceLines("FooGreetingChild",
+        "package test;",
+        "",
+        "public class FooGreetingChild extends FooGreeting {",
+        "}");
+
     @TempDir
     Path tempDir;
 
@@ -382,11 +389,38 @@ class AbstractExtensionFinderTest {
     }
 
     /**
-     * Writes the class files of {@link JavaSources#GREETING} and {@link #FOO_GREETING} to a directory,
-     * so that asm can read them as resources of the returned class loader.
+     * Test of {@link AbstractExtensionFinder#find(Class)} with an extension that inherits
+     * {@code @Extension(plugins = "foo")} from its superclass.
+     * See <a href="https://github.com/pf4j/pf4j/issues/701">#701</a>.
+     */
+    @Test
+    void findSkipsExtensionWhoseInheritedRequiredPluginIsNotStarted() throws Exception {
+        try (ExtensionClassLoader classLoader = createExtensionClassLoader()) {
+            AbstractExtensionFinder instance = createFinderWithExtensionDependencies(classLoader, FOO_GREETING_CHILD_CLASS_NAME);
+            Class<?> greeting = classLoader.loadClass(JavaSources.GREETING_CLASS_NAME);
+
+            // "foo" is not a plugin
+            assertEquals(0, instance.find(greeting).size());
+            assertFalse(classLoader.isLoaded(FOO_GREETING_CHILD_CLASS_NAME));
+
+            // "foo" is a plugin, and it is started
+            PluginWrapper foo = mock(PluginWrapper.class);
+            when(foo.getPluginState()).thenReturn(PluginState.STARTED);
+            when(pluginManager.getPlugin("foo")).thenReturn(foo);
+
+            List<? extends ExtensionWrapper<?>> list = instance.find(greeting);
+            assertEquals(1, list.size());
+            assertEquals(FOO_GREETING_CHILD_CLASS_NAME, list.get(0).getDescriptor().extensionClass.getName());
+        }
+    }
+
+    /**
+     * Writes the class files of {@link JavaSources#GREETING}, {@link #FOO_GREETING} and
+     * {@link #FOO_GREETING_CHILD} to a directory, so that asm can read them as resources of the
+     * returned class loader.
      */
     private ExtensionClassLoader createExtensionClassLoader() throws IOException {
-        for (JavaFileObject object : JavaSources.compileAll(JavaSources.GREETING, FOO_GREETING)) {
+        for (JavaFileObject object : JavaSources.compileAll(JavaSources.GREETING, FOO_GREETING, FOO_GREETING_CHILD)) {
             Path classFile = tempDir.resolve(JavaFileObjectUtils.getClassName(object).replace('.', '/') + ".class");
             Files.createDirectories(classFile.getParent());
             Files.write(classFile, JavaFileObjectUtils.getAllBytes(object));
@@ -400,6 +434,14 @@ class AbstractExtensionFinderTest {
      * with an optional dependency, whose start turns on the check for extension dependencies.
      */
     private AbstractExtensionFinder createFinderWithExtensionDependencies(ClassLoader classLoader) {
+        return createFinderWithExtensionDependencies(classLoader, FOO_GREETING_CLASS_NAME);
+    }
+
+    /**
+     * Same as {@link #createFinderWithExtensionDependencies(ClassLoader)}, with the given extension
+     * in the storage of "plugin3".
+     */
+    private AbstractExtensionFinder createFinderWithExtensionDependencies(ClassLoader classLoader, String extensionClassName) {
         PluginDescriptor descriptor = mock(PluginDescriptor.class);
         when(descriptor.getDependencies()).thenReturn(Collections.singletonList(new PluginDependency("foo?")));
 
@@ -415,7 +457,7 @@ class AbstractExtensionFinderTest {
             @Override
             public Map<String, Set<String>> readPluginsStorages() {
                 Map<String, Set<String>> entries = new LinkedHashMap<>();
-                entries.put("plugin3", Collections.singleton(FOO_GREETING_CLASS_NAME));
+                entries.put("plugin3", Collections.singleton(extensionClassName));
 
                 return entries;
             }
