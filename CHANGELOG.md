@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#701]: Read the `plugins` attribute of an `Extension` annotation inherited from a superclass, so that the extension is skipped when a required plugin is missing
 
 #### Changed
 
@@ -589,6 +590,7 @@ The changes to the extensions index, [#697] and [#698], are made by the annotati
 
 [#704]: https://github.com/pf4j/pf4j/issues/704
 [#702]: https://github.com/pf4j/pf4j/issues/702
+[#701]: https://github.com/pf4j/pf4j/issues/701
 [#698]: https://github.com/pf4j/pf4j/issues/698
 [#697]: https://github.com/pf4j/pf4j/issues/697
 [#694]: https://github.com/pf4j/pf4j/issues/694

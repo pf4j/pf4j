@@ -87,25 +87,66 @@ public final class ExtensionInfo {
      * Load an {@link ExtensionInfo} for a certain class.
      * A class without an {@link Extension} annotation gives an info with the default values,
      * null is returned when the class file cannot be read.
+     * <p>
+     * {@link Extension} is {@link java.lang.annotation.Inherited}, so for a class that does not carry
+     * the annotation itself, the attributes are read from the nearest superclass that does.
      *
      * @param className absolute class name
      * @param classLoader class loader to access the class
      * @return the {@link ExtensionInfo} of the class, or null if its class file cannot be read
      */
     public static ExtensionInfo load(String className, ClassLoader classLoader) {
-        try (InputStream input = classLoader.getResourceAsStream(className.replace('.', '/') + ".class")) {
-            ExtensionInfo info = new ExtensionInfo(className);
-            new ClassReader(input).accept(new ExtensionVisitor(info), ClassReader.SKIP_DEBUG);
+        ExtensionInfo info = new ExtensionInfo(className);
+        ExtensionVisitor visitor = visit(className, classLoader, info, false);
+        if (visitor == null) {
+            return null;
+        }
 
-            return info;
+        while (!visitor.isAnnotationFound() && visitor.getSuperName() != null) {
+            String superClassName = visitor.getSuperName().replace('/', '.');
+            if (superClassName.equals(Object.class.getName())) {
+                break;
+            }
+
+            // a superclass that cannot be read carries no annotation we can see, the defaults apply
+            visitor = visit(superClassName, classLoader, info, true);
+            if (visitor == null) {
+                break;
+            }
+        }
+
+        return info;
+    }
+
+    /**
+     * Reads the {@link Extension} annotation of a class into {@code info}.
+     *
+     * @param superclass true when the class is a superclass of the extension; a superclass that cannot be read
+     *                   is not an error, the defaults are kept, so it is only logged at debug level
+     * @return the visitor that read the class, or null if its class file cannot be read
+     */
+    private static ExtensionVisitor visit(String className, ClassLoader classLoader, ExtensionInfo info, boolean superclass) {
+        try (InputStream input = classLoader.getResourceAsStream(className.replace('.', '/') + ".class")) {
+            ExtensionVisitor visitor = new ExtensionVisitor(info);
+            new ClassReader(input).accept(visitor, ClassReader.SKIP_DEBUG);
+
+            return visitor;
         } catch (IOException e) {
-            log.error("Cannot read the class file of '{}'", className, e);
+            if (superclass) {
+                log.debug("Cannot read the class file of superclass '{}', keeping the defaults", className, e);
+            } else {
+                log.error("Cannot read the class file of '{}'", className, e);
+            }
             return null;
         } catch (RuntimeException e) {
             // The class file cannot be parsed by the bundled ASM version, for example because it was
             // compiled for a newer Java release. Skip this extension instead of aborting the whole
             // extension discovery, see https://github.com/pf4j/pf4j/issues/669.
-            log.error("Cannot read the class file of '{}', it may have been compiled for a newer Java release", className, e);
+            if (superclass) {
+                log.debug("Cannot read the class file of superclass '{}', keeping the defaults", className, e);
+            } else {
+                log.error("Cannot read the class file of '{}', it may have been compiled for a newer Java release", className, e);
+            }
             return null;
         }
     }

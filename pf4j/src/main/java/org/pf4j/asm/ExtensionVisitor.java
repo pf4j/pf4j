@@ -46,9 +46,33 @@ class ExtensionVisitor extends ClassVisitor {
 
     private final ExtensionInfo extensionInfo;
 
+    private boolean annotationFound;
+    private String superName;
+
     ExtensionVisitor(ExtensionInfo extensionInfo) {
         super(ASM_VERSION);
         this.extensionInfo = extensionInfo;
+    }
+
+    /**
+     * Tell whether the visited class carries the {@link Extension} annotation itself.
+     */
+    boolean isAnnotationFound() {
+        return annotationFound;
+    }
+
+    /**
+     * The internal name of the superclass of the visited class, or null for {@code java.lang.Object}.
+     */
+    String getSuperName() {
+        return superName;
+    }
+
+    @Override
+    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        this.superName = superName;
+
+        super.visit(version, access, name, signature, superName, interfaces);
     }
 
     @Override
@@ -57,6 +81,8 @@ class ExtensionVisitor extends ClassVisitor {
         if (!Type.getType(descriptor).getClassName().equals(Extension.class.getName())) {
             return super.visitAnnotation(descriptor, visible);
         }
+
+        annotationFound = true;
 
         return new AnnotationVisitor(ASM_VERSION) {
 
