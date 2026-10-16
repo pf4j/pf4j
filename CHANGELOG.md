@@ -589,8 +589,8 @@ The changes to the extensions index, [#697] and [#698], are made by the annotati
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
 [#704]: https://github.com/pf4j/pf4j/issues/704
-[#701]: https://github.com/pf4j/pf4j/issues/701
 [#702]: https://github.com/pf4j/pf4j/issues/702
+[#701]: https://github.com/pf4j/pf4j/issues/701
 [#698]: https://github.com/pf4j/pf4j/issues/698
 [#697]: https://github.com/pf4j/pf4j/issues/697
 [#694]: https://github.com/pf4j/pf4j/issues/694
