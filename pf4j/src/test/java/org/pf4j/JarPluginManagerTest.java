@@ -36,6 +36,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JarPluginManagerTest {
@@ -112,17 +113,13 @@ public class JarPluginManagerTest {
         pluginManager.loadPlugins();
         Path pluginPath = pluginManager.getPlugin(pluginZip.pluginId()).getPluginPath();
 
-        try {
-            pluginManager.startPlugin(pluginZip.pluginId());
-        } catch (Exception exceptionStartPlugin) {
-            Assertions.assertThrows(FileSystemException.class, () -> Files.delete(pluginPath));
+        assertEquals(PluginState.FAILED, pluginManager.startPlugin(pluginZip.pluginId()));
+        assertNotNull(pluginManager.getPlugin(pluginZip.pluginId()).getFailedException());
+        assertTrue(Files.exists(pluginPath));
+        // A failed plugin keeps its jar open until unloadPlugin closes its class loader
+        Assertions.assertThrows(FileSystemException.class, () -> Files.delete(pluginPath));
 
-            // Try to remove the plugin if it cannot be started
-            try {
-                pluginManager.unloadPlugin(pluginZip.pluginId());
-            } catch (Exception ignored2) {
-            }
-            Assertions.assertDoesNotThrow(() -> Files.delete(pluginPath));
-        }
+        assertTrue(pluginManager.unloadPlugin(pluginZip.pluginId()));
+        Files.delete(pluginPath);
     }
 }
