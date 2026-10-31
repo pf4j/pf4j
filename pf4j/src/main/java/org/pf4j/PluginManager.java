@@ -112,10 +112,18 @@ public interface PluginManager {
 
     /**
      * Unload a plugin.
+     * <p>
+     * The plugin and its dependents are unloaded, dependents first. Returns
+     * {@code false} if there is no loaded plugin with this id, or if the plugin
+     * could not be stopped and therefore stays loaded. Dependents are unloaded
+     * before either check, so they may already be gone when this method returns
+     * {@code false}.
      *
      * @param pluginId the unique plugin identifier, specified in its metadata
-     * @return true if the plugin was unloaded
-     * @throws PluginRuntimeException if something goes wrong
+     * @return {@code true} if the plugin was unloaded, {@code false} if it was
+     *         not loaded or could not be stopped
+     * @throws PluginRuntimeException if unloading the plugin or resolving the
+     *         remaining plugins fails
      */
     boolean unloadPlugin(String pluginId);
 
