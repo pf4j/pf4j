@@ -25,11 +25,11 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Clean Maven Cache
-        run: mvn dependency:purge-local-repository
+        run: ./mvnw dependency:purge-local-repository
 
       - name: Verify snapshot version
         run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "Current version: $VERSION"
           if [[ ! $VERSION == *-SNAPSHOT ]]; then
             echo "::error::Not a SNAPSHOT version: $VERSION"
@@ -37,7 +37,7 @@ jobs:
           fi
 
       - name: Deploy snapshot to Maven Central
-        run: mvn -B clean deploy -Prelease
+        run: ./mvnw -B clean deploy -Prelease
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           MAVEN_TOKEN: ${{ secrets.SONATYPE_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
       - name: Summary
         if: success()
         run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "## Snapshot Deployed! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** \`$VERSION\`" >> $GITHUB_STEP_SUMMARY

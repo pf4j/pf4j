@@ -46,7 +46,7 @@ jobs:
 
       - name: Prepare release
         run: |
-          mvn -B release:prepare \
+          ./mvnw -B release:prepare \
             -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
             -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} \
             -Darguments="-DskipTests -Prelease"
@@ -56,7 +56,7 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Perform release
-        run: mvn -B release:perform -Darguments="-DskipTests -Prelease"
+        run: ./mvnw -B release:perform -Darguments="-DskipTests -Prelease"
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           MAVEN_TOKEN: ${{ secrets.SONATYPE_TOKEN }}
