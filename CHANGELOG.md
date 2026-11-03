@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+
+#### Changed
+
+#### Added
+
+#### Removed
+
+### [3.16.1] - 2026-11-03
+
+#### Fixed
 - [#701]: Read the `plugins` attribute of an `Extension` annotation inherited from a superclass, so that the extension is skipped when a required plugin is missing
 
 #### Changed
@@ -547,7 +557,8 @@ The changes to the extensions index, [#697] and [#698], are made by the annotati
 - [#41]: Added plugin archive source abstraction
 - Added test for DefaultPluginRepository
 
-[unreleased]: https://github.com/pf4j/pf4j/compare/release-3.16.0...HEAD
+[unreleased]: https://github.com/pf4j/pf4j/compare/release-3.16.1...HEAD
+[3.16.1]: https://github.com/pf4j/pf4j/compare/release-3.16.0...release-3.16.1
 [3.16.0]: https://github.com/pf4j/pf4j/compare/release-3.15.1...release-3.16.0
 [3.15.1]: https://github.com/pf4j/pf4j/compare/release-3.15.0...release-3.15.1
 [3.15.0]: https://github.com/pf4j/pf4j/compare/release-3.14.1...release-3.15.0
