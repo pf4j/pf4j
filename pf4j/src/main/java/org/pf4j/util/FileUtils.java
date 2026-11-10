@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Decebal Suiu
@@ -207,7 +208,7 @@ public final class FileUtils {
      * @return true if file with {@code .zip} ending
      */
     public static boolean isZipFile(Path path) {
-        return Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".zip");
+        return Files.isRegularFile(path) && path.toString().toLowerCase(Locale.ROOT).endsWith(".zip");
     }
 
     /**
@@ -217,7 +218,7 @@ public final class FileUtils {
      * @return true if file with {@code .jar} ending
      */
     public static boolean isJarFile(Path path) {
-        return Files.isRegularFile(path) && path.toString().toLowerCase().endsWith(".jar");
+        return Files.isRegularFile(path) && path.toString().toLowerCase(Locale.ROOT).endsWith(".jar");
     }
 
     /**

@@ -25,8 +25,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -128,6 +130,36 @@ public class FileUtilsTest {
         URL url = new URL("http://localhost/META-INF/extensions.idx");
 
         assertNull(FileUtils.getRealPath(url));
+    }
+
+    /**
+     * Whether a letter is upper or lower case is a question the default locale
+     * answers. Turkish and Azerbaijani lower case "I" to "ı", so "PLUGIN.ZIP"
+     * becomes "plugın.zıp" and stops looking like a zip file.
+     */
+    @Test
+    public void recognisesZipAndJarWhateverTheDefaultLocaleIs() throws Exception {
+        Path lowerZip = Files.createFile(pluginsPath.resolve("alpha.zip"));
+        Path upperZip = Files.createFile(pluginsPath.resolve("BETA.ZIP"));
+        Path lowerJar = Files.createFile(pluginsPath.resolve("gamma.jar"));
+        Path upperJar = Files.createFile(pluginsPath.resolve("DELTA.JAR"));
+
+        Locale previous = Locale.getDefault();
+        try {
+            for (String tag : new String[]{"en-US", "tr-TR", "az-AZ", "lt-LT"}) {
+                Locale.setDefault(Locale.forLanguageTag(tag));
+
+                assertTrue(FileUtils.isZipFile(lowerZip), tag);
+                assertTrue(FileUtils.isZipFile(upperZip), tag);
+                assertFalse(FileUtils.isZipFile(lowerJar), tag);
+
+                assertTrue(FileUtils.isJarFile(lowerJar), tag);
+                assertTrue(FileUtils.isJarFile(upperJar), tag);
+                assertFalse(FileUtils.isJarFile(lowerZip), tag);
+            }
+        } finally {
+            Locale.setDefault(previous);
+        }
     }
 
     public File createSampleFile(String fileName) throws IOException {

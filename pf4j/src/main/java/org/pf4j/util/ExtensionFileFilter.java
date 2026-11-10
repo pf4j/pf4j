@@ -17,6 +17,7 @@ package org.pf4j.util;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Locale;
 
 /**
  * Filter accepts any file ending in extension. The case of the filename is ignored.
@@ -34,7 +35,10 @@ public class ExtensionFileFilter implements FileFilter {
     @Override
     public boolean accept(File file) {
         // perform a case insensitive check.
-        return file.getName().toUpperCase().endsWith(extension.toUpperCase());
+        // Locale.ROOT because the default locale decides what case means: in a
+        // Turkish or Azerbaijani one "i".toUpperCase() is "İ", so "plugin.zip"
+        // becomes "PLUGİN.ZİP" and no longer ends with ".ZIP".
+        return file.getName().toUpperCase(Locale.ROOT).endsWith(extension.toUpperCase(Locale.ROOT));
     }
 
 }
