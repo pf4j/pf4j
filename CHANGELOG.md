@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### [Unreleased][unreleased]
 
 #### Fixed
+- [#713]: Pass `Locale.ROOT` to the case-insensitive file checks in `ExtensionFileFilter` and `FileUtils`, so that a plugin archive is still recognised when the default locale is Turkish or Azerbaijani
 
 #### Changed
 
@@ -599,6 +600,7 @@ The changes to the extensions index, [#697] and [#698], are made by the annotati
 [0.11.0]: https://github.com/decebals/pf4j/compare/release-0.10.0...release-0.11.0
 [0.10.0]: https://github.com/decebals/pf4j/compare/release-0.9.0...release-0.10.0
 
+[#713]: https://github.com/pf4j/pf4j/pull/713
 [#704]: https://github.com/pf4j/pf4j/issues/704
 [#702]: https://github.com/pf4j/pf4j/issues/702
 [#701]: https://github.com/pf4j/pf4j/issues/701
